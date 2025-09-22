@@ -2,7 +2,9 @@
 	export let title = '';
 	export let rank_and_points = '';
 	export let image = '';
-	export let logo = '';
+	export let logo;
+	export let marginLeft = '';
+	export let marginBottom = '';
 </script>
 
 <div
@@ -12,10 +14,12 @@
 		<h1 class="text-xl font-bold">{title}</h1>
 		<h1 class="text-xl font-bold">{rank_and_points}</h1>
 	</div>
-	<div id="" class="h-28">
+	<div id="" class="flex flex-row h-28 items-center">
 		<img src={image} alt={title} class="h-28 aspect-auto" />
+		<div class="translate-x-[{marginLeft}px] -translate-y-[{marginBottom}px] flex items-center">
+			<svelte:component this={logo} class="h-28" sizeW="163px" sizeH="185px" />
+		</div>
 	</div>
-	<div></div>
 </div>
 
 <style>

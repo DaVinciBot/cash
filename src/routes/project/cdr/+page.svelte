@@ -12,10 +12,14 @@
 	import IFTLogo from '$lib/components/share/Logo/IFT.svelte';
 	import GotronicLogo from '$lib/components/share/Logo/Gotronic.svelte';
 	import AislerLogo from '$lib/components/share/Logo/Aisler.svelte';
+	import TheShowMustGoOnLogo from '$lib/components/share/Logo/TheShowMustGoOnLogo.svelte';
+	import FarmingMars from '$lib/components/share/Logo/FarmingMars.svelte';
 
 	// SSR data from +page.server.js
 	export let data;
 	const posts = data?.posts ?? [];
+
+	let cdrImg = '/assets/projets/CDR.jpg';
 </script>
 
 <svelte:head>
@@ -118,25 +122,24 @@
 			</p>
 		</div>
 		<div class="max-w-full my-10">
-			{#if posts.length}
-				<Carousel time={90}>
-					{#each posts as p}
-						<ResultCard
-							title={'XXXX - Theme of the competition'}
-							rank_and_points={'XXe/XXX - XXX pts'}
-							image={p.cover}
-						/>
-					{/each}
-				</Carousel>
-			{:else}
-				<Carousel time={90}>
-					<ResultCard
-						title="Bientôt sur le blog"
-						rank_and_points="Nos dernières actus s'afficheront ici."
-						image="/assets/article/precoupe.jpg"
-					/>
-				</Carousel>
-			{/if}
+			<Carousel time={90}>
+				<ResultCard
+					title={'2025 - The Show Must Go On'}
+					rank_and_points={'37e/102 - 230 pts'}
+					image={cdrImg}
+					logo={TheShowMustGoOnLogo}
+					marginLeft={'70'}
+					marginBottom={'30'}
+				/>
+				<ResultCard
+					title={'2024 - Farming Mars'}
+					rank_and_points={'56e/200 - 157 pts'}
+					image={cdrImg}
+					logo={FarmingMars}
+					marginLeft={'30'}
+					marginBottom={'35'}
+				/>
+			</Carousel>
 		</div>
 	</div>
 </div>
