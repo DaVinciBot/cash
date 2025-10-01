@@ -8,11 +8,117 @@
 	import { onMount } from 'svelte';
 	import { triggerTableRefresh } from '$lib/store';
 
+	// Charts (inspiration from projects page)
+	import { Bar } from 'svelte-chartjs';
+	import {
+		Chart as ChartJS,
+		Title,
+		Tooltip,
+		Legend,
+		CategoryScale,
+		LinearScale,
+		BarElement
+	} from 'chart.js';
+	ChartJS.register(Title, Tooltip, Legend, CategoryScale, LinearScale, BarElement);
+
 	// Bank accounts overview state
 	let banks = [];
 	let banksLoading = true;
 	let banksError = '';
 	let banksOpen = false; // collapsed by default
+
+	// Tabs
+	let selectedTab = 'detail'; // 'detail' | 'cashflow'
+
+	// Cashflow state
+	let isLoadingCashflow = false;
+	let startDate = '';
+	let endDate = '';
+	let cashflowChartData = {
+		labels: [],
+		datasets: [
+			{ label: 'Recettes', data: [], backgroundColor: '#36A2EB' },
+			{ label: 'Dépenses', data: [], backgroundColor: '#FF6384' }
+		]
+	};
+
+	const barOptions = {
+		responsive: true,
+		maintainAspectRatio: false,
+		plugins: { legend: { display: true, labels: { color: '#cbd5e1' } }, title: { display: false } },
+		scales: {
+			x: { ticks: { color: '#cbd5e1' }, grid: { color: 'rgba(148,163,184,0.15)' } },
+			y: { ticks: { color: '#cbd5e1' }, grid: { color: 'rgba(148,163,184,0.15)' } }
+		}
+	};
+
+	function getCurrentQuarterRange() {
+		const now = new Date();
+		const q = Math.floor(now.getMonth() / 3);
+		const start = new Date(now.getFullYear(), q * 3, 1);
+		// day 0 of next quarter month gives last day of current quarter
+		const end = new Date(now.getFullYear(), q * 3 + 3, 0);
+		const fmt = (d) => {
+			const mm = String(d.getMonth() + 1).padStart(2, '0');
+			const dd = String(d.getDate()).padStart(2, '0');
+			return `${d.getFullYear()}-${mm}-${dd}`;
+		};
+		return { start: fmt(start), end: fmt(end) };
+	}
+
+	function weekStart(dateStr) {
+		const d = new Date(dateStr);
+		// Normalize to local midnight
+		d.setHours(0, 0, 0, 0);
+		const day = d.getDay(); // 0=Sun .. 6=Sat
+		const diff = (day === 0 ? -6 : 1) - day; // move to Monday
+		const monday = new Date(d);
+		monday.setDate(d.getDate() + diff);
+		const key = monday.toISOString().slice(0, 10);
+		const label = `Semaine du ${monday.toLocaleDateString('fr-FR', { day: '2-digit', month: '2-digit' })}`;
+		return { key, label, date: monday };
+	}
+
+	async function loadCashflow() {
+		isLoadingCashflow = true;
+		try {
+			const { data, error } = await supabase
+				.from('spending')
+				.select('id, amount, is_positive, date')
+				.gte('date', startDate)
+				.lte('date', endDate);
+			if (error) throw error;
+
+			// Group by week
+			const buckets = new Map();
+			for (const row of data || []) {
+				if (!row?.date) continue;
+				const { key, label, date } = weekStart(row.date);
+				if (!buckets.has(key)) buckets.set(key, { label, date, in: 0, out: 0 });
+				const b = buckets.get(key);
+				const amt = parseFloat(row.amount ?? 0) || 0;
+				if (row.is_positive) b.in += amt;
+				else b.out += amt;
+			}
+			const sorted = Array.from(buckets.values()).sort((a, b) => a.date - b.date);
+			cashflowChartData = {
+				labels: sorted.map((b) => b.label),
+				datasets: [
+					{ label: 'Recettes', data: sorted.map((b) => b.in), backgroundColor: '#36A2EB' },
+					// Display dépenses as negative values so it shows below axis
+					{
+						label: 'Dépenses',
+						data: sorted.map((b) => -Math.abs(b.out)),
+						backgroundColor: '#FF6384'
+					}
+				]
+			};
+		} catch (err) {
+			console.error(err);
+		} finally {
+			isLoadingCashflow = false;
+		}
+	}
 
 	function formatEUR(value) {
 		const num = typeof value === 'number' ? value : parseFloat(value ?? 0);
@@ -39,7 +145,14 @@
 		banksLoading = false;
 	}
 
-	onMount(loadBanks);
+	onMount(() => {
+		// Set default period to current quarter then load banks and cashflow
+		const q = getCurrentQuarterRange();
+		startDate = q.start;
+		endDate = q.end;
+		loadBanks();
+		loadCashflow();
+	});
 
 	async function addNew() {
 		const { data: banks, error: bankErr } = await supabase
@@ -572,98 +685,161 @@
 
 <div class="w-full py-2 sm:px-8 lg:px-16">
 	<h2 class="mb-4 text-4xl font-bold tracking-tight text-white">Gestion de la Trésorerie</h2>
-	<p class="text-gray-400">Overview des comptes et liste détaillées des dépenses et recettes</p>
+	<p class="text-gray-400">
+		Overview des comptes, cashflow et liste détaillée des dépenses/recettes
+	</p>
 	<hr class="mt-2 border-gray-700" />
-	<div class="mt-4">
-		<!-- Bank accounts aggregate + collapsible details -->
-		<div class="overflow-hidden bg-gray-800 border border-gray-700 rounded-lg">
-			<button
-				class="flex items-center justify-between w-full px-4 py-4 sm:px-6 focus:outline-none hover:bg-gray-750/50"
-				aria-expanded={banksOpen}
-				on:click={() => (banksOpen = !banksOpen)}
-			>
-				<div class="text-left">
-					<div class="text-sm text-gray-400">Total comptes</div>
-					<div class="text-2xl font-semibold text-white sm:text-3xl">{formatEUR(totalBanks)}</div>
-				</div>
-				<div class="flex items-center gap-3">
-					{#if banksLoading}
-						<span class="text-sm text-gray-400">Chargement…</span>
-					{:else}
-						<span class="text-sm text-gray-400"
-							>{banks.length} compte{banks.length > 1 ? 's' : ''}</span
-						>
-					{/if}
-					<svg
-						class="w-5 h-5 text-gray-400 transition-transform duration-200 transform"
-						viewBox="0 0 20 20"
-						fill="currentColor"
-						style={`transform: rotate(${banksOpen ? 180 : 0}deg)`}
-						aria-hidden="true"
-					>
-						<path
-							fill-rule="evenodd"
-							d="M5.23 7.21a.75.75 0 011.06.02L10 11.146l3.71-3.915a.75.75 0 111.08 1.04l-4.24 4.47a.75.75 0 01-1.08 0L5.21 8.27a.75.75 0 01.02-1.06z"
-							clip-rule="evenodd"
-						/>
-					</svg>
-				</div>
-			</button>
 
-			{#if banksOpen}
-				<div class="px-4 pb-4 sm:px-6">
-					{#if banksLoading}
-						<div class="py-2 text-sm text-gray-400">Chargement des comptes…</div>
-					{:else if banksError}
-						<div class="py-2 text-sm text-red-400">{banksError}</div>
-					{:else if banks.length === 0}
-						<div class="py-2 text-sm text-gray-400">Aucun compte enregistré.</div>
-					{:else}
-						<ul class="divide-y divide-gray-700">
-							{#each banks as bank}
-								<li class="flex items-start justify-between py-3">
-									<div>
-										<div class="flex items-center gap-2">
-											<span class="font-medium text-white">{bank.name ?? 'Compte sans nom'}</span>
-											{#if bank.category}
-												<span
-													class="text-xs px-2 py-0.5 rounded-full bg-gray-700 text-gray-300 border border-gray-600"
-													>{bank.category}</span
-												>
+	<!-- Tabs header -->
+	<div class="flex gap-2 mt-4">
+		<button
+			class="px-4 py-2 text-sm font-medium rounded-md border transition-colors
+				{selectedTab === 'detail'
+				? 'bg-gray-700 border-gray-600 text-white'
+				: 'bg-gray-800 border-gray-700 text-gray-300 hover:bg-gray-750'}"
+			on:click={() => (selectedTab = 'detail')}
+			aria-pressed={selectedTab === 'detail'}
+		>
+			Détail
+		</button>
+		<button
+			class="px-4 py-2 text-sm font-medium rounded-md border transition-colors
+				{selectedTab === 'cashflow'
+				? 'bg-gray-700 border-gray-600 text-white'
+				: 'bg-gray-800 border-gray-700 text-gray-300 hover:bg-gray-750'}"
+			on:click={() => (selectedTab = 'cashflow')}
+			aria-pressed={selectedTab === 'cashflow'}
+		>
+			Cashflow
+		</button>
+	</div>
+
+	{#if selectedTab === 'cashflow'}
+		<div class="mt-4">
+			<div class="flex flex-col gap-3 sm:flex-row sm:items-end">
+				<div class="flex flex-col">
+					<label class="text-sm text-gray-400" for="start">Début</label>
+					<input
+						id="start"
+						type="date"
+						bind:value={startDate}
+						class="px-3 py-2 text-white bg-gray-900 border border-gray-800 rounded-md"
+						on:change={loadCashflow}
+					/>
+				</div>
+				<div class="flex flex-col">
+					<label class="text-sm text-gray-400" for="end">Fin</label>
+					<input
+						id="end"
+						type="date"
+						bind:value={endDate}
+						class="px-3 py-2 text-white bg-gray-900 border border-gray-800 rounded-md"
+						on:change={loadCashflow}
+					/>
+				</div>
+			</div>
+
+			<div class="p-4 mt-4 bg-gray-900 border border-gray-800 h-80 rounded-xl">
+				{#if isLoadingCashflow}
+					<div class="text-sm text-gray-400">Chargement du cashflow…</div>
+				{:else}
+					<Bar data={cashflowChartData} options={barOptions} />
+				{/if}
+			</div>
+		</div>
+	{:else}
+		<div class="mt-4">
+			<!-- Bank accounts aggregate + collapsible details -->
+			<div class="overflow-hidden bg-gray-800 border border-gray-700 rounded-lg">
+				<button
+					class="flex items-center justify-between w-full px-4 py-4 sm:px-6 focus:outline-none hover:bg-gray-750/50"
+					aria-expanded={banksOpen}
+					on:click={() => (banksOpen = !banksOpen)}
+				>
+					<div class="text-left">
+						<div class="text-sm text-gray-400">Total comptes</div>
+						<div class="text-2xl font-semibold text-white sm:text-3xl">{formatEUR(totalBanks)}</div>
+					</div>
+					<div class="flex items-center gap-3">
+						{#if banksLoading}
+							<span class="text-sm text-gray-400">Chargement…</span>
+						{:else}
+							<span class="text-sm text-gray-400"
+								>{banks.length} compte{banks.length > 1 ? 's' : ''}</span
+							>
+						{/if}
+						<svg
+							class="w-5 h-5 text-gray-400 transition-transform duration-200 transform"
+							viewBox="0 0 20 20"
+							fill="currentColor"
+							style={`transform: rotate(${banksOpen ? 180 : 0}deg)`}
+							aria-hidden="true"
+						>
+							<path
+								fill-rule="evenodd"
+								d="M5.23 7.21a.75.75 0 011.06.02L10 11.146l3.71-3.915a.75.75 0 111.08 1.04l-4.24 4.47a.75.75 0 01-1.08 0L5.21 8.27a.75.75 0 01.02-1.06z"
+								clip-rule="evenodd"
+							/>
+						</svg>
+					</div>
+				</button>
+
+				{#if banksOpen}
+					<div class="px-4 pb-4 sm:px-6">
+						{#if banksLoading}
+							<div class="py-2 text-sm text-gray-400">Chargement des comptes…</div>
+						{:else if banksError}
+							<div class="py-2 text-sm text-red-400">{banksError}</div>
+						{:else if banks.length === 0}
+							<div class="py-2 text-sm text-gray-400">Aucun compte enregistré.</div>
+						{:else}
+							<ul class="divide-y divide-gray-700">
+								{#each banks as bank}
+									<li class="flex items-start justify-between py-3">
+										<div>
+											<div class="flex items-center gap-2">
+												<span class="font-medium text-white">{bank.name ?? 'Compte sans nom'}</span>
+												{#if bank.category}
+													<span
+														class="text-xs px-2 py-0.5 rounded-full bg-gray-700 text-gray-300 border border-gray-600"
+														>{bank.category}</span
+													>
+												{/if}
+											</div>
+											{#if bank.description}
+												<div class="mt-1 text-xs text-gray-400">{bank.description}</div>
 											{/if}
 										</div>
-										{#if bank.description}
-											<div class="mt-1 text-xs text-gray-400">{bank.description}</div>
-										{/if}
-									</div>
-									<div
-										class="text-right font-semibold {parseFloat(bank.current_amount ?? 0) < 0
-											? 'text-red-300'
-											: 'text-green-300'}"
-									>
-										{formatEUR(bank.current_amount ?? 0)}
-									</div>
-								</li>
-							{/each}
-						</ul>
-					{/if}
+										<div
+											class="text-right font-semibold {parseFloat(bank.current_amount ?? 0) < 0
+												? 'text-red-300'
+												: 'text-green-300'}"
+										>
+											{formatEUR(bank.current_amount ?? 0)}
+										</div>
+									</li>
+								{/each}
+							</ul>
+						{/if}
+					</div>
+				{/if}
+			</div>
+
+			<div class="w-full mt-4">
+				<div class="bg-gray-800 rounded-lg">
+					<Table
+						{addNew}
+						{parseItems}
+						{dbInfo}
+						{headers}
+						{actions}
+						refreshTopic="spending"
+						type="ligne"
+						type_accord="une"
+						searchable="description"
+					/>
 				</div>
-			{/if}
+			</div>
 		</div>
-	</div>
-</div>
-<div class="w-full py-2 sm:px-8 lg:px-16">
-	<div class="bg-gray-800 rounded-lg">
-		<Table
-			{addNew}
-			{parseItems}
-			{dbInfo}
-			{headers}
-			{actions}
-			refreshTopic="spending"
-			type="ligne"
-			type_accord="une"
-			searchable="description"
-		/>
-	</div>
+	{/if}
 </div>

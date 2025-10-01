@@ -1,9 +1,6 @@
 // @ts-nocheck
 import { supabase } from '$lib/supabaseClient.js';
 
-export const ssr = true;
-export const csr = false;
-export const prerender = false;
 
 function stripMarkdown(md = '') {
     return (

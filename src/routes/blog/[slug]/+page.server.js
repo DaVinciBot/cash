@@ -5,9 +5,6 @@ import { marked } from 'marked';
 import sanitizeHtml from 'sanitize-html';
 import { parseMarkdownToAst } from '$lib/markdown/parse.js';
 
-export const ssr = true;
-export const csr = false;
-export const prerender = false;
 
 // Render markdown to safe HTML on the server
 function renderMarkdown(md) {
