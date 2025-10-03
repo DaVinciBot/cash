@@ -187,12 +187,12 @@
 						>
 							<ul class="py-2 text-sm text-gray-400" aria-labelledby="dropdownLargeButton">
 								<li>
-									<a href="#" class="block px-4 py-2 hover:bg-gray-600 hover:text-white"
+									<a href="/" class="block px-4 py-2 hover:bg-gray-600 hover:text-white"
 										>L'association</a
 									>
 								</li>
 								<li>
-									<a href="#" class="block px-4 py-2 hover:bg-gray-600 hover:text-white"
+									<a href="/nos-ecoles" class="block px-4 py-2 hover:bg-gray-600 hover:text-white"
 										>Nos écoles</a
 									>
 								</li>
