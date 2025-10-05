@@ -229,6 +229,9 @@
 					for (let [key, value] of form_data.entries()) {
 						if (key.startsWith('justificatif')) {
 							const files = form_data.getAll('justificatif').filter((v) => v instanceof File);
+							if (files[0]?.name == '') {
+								files.pop();
+							}
 							data['justificatif'] = files;
 						} else {
 							data[key.toLowerCase()] = value;
@@ -253,32 +256,38 @@
 					if (error) {
 						console.error(error);
 						alert('Une erreur est survenue lors de la création de la dépense');
+						crud.$destroy();
+						return;
 					}
 
 					// upload proof
 					const logoFile = Array.isArray(data['justificatif']) ? data['justificatif'] : [];
+					let message = `La dépense a bien été ajoutée`;
 
-					console.log(logoFile);
-
-					// upload all files
-					for (let i = 0; i < logoFile.length; i++) {
-						const { data: _, error: err } = await supabase.storage
-							.from('proof')
-							.upload(`invoices/${row.id}/${logoFile[i].name}`, logoFile[i], {
-								cacheControl: '3600',
-								upsert: true
-							});
-						if (err) {
-							console.error(err);
-							alert("Une erreur est survenue lors de l'envoi des justificatifs");
-							return;
+					if (logoFile.length > 0) {
+						for (let i = 0; i < logoFile.length; i++) {
+							const { data: _, error: err } = await supabase.storage
+								.from('proof')
+								.upload(`invoices/${row.id}/${logoFile[i].name}`, logoFile[i], {
+									cacheControl: '3600',
+									upsert: true
+								});
+							if (err) {
+								console.error(err);
+								alert("Une erreur est survenue lors de l'envoi des justificatifs");
+								crud.$destroy();
+								return;
+							}
 						}
+					} else {
+						console.log('No proof to upload, skipping');
+						message += ' (sans justificatif)';
 					}
 
 					new SucessModal({
 						target: document.body,
 						props: {
-							message: 'La dépense a bien été ajoutée',
+							message: message,
 							onClose: () => {
 								// Ask any listening table to refresh and update banks overview
 								triggerTableRefresh('spending', { resetPage: true });
