@@ -6,7 +6,6 @@
 	import { statusText, updateText } from '$lib/utils';
 
 	import Table from '$lib/components/admin/Table.svelte';
-	import ReadModal from '$lib/components/modals/ReadModal.svelte';
 	import ReadDrawer from '$lib/components/drawers/ReadDrawer.svelte';
 
 	let skip = false;
@@ -55,7 +54,7 @@
 
 				const { data, error } = await supabase
 					.from('orders')
-					.select('id, creationDate, projectId, status, lastUpdate, items(*), comment')
+					.select('id, creationDate, projectId, status, lastUpdate, items(*), comment, price, name')
 					.eq('id', id)
 					.single();
 
@@ -63,18 +62,17 @@
 					console.error(error);
 					return;
 				}
-				const price = data.items
-					.reduce((acc, item, i) => acc + item.price * item.quantity, 0)
-					.toFixed(2);
-				const name = data.items.map((item) => item.name).join(', ');
+				const price = data.price.toFixed(2);
+				const name = data.name;
 
 				let items = [];
 				data.items.forEach((item, i) => {
 					items.push({
-						name: item.name,
+						name: item.name.length > 30 ? item.name.slice(0, 30) + '...' : item.name,
 						quantity: item.quantity,
 						price: `${item.price} €`,
-						id: item.id
+						id: item.id,
+						link: item.link
 					});
 				});
 

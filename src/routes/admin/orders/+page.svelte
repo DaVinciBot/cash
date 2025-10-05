@@ -78,7 +78,7 @@
 				const { data, error } = await supabase
 					.from('orders')
 					.select(
-						'id, creationDate, projectId, status, lastUpdate, items(*), comment, tags, requestedBy(username)'
+						'id, creationDate, projectId, status, lastUpdate, items(*), comment, tags, requestedBy(username), price, name'
 					)
 					.eq('id', id)
 					.single();
@@ -87,10 +87,8 @@
 					console.error(error);
 					return;
 				}
-				const price = data.items
-					.reduce((acc, item, i) => acc + item.price * item.quantity, 0)
-					.toFixed(2);
-				const name = data.items.map((item) => item.name).join(', ');
+				const price = data.price.toFixed(2);
+				const name = data.name;
 
 				let items = [];
 				data.items.forEach((item, i) => {
