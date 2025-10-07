@@ -139,21 +139,27 @@
 					<div class="text-4xl leading-none md:text-5xl lg:text-6xl">
 						<AnimatedNumber target={4} duration={1500} />
 					</div>
-					<div class="mt-4 text-sm font-semibold tracking-wider uppercase">Écoles</div>
+					<div class="mt-4 text-sm font-semibold tracking-wider uppercase text-dark-blue-gray">
+						Écoles
+					</div>
 				</div>
 
 				<div class="flex-1">
 					<div class="text-4xl leading-none md:text-5xl lg:text-6xl">
 						<AnimatedNumber prefix="+" target={10500} duration={2000} />
 					</div>
-					<div class="mt-4 text-sm font-semibold tracking-wider uppercase">Étudiants</div>
+					<div class="mt-4 text-sm font-semibold tracking-wider uppercase text-dark-blue-gray">
+						Étudiants
+					</div>
 				</div>
 
 				<div class="flex-1">
 					<div class="text-4xl leading-none md:text-5xl lg:text-6xl">
 						<AnimatedNumber target={7} duration={1500} />
 					</div>
-					<div class="mt-4 text-sm font-semibold tracking-wider uppercase">Campus</div>
+					<div class="mt-4 text-sm font-semibold tracking-wider uppercase text-dark-blue-gray">
+						Campus
+					</div>
 				</div>
 			</div>
 		</div>

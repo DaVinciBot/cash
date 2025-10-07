@@ -41,7 +41,7 @@ export async function load({ setHeaders }) {
     const posts = (data || []).map((row) => {
         const meta = row.data || {};
         const cover = meta?.heroImage || '/assets/article/precoupe.jpg';
-        const description = meta.excerpt || toExcerpt(row.body || '');
+        const description = toExcerpt(row.body || '');
         const date = row.publish_date || row.last_update || null;
         // normalize tags if present
         let tags = [];
