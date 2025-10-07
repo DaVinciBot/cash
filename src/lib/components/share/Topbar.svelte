@@ -5,6 +5,7 @@
 
 	import DvbLogo from './Logo/DVBLogo.svelte';
 	import SideBar from '$lib/components/admin/SideBar.svelte';
+	import CTAButton from '../utils/CTAButton.svelte';
 
 	let user;
 	let skip = false;
@@ -215,19 +216,11 @@
 			</div>
 			<div class="gap-5">
 				{#if user}
-					<a
-						class="inline-flex items-center px-3 py-2 m-auto text-sm font-medium text-center text-white rounded-lg focus:ring-4 focus:outline-none bg-primary-600 hover:bg-primary-700 focus:ring-primary-800"
-						href="/admin"
-					>
-						Espace membre
-					</a>
+					<CTAButton href="/admin" secondary={true} size="sm">Espace membre</CTAButton>
 				{:else}
-					<a
-						class="inline-flex items-center px-3 py-2 m-auto text-sm font-medium text-center text-white rounded-lg focus:ring-4 focus:outline-none bg-primary-600 hover:bg-primary-700 focus:ring-primary-800"
-						href="/auth/login?redirect=/admin"
+					<CTAButton href="/auth/register?redirect=/admin" secondary={true} size="sm"
+						>Se connecter</CTAButton
 					>
-						Espace membre
-					</a>
 				{/if}
 			</div>
 		</div>

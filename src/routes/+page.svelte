@@ -4,6 +4,7 @@
 	import Footer from '$lib/components/share/Footer.svelte';
 	import Topbar from '$lib/components/share/Topbar.svelte';
 	import CtaButton from '$lib/components/utils/CTAButton.svelte';
+	import AnimatedNumber from '$lib/components/utils/AnimatedNumber.svelte';
 
 	import HDSLogo from '$lib/components/share/Logo/HDS.svelte';
 	import RSLogo from '$lib/components/share/Logo/RS.svelte';
@@ -51,7 +52,7 @@
 <Topbar />
 
 <div class="flex flex-col h-full gap-8 px-4 pt-16 sm:px-8 md:px-16 lg:px-32 md:pt-32 lg:pt-48">
-	<div class="justify-start">
+	<section class="justify-start">
 		<div class="grid grid-cols-1 md:grid-cols-[2fr_1.5fr] items-center gap-8">
 			<div class="flex flex-col justify-start order-2 gap-4 overflow-hidden text-start md:order-1">
 				<div class="flex flex-col gap-5">
@@ -65,8 +66,8 @@
 						professionnelle.
 					</p>
 				</div>
-				<div class="flex flex-col gap-4 sm:flex-row sm:gap-8">
-					<CtaButton>Nos Projets</CtaButton>
+				<div class="flex flex-col w-full gap-4 sm:flex-row sm:gap-8 sm:w-96">
+					<CtaButton href="#projets">Nos Projets</CtaButton>
 					<CtaButton secondary={true}>Soutenez nous</CtaButton>
 				</div>
 			</div>
@@ -95,8 +96,9 @@
 				<IgusLogo />
 			</Carousel>
 		</div>
-	</div>
-	<div class="flex flex-col items-center justify-center mt-12">
+	</section>
+
+	<section class="flex flex-col items-center justify-center mt-12">
 		<div class="flex flex-col gap-12 text-left md:text-center md:w-6/12">
 			<h1 class="text-6xl font-extrabold tracking-[4.10px] pr-5">Nos actualités</h1>
 			<p class="self-stretch text-xl tracking-wider text-dark-blue-gray">
@@ -129,10 +131,131 @@
 				</Carousel>
 			{/if}
 		</div>
-	</div>
+	</section>
+	<section class="w-full">
+		<div class="max-w-full px-4 py-12">
+			<div class="flex flex-col items-center justify-between w-full gap-8 text-center md:flex-row">
+				<div class="flex-1">
+					<div class="text-4xl leading-none md:text-5xl lg:text-6xl">
+						<AnimatedNumber target={4} duration={1500} />
+					</div>
+					<div class="mt-4 text-sm font-semibold tracking-wider uppercase">Écoles</div>
+				</div>
+
+				<div class="flex-1">
+					<div class="text-4xl leading-none md:text-5xl lg:text-6xl">
+						<AnimatedNumber prefix="+" target={10500} duration={2000} />
+					</div>
+					<div class="mt-4 text-sm font-semibold tracking-wider uppercase">Étudiants</div>
+				</div>
+
+				<div class="flex-1">
+					<div class="text-4xl leading-none md:text-5xl lg:text-6xl">
+						<AnimatedNumber target={7} duration={1500} />
+					</div>
+					<div class="mt-4 text-sm font-semibold tracking-wider uppercase">Campus</div>
+				</div>
+			</div>
+		</div>
+	</section>
+
+	<section class="flex flex-col gap-4 pt-4 mb-12 md:pt-0 md:gap-0" id="projets">
+		<div class="w-full mb-12 text-center">
+			<h1 class="text-6xl font-extrabold tracking-[4.10px] pr-5">Nos projets</h1>
+		</div>
+
+		<div class="max-w-full">
+			<!-- Project 1: Coupe de France de Robotique -->
+			<div class="grid grid-cols-1 md:grid-cols-[1fr_2fr] items-center gap-6 py-6">
+				<div class="w-full">
+					<img
+						class="object-cover h-48 mx-auto md:w-full md:h-56 rounded-2xl"
+						alt="Notre robot lors de la Coupe de France de Robotique 2024"
+						src="/assets/projets/CDR.jpg"
+					/>
+				</div>
+				<div class="flex flex-col justify-center h-full text-center md:text-left">
+					<h1 class="text-2xl font-extrabold md:text-3xl">Coupe de France de Robotique</h1>
+					<p
+						class="py-2 text-justify md:text-xl text-blue-gray dark:text-dark-blue-gray sm:text-left"
+					>
+						La Coupe de France de Robotique est une compétition annuelle où des équipes d'étudiants
+						conçoivent, construisent et programment des robots pour accomplir des tâches
+						spécifiques. DaVinciBot participe chaque année à cet événement prestigieux, mettant en
+						avant les compétences et l'innovation de ses membres.
+					</p>
+					<div class="mt-4 sm:w-44">
+						<CtaButton>Découvrir</CtaButton>
+					</div>
+				</div>
+			</div>
+
+			<!-- Project 2: TRAVELERS (image on right for md+ screens) -->
+			<div class="grid grid-cols-1 md:grid-cols-[2fr_1fr] items-center gap-6 py-6">
+				<div class="w-full md:order-last">
+					<img
+						class="object-cover h-48 mx-auto md:w-full md:h-56 rounded-2xl"
+						alt="Travelers"
+						src="/assets/projets/cohoma.png"
+					/>
+				</div>
+				<div
+					class="flex flex-col justify-center h-full mt-6 text-center md:text-left md:mt-0 md:order-first"
+				>
+					<h1 class="text-2xl font-extrabold md:text-3xl">CoHoMa</h1>
+					<p
+						class="py-2 text-justify md:text-xl text-blue-gray dark:text-dark-blue-gray sm:text-left"
+					>
+						En collaboration avec l'Armée de Terre Française, nous participons au challenge CoHoMa
+						(Cohabitation Homme-Machine). Ce projet vise à développer un système robotique capable
+						d'interagir de manière semi-autonome avec son environnement, et ainsi de réduire la
+						charge de l'opérateur.
+					</p>
+					<div class="mt-4 sm:w-44">
+						<CtaButton>Découvrir</CtaButton>
+					</div>
+				</div>
+			</div>
+
+			<!-- Project 3: Exaudus -->
+			<div class="grid grid-cols-1 md:grid-cols-[1fr_2fr] items-center gap-6 py-6">
+				<div class="w-full">
+					<img
+						class="object-cover h-48 mx-auto md:w-full md:h-56 rounded-2xl"
+						alt="Exodus"
+						src="/assets/projets/exodus.jpg"
+					/>
+				</div>
+				<div class="flex flex-col justify-center h-full text-center md:text-left">
+					<h1 class="text-2xl font-extrabold md:text-3xl">Exodus</h1>
+					<p
+						class="py-2 text-justify md:text-xl text-blue-gray dark:text-dark-blue-gray sm:text-left"
+					>
+						Nous entrons dans la deuxième année de développement d'Exodus, notre exosquelette de
+						soutien. Ce projet vise à assister les utilisateurs dans leurs tâches physiques, en
+						améliorant leur endurance et en diminuant la fatigue.
+					</p>
+					<div class="mt-4 sm:w-44">
+						<CtaButton>Découvrir</CtaButton>
+					</div>
+				</div>
+			</div>
+		</div>
+	</section>
 </div>
 
 <Footer />
 
 <style>
+	:global(html) {
+		/* enable smooth scrolling for in-page anchors */
+		scroll-behavior: smooth;
+	}
+
+	/* Respect users who prefer reduced motion */
+	@media (prefers-reduced-motion: reduce) {
+		:global(html) {
+			scroll-behavior: auto;
+		}
+	}
 </style>
