@@ -1,7 +1,8 @@
 <script>
 	import { userdata } from '$lib/store';
 	import { loadUserdata, hideOnClickOutside } from '$lib/utils';
-	import { onMount } from 'svelte';
+	import { onMount, onDestroy } from 'svelte';
+	import { afterNavigate } from '$app/navigation';
 
 	import DvbLogo from './Logo/DVBLogo.svelte';
 	import SideBar from '$lib/components/admin/SideBar.svelte';
@@ -50,6 +51,30 @@
 				);
 			}
 		});
+	});
+
+	// make sure dropdowns are closed and detached dropdown nodes removed when navigating
+	const _afterUnsub = afterNavigate(() => {
+		dropdown.projects = false;
+		dropdown.infos = false;
+
+		// remove any dropdown elements that were detached to document.body
+		try {
+			document.querySelectorAll('.dropdown').forEach((el) => {
+				if (el && el.parentNode) el.parentNode.removeChild(el);
+			});
+		} catch (e) {
+			// ignore
+		}
+	});
+
+	onDestroy(() => {
+		// unregister navigation handler
+		try {
+			if (typeof _afterUnsub === 'function') _afterUnsub();
+		} catch (e) {
+			// ignore
+		}
 	});
 
 	function closeSidebar() {

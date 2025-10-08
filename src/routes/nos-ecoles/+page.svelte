@@ -112,25 +112,18 @@
 								Au cœur de La Défense, le Pôle Léonard de Vinci réunit trois écoles complémentaires
 								— ESILV, EMLV et IIM. Ingénierie, management et création numérique se rencontrent au
 								quotidien via une pédagogie par projets et une forte culture de
-								l’interdisciplinarité.
+								l'interdisciplinarité.
 							</p>
 
 							<div
-								class="flex flex-col items-center justify-center gap-4 mt-8 sm:flex-row lg:justify-start"
+								class="flex flex-col items-center justify-center gap-4 mt-8 sm:flex-row lg:justify-start sm:w-[500px]"
 							>
 								<CTAButton href="#ecoles">Découvrir nos écoles</CTAButton>
-								<a
-									href="https://www.devinci.fr/"
-									target="_blank"
-									rel="noopener noreferrer"
-									class="inline-flex items-center px-5 py-3 text-sm font-semibold transition border rounded-xl border-white/20 text-white/90 hover:bg-white/10 focus:outline-none focus-visible:ring-2 focus-visible:ring-white/60"
-								>
-									Site du Pôle
-								</a>
+								<CTAButton secondary={true} href="https://www.devinci.fr/">Site du Pôle</CTAButton>
 							</div>
 
 							<p class="mt-6 text-sm text-white/60">
-								Découvrez l’écosystème pluridisciplinaire qui fait la force de nos projets
+								Découvrez l'écosystème pluridisciplinaire qui fait la force de nos projets
 								étudiants.
 							</p>
 						</div>
