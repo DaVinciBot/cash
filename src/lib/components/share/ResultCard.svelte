@@ -16,7 +16,7 @@
 	</div>
 	<div id="" class="flex flex-row h-28 items-center">
 		<img src={image} alt={title} class="h-28 aspect-auto" />
-		<div class="translate-x-[{marginLeft}px] -translate-y-[{marginBottom}px] flex items-center">
+		<div class="flex items-center" style="transform: translate({marginLeft}px, {-marginBottom}px)">
 			<svelte:component this={logo} class="h-28" sizeW="163px" sizeH="185px" />
 		</div>
 	</div>

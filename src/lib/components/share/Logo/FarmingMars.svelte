@@ -1,15 +1,4 @@
-<script>
-	export let sizeH = '223px';
-	export let sizeW = '200px';
-</script>
-
-<svg
-	width={sizeW}
-	height={sizeH}
-	viewBox="0 0 156 243"
-	fill="none"
-	xmlns="http://www.w3.org/2000/svg"
->
+<svg width="163" height="185" viewBox="0 0 156 243" fill="none" xmlns="http://www.w3.org/2000/svg">
 	<path
 		d="M134.317 188.807C134.317 218.737 110.054 243 80.1246 243C50.1949 243 25.9321 218.737 25.9321 188.807C25.9321 158.878 50.1949 134.615 80.1246 134.615C110.054 134.615 134.317 158.878 134.317 188.807Z"
 		fill="#F14A42"

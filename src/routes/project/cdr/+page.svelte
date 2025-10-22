@@ -20,6 +20,7 @@
 	const posts = data?.posts ?? [];
 
 	let cdrImg = '/assets/projets/CDR.jpg';
+	let precoupeImg = '/assets/article/precoupe.jpg';
 </script>
 
 <svelte:head>
@@ -128,15 +129,15 @@
 					rank_and_points={'37e/102 - 230 pts'}
 					image={cdrImg}
 					logo={TheShowMustGoOnLogo}
-					marginLeft={'70'}
-					marginBottom={'30'}
+					marginLeft={'40'}
+					marginBottom={'20'}
 				/>
 				<ResultCard
 					title={'2024 - Farming Mars'}
 					rank_and_points={'56e/200 - 157 pts'}
-					image={cdrImg}
+					image={precoupeImg}
 					logo={FarmingMars}
-					marginLeft={'30'}
+					marginLeft={'35'}
 					marginBottom={'35'}
 				/>
 			</Carousel>
