@@ -31,26 +31,69 @@
 		dropdownEl.style.left = 'calc(' + rect.left + 'px + 0rem)';
 	}
 
+	function attachDropdowns() {
+		// Move dropdowns to body once, remove stale duplicates, position, and bind outside-click once
+		const dropdownNodes = Array.from(document.querySelectorAll('.dropdown'));
+		dropdownNodes.forEach((el) => {
+			const activatorId = el.dataset.activator;
+			if (!activatorId) return;
+
+			// If there is an older, stale dropdown in <body> for the same activator, remove it
+			document
+				.querySelectorAll('body > .dropdown[data-activator="' + activatorId + '"]')
+				.forEach((stale) => {
+					if (stale !== el && stale.parentNode) {
+						stale.parentNode.removeChild(stale);
+					}
+				});
+
+			// Only append to body if not already there
+			if (el.parentNode !== document.body) {
+				document.body.appendChild(el);
+			}
+
+			// Position under its activator
+			const activator = document.getElementById(activatorId);
+			if (activator) {
+				setupDropdown(el, activator);
+			}
+
+			// Bind outside click only once per element
+			if (!el.dataset.clickOutsideBound) {
+				try {
+					hideOnClickOutside(
+						el,
+						() => {
+							dropdown.projects = false;
+							dropdown.infos = false;
+						},
+						true
+					);
+					el.dataset.clickOutsideBound = 'true';
+				} catch (e) {
+					// ignore binding failures
+				}
+			}
+		});
+	}
+
 	onMount(async () => {
 		if (!skip) await loadUserdata();
 		onMobile = window.innerWidth < 768;
 
-		// detach all dropdown menus from their parent
-		document.querySelectorAll('.dropdown').forEach((el) => {
-			document.body.appendChild(el);
-			const activator = document.querySelector('#' + el.dataset.activator);
-			if (activator) {
-				setupDropdown(el, activator);
-				hideOnClickOutside(
-					el,
-					() => {
-						dropdown.projects = false;
-						dropdown.infos = false;
-					},
-					true
-				);
-			}
-		});
+		// detach, dedupe and initialize dropdowns
+		attachDropdowns();
+
+		onresize = () => {
+			onMobile = window.innerWidth < 768;
+			// reposition dropdowns
+			document.querySelectorAll('.dropdown').forEach((el) => {
+				const activator = document.querySelector('#' + el.dataset.activator);
+				if (activator) {
+					setupDropdown(el, activator);
+				}
+			});
+		};
 	});
 
 	// make sure dropdowns are closed and detached dropdown nodes removed when navigating
@@ -60,7 +103,7 @@
 
 		// remove any dropdown elements that were detached to document.body
 		try {
-			document.querySelectorAll('.dropdown').forEach((el) => {
+			document.querySelectorAll('body > .dropdown').forEach((el) => {
 				if (el && el.parentNode) el.parentNode.removeChild(el);
 			});
 		} catch (e) {
@@ -70,6 +113,8 @@
 
 	onDestroy(() => {
 		// unregister navigation handler
+		dropdown.projects = false;
+		dropdown.infos = false;
 		try {
 			if (typeof _afterUnsub === 'function') _afterUnsub();
 		} catch (e) {
@@ -243,7 +288,7 @@
 				{#if user}
 					<CTAButton href="/admin" secondary={true} size="sm">Espace membre</CTAButton>
 				{:else}
-					<CTAButton href="/auth/register?redirect=/admin" secondary={true} size="sm"
+					<CTAButton href="/auth/login?redirect=/admin" secondary={true} size="sm"
 						>Se connecter</CTAButton
 					>
 				{/if}

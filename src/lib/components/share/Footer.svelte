@@ -21,7 +21,7 @@
 		[
 			{ text: 'La CDR', href: '/CDR' },
 			{ text: 'Travelers', href: '/travelers' },
-			{ text: 'Exaudus', href: '/exaudus' }
+			{ text: 'Exodus', href: '/exodus' }
 		],
 		[
 			{ text: 'CGU', href: '/cgu' },
