@@ -191,7 +191,7 @@
 						avant les compétences et l'innovation de ses membres.
 					</p>
 					<div class="mt-4 sm:w-44">
-						<CtaButton>Découvrir</CtaButton>
+						<CtaButton href="/projets/coupe-de-france-de-robotique">Découvrir</CtaButton>
 					</div>
 				</div>
 			</div>

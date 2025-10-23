@@ -209,7 +209,11 @@
 						>
 							<ul class="py-2 text-sm text-gray-400" aria-labelledby="dropdownLargeButton">
 								<li>
-									<a href="#" class="block px-4 py-2 hover:bg-gray-600 hover:text-white">La CDR</a>
+									<a
+										href="/projets/coupe-de-france-de-robotique"
+										class="block px-4 py-2 hover:bg-gray-600 hover:text-white"
+										>La CDR</a
+									>
 								</li>
 								<li>
 									<a href="#" class="block px-4 py-2 hover:bg-gray-600 hover:text-white">Exodus</a>
@@ -312,7 +316,7 @@
 					title: 'Nos Projets',
 					icon: 'briefcase',
 					sub: [
-						{ title: 'La CDR', uri: '#' },
+						{ title: 'La CDR', uri: '/projets/coupe-de-france-de-robotique' },
 						{ title: 'Exodus', uri: '#' },
 						{ title: 'CoHoMa', uri: '#' }
 					]
