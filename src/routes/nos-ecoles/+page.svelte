@@ -5,15 +5,6 @@
 	import { browser } from '$app/environment';
 	import { onMount } from 'svelte';
 
-	// Map/viewport logic preserved from the existing hero
-	const MAPS_KEY = 'AIzaSyAjdwBeu7JlmpeDFB7a3ghIE536u9z2F_4';
-	const MAPS_CENTER = '48.8969983,2.2224943';
-	const MAPS_CENTER_MOBILE = '48.8900983,2.2354943';
-	const MAPS_MARKER = '48.8959983,2.2354943';
-	const MAP_ZOOM = 14;
-	const MAP_SIZE = '640x640';
-	const MAP_SCALE = 2;
-
 	let isMobile = false;
 	if (browser) {
 		isMobile = window.matchMedia('(max-width: 768px)').matches;
@@ -26,42 +17,20 @@
 		return () => mql.removeEventListener('change', handler);
 	});
 
-	const mapStyles = [
-		'element:geometry|color:0x010128',
-		'element:labels.text.fill|color:0xB3C2FF',
-		'element:labels.text.stroke|color:0x010128',
-		'feature:road|element:geometry|color:0x5A6294',
-		'feature:road|element:geometry.stroke|color:0x828AB6',
-		'feature:poi|element:geometry|color:0x575e7d',
-		'feature:water|element:geometry|color:0x063B9F'
-	];
-
-	$: mapsCenter = isMobile ? MAPS_CENTER_MOBILE : MAPS_CENTER;
-	$: staticMapUrl =
-		`https://maps.googleapis.com/maps/api/staticmap?key=${MAPS_KEY}` +
-		`&center=${encodeURIComponent(mapsCenter)}` +
-		`&zoom=${MAP_ZOOM}` +
-		`&scale=${MAP_SCALE}` +
-		`&size=${MAP_SIZE}` +
-		`&markers=color:0x0232FF|icon:https%3A%2F%2Fdavincibot.fr%2Fassets%2Fimg%2Ficon%2Fpointer.png|${encodeURIComponent(MAPS_MARKER)}` +
-		`&maptype=roadmap` +
-		`&${mapStyles.map((s) => `style=${encodeURIComponent(s)}`).join('&')}`;
-	$: mapsExternalLink = `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(mapsCenter)}`;
-
 	// Schools content for alternating sections
 	const schools = [
 		{
 			slug: 'esilv',
 			name: 'ESILV',
-			subtitle: 'École d’ingénieurs',
+			subtitle: "École d'ingénieurs",
 			description:
-				'L’ESILV forme des ingénieurs généralistes tournés vers les technologies numériques et l’innovation. Les étudiants y développent des compétences en informatique, IA, data, finance, mécanique et énergie au travers d’une pédagogie par projets.',
+				"L'ESILV forme des ingénieurs généralistes tournés vers les technologies numériques et l’innovation. Les étudiants y développent des compétences en informatique, IA, data, finance, mécanique et énergie au travers d’une pédagogie par projets.",
 			highlights: [
 				'Accréditée CTI, grade de master',
 				'Spécialisations: IA, data, fintech, mécatronique, énergie',
 				'Forte proximité avec les entreprises et la recherche'
 			],
-			image: '/assets/img/esilv.png',
+			image: '/assets/img/esilv.webp',
 			site: 'https://www.esilv.fr/'
 		},
 		{
@@ -69,27 +38,27 @@
 			name: 'EMLV',
 			subtitle: 'École de management',
 			description:
-				'L’EMLV prépare aux métiers du management, du marketing et de la finance dans un contexte résolument digital. L’école met l’accent sur l’ouverture, la professionnalisation et le travail en équipe inter-écoles.',
+				"L'EMLV prépare aux métiers du management, du marketing et de la finance dans un contexte résolument digital. L’école met l’accent sur l’ouverture, la professionnalisation et le travail en équipe inter-écoles.",
 			highlights: [
 				'Programmes visés et grade de master',
-				'Marketing digital, business development, finance d’entreprise',
+				"Marketing digital, business development, finance d'entreprise",
 				'Stages, alternance et projets concrets au cœur de la pédagogie'
 			],
-			image: '/assets/img/emlv.png',
+			image: '/assets/img/emlv.webp',
 			site: 'https://www.emlv.fr/'
 		},
 		{
 			slug: 'iim',
 			name: 'IIM',
-			subtitle: 'Institut de l’Internet et du Multimédia',
+			subtitle: "Institut de l'Internet et du Multimédia",
 			description:
-				'L’IIM forme aux métiers de la création numérique: design, communication visuelle, jeu vidéo, animation 3D, web et communication digitale. Les étudiants alternent entre fondamentaux créatifs et réalisations professionnelles.',
+				"L'IIM forme aux métiers de la création numérique: design, communication visuelle, jeu vidéo, animation 3D, web et communication digitale. Les étudiants alternent entre fondamentaux créatifs et réalisations professionnelles.",
 			highlights: [
 				'Parcours: Création & Design, Jeux vidéo, Animation 3D, Communication digitale',
 				'Projets réels, workshops et pédagogie studio',
 				'Forte culture de la collaboration inter-écoles'
 			],
-			image: '/assets/img/iim.png',
+			image: '/assets/img/iim.webp',
 			site: 'https://www.iim.fr/'
 		}
 	];
@@ -132,20 +101,11 @@
 			</div>
 			<div id="teaser">
 				<img
-					src="/assets/img/pulv_lc.png"
+					src="/assets/img/pulv_lc.webp"
 					alt="Vue du campus du Pôle Léonard de Vinci"
 					class="absolute top-0 left-0 object-cover w-full h-full opacity-50 pointer-events-none -z-10"
 					loading="lazy"
 				/>
-			</div>
-			<div class="flex items-center justify-center gap-3 px-4 py-3 text-sm text-white/70 lg:hidden">
-				<span>Carte intégrée Google Maps</span>
-				<a
-					href={mapsExternalLink}
-					target="_blank"
-					rel="noopener noreferrer"
-					class="underline hover:text-white">Ouvrir Google Maps</a
-				>
 			</div>
 		</div>
 	</div>

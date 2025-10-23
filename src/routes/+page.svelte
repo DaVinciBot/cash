@@ -72,7 +72,7 @@
 				</div>
 			</div>
 			<img
-				src="/assets/projets/rob_shadows.png"
+				src="/assets/projets/rob_shadows.webp"
 				alt="Robot dessin stylisé pour DaVinciBot"
 				width="1280"
 				height="720"
@@ -177,7 +177,7 @@
 					<img
 						class="object-cover h-48 mx-auto md:w-full md:h-56 rounded-2xl"
 						alt="Notre robot lors de la Coupe de France de Robotique 2024"
-						src="/assets/projets/CDR.jpg"
+						src="/assets/projets/CDR.webp"
 					/>
 				</div>
 				<div class="flex flex-col justify-center h-full text-center md:text-left">
@@ -202,7 +202,7 @@
 					<img
 						class="object-cover h-48 mx-auto md:w-full md:h-56 rounded-2xl"
 						alt="Travelers"
-						src="/assets/projets/cohoma.png"
+						src="/assets/projets/cohoma.webp"
 					/>
 				</div>
 				<div
@@ -223,13 +223,13 @@
 				</div>
 			</div>
 
-			<!-- Project 3: Exaudus -->
+			<!-- Project 3: Exodus -->
 			<div class="grid grid-cols-1 md:grid-cols-[1fr_2fr] items-center gap-6 py-6">
 				<div class="w-full">
 					<img
 						class="object-cover h-48 mx-auto md:w-full md:h-56 rounded-2xl"
 						alt="Exodus"
-						src="/assets/projets/exodus.jpg"
+						src="/assets/projets/exodus.webp"
 					/>
 				</div>
 				<div class="flex flex-col justify-center h-full text-center md:text-left">
