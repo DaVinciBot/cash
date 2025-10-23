@@ -218,7 +218,7 @@
 						charge de l'opérateur.
 					</p>
 					<div class="mt-4 sm:w-44">
-						<CtaButton>Découvrir</CtaButton>
+						<CtaButton href="/projets/cohoma">Découvrir</CtaButton>
 					</div>
 				</div>
 			</div>

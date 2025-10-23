@@ -24,6 +24,7 @@ export async function GET() {
         '/',
         '/blog/',
         '/contact/',
+        '/projets/cohoma/',
         '/sponsors/',
         '/nos-ecoles/',
     ];

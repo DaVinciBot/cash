@@ -215,7 +215,9 @@
 									<a href="#" class="block px-4 py-2 hover:bg-gray-600 hover:text-white">Exodus</a>
 								</li>
 								<li>
-									<a href="#" class="block px-4 py-2 hover:bg-gray-600 hover:text-white">CoHoMa</a>
+									<a href="/projets/cohoma" class="block px-4 py-2 hover:bg-gray-600 hover:text-white"
+										>CoHoMa</a
+									>
 								</li>
 							</ul>
 							<div class="py-1">
@@ -314,7 +316,7 @@
 					sub: [
 						{ title: 'La CDR', uri: '#' },
 						{ title: 'Exodus', uri: '#' },
-						{ title: 'CoHoMa', uri: '#' }
+						{ title: 'CoHoMa', uri: '/projets/cohoma' }
 					]
 				},
 				{
