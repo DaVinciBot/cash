@@ -361,7 +361,7 @@
 		<div class="grid gap-6 mt-12 md:grid-cols-2">
 			{#each journey as step, index}
 				<div class="flex gap-5 p-6 rounded-3xl bg-dark-blue/60 border border-white/10">
-					<div class="flex items-start justify-center w-12 h-12 text-xl font-semibold rounded-full bg-primary-500/70">
+					<div class="flex items-center justify-center w-12 h-12 text-xl font-semibold rounded-full bg-primary-500/70">
 						{index + 1}
 					</div>
 					<div class="space-y-2">
