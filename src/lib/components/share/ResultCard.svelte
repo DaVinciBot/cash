@@ -8,7 +8,7 @@
 </script>
 
 <div
-	class="rounded-xl border-[3.5px] border-dark-light-blue p-4 w-[450px] flex flex-col gap-2 min-w-96"
+	class="rounded-xl border-[3.5px] border-dark-light-blue p-4 w-[420px] flex flex-col gap-2 min-w-96"
 >
 	<div class="flex flex-col">
 		<h1 class="text-xl font-bold">{title}</h1>

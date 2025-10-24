@@ -14,6 +14,8 @@
 	import AislerLogo from '$lib/components/share/Logo/Aisler.svelte';
 	import TheShowMustGoOnLogo from '$lib/components/share/Logo/TheShowMustGoOnLogo.svelte';
 	import FarmingMars from '$lib/components/share/Logo/FarmingMars.svelte';
+	import TheCherryOnTheCake from '$lib/components/share/Logo/TheCherryOnTheCake.svelte';
+	import AgeOfBots from '$lib/components/share/Logo/AgeOfBots.svelte';
 
 	// SSR data from +page.server.js
 	export let data;
@@ -21,6 +23,7 @@
 
 	let cdrImg = '/assets/projets/CDR.jpg';
 	let precoupeImg = '/assets/article/precoupe.jpg';
+	let coupe23Img = '/assets/img/IMG_1179.jpg';
 </script>
 
 <svelte:head>
@@ -129,7 +132,7 @@
 					rank_and_points={'37e/102 - 230 pts'}
 					image={cdrImg}
 					logo={TheShowMustGoOnLogo}
-					marginLeft={'40'}
+					marginLeft={'30'}
 					marginBottom={'20'}
 				/>
 				<ResultCard
@@ -139,6 +142,22 @@
 					logo={FarmingMars}
 					marginLeft={'35'}
 					marginBottom={'35'}
+				/>
+				<ResultCard
+					title={'2023 - The Cherry on the Cake'}
+					rank_and_points={'46e/100 - 456 pts'}
+					image={coupe23Img}
+					logo={TheCherryOnTheCake}
+					marginLeft={'50'}
+					marginBottom={'35'}
+				/>
+				<ResultCard
+					title={'2025 - Age of Bots'}
+					rank_and_points={'36e/100 - 456 pts'}
+					image={cdrImg}
+					logo={AgeOfBots}
+					marginLeft={'20'}
+					marginBottom={'5'}
 				/>
 			</Carousel>
 		</div>
