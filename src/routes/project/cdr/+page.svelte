@@ -27,32 +27,35 @@
 </script>
 
 <svelte:head>
-	<title>DaVinciBot</title>
-	<meta name="description" content="DaVinciBot. L'association de robotique étudiante." />
-	<meta name="keywords" content="DaVinciBot, association, robot, robotique, étudiant, esilv" />
+	<title>Projet Coupe de France de Robotique — DaVinciBot</title>
+	<meta
+		name="description"
+		content="Découvrez nos robots développés par DaVinciBot pour la Coupe de France de Robotique"
+	/>
+	<meta name="keywords" content="DaVinciBot, Coue de France de Robotique, étudiant." />
 	<meta name="author" content="DaVinciBot" />
 	<meta name="robots" content="index, follow" />
 
 	<!-- meta og -->
-	<meta property="og:title" content="DaVinciBot" />
-	<meta property="og:description" content="DaVinciBot. L'association de robotique étudiante." />
-	<meta property="og:image" content="/dvb_og_img.png" />
-	<meta property="og:url" content="https://davincibot.fr" />
+	<meta property="og:title" content="Projet Coupe de France de Robotique — DaVinciBot" />
+	<meta
+		property="og:description"
+		content="DaVinciBot participe à la Coupe de France de Robotique"
+	/>
+	<meta property="og:image" content="/assets/projets/CDR.jpg" />
+	<meta property="og:url" content="https://davincibot.fr/project/cdr" />
 	<meta property="og:type" content="website" />
 	<meta property="og:site_name" content="DaVinciBot" />
 	<meta property="og:locale" content="fr_FR" />
 
 	<!-- meta twitter -->
-	<meta name="twitter:card" content="summary" />
-	<meta name="twitter:site" content="@DaVinciBot" />
-	<meta name="twitter:creator" content="@DaVinciBot" />
-	<meta name="twitter:title" content="DaVinciBot" />
-	<meta name="twitter:description" content="DaVinciBot. L'association de robotique étudiante." />
-	<meta name="twitter:image" content="/dvb_og_img.png" />
-	<meta name="twitter:image:alt" content="DaVinciBot" />
-	<meta name="twitter:url" content="https://davincibot.fr" />
-	<meta name="twitter:domain" content="davincibot.fr" />
 	<meta name="twitter:card" content="summary_large_image" />
+	<meta name="twitter:title" content="Projet Coupe de France de Robotique — DaVinciBot" />
+	<meta
+		name="twitter:description"
+		content="Focus sur notre participation à la Coupe de France de Robotique."
+	/>
+	<meta name="twitter:image" content="/assets/projets/CDR.jpg" />
 </svelte:head>
 
 <Topbar />
