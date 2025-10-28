@@ -5,25 +5,32 @@
 	import Footer from '$lib/components/share/Footer.svelte';
 	import CTAButton from '$lib/components/utils/CTAButton.svelte';
 	import AnimatedNumber from '$lib/components/utils/AnimatedNumber.svelte';
+	import Link from '$lib/components/markdown/Link.svelte';
 
 	const heroImages = [
 		{
-			src: '/assets/projets/Travelers.webp',
-			alt: "L'équipe Travelers lors d'une séance de tests",
-			caption: 'Travelers, mission exploration 2024',
-			details: 'Ingénierie système · Vision embarquée · Collaboration inter-écoles'
+			src: '/assets/projets/CDR.webp',
+			alt: 'Rob, le robot de DaVinciBot pour la Coupe 2024, aligné sur la table de la Coupe de France de Robotique',
+			caption: 'Coupe de France de Robotique',
+			details: 'Autonomie · Formation · Compétition'
 		},
 		{
-			src: '/assets/projets/CDR.webp',
-			alt: 'Robot DaVinciBot aligné sur la table de la Coupe de France de Robotique',
-			caption: 'Coupe de France de Robotique',
-			details: 'Mécanique de précision · Automatisation · Esprit de compétition'
+			src: '/assets/projets/cohoma.webp',
+			alt: "Le projet CoHoMa en démonstration lors d'un événement",
+			caption: "Challenge CoHoMa, organisé par L'Armée de Terre française",
+			details: 'IA · Interaction · Robotique mobile'
 		},
 		{
 			src: '/assets/projets/exodus.webp',
-			alt: 'Prototype du robot Exodus en phase de validation',
-			caption: 'Exodus, robot autonome multi-terrain',
-			details: 'Prototypage rapide · Gestion de projet · Innovation continue'
+			alt: "Prototype de l'exosquelette Exodus en phase de validation",
+			caption: "Exodus, exosquelette d'assistance à la mobilité",
+			details: 'Mécatronique · Ergonomie · Santé'
+		},
+		{
+			src: '/assets/projets/Travelers.webp',
+			alt: "Le robot Travelers lors d'une séance de tests",
+			caption: 'Travelers, version Delta, 2024',
+			details: 'Exploration · Vision embarquée · Amphibie'
 		}
 	];
 
@@ -66,15 +73,15 @@
 			description:
 				"Nous transformons les idées en prototypes à travers des projets concrets tout au long de l'année.",
 			points: [
-				'Ateliers hebdomadaires mêlant mécanique, électronique et logiciel',
-				'Coachs expérimentés issus des promotions précédentes',
-				'Mises en situation inspirées des challenges de robotique'
+				'Formations hebdomadaires mêlant mécanique, électronique et informatique',
+				"Mentors expérimentés, notamment la championne d'électronique 2025, Chloé Muvila",
+				'Workshops techniques, fabrication et programmation en une seule session'
 			]
 		},
 		{
 			title: 'Grandir ensemble',
 			description:
-				"L’association fonctionne comme un collectif : chaque membre partage ses avancées, ses doutes et ses succès.",
+				"L'association fonctionne comme un collectif : chaque membre partage ses avancées, ses doutes et ses succès.",
 			points: [
 				'Mentorat entre promotions et entraide au quotidien',
 				'Événements fédérateurs : bootcamps, soirées techniques, afterworks',
@@ -84,20 +91,20 @@
 		{
 			title: 'Briller en compétition',
 			description:
-				'Nos projets s’achèvent sur des rendez-vous nationaux et internationaux qui récompensent la rigueur et la créativité.',
+				"Nos projets s'achèvent sur des rendez-vous nationaux et internationaux qui récompensent la rigueur et la créativité.",
 			points: [
 				'Participation annuelle à la Coupe de France de Robotique',
-				'Projets satellites : Travelers, Exodus, CoHoMa…',
-				'Mise en lumière auprès de nos partenaires industriels'
+				'Participation à CoHoMa IV en mai 2027',
+				'Projets ambitieux avec des objectifs techniques clairs'
 			]
 		}
 	];
 
 	const community = [
 		{
-			title: 'Pôle Technique',
+			title: 'Pôle Projets',
 			description:
-				'Conception, fabrication et programmation : les équipes robot travaillent main dans la main pour intégrer mécatronique, vision et IA.'
+				'Conception, fabrication et programmation : les équipes de DaVinciBot travaillent main dans la main pour intégrer mécatronique, électronique et IA.'
 		},
 		{
 			title: 'Pôle Communication',
@@ -110,9 +117,9 @@
 				'Relations entreprises, recherche de financement et organisation d’événements avec nos sponsors.'
 		},
 		{
-			title: 'Pôle Expérience',
+			title: 'Pôle Formation',
 			description:
-				'Intégration des nouveaux membres, logistique des déplacements et cohésion de groupe tout au long de l’année.'
+				'Organisation de workshops techniques, sessions de formation et documentation pour faire monter en compétences tous les membres.'
 		}
 	];
 
@@ -125,17 +132,17 @@
 		{
 			title: 'Montée en compétences',
 			description:
-				"De septembre à décembre, les équipes se forment sur les outils (CAO, électronique, dev embarqué) et réalisent leurs premiers modules."
+				'De septembre à décembre, les équipes se forment sur les outils (CAO, électronique, dev embarqué) et réalisent leurs premiers modules.'
 		},
 		{
 			title: 'Construction & tests',
 			description:
-				"De janvier à avril, place au prototypage intensif, aux revues techniques et aux tests en conditions de match."
+				'De janvier à avril, place au prototypage intensif, aux revues techniques et aux tests en conditions de match.'
 		},
 		{
 			title: 'Compétitions & transmission',
 			description:
-				"Mai et juin sont rythmés par la Coupe de France de Robotique, les retours d’expérience puis le passage de relais à la promotion suivante."
+				'Mai et juin sont rythmés par la Coupe de France de Robotique, les retours d’expérience puis le passage de relais à la promotion suivante.'
 		}
 	];
 </script>
@@ -177,15 +184,15 @@
 		<div class="grid items-center gap-12 md:grid-cols-[1.2fr_1fr]">
 			<div class="space-y-6">
 				<p class="text-sm font-semibold tracking-[0.4rem] uppercase text-dark-light-blue">
-					Association de robotique depuis 2011
+					Association de robotique depuis 2014
 				</p>
 				<h1 class="text-4xl font-extrabold sm:text-5xl lg:text-6xl">
-					Faire émerger des ingénieurs complets par la robotique collaborative
+					Ingénieur par vocation <wbr /> Robotique par passion
 				</h1>
 				<p class="max-w-xl text-lg leading-8 text-dark-blue-gray">
 					DaVinciBot rassemble des étudiants de l'ESILV, de l'EMLV et de l'IIM pour concevoir des
-					robots ambitieux, apprendre en équipe et repousser leurs limites lors de compétitions.
-					Chaque projet s’accompagne d’un parcours humain, technique et entrepreneurial.
+					robots ambitieux, apprendre en équipe et repousser leurs limites lors de compétitions &
+					événements. Chaque projet est un parcours humain, technique et entrepreneurial.
 				</p>
 				<div class="flex flex-col items-start gap-4 sm:flex-row">
 					<CTAButton href="/contact">Rejoindre l'aventure</CTAButton>
@@ -241,7 +248,7 @@
 						{#each heroImages as image, idx}
 							<button
 								type="button"
-								class={`h-1.5 w-10 rounded-full transition-all duration-300 focus:outline-none focus:ring-2 focus:ring-primary-500 hover:bg-white/50 ${idx === activeHero ? 'bg-primary-500' : 'bg-white/30'}`}
+								class={`h-1.5 w-10 rounded-full transition-all duration-300 focus:outline-none focus:ring-2 focus:ring-dark-light-blue hover:bg-white/50 ${idx === activeHero ? 'bg-dark-light-blue  ' : 'bg-white/30'}`}
 								on:click={() => selectHero(idx)}
 								aria-label={`Afficher ${image.caption}`}
 								aria-current={idx === activeHero ? 'true' : 'false'}
@@ -258,26 +265,25 @@
 			<h2 class="text-3xl font-extrabold sm:text-4xl">Notre mission</h2>
 			<p class="mt-6 text-lg leading-8 text-dark-blue-gray">
 				Nous imaginons des robots qui répondent aux défis posés par les concours, mais surtout nous
-				formons des étudiants capables de mener un projet de bout en bout. L’association est un terrain
-				d’entraînement intensif qui allie technique, gestion de projet et collaboration inter-écoles.
+				formons des étudiants capables de mener un projet de bout en bout. L'association est un
+				terrain d'entraînement intensif qui allie technique, gestion de projet et collaboration
+				inter-écoles.
 			</p>
 		</div>
 
 		<div class="grid gap-8 mt-12 md:grid-cols-3">
 			{#each pillars as pillar}
-				<article class="flex flex-col h-full p-6 space-y-4 rounded-3xl bg-dark-blue/60 border border-white/10">
+				<article
+					class="flex flex-col h-full p-6 space-y-4 rounded-3xl bg-dark-blue/60 border border-white/10"
+				>
 					<h3 class="text-2xl font-semibold">{pillar.title}</h3>
 					<p class="text-base leading-7 text-white/80">{pillar.description}</p>
 					<ul class="space-y-2 text-sm text-white/70">
 						{#each pillar.points as point}
-							<li class="flex gap-3">
+							<li class="flex pl-3 gap-2 items-center">
 								<span
-									class="inline-flex items-center justify-center flex-none w-5 h-5 rounded-full bg-primary-500/80"
+									class="inline-flex items-center justify-center flex-none w-1 h-1 rounded-full bg-dark-light-blue"
 								>
-									<span
-										class="w-3 h-3 bg-white"
-										style="-webkit-mask:url('/assets/img/icon/checked-document.svg') no-repeat center / contain; mask:url('/assets/img/icon/checked-document.svg') no-repeat center / contain;"
-									></span>
 								</span>
 								<span>{point}</span>
 							</li>
@@ -293,9 +299,10 @@
 			<div class="space-y-8">
 				<h2 class="text-3xl font-extrabold sm:text-4xl">Une communauté pluridisciplinaire</h2>
 				<p class="text-lg leading-8 text-dark-blue-gray">
-					Derrière nos robots se cachent des élèves ingénieurs, des communicants, des designers et des
-					managers qui partagent une passion commune pour l’innovation. Chaque pôle cultive ses
-					compétences tout en travaillant avec les autres pour livrer un robot cohérent et performant.
+					Derrière nos robots se cachent des élèves ingénieurs, des communicants, des designers et
+					des managers qui partagent une passion commune pour l'innovation. Chaque pôle cultive ses
+					compétences tout en travaillant avec les autres afin de mener à bien des projets
+					ambitieux.
 				</p>
 				<div class="grid gap-6 sm:grid-cols-2">
 					{#each community as bloc}
@@ -306,33 +313,39 @@
 					{/each}
 				</div>
 			</div>
-			<div class="grid self-stretch grid-cols-1 gap-6 p-8 rounded-3xl bg-gradient-to-b from-white/5 to-white/0 border border-white/10">
+			<div
+				class="grid self-stretch grid-cols-1 gap-6 p-8 rounded-3xl bg-gradient-to-b from-white/5 to-white/0 border border-white/10"
+			>
 				<div>
 					<p class="text-sm tracking-[0.35rem] uppercase text-dark-light-blue">Nos chiffres</p>
-					<h3 class="mt-4 text-2xl font-semibold">Un laboratoire étudiant en croissance continue</h3>
+					<h3 class="mt-4 text-2xl font-semibold">
+						Un laboratoire étudiant en croissance continue
+					</h3>
 				</div>
 				<div class="grid gap-6 sm:grid-cols-2">
 					<div class="space-y-2">
 						<div class="text-5xl font-extrabold">
-							<AnimatedNumber target={70} suffix="+" duration={1800} />
+							<AnimatedNumber target={130} suffix="+" duration={1800} />
 						</div>
-						<p class="text-sm text-white/70">membres actifs chaque année</p>
+						<p class="text-sm text-white/70">
+							membres actifs chaque année, de Paris comme de Nantes
+						</p>
 					</div>
 					<div class="space-y-2">
 						<div class="text-5xl font-extrabold">
-							<AnimatedNumber target={12} suffix="+" duration={1600} />
+							<AnimatedNumber target={150} suffix="h" duration={1600} />
 						</div>
-						<p class="text-sm text-white/70">roboticiens répartis sur 4 équipes</p>
+						<p class="text-sm text-white/70">de formations toute au long de l'année</p>
 					</div>
 					<div class="space-y-2">
 						<div class="text-5xl font-extrabold">
-							<AnimatedNumber target={15} suffix="+" duration={2000} />
+							<AnimatedNumber target={120} suffix="k" duration={2000} />
 						</div>
-						<p class="text-sm text-white/70">événements organisés ou soutenus</p>
+						<p class="text-sm text-white/70">de Budgets prévisionnels</p>
 					</div>
 					<div class="space-y-2">
 						<div class="text-5xl font-extrabold">
-							<AnimatedNumber prefix="+" target={10} duration={1700} />
+							<AnimatedNumber prefix="+" target={8} duration={1700} />
 						</div>
 						<p class="text-sm text-white/70">partenaires industriels fidèles</p>
 					</div>
@@ -350,44 +363,76 @@
 			<p class="text-sm font-semibold tracking-[0.4rem] uppercase text-dark-light-blue">
 				Un cycle en quatre temps
 			</p>
-			<h2 class="mt-4 text-3xl font-extrabold sm:text-4xl">La vie d’un membre DaVinciBot</h2>
+			<h2 class="mt-4 text-3xl font-extrabold sm:text-4xl">La vie d'un membre DaVinciBot</h2>
 			<p class="mt-6 text-lg leading-8 text-dark-blue-gray">
 				Chaque année suit un rythme précis qui mêle formation, prototypage, compétition et bilan.
-				Rejoindre DaVinciBot, c’est s’engager dans une aventure exigeante où la progression individuelle
-				se mesure à l’impact collectif.
+				Rejoindre DaVinciBot, c'est s'engager dans une aventure exigeante où la progression
+				individuelle se mesure à l'impact collectif.
 			</p>
 		</div>
 
-		<div class="grid gap-6 mt-12 md:grid-cols-2">
-			{#each journey as step, index}
-				<div class="flex gap-5 p-6 rounded-3xl bg-dark-blue/60 border border-white/10">
-					<div class="flex items-center justify-center w-12 h-12 text-xl font-semibold rounded-full bg-primary-500/70">
-						{index + 1}
+		<div class="mt-12">
+			<div class="relative pl-8 lg:pl-0 lg:max-w-4xl lg:mx-auto">
+				<!-- Vertical line - left aligned on mobile, centered on lg -->
+				<div
+					class="absolute left-5 top-[30px] h-[75%] w-0.5 bg-dark-light-blue lg:left-1/2 lg:-translate-x-1/2"
+				></div>
+				{#each journey as step, index}
+					<div class="relative mb-6 lg:grid lg:grid-cols-2 lg:gap-8">
+						<!-- Left side content (odd items on lg) -->
+						<div
+							class="lg:col-start-1 lg:col-end-2 {index % 2 === 0 ? 'lg:text-right' : 'lg:order-2'}"
+						>
+							{#if index % 2 === 0}
+								<div
+									class="p-6 rounded-3xl bg-dark-blue/60 border border-white/10 space-y-2 lg:mr-8"
+								>
+									<h3 class="text-xl font-semibold">{step.title}</h3>
+									<p class="text-sm leading-6 text-white/75">{step.description}</p>
+								</div>
+							{/if}
+						</div>
+
+						<!-- Badge - always in the middle on lg -->
+						<span
+							class="absolute -left-[2rem] top-6 flex items-center justify-center w-10 h-10 flex-shrink-0 text-lg font-semibold rounded-full bg-dark-light-blue text-dark-blue z-10 lg:left-1/2 lg:-translate-x-1/2"
+						>
+							{index + 1}
+						</span>
+
+						<!-- Right side content (even items on lg) -->
+						<div class="lg:col-start-2 lg:col-end-3 {index % 2 === 1 ? '' : 'lg:order-1'}">
+							{#if index % 2 === 1}
+								<div
+									class="p-6 rounded-3xl bg-dark-blue/60 border border-white/10 space-y-2 lg:ml-8"
+								>
+									<h3 class="text-xl font-semibold">{step.title}</h3>
+									<p class="text-sm leading-6 text-white/75">{step.description}</p>
+								</div>
+							{/if}
+						</div>
 					</div>
-					<div class="space-y-2">
-						<h3 class="text-xl font-semibold">{step.title}</h3>
-						<p class="text-sm leading-6 text-white/75">{step.description}</p>
-					</div>
-				</div>
-			{/each}
+				{/each}
+			</div>
 		</div>
 	</section>
-
 	<section class="px-4 py-20 sm:px-10 md:px-20 lg:px-32 flex-1">
 		<div class="grid gap-10 md:grid-cols-[1fr_1.1fr]">
 			<div class="space-y-6">
 				<p class="text-sm font-semibold tracking-[0.4rem] uppercase text-dark-light-blue">
 					Derrière les robots
 				</p>
-				<h2 class="text-3xl font-extrabold sm:text-4xl">Des projets pour apprendre, inspirer et partager</h2>
+				<h2 class="text-3xl font-extrabold sm:text-4xl">
+					Des projets pour apprendre, inspirer et partager
+				</h2>
 				<p class="text-lg leading-8 text-dark-blue-gray">
 					Au sein de DaVinciBot, tout projet est pensé pour être documenté et réutilisé. Nous
-					partageons nos retours d’expérience avec les autres clubs du Pôle, les lycées et nos
-					partenaires afin de démocratiser la robotique auprès du plus grand nombre.
+					partageons nos retours d'expérience avec le monde entier afin de démocratiser la robotique
+					auprès du plus grand nombre.
 				</p>
 				<p class="text-lg leading-8 text-dark-blue-gray">
-					Que vous soyez étudiant, enseignant ou entreprise, vous pouvez nous rencontrer lors de nos
-					démos, proposer un workshop ou soutenir nos équipes pour la prochaine saison.
+					Que vous soyez étudiant, enseignant ou entreprise, vous démos, proposer un workshop ou
+					soutenir nos équipes pour la prochaine saison.
 				</p>
 				<div class="flex flex-col items-start gap-4 sm:flex-row">
 					<CTAButton href="/sponsors">Devenir partenaire</CTAButton>
@@ -399,21 +444,26 @@
 					<div class="p-6 rounded-3xl bg-white/5 border border-white/10 backdrop-blur-sm">
 						<h3 class="text-xl font-semibold">Apprentissage continu</h3>
 						<p class="mt-3 text-sm leading-6 text-white/75">
-							Des sessions techniques ouvertes à tous les niveaux pour progresser en CAD, fabrication
-							additive, électronique embarquée ou vision par ordinateur.
+							Des sessions techniques ouvertes à tous les niveaux pour progresser en CAD,
+							fabrication additive, électronique embarquée ou vision par ordinateur.
 						</p>
 					</div>
 					<div class="p-6 rounded-3xl bg-white/5 border border-white/10 backdrop-blur-sm">
 						<h3 class="text-xl font-semibold">Culture de la documentation</h3>
 						<p class="mt-3 text-sm leading-6 text-white/75">
-							Chaque équipe rédige fiches techniques, plans et guides afin d’assurer la maintenance
+							Chaque équipe rédige fiches techniques, plans et guides afin d'assurer la maintenance
 							des robots et le passage de relais aux nouvelles promotions.
+							<a
+								href="https://docs.davincibot.fr"
+								class="text-dark-light-blue underline font-bold"
+								target="_blank">Découvrez notre documentation en ligne.</a
+							>
 						</p>
 					</div>
 					<div class="p-6 rounded-3xl bg-white/5 border border-white/10 backdrop-blur-sm">
-						<h3 class="text-xl font-semibold">Ouverture vers l’extérieur</h3>
+						<h3 class="text-xl font-semibold">Ouverture vers l'extérieur</h3>
 						<p class="mt-3 text-sm leading-6 text-white/75">
-							Nous animons des ateliers d’initiation pour des lycéens, participons à des salons et
+							Nous animons des ateliers d'initiation pour des lycéens, participons à des salons et
 							collaborons avec des entreprises sur des problématiques techniques concrètes.
 						</p>
 					</div>
