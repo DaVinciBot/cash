@@ -50,7 +50,7 @@
 		display: block;
 		/* add blue transparent filter  */
 		background:
-			linear-gradient(rgb(2, 50, 255, 0.3), rgba(2, 50, 255, 0.3)),
+			linear-gradient(rgb(2, 50, 255, 0.15), rgba(2, 50, 255, 0.15)),
 			url('') no-repeat center center;
 		background-size: cover;
 	}

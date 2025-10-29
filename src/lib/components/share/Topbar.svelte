@@ -1,10 +1,12 @@
 <script>
 	import { userdata } from '$lib/store';
 	import { loadUserdata, hideOnClickOutside } from '$lib/utils';
-	import { onMount } from 'svelte';
+	import { onMount, onDestroy } from 'svelte';
+	import { afterNavigate } from '$app/navigation';
 
 	import DvbLogo from './Logo/DVBLogo.svelte';
 	import SideBar from '$lib/components/admin/SideBar.svelte';
+	import CTAButton from '../utils/CTAButton.svelte';
 
 	let user;
 	let skip = false;
@@ -29,26 +31,95 @@
 		dropdownEl.style.left = 'calc(' + rect.left + 'px + 0rem)';
 	}
 
+	function attachDropdowns() {
+		// Move dropdowns to body once, remove stale duplicates, position, and bind outside-click once
+		const dropdownNodes = Array.from(document.querySelectorAll('.dropdown'));
+		dropdownNodes.forEach((el) => {
+			const activatorId = el.dataset.activator;
+			if (!activatorId) return;
+
+			// If there is an older, stale dropdown in <body> for the same activator, remove it
+			document
+				.querySelectorAll('body > .dropdown[data-activator="' + activatorId + '"]')
+				.forEach((stale) => {
+					if (stale !== el && stale.parentNode) {
+						stale.parentNode.removeChild(stale);
+					}
+				});
+
+			// Only append to body if not already there
+			if (el.parentNode !== document.body) {
+				document.body.appendChild(el);
+			}
+
+			// Position under its activator
+			const activator = document.getElementById(activatorId);
+			if (activator) {
+				setupDropdown(el, activator);
+			}
+
+			// Bind outside click only once per element
+			if (!el.dataset.clickOutsideBound) {
+				try {
+					hideOnClickOutside(
+						el,
+						() => {
+							dropdown.projects = false;
+							dropdown.infos = false;
+						},
+						true
+					);
+					el.dataset.clickOutsideBound = 'true';
+				} catch (e) {
+					// ignore binding failures
+				}
+			}
+		});
+	}
+
 	onMount(async () => {
 		if (!skip) await loadUserdata();
 		onMobile = window.innerWidth < 768;
 
-		// detach all dropdown menus from their parent
-		document.querySelectorAll('.dropdown').forEach((el) => {
-			document.body.appendChild(el);
-			const activator = document.querySelector('#' + el.dataset.activator);
-			if (activator) {
-				setupDropdown(el, activator);
-				hideOnClickOutside(
-					el,
-					() => {
-						dropdown.projects = false;
-						dropdown.infos = false;
-					},
-					true
-				);
-			}
-		});
+		// detach, dedupe and initialize dropdowns
+		attachDropdowns();
+
+		onresize = () => {
+			onMobile = window.innerWidth < 768;
+			// reposition dropdowns
+			document.querySelectorAll('.dropdown').forEach((el) => {
+				const activator = document.querySelector('#' + el.dataset.activator);
+				if (activator) {
+					setupDropdown(el, activator);
+				}
+			});
+		};
+	});
+
+	// make sure dropdowns are closed and detached dropdown nodes removed when navigating
+	const _afterUnsub = afterNavigate(() => {
+		dropdown.projects = false;
+		dropdown.infos = false;
+
+		// remove any dropdown elements that were detached to document.body
+		try {
+			document.querySelectorAll('body > .dropdown').forEach((el) => {
+				if (el && el.parentNode) el.parentNode.removeChild(el);
+			});
+		} catch (e) {
+			// ignore
+		}
+	});
+
+	onDestroy(() => {
+		// unregister navigation handler
+		dropdown.projects = false;
+		dropdown.infos = false;
+		try {
+			if (typeof _afterUnsub === 'function') _afterUnsub();
+		} catch (e) {
+			// ignore
+		}
 	});
 
 	function closeSidebar() {
@@ -189,12 +260,12 @@
 						>
 							<ul class="py-2 text-sm text-gray-400" aria-labelledby="dropdownLargeButton">
 								<li>
-									<a href="#" class="block px-4 py-2 hover:bg-gray-600 hover:text-white"
+									<a href="/" class="block px-4 py-2 hover:bg-gray-600 hover:text-white"
 										>L'association</a
 									>
 								</li>
 								<li>
-									<a href="#" class="block px-4 py-2 hover:bg-gray-600 hover:text-white"
+									<a href="/nos-ecoles" class="block px-4 py-2 hover:bg-gray-600 hover:text-white"
 										>Nos écoles</a
 									>
 								</li>
@@ -217,19 +288,11 @@
 			</div>
 			<div class="gap-5">
 				{#if user}
-					<a
-						class="inline-flex items-center px-3 py-2 m-auto text-sm font-medium text-center text-white rounded-lg focus:ring-4 focus:outline-none bg-primary-600 hover:bg-primary-700 focus:ring-primary-800"
-						href="/admin"
-					>
-						Espace membre
-					</a>
+					<CTAButton href="/admin" secondary={true} size="sm">Espace membre</CTAButton>
 				{:else}
-					<a
-						class="inline-flex items-center px-3 py-2 m-auto text-sm font-medium text-center text-white rounded-lg focus:ring-4 focus:outline-none bg-primary-600 hover:bg-primary-700 focus:ring-primary-800"
-						href="/auth/login?redirect=/admin"
+					<CTAButton href="/auth/login?redirect=/admin" secondary={true} size="sm"
+						>Se connecter</CTAButton
 					>
-						Espace membre
-					</a>
 				{/if}
 			</div>
 		</div>
@@ -251,7 +314,7 @@
 					title: 'Nos Projets',
 					icon: 'briefcase',
 					sub: [
-						{ title: 'La CDR', uri: '#' },
+						{ title: 'La CDR', uri: '/projets/coupe-de-france-de-robotique' },
 						{ title: 'Exodus', uri: '#' },
 						{ title: 'CoHoMa', uri: '#' }
 					]

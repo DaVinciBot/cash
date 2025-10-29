@@ -1,9 +1,6 @@
 // @ts-nocheck
 import { supabase } from '$lib/supabaseClient.js';
 
-export const ssr = true;
-export const csr = false;
-export const prerender = false;
 
 function stripMarkdown(md = '') {
     return (
@@ -47,7 +44,7 @@ export async function load({ setHeaders }) {
     const posts = (data || []).map((row) => {
         const meta = row.data || {};
         const cover = meta?.heroImage || '/assets/article/precoupe.jpg';
-        const description = meta.excerpt || toExcerpt(row.body || '');
+        const description = toExcerpt(row.body || '');
         const date = row.publish_date || row.last_update || null;
         // normalize tags from multiple potential sources
         let tags = [];

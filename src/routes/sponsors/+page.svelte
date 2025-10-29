@@ -53,6 +53,13 @@
 			link: 'https://ift.devinci.fr/',
 			blurb:
 				"Partenaire sur des initiatives de recherche, d'enseignement et de transfert de technologie. Ils sont notre service parrain au sein de l'ESILV."
+		},
+		{
+			name: 'Igus',
+			logo: '/assets/parte/Igus.svg',
+			link: 'https://www.igus.fr/',
+			blurb:
+				'Fournisseur de matériaux polymères innovants qui améliorent la durabilité et la performance de nos systèmes mécaniques.'
 		}
 	];
 

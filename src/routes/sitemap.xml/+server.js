@@ -25,6 +25,7 @@ export async function GET() {
         '/blog/',
         '/contact/',
         '/sponsors/',
+        '/nos-ecoles/',
     ];
 
     const urls = [];

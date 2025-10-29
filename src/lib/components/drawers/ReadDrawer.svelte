@@ -3,7 +3,7 @@
 
 	import { get_current_component } from 'svelte/internal';
 	import { hideOnClickOutside } from '$lib/utils';
-	import { onMount } from 'svelte';
+	import { onMount, onDestroy } from 'svelte';
 	import { supabase } from '$lib/supabaseClient';
 	import Stepper from '../admin/Stepper.svelte';
 	import { updateText } from '$lib/utils';
@@ -39,6 +39,61 @@
 	let isMobile = false;
 	let files_array = [{ mime: 'application/pdf', url: null }];
 	let forms;
+
+	// Resizing state for the right-anchored drawer (drag from left edge)
+	let width = 384; // default equals Tailwind w-96
+	const minWidth = 320;
+	const maxWidth = 960;
+	let isResizing = false;
+	let startX = 0;
+	let startWidth = width;
+
+	function beginResize(clientX) {
+		isResizing = true;
+		startX = clientX;
+		startWidth = width;
+		document.body.style.cursor = 'col-resize';
+		document.body.style.userSelect = 'none';
+		window.addEventListener('mousemove', onMouseMove);
+		window.addEventListener('mouseup', endResize);
+		window.addEventListener('touchmove', onTouchMove, { passive: false });
+		window.addEventListener('touchend', endResize);
+	}
+
+	function onMouseMove(e) {
+		if (!isResizing) return;
+		const dx = startX - e.clientX; // dragging left increases width
+		width = Math.max(minWidth, Math.min(maxWidth, startWidth + dx));
+	}
+
+	function onTouchMove(e) {
+		if (!isResizing) return;
+		if (e.touches && e.touches.length) {
+			e.preventDefault();
+			const dx = startX - e.touches[0].clientX;
+			width = Math.max(minWidth, Math.min(maxWidth, startWidth + dx));
+		}
+	}
+
+	function endResize() {
+		isResizing = false;
+		document.body.style.cursor = '';
+		document.body.style.userSelect = '';
+		window.removeEventListener('mousemove', onMouseMove);
+		window.removeEventListener('mouseup', endResize);
+		window.removeEventListener('touchmove', onTouchMove);
+		window.removeEventListener('touchend', endResize);
+	}
+
+	$: cropTitle =
+		values.header.title.length > width / 10
+			? values.header.title.slice(0, width / 10 - 3) + '...'
+			: values.header.title;
+
+	onDestroy(() => {
+		// ensure listeners are cleared if component is destroyed mid-drag
+		endResize();
+	});
 
 	let __onClose = (e) => {
 		current_component.$destroy();
@@ -124,13 +179,30 @@
 <div
 	id={'drawer-' + id}
 	tabindex="-1"
-	class="fixed top-0 right-0 z-50 flex flex-col h-full transition-transform duration-300 bg-gray-800 shadow-lg w-96"
-	style="transform: translateX(0);"
+	class="fixed top-0 right-0 z-50 flex flex-col h-full transition-transform duration-300 bg-gray-800 shadow-lg"
+	style={`transform: translateX(0); width: ${width}px;`}
 >
+	<!-- Resize handle (left edge) -->
+	<button
+		type="button"
+		aria-label="Resize drawer"
+		class="absolute top-0 left-0 w-2 h-full bg-transparent cursor-col-resize group focus:outline-none"
+		on:mousedown={(e) => beginResize(e.clientX)}
+		on:touchstart={(e) => beginResize(e.touches[0].clientX)}
+		on:keydown={(e) => {
+			// keyboard resizing: arrow left increases width (drawer anchored right)
+			const step = e.shiftKey ? 40 : 10;
+			if (e.key === 'ArrowLeft') width = Math.min(maxWidth, width + step);
+			if (e.key === 'ArrowRight') width = Math.max(minWidth, width - step);
+		}}
+	>
+		<span class="absolute top-0 right-0 w-1 h-full bg-transparent group-hover:bg-gray-600/60"
+		></span>
+	</button>
 	<!-- Header -->
 	<div class="flex items-center justify-between p-4 border-gray-700">
 		<div class="flex flex-col">
-			<span class="text-lg font-semibold text-white">{values.header.title}</span>
+			<span class="text-lg font-semibold text-white">{cropTitle}</span>
 			{#if values.header.sub}
 				<span class="text-sm text-gray-400">{values.header.sub}</span>
 			{/if}
@@ -792,7 +864,38 @@
 									<tbody>
 										{#each item.value.list as item}
 											<tr data-utils={item.id}>
-												<td class="p-2"><a href={item.link} target="_blank">{item.name}</a></td>
+												<td class="p-2 hover:fill-gray-200 fill-gray-400"
+													><a href={item.link} target="_blank">
+														{#if item.link}
+															<svg
+																class="inline w-4 h-4 ml-1 transition-all"
+																xmlns="http://www.w3.org/2000/svg"
+																xmlns:xlink="http://www.w3.org/1999/xlink"
+																version="1.1"
+																id="Capa_1"
+																x="0px"
+																y="0px"
+																viewBox="0 0 511.904 511.904"
+																style="enable-background:new 0 0 511.904 511.904;"
+																xml:space="preserve"
+																width="16"
+																height="16"
+															>
+																<g>
+																	<path
+																		d="M222.025,417.764c-33.872,35.124-89.034,38.364-126.784,7.445c-22.482-19.465-33.966-48.733-30.72-78.293   c2.811-21.794,12.997-41.97,28.864-57.173l61.355-61.397c12.492-12.496,12.492-32.752,0-45.248l0,0   c-12.496-12.492-32.752-12.492-45.248,0l-60.053,60.075C22.065,269.57,4.802,304.721,0.649,342.521   c-7.757,85.138,54.972,160.445,140.11,168.202c45.721,4.166,90.933-12.179,123.42-44.618l64.171-64.149   c12.492-12.496,12.492-32.752,0-45.248l0,0c-12.496-12.492-32.752-12.492-45.248,0L222.025,417.764z"
+																	/>
+																	<path
+																		d="M451.358,31.289C387.651-15.517,299.186-8.179,244.062,48.484L183.667,108.9c-12.492,12.496-12.492,32.752,0,45.248l0,0   c12.496,12.492,32.752,12.492,45.248,0l61.355-61.291c33.132-34.267,86.738-38.127,124.437-8.96   c38.803,31.818,44.466,89.067,12.648,127.87c-1.862,2.271-3.833,4.45-5.907,6.53l-64.171,64.171   c-12.492,12.496-12.492,32.752,0,45.248l0,0c12.496,12.492,32.752,12.492,45.248,0l64.171-64.171   c60.413-60.606,60.257-158.711-0.349-219.124C461.638,39.727,456.631,35.341,451.358,31.289z"
+																	/>
+																	<path
+																		d="M183.667,282.525l99.425-99.425c12.497-12.497,32.758-12.497,45.255,0l0,0c12.497,12.497,12.497,32.758,0,45.255   l-99.425,99.425c-12.497,12.497-32.758,12.497-45.255,0l0,0C171.17,315.283,171.17,295.022,183.667,282.525z"
+																	/>
+																</g>
+															</svg>
+														{/if}{item.name}</a
+													></td
+												>
 												<td>{item.quantity}</td>
 												<td>{item.price}</td>
 												{#if values.body.find((el) => el.label == 'Status')?.type == 'pendingCDP'}

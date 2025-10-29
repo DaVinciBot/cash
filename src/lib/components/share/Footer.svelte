@@ -7,6 +7,7 @@
 	import GotronicLogo from './Logo/Gotronic.svelte';
 	import DVBLogo from './Logo/DVBLogo.svelte';
 	import AislerLogo from './Logo/Aisler.svelte';
+	import IgusLogo from '$lib/components/share/Logo/Igus.svelte';
 
 	import Carousel from '$lib/components/others/Carousel.svelte';
 	import CtaButton from '$lib/components/utils/CTAButton.svelte';
@@ -20,7 +21,7 @@
 		[
 			{ text: 'La CDR', href: '/CDR' },
 			{ text: 'Travelers', href: '/travelers' },
-			{ text: 'Exaudus', href: '/exaudus' }
+			{ text: 'Exodus', href: '/exodus' }
 		],
 		[
 			{ text: 'CGU', href: '/cgu' },
@@ -135,6 +136,7 @@
 				<AlstomLogo />
 				<IFTLogo />
 				<GotronicLogo />
+				<IgusLogo />
 			</Carousel>
 		</div>
 	</div>
