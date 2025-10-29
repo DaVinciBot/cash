@@ -214,7 +214,7 @@
 						>
 							<ul class="py-2 text-sm text-gray-400" aria-labelledby="dropdownLargeButton">
 								<li>
-									<a href="/" class="block px-4 py-2 hover:bg-gray-600 hover:text-white"
+									<a href="/a-propos" class="block px-4 py-2 hover:bg-gray-600 hover:text-white"
 										>L'association</a
 									>
 								</li>
@@ -276,11 +276,11 @@
 				{
 					title: 'À Propos',
 					icon: 'information-circle',
-					sub: [
-						{ title: "L'association", uri: '#' },
-						{ title: 'Nos écoles', uri: '#' },
-						{ title: 'Soutenez-nous', uri: '#' }
-					]
+						sub: [
+							{ title: "L'association", uri: '/a-propos' },
+							{ title: 'Nos écoles', uri: '/nos-ecoles' },
+							{ title: 'Soutenez-nous', uri: '#' }
+						]
 				},
 				{ title: 'Partenaires', icon: 'people', uri: '/sponsors' },
 				{ title: 'Contact', icon: 'mail', uri: '/contact' }
