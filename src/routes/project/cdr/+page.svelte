@@ -16,6 +16,7 @@
 	import FarmingMars from '$lib/components/share/Logo/FarmingMars.svelte';
 	import TheCherryOnTheCake from '$lib/components/share/Logo/TheCherryOnTheCake.svelte';
 	import AgeOfBots from '$lib/components/share/Logo/AgeOfBots.svelte';
+	import AnimatedNumber from '$lib/components/utils/AnimatedNumber.svelte';
 
 	// SSR data from +page.server.js
 	export let data;
@@ -106,15 +107,21 @@
 	</div>
 	<div class="flex flex-row items-center justify-between p-4">
 		<div class="w-1/3 p-4 m-2 md:text-center md:w-6/12">
-			<h2 class="text-6xl font-extrabold tracking-[4.10px]">8</h2>
+			<div class="text-6xl font-extrabold">
+				<AnimatedNumber target={8} duration={1600} />
+			</div>
 			<p class="self-stretch text-xl tracking-wider text-dark-blue-gray">Robots</p>
 		</div>
 		<div class="w-1/3 p-4 m-2 md:text-center md:w-6/12">
-			<h2 class="text-6xl font-extrabold tracking-[4.10px] pl-6">2000 €</h2>
+			<div class="text-6xl font-extrabold">
+				<AnimatedNumber target={2000} suffix="€" duration={1600} />
+			</div>
 			<p class="self-stretch text-xl tracking-wider text-dark-blue-gray pr-3">Budget</p>
 		</div>
 		<div class="w-1/3 p-4 m-2 md:text-center md:w-6/12">
-			<h2 class="text-6xl font-extrabold tracking-[4.10px]">12</h2>
+			<div class="text-6xl font-extrabold">
+				<AnimatedNumber target={12} duration={1600} />
+			</div>
 			<p class="self-stretch text-xl tracking-wider text-dark-blue-gray">Membres</p>
 		</div>
 	</div>
