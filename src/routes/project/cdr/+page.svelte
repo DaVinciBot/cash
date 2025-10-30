@@ -60,21 +60,23 @@
 
 <Topbar />
 
-<div class="flex flex-col h-full gap-8 px-4 pt-16 sm:px-8 md:px-16 lg:px-32 md:pt-32 lg:pt-48">
+<div
+	class="flex flex-col h-full gap-12 px-4 pt-20 mx-auto w-full max-w-screen-2xl sm:px-6 md:px-10 lg:px-16 md:pt-28 lg:pt-36"
+>
 	<div class="justify-start">
-		<div class="grid grid-cols-1 md:grid-cols-[2fr_1.5fr] items-center gap-8">
-			<div class="flex flex-col justify-start order-2 gap-4 overflow-hidden text-start md:order-1">
+		<div class="grid items-center grid-cols-1 gap-10 md:grid-cols-[2fr_1.5fr]">
+			<div class="flex flex-col justify-start order-2 gap-6 text-start md:order-1">
 				<div class="flex flex-col gap-5">
 					<h1 class="text-4xl font-extrabold sm:text-5xl lg:text-6xl">
 						La Coupe de France de Robotique
 					</h1>
-					<p class="self-stretch text-lg tracking-wider sm:text-xl text-dark-blue-gray">
-						DaVinciBot participe depuis plus de 10 ans à cette compétion organisée par Planète
+					<p class="self-stretch text-lg leading-relaxed sm:text-xl text-dark-blue-gray">
+						DaVinciBot participe depuis plus de 10 ans à cette compétition organisée par Planète
 						Sciences avec tous les ans une nouvelle équipe, un nouveau thème et de nouveaux défis à
 						réaliser.
 					</p>
 				</div>
-				<div class="flex flex-col gap-4 sm:flex-row sm:gap-8">
+				<div class="flex flex-col w-full gap-4 sm:flex-row sm:gap-6 sm:w-auto">
 					<CtaButton>Nos Projets</CtaButton>
 					<CtaButton secondary={true}>Soutenez nous</CtaButton>
 				</div>
@@ -86,7 +88,7 @@
 				height="720"
 				loading="eager"
 				fetchpriority="high"
-				class="order-1 w-full mx-auto mb-6 md:mb-0 md:order-2 scale-130"
+				class="order-1 w-full max-w-md mx-auto mb-6 object-contain md:mb-0 md:order-2 md:max-w-full md:max-h-[420px] lg:max-h-[480px]"
 			/>
 		</div>
 
@@ -104,24 +106,32 @@
 			</Carousel>
 		</div>
 	</div>
-	<div class="flex flex-row items-center justify-between p-4">
-		<div class="w-1/3 p-4 m-2 md:text-center md:w-6/12">
-			<h2 class="text-6xl font-extrabold tracking-[4.10px]">8</h2>
-			<p class="self-stretch text-xl tracking-wider text-dark-blue-gray">Robots</p>
+	<section class="flex flex-col w-full gap-6 px-2 py-10 sm:px-0">
+		<div class="flex flex-col items-center gap-2 text-center">
+			<h2 class="text-3xl font-extrabold sm:text-4xl">Nos chiffres clés</h2>
+			<p class="text-base leading-relaxed text-dark-blue-gray sm:text-lg">
+				Un aperçu rapide de l'engagement annuel de l'équipe CDR.
+			</p>
 		</div>
-		<div class="w-1/3 p-4 m-2 md:text-center md:w-6/12">
-			<h2 class="text-6xl font-extrabold tracking-[4.10px] pl-6">2000 €</h2>
-			<p class="self-stretch text-xl tracking-wider text-dark-blue-gray pr-3">Budget</p>
+		<div class="grid w-full grid-cols-1 gap-6 sm:grid-cols-3 md:gap-8 lg:gap-10">
+			<div class="flex flex-col items-center gap-2 p-4 text-center rounded-2xl">
+				<h2 class="text-4xl font-extrabold sm:text-5xl lg:text-6xl">8</h2>
+				<p class="text-lg font-semibold tracking-wide text-dark-blue-gray">Robots</p>
+			</div>
+			<div class="flex flex-col items-center gap-2 p-4 text-center rounded-2xl">
+				<h2 class="text-4xl font-extrabold sm:text-5xl lg:text-6xl">2000&nbsp;€</h2>
+				<p class="text-lg font-semibold tracking-wide text-dark-blue-gray">Budget</p>
+			</div>
+			<div class="flex flex-col items-center gap-2 p-4 text-center rounded-2xl">
+				<h2 class="text-4xl font-extrabold sm:text-5xl lg:text-6xl">12</h2>
+				<p class="text-lg font-semibold tracking-wide text-dark-blue-gray">Membres</p>
+			</div>
 		</div>
-		<div class="w-1/3 p-4 m-2 md:text-center md:w-6/12">
-			<h2 class="text-6xl font-extrabold tracking-[4.10px]">12</h2>
-			<p class="self-stretch text-xl tracking-wider text-dark-blue-gray">Membres</p>
-		</div>
-	</div>
+	</section>
 	<div class="flex flex-col items-center justify-center mt-12">
-		<div class="relative max-w-[500px] m-auto text-center">
-			<h1 class="text-4xl font-extrabold tracking-wide sm:text-3xl md:text-5xl">Nos classements</h1>
-			<p class="mt-5 text-base sm:text-lg text-dark-blue-gray">
+		<div class="relative w-full max-w-2xl mx-auto text-center">
+			<h1 class="text-4xl font-extrabold tracking-tight sm:text-4xl md:text-5xl">Nos classements</h1>
+			<p class="mt-5 text-base leading-relaxed sm:text-lg text-dark-blue-gray">
 				DaVinciBot organise et participe à des événements de robotique, offrant à ses membres des
 				occasions de se perfectionner et de relever des défis concrets. <br /> <br />
 				L'association propose des compétitions internes et externes, ainsi que des ateliers, permettant
