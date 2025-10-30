@@ -176,8 +176,8 @@
 			</div>
 
 			<div class="relative grid w-full gap-10 -mt-2 md:-mt-4 lg:-mt-6 md:grid-cols-[minmax(18rem,24rem)_minmax(20rem,28rem)_minmax(18rem,24rem)] md:items-center lg:grid-cols-[minmax(20rem,30rem)_minmax(22rem,32rem)_minmax(20rem,30rem)]">
-				<div class="flex flex-col items-center gap-10 text-center md:items-start md:text-left md:gap-20 md:justify-between">
-					<div class="flex flex-col items-center gap-2 md:items-start md:text-left md:-translate-x-6 lg:-translate-x-8">
+				<div class="flex flex-col items-center gap-10 text-center md:items-center md:text-center md:gap-20 md:justify-between">
+					<div class="flex flex-col items-center gap-2 md:-translate-x-6 lg:-translate-x-8">
 						<span class="flex h-11 w-11 items-center justify-center rounded-full bg-gradient-to-br from-dark-light-blue to-primary-200 text-dark-blue shadow-[0_10px_24px_-12px_rgba(2,50,255,0.45)]">
 							<svg
 								xmlns="http://www.w3.org/2000/svg"
@@ -206,7 +206,7 @@
 							</p>
 						</div>
 					</div>
-					<div class="flex flex-col items-center gap-2 md:items-start md:text-left md:-translate-x-1 lg:-translate-x-2">
+					<div class="flex flex-col items-center gap-2 md:-translate-x-1 lg:-translate-x-2">
 						<span class="flex h-11 w-11 items-center justify-center rounded-full bg-gradient-to-br from-dark-light-blue to-primary-200 text-dark-blue shadow-[0_10px_24px_-12px_rgba(2,50,255,0.45)]">
 							<svg
 								xmlns="http://www.w3.org/2000/svg"
@@ -253,8 +253,8 @@
 						/>
 					</div>
 				</div>
-				<div class="flex flex-col items-center gap-10 text-center md:items-end md:text-right md:gap-20 md:justify-between">
-					<div class="flex flex-col items-center gap-2 md:items-end md:text-right md:translate-x-6 lg:translate-x-8">
+				<div class="flex flex-col items-center gap-10 text-center md:items-center md:text-center md:gap-20 md:justify-between">
+					<div class="flex flex-col items-center gap-2 md:translate-x-6 lg:translate-x-8">
 						<span class="flex h-11 w-11 items-center justify-center rounded-full bg-gradient-to-br from-dark-light-blue to-primary-200 text-dark-blue shadow-[0_10px_24px_-12px_rgba(2,50,255,0.45)]">
 							<svg
 								xmlns="http://www.w3.org/2000/svg"
@@ -281,7 +281,7 @@
 							</p>
 						</div>
 					</div>
-					<div class="flex flex-col items-center gap-2 md:items-end md:text-right md:-translate-x-1 lg:-translate-x-2">
+					<div class="flex flex-col items-center gap-2 md:-translate-x-1 lg:-translate-x-2">
 						<span class="flex h-11 w-11 items-center justify-center rounded-full bg-gradient-to-br from-dark-light-blue to-primary-200 text-dark-blue shadow-[0_10px_24px_-12px_rgba(2,50,255,0.45)]">
 							<svg
 								xmlns="http://www.w3.org/2000/svg"
@@ -291,13 +291,19 @@
 								stroke-width="1.5"
 								class="h-6 w-6"
 							>
-								<circle cx="8" cy="9" r="2" />
-								<circle cx="16" cy="8" r="2" />
-								<circle cx="15" cy="16" r="2" />
-								<circle cx="9" cy="16" r="2" />
-								<path stroke-linecap="round" stroke-linejoin="round" d="M9.8 10.6l3.2 4.8" />
-								<path stroke-linecap="round" stroke-linejoin="round" d="M10 9.5l4.5-1.3" />
-								<path stroke-linecap="round" stroke-linejoin="round" d="M14.2 10.2l1.6 4.4" />
+								<path
+									stroke-linecap="round"
+									stroke-linejoin="round"
+									d="M11.8 6.1c-2.2-1.9-5.1-2.5-7.3-1.7v11.6c2.2-.8 5.1-.2 7.3 1.3V6.1Z"
+								/>
+								<path
+									stroke-linecap="round"
+									stroke-linejoin="round"
+									d="M12.2 6.1c2.2-1.9 5.1-2.5 7.3-1.7v11.6c-2.2-.8-5.1-.2-7.3 1.3V6.1Z"
+								/>
+								<path stroke-linecap="round" stroke-linejoin="round" d="M12 6.1v11.2" />
+								<path stroke-linecap="round" stroke-linejoin="round" d="M4.5 5.5c2.4-.8 5.5-.1 7.5 1.8" />
+								<path stroke-linecap="round" stroke-linejoin="round" d="M19.5 5.5c-2.4-.8-5.5-.1-7.5 1.8" />
 							</svg>
 						</span>
 						<div class="max-w-xs space-y-1 md:max-w-sm lg:max-w-md">
