@@ -2,57 +2,42 @@
 	import Topbar from '$lib/components/share/Topbar.svelte';
 	import Footer from '$lib/components/share/Footer.svelte';
 	import CTAButton from '$lib/components/utils/CTAButton.svelte';
-	import Carousel from '$lib/components/others/Carousel.svelte';
-
-	import HDSLogo from '$lib/components/share/Logo/HDS.svelte';
-	import RSLogo from '$lib/components/share/Logo/RS.svelte';
-	import FaulhaberLogo from '$lib/components/share/Logo/Faulhaber.svelte';
-	import AlstomLogo from '$lib/components/share/Logo/Alstom.svelte';
-	import IFTLogo from '$lib/components/share/Logo/IFT.svelte';
-	import GotronicLogo from '$lib/components/share/Logo/Gotronic.svelte';
-	import AislerLogo from '$lib/components/share/Logo/Aisler.svelte';
 
 	const keyFigures = [
 		{
-			value: '2025',
-			label: 'Édition CoHoMa',
+			value: '2024',
+			label: 'Naissance du projet',
 			description:
-				'Participation à la quatrième édition du challenge CoHaMa organisé par le Battle Lab Terre.'
+				"Création du projet initialement avec l'association DeVinci Fablab, début d'une aventure technologique."
 		},
 		{
-			value: '6',
+			value: '12',
 			label: 'Étudiants mobilisés',
 			description:
-				"Équipe pluridisciplinaire mêlant mécatronique, IA, électronique et design d'expérience."
+				'Équipe pluridisciplinaire mêlant CAO, électronique, informatique embarquée et fabrication additive.'
 		},
 		{
 			value: '3',
-			label: 'Sous-systèmes intégrés',
-			description: 'Navigation autonome, perception 3D et interface opérateur augmentée.'
-		},
-		{
-			value: '12+',
-			label: 'Capteurs embarqués',
-			description:
-				'Lidar, caméras stéréo, IMU tactique, télémétrie GNSS et surveillance énergétique.'
+			label: 'Axes technologiques',
+			description: "Trois piliers guide la conception : la légèreté, l'ergonomie et la polyvalence."
 		}
 	];
 
 	const missionPillars = [
 		{
-			title: 'Augmenter le soldat',
+			title: "Augmenter l'utilisateur",
 			description:
-				"Offrir une aide robotique capable d'explorer, cartographier et sécuriser les abords d'une zone d'intervention."
+				'Augmenter l’utilisateur en amplifiant sa force, sa précision et son endurance grâce à un exosquelette intelligent.'
 		},
 		{
-			title: 'Assurer la cohabitation',
+			title: 'Préserver la liberté de mouvement',
 			description:
-				"Concevoir une interface qui laisse l'humain au centre de la décision tout en exploitant les capacités du robot."
+				'Concevoir un exosquelette qui épouse les gestes de l’utilisateur en garantissant un confort optimal et une utilisation fluide.'
 		},
 		{
-			title: 'Garder le rythme opérationnel',
+			title: 'Renforcer la sécurité',
 			description:
-				'Développer une plateforme robuste, rapide à déployer et autonome sur un cycle de mission complet.'
+				'Protéger les utilisateurs des risques de blessures en anticipant leurs mouvements et en adaptant l’assistance en temps réel.'
 		}
 	];
 
@@ -180,11 +165,6 @@
 	<section
 		class="relative overflow-hidden px-4 pt-24 pb-16 sm:px-8 md:px-16 lg:px-32 md:pt-28 lg:pt-36"
 	>
-		<div
-			class="absolute inset-0 -z-10 opacity-70"
-			style="background: radial-gradient(circle at 10% 20%, rgba(2, 50, 255, 0.25), transparent 55%), radial-gradient(circle at 90% 10%, rgba(255, 255, 255, 0.15), transparent 45%);"
-			aria-hidden="true"
-		></div>
 		<div class="max-w-6xl mx-auto grid items-center gap-12 lg:grid-cols-[1.1fr_0.9fr]">
 			<div class="space-y-6">
 				<p class="text-sm font-semibold tracking-[0.3em] uppercase text-white/70">Projet Exodus</p>
@@ -209,30 +189,17 @@
 					aria-hidden="true"
 				></div>
 				<img
-					src="/assets/projets/cohoma.png"
-					alt="Rendu 3D du robot CoHoMa développé par DaVinciBot"
+					src="/assets/projets/future_exodus.jpg"
+					alt="Objectif d'Exodus"
 					class="relative w-full max-w-md rounded-3xl border border-white/10 shadow-2xl shadow-dark-light-blue/40"
 					loading="lazy"
 				/>
 			</div>
 		</div>
-		<div class="flex flex-col justify-center w-full mt-8 2xl:mt-0 sm:w-10/12 md:w-9/12 lg:w-7/12">
-			<h2 class="text-base font-bold">Nos soutiens</h2>
-
-			<Carousel>
-				<HDSLogo />
-				<RSLogo />
-				<FaulhaberLogo />
-				<AislerLogo />
-				<AlstomLogo />
-				<IFTLogo />
-				<GotronicLogo />
-			</Carousel>
-		</div>
 	</section>
 
 	<section class="px-4 py-12 sm:px-8 md:px-16 lg:px-32">
-		<div class="max-w-6xl mx-auto grid gap-6 sm:grid-cols-2 xl:grid-cols-4">
+		<div class="max-w-6xl mx-auto grid gap-6 sm:grid-cols-2 xl:grid-cols-3">
 			{#each keyFigures as figure}
 				<article class="rounded-2xl border border-white/10 bg-white/5 p-6 backdrop-blur">
 					<h2 class="text-3xl font-extrabold text-dark-light-blue sm:text-4xl">{figure.value}</h2>
@@ -248,10 +215,10 @@
 			<div class="space-y-6">
 				<h2 class="text-3xl font-extrabold sm:text-4xl">Mission et contraintes</h2>
 				<p class="text-base leading-relaxed text-white/75 sm:text-lg">
-					Le challenge CoHoMa met l'accent sur la collaboration entre l'humain et la machine. Chaque
-					épreuve impose un tempo soutenu, l'identification rapide des menaces et la capacité à
-					explorer des zones à visibilité limitée. Notre réponse combine perception 3D, navigation
-					assistée et une interface opérateur qui guide sans saturer l'attention.
+					L'exosquelette Exodus vise à améliorer la condition des employés amenés à porter des
+					charges lourdes. Plusieurs défis sont à relever comme équilibrer puissance et légèreté ou
+					garantir une autonomie pronlongée.Notre solution combine l'utilisation de matériaux
+					avancés, une conception ergonomique et prédiction de mouvements avec l'IA.
 				</p>
 				<ul class="space-y-4">
 					{#each missionPillars as item}
