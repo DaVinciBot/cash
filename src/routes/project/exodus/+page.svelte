@@ -41,75 +41,55 @@
 		}
 	];
 
-	const capabilities = [
-		{
-			title: 'Perception et fusion de données',
-			description:
-				'LiDAR 360°, caméras RGB-D et odométrie sont fusionnés pour produire une carte locale dense et détecter les menaces.'
-		},
-		{
-			title: 'Navigation adaptative',
-			description:
-				'Planification hybride : navigation autonome sur zones sûres, reprise manuelle instantanée via joystick militaire.'
-		},
-		{
-			title: 'Interaction homme-machine',
-			description:
-				"Interface tactile et casque X-AR affichent l'état du robot, les alertes terrain et les propositions de trajectoire."
-		}
-	];
-
 	const teamStreams = [
 		{
-			title: 'Robotique & mécatronique',
+			title: 'Conception mécanique',
 			points: [
-				"Intégration d'un châssis à assistance électrique tout-terrain",
-				'Suspension modulaire pour franchir les obstacles du parcours de qualification',
-				"Gestion thermique et énergétique pour 90 minutes d'autonomie"
+				"Modélisation 3D des différentes parties de l'exosquelette.",
+				"Prototypage rapide à l' aide de la fabrication additive et soustractive.",
+				'Recherche de nouveaux matériaux et procédés de fabrication pour allier légèreté et robustesse.'
 			]
 		},
 		{
-			title: 'Perception & IA embarquée',
+			title: 'Electronique et informatique embarquée.',
 			points: [
-				'Segmentation 3D en temps réel pour distinguer alliés, obstacles et zones de danger',
-				'Suivi de chemin sécurisé avec recalage SLAM et géorepérage',
-				'Pipeline ROS 2 optimisé pour Jetson Orin'
+				'Conception des cartes électroniques utiles pour le fonctionnement des capteurs et drivers.',
+				"Développement d'un système de contrôle des moteurs intelligents et réactifs."
 			]
 		},
 		{
-			title: 'Expérience opérateur',
+			title: 'Expérience utilisateur',
 			points: [
-				'Interface qui priorise les alertes critiques et simplifie la supervision des capteurs',
-				'Visualisation AR pour projeter cartes et trajectoires directement dans le champ de vision',
-				"Séquences d'entraînement gamifiées pour familiariser l'opérateur avant la compétition"
+				"Interface permettant un paramétrage simple de l'exosquelette.",
+				'Tests sur des personnes ayant des morphologies différetes pour un meilleur feedback.',
+				'Processus de tests des composants mécaniques sur banc de test pour vérifier la solidité.'
 			]
 		}
 	];
 
 	const milestones = [
 		{
-			period: 'Septembre 2024',
-			title: 'Définition du besoin tactique',
+			period: '2025-2026',
+			title: 'Bras et liaison dorsale',
 			description:
-				'Analyse des scénarios fournis par le Battle Lab Terre et sélection des modules critiques à prototyper.'
+				'Recherche et développement pour la conception de la liaison dorsale et des bras avec les moteurs brushless.'
 		},
 		{
-			period: 'Janvier 2025',
-			title: 'Prototype terrain V1',
+			period: '2026-2027',
+			title: 'Développement du bassin',
 			description:
-				'Assemblage châssis, capteurs principaux et téléopération sécurisée. Campagne de tests sur terrain accidenté.'
+				"Intégration d'un bassin aux précédents prototypes et développement d'une IA de prédiction des mouvements."
 		},
 		{
-			period: 'Avril 2025',
-			title: 'Itération co-design',
+			period: '2027-2028',
+			title: 'Intégration des jambes',
 			description:
-				'Intégration des retours des instructeurs militaires : révision IHM, modes de secours et checklists opérateur.'
+				"recherche et développement pour l'intégration des jambes et consolidation du reste de l'exosquelette."
 		},
 		{
-			period: 'Juin 2025',
-			title: 'Qualification Challenge',
-			description:
-				'Présentation officielle, démonstrateur complet et simulations des épreuves de cohabitation homme-machine.'
+			period: '2028-2029',
+			title: 'Version Finale',
+			description: "Tests finaux et présentation du modèle finale d'Exodus."
 		}
 	];
 
@@ -232,18 +212,19 @@
 			<div class="relative rounded-3xl border border-white/10 bg-white/5 p-8 backdrop-blur">
 				<h3 class="text-2xl font-bold">Architecture système</h3>
 				<p class="mt-3 text-sm leading-relaxed text-white/75">
-					Le robot s'articule autour d'un châssis motorisé quatre roues motrices, d'un mât capteurs
-					modulaire et d'une baie électronique refroidie passivement. Des rails de montage
-					permettent d'ajouter facilement des charges utiles (bras robotique, capteurs NRBC, relais
-					de communications). Une architecture ROS&nbsp;2 distribue la prise de décision sur trois
-					ordinateurs embarqués reliés par un réseau temps réel.
+					Exodus s'articule autour d'une liaison dorsale et de 2 bras. Des moteurs brushless dédiés
+					à chaque épaule assurent une assistance précise, tandis qu’une structure en TPU offre
+					légèreté et résistance. Le réseau CAN garantit une communication fluide entre les
+					composants, et un écran intégré permet à l’utilisateur de configurer en temps réel les
+					paramètres d’assistance.
 				</p>
 				<div class="mt-6 grid gap-4 rounded-2xl border border-white/10 bg-dark-blue/40 p-5 text-sm">
 					<p class="font-semibold uppercase tracking-[0.25em] text-white/60">Composants clés</p>
 					<ul class="space-y-2 text-white/75">
-						<li>• Compute Jetson Orin + MCU redondante pour la sécurité</li>
-						<li>• Double réseau CAN pour la motorisation et les actionneurs secondaires</li>
-						<li>• Lien radio crypté + 5G privée pour le retour vidéo et télémétrie</li>
+						<li>• Structure dorsale en TPU pour plus de flexibilité</li>
+						<li>• Capteurs de force intégrés pour une meilleure assistance</li>
+						<li>• Moteurs brushless pour plus de puissance</li>
+						<li>• Systèmes embarqués capable de répondre en moins 250 ms</li>
 					</ul>
 				</div>
 			</div>
@@ -252,35 +233,11 @@
 
 	<section class="px-4 py-16 sm:px-8 md:px-16 lg:px-32 bg-white/5">
 		<div class="max-w-6xl mx-auto">
-			<div class="flex flex-col gap-6 mb-12 lg:flex-row lg:items-end lg:justify-between">
-				<div>
-					<h2 class="text-3xl font-extrabold sm:text-4xl">Capacités principales</h2>
-					<p class="mt-3 text-base text-white/70 sm:text-lg">
-						Chaque sous-système est pensé pour apporter une information exploitable en quelques
-						secondes par l'opérateur, tout en respectant les règles d'engagement.
-					</p>
-				</div>
-			</div>
-			<div class="grid gap-6 md:grid-cols-3">
-				{#each capabilities as capability}
-					<article
-						class="flex flex-col gap-3 rounded-2xl border border-white/10 bg-dark-blue/60 p-6"
-					>
-						<h3 class="text-xl font-semibold text-white">{capability.title}</h3>
-						<p class="text-sm leading-relaxed text-white/70">{capability.description}</p>
-					</article>
-				{/each}
-			</div>
-		</div>
-	</section>
-
-	<section class="px-4 py-16 sm:px-8 md:px-16 lg:px-32">
-		<div class="max-w-6xl mx-auto">
 			<h2 class="text-3xl font-extrabold sm:text-4xl">Organisation de l'équipe</h2>
 			<p class="mt-3 text-base text-white/70 sm:text-lg">
-				L'équipe CoHoMa mobilise les compétences des trois écoles du Pôle Léonard de Vinci. Nos
-				méthodes agiles se combinent à une approche V&V (Verification &amp; Validation) inspirée de
-				l'industrie défense.
+				L'équipe Exodus mobilise les compétences des trois écoles du Pôle Léonard de Vinci. Nos
+				méthodes agiles permettent un protypage rapide afin de répondre efficacement aux besoins des
+				utilisateurs.
 			</p>
 			<div class="mt-10 grid gap-6 lg:grid-cols-3">
 				{#each teamStreams as stream}
@@ -297,9 +254,9 @@
 		</div>
 	</section>
 
-	<section class="px-4 py-16 sm:px-8 md:px-16 lg:px-32 bg-white/5">
+	<section class="px-4 py-16 sm:px-8 md:px-16 lg:px-32">
 		<div class="max-w-5xl mx-auto">
-			<h2 class="text-3xl font-extrabold sm:text-4xl">Feuille de route 2024—2025</h2>
+			<h2 class="text-3xl font-extrabold sm:text-4xl">Feuille de route du projet</h2>
 			<ol class="mt-10 space-y-8">
 				{#each milestones as milestone, index}
 					<li class="relative rounded-2xl border border-white/10 bg-dark-blue/60 p-6">
@@ -323,7 +280,7 @@
 		<div
 			class="max-w-5xl mx-auto rounded-3xl border border-white/10 bg-gradient-to-br from-white/10 via-white/5 to-white/10 p-10 text-center backdrop-blur"
 		>
-			<h2 class="text-3xl font-extrabold sm:text-4xl">Collaborer autour de CoHoMa</h2>
+			<h2 class="text-3xl font-extrabold sm:text-4xl">Sponsoriser le projet Exodus</h2>
 			<p class="mt-4 text-base leading-relaxed text-white/75 sm:text-lg">
 				Nous cherchons des partenaires techniques, mentors tactiques et soutiens financiers pour
 				accélérer le développement. Vous souhaitez contribuer à la prochaine génération de systèmes
