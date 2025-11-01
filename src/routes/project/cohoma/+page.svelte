@@ -5,10 +5,10 @@
 
 	const keyFigures = [
 		{
-			value: '2025',
-			label: "Édition CoHoMa",
+			value: '2027',
+			label: 'Édition CoHoMa',
 			description:
-				"Participation à la quatrième édition du challenge CoHaMa organisé par le Battle Lab Terre."
+				'Participation à la quatrième édition du challenge CoHaMa organisé par le Battle Lab Terre.'
 		},
 		{
 			value: '6',
@@ -24,7 +24,8 @@
 		{
 			value: '12+',
 			label: 'Capteurs embarqués',
-			description: 'Lidar, caméras stéréo, IMU tactique, télémétrie GNSS et surveillance énergétique.'
+			description:
+				'Lidar, caméras stéréo, IMU tactique, télémétrie GNSS et surveillance énergétique.'
 		}
 	];
 
@@ -42,7 +43,7 @@
 		{
 			title: 'Garder le rythme opérationnel',
 			description:
-				"Développer une plateforme robuste, rapide à déployer et autonome sur un cycle de mission complet."
+				'Développer une plateforme robuste, rapide à déployer et autonome sur un cycle de mission complet.'
 		}
 	];
 
@@ -50,7 +51,7 @@
 		{
 			title: 'Perception et fusion de données',
 			description:
-				"LiDAR 360°, caméras RGB-D et odométrie sont fusionnés pour produire une carte locale dense et détecter les menaces."
+				'LiDAR 360°, caméras RGB-D et odométrie sont fusionnés pour produire une carte locale dense et détecter les menaces.'
 		},
 		{
 			title: 'Navigation adaptative',
@@ -84,7 +85,7 @@
 		{
 			title: 'Expérience opérateur',
 			points: [
-				"Interface qui priorise les alertes critiques et simplifie la supervision des capteurs",
+				'Interface qui priorise les alertes critiques et simplifie la supervision des capteurs',
 				'Visualisation AR pour projeter cartes et trajectoires directement dans le champ de vision',
 				"Séquences d'entraînement gamifiées pour familiariser l'opérateur avant la compétition"
 			]
@@ -93,28 +94,28 @@
 
 	const milestones = [
 		{
-			period: 'Septembre 2024',
+			period: 'Septembre 2025',
 			title: 'Définition du besoin tactique',
 			description:
-				"Analyse des scénarios fournis par le Battle Lab Terre et sélection des modules critiques à prototyper."
+				'Analyse des scénarios fournis par le Battle Lab Terre et sélection des modules critiques à prototyper.'
 		},
 		{
-			period: 'Janvier 2025',
+			period: 'Juin 2026',
 			title: 'Prototype terrain V1',
 			description:
-				"Assemblage châssis, capteurs principaux et téléopération sécurisée. Campagne de tests sur terrain accidenté."
+				'Assemblage châssis, capteurs principaux et téléopération sécurisée. Campagne de tests sur terrain accidenté.'
 		},
 		{
-			period: 'Avril 2025',
+			period: 'Octobre 2026',
 			title: 'Itération co-design',
 			description:
-				"Intégration des retours des instructeurs militaires : révision IHM, modes de secours et checklists opérateur."
+				'Intégration des retours des instructeurs militaires : révision IHM, modes de secours et checklists opérateur.'
 		},
 		{
-			period: 'Juin 2025',
+			period: 'Juin 2027',
 			title: 'Qualification Challenge',
 			description:
-				"Présentation officielle, démonstrateur complet et simulations des épreuves de cohabitation homme-machine."
+				'Présentation officielle, démonstrateur complet et simulations des épreuves de cohabitation homme-machine.'
 		}
 	];
 
@@ -186,8 +187,8 @@
 				</h1>
 				<p class="text-base leading-relaxed text-white/80 sm:text-lg">
 					DaVinciBot développe une plateforme robotique semi-autonome capable de partager la mission
-					avec le soldat. Notre objectif : offrir un éclaireur fiable, conscient de son environnement
-					et capable d'assister l'opérateur sans le remplacer.
+					avec le soldat. Notre objectif : offrir un éclaireur fiable, conscient de son
+					environnement et capable d'assister l'opérateur sans le remplacer.
 				</p>
 				<div class="flex flex-col gap-4 sm:flex-row sm:items-center">
 					<CTAButton href="/contact">Échanger avec nous</CTAButton>
@@ -246,9 +247,9 @@
 				<h3 class="text-2xl font-bold">Architecture système</h3>
 				<p class="mt-3 text-sm leading-relaxed text-white/75">
 					Le robot s'articule autour d'un châssis motorisé quatre roues motrices, d'un mât capteurs
-					modulaire et d'une baie électronique refroidie passivement. Des rails de montage permettent
-					d'ajouter facilement des charges utiles (bras robotique, capteurs NRBC, relais de
-					communications). Une architecture ROS&nbsp;2 distribue la prise de décision sur trois
+					modulaire et d'une baie électronique refroidie passivement. Des rails de montage
+					permettent d'ajouter facilement des charges utiles (bras robotique, capteurs NRBC, relais
+					de communications). Une architecture ROS&nbsp;2 distribue la prise de décision sur trois
 					ordinateurs embarqués reliés par un réseau temps réel.
 				</p>
 				<div class="mt-6 grid gap-4 rounded-2xl border border-white/10 bg-dark-blue/40 p-5 text-sm">
@@ -276,7 +277,9 @@
 			</div>
 			<div class="grid gap-6 md:grid-cols-3">
 				{#each capabilities as capability}
-					<article class="flex flex-col gap-3 rounded-2xl border border-white/10 bg-dark-blue/60 p-6">
+					<article
+						class="flex flex-col gap-3 rounded-2xl border border-white/10 bg-dark-blue/60 p-6"
+					>
 						<h3 class="text-xl font-semibold text-white">{capability.title}</h3>
 						<p class="text-sm leading-relaxed text-white/70">{capability.description}</p>
 					</article>
@@ -310,7 +313,7 @@
 
 	<section class="px-4 py-16 sm:px-8 md:px-16 lg:px-32 bg-white/5">
 		<div class="max-w-5xl mx-auto">
-			<h2 class="text-3xl font-extrabold sm:text-4xl">Feuille de route 2024—2025</h2>
+			<h2 class="text-3xl font-extrabold sm:text-4xl">Feuille de route 2025-2027</h2>
 			<ol class="mt-10 space-y-8">
 				{#each milestones as milestone, index}
 					<li class="relative rounded-2xl border border-white/10 bg-dark-blue/60 p-6">
