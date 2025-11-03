@@ -14,18 +14,18 @@
 	import FooterEl from './FooterEl.svelte';
 	let items = [
 		[
-			{ text: "L'association", href: '/association' },
+			{ text: "L'association", href: '/a-propos' },
 			{ text: 'Nos écoles', href: '/nos-ecoles' },
 			{ text: 'Soutenez-nous', href: '/soutenez-nous' }
 		],
 		[
-			{ text: 'La CDR', href: '/CDR' },
-			{ text: 'Travelers', href: '/travelers' },
-			{ text: 'Exodus', href: '/exodus' }
+			{ text: 'La CDR', href: '/project/coupe-de-robotique' },
+			{ text: 'CoHoMa', href: '/project/cohoma' },
+			{ text: 'Exodus', href: '/project/exodus' }
 		],
 		[
 			{ text: 'CGU', href: '/cgu' },
-			{ text: 'Mentions légales', href: '/mention-legales' },
+			{ text: 'Mentions légales', href: '/mentions-legales' },
 			{ text: 'Données personnelles', href: '/donnees-personnelles' }
 		],
 		[
