@@ -1,13 +1,14 @@
 <script>
+	// @ts-nocheck
 	import { onMount } from 'svelte';
 	import { supabase, supabaseUrl } from '$lib/supabaseClient';
 	import { createClient } from '@supabase/supabase-js';
 	import { userdata } from '$lib/store.js';
 
 	import Table from '$lib/components/admin/Table.svelte';
-	import CrudForm from '$lib/components/modals/CrudForm.svelte';
 	import SucessModal from '$lib/components/modals/InfoModal.svelte';
 	import ReadDrawer from '$lib/components/drawers/ReadDrawer.svelte';
+	import UserImportModal from '$lib/components/modals/UserImportModal.svelte';
 
 	let headers = ['Nom', 'Rôle', 'Projets', 'Actions'];
 
@@ -29,6 +30,13 @@
 		{ text: 'Mur Végétal', value: '12' },
 		{ text: 'E-Dog', value: '13' },
 		{ text: 'CDR Nantes', value: '14' }
+	];
+
+	const roleOptions = [
+		{ value: 'admin', text: 'Admin' },
+		{ value: 'bureau', text: 'Bureau' },
+		{ value: 'cdp', text: 'Chef de projet' },
+		{ value: 'membre', text: 'Membre' }
 	];
 
 	let filters = [
@@ -70,121 +78,191 @@
 	}
 
 	async function addNew() {
-		new CrudForm({
+		new UserImportModal({
 			target: document.body,
 			props: {
-				open: true,
-				fields: [
-					{
-						name: 'Nom',
-						type: 'text',
-						placeholder: 'Rob, aka Robert',
-						required: true,
-						wide: true
-					},
-					{
-						name: 'Rôle',
-						id: 'role',
-						type: 'select',
-						options: [
-							{ value: 'admin', text: 'Admin' },
-							{ value: 'bureau', text: 'Bureau' },
-							{ value: 'cdp', text: 'Chef de projet' },
-							{ value: 'membre', text: 'Membre' }
-						],
-						required: true
-					},
-					{
-						name: 'Projet',
-						id: 'project',
-						type: 'select',
-						options: allProjects,
-						required: true
-					},
-					{
-						name: 'email',
-						type: 'email',
-						placeholder: 'davincibot@devinci.fr',
-						required: true,
-						wide: true
-					}
-				],
-				onSubmit: async (e) => {
-					e.preventDefault();
+				projectOptions: allProjects,
+				roleOptions,
+				initialRole: 'membre',
+				title: 'Importer des utilisateurs',
+				onSubmit: async ({ role, project, users }) => {
 					if (admin_supabase === null) {
-						console.error('No service key');
-						alert(
-							'You do not have the required permissions to perform this action (required: admin)'
+						throw new Error(
+							"Vous n'avez pas les permissions requises pour cette action (rôle admin nécessaire)."
 						);
-						return;
 					}
 
-					const form = {
-						email: document.querySelector('#email').value,
-						role: document.querySelector('#role').value,
-						username: document.querySelector('#nom').value,
-						project: document.querySelector('#project').value || 0
-					};
+					const createdUsers = [];
+					const updatedUsers = [];
+					const alreadyLinked = [];
+					const failures = [];
+					const defaultProject = project && project !== 'NULL' ? project : '';
+					const effectiveRole = role || 'membre';
 
-					if (form.project == 'NULL') form.project = 0;
+					const existingAuthUsers = new Map();
+					try {
+						const perPage = 100;
+						let page = 1;
+						while (true) {
+							const { data, error } = await admin_supabase.auth.admin.listUsers({ page, perPage });
+							if (error) throw error;
+							const fetched = data?.users ?? [];
+							for (const authUser of fetched) {
+								if (!authUser.email) continue;
+								existingAuthUsers.set(authUser.email.toLowerCase(), authUser);
+							}
+							if (fetched.length < perPage) break;
+							page += 1;
+						}
+					} catch (error) {
+						console.error('Impossible de récupérer les utilisateurs existants', error);
+						throw new Error('Impossible de récupérer la liste des utilisateurs existants.');
+					}
 
-					if (!form.email) {
-						alert('No email provided');
-						return;
-					}
-					if (!form.role) {
-						alert('No role provided');
-						return;
-					}
-					if (!form.username) {
-						alert('No username provided');
-						return;
-					}
+					for (const user of users) {
+						const email = user.email.trim().toLowerCase();
+						const username = user.name.trim();
+						const projectRaw =
+							user.project && user.project !== 'NULL' ? user.project : defaultProject;
+						const resolvedProjectValue = (projectRaw ?? '').toString().trim();
+						if (!resolvedProjectValue) {
+							failures.push({
+								email,
+								message: 'Aucun projet associé pour cet utilisateur.'
+							});
+							continue;
+						}
+						const projectId = parseInt(resolvedProjectValue, 10);
+						if (!Number.isInteger(projectId) || projectId <= 0) {
+							failures.push({
+								email,
+								message: 'Projet invalide ou introuvable pour cet utilisateur.'
+							});
+							continue;
+						}
+						const existingAuth = existingAuthUsers.get(email);
+						let createdUserId = existingAuth?.id ?? null;
+						let isNewlyCreated = false;
 
-					{
-						// invite the user with the email
-						const { data, error } = await admin_supabase.auth.admin.inviteUserByEmail(form.email);
-						if (error) {
-							console.error(error);
-							alert('An error occured while inviting the user');
-							return;
-						} else {
-							console.log('User invited');
-							form.id = data.user.id;
+						try {
+							if (!existingAuth) {
+								const { data: inviteData, error: inviteError } =
+									await admin_supabase.auth.admin.inviteUserByEmail(email);
+								if (inviteError) throw new Error(inviteError.message);
+								createdUserId = inviteData.user.id;
+								isNewlyCreated = true;
+								const { error: profileError } = await supabase.from('profiles').insert({
+									id: createdUserId,
+									username,
+									role: effectiveRole
+								});
+								if (profileError) throw new Error(profileError.message);
+								const { error: memberError } = await supabase.from('member_of').insert({
+									profile: createdUserId,
+									project: projectId
+								});
+								if (memberError) throw new Error(memberError.message);
+								createdUsers.push(email);
+								existingAuthUsers.set(email, { id: createdUserId, email });
+							} else {
+								const profileId = createdUserId;
+								const { data: existingProfileRows, error: existingProfileError } = await supabase
+									.from('profiles')
+									.select('id, username, role')
+									.eq('id', profileId)
+									.limit(1);
+								if (existingProfileError) throw new Error(existingProfileError.message);
+								const existingProfile = existingProfileRows?.[0];
+								if (!existingProfile) {
+									const fallbackUsername = username || email.split('@')[0];
+									const { error: profileInsertError } = await supabase.from('profiles').insert({
+										id: profileId,
+										username: fallbackUsername,
+										role: effectiveRole
+									});
+									if (profileInsertError) throw new Error(profileInsertError.message);
+								}
+								const { count: memberCount, error: memberCheckError } = await supabase
+									.from('member_of')
+									.select('project', { count: 'exact', head: true })
+									.eq('profile', profileId)
+									.eq('project', projectId);
+								if (memberCheckError) throw new Error(memberCheckError.message);
+								if ((memberCount ?? 0) === 0) {
+									const { error: attachError } = await supabase.from('member_of').insert({
+										profile: profileId,
+										project: projectId
+									});
+									if (attachError) throw new Error(attachError.message);
+									updatedUsers.push(email);
+								} else {
+									alreadyLinked.push(email);
+								}
+							}
+						} catch (error) {
+							failures.push({ email, message: error?.message || 'Erreur inconnue' });
+							if (isNewlyCreated && createdUserId) {
+								const { error: cleanupProfileError } = await supabase
+									.from('profiles')
+									.delete()
+									.eq('id', createdUserId);
+								if (cleanupProfileError) {
+									console.error('Impossible de nettoyer le profil créé', cleanupProfileError);
+								}
+								const { error: cleanupUserError } =
+									await admin_supabase.auth.admin.deleteUser(createdUserId);
+								if (cleanupUserError) {
+									console.error('Impossible de supprimer le compte Supabase', cleanupUserError);
+								}
+							}
 						}
 					}
 
-					{
-						const { data, error } = await supabase.from('profiles').insert({
-							id: form.id,
-							username: form.username,
-							role: form.role
-						});
-						if (error) {
-							console.error(error);
-							alert('An error occured while updating the user');
-							return;
-						} else {
-							console.log(data);
-						}
+					if (
+						createdUsers.length === 0 &&
+						updatedUsers.length === 0 &&
+						alreadyLinked.length === 0
+					) {
+						const firstFailure = failures[0];
+						throw new Error(
+							firstFailure?.message
+								? `Impossible de traiter ${firstFailure.email} : ${firstFailure.message}`
+								: 'Impossible de traiter les utilisateurs.'
+						);
 					}
 
-					{
-						const { data, error } = await supabase.from('member_of').insert({
-							profile: form.id,
-							project: form.project
-						});
-						if (error) {
-							console.error(error);
-							alert('An error occured while adding the user to the project');
-							return;
-						}
+					const messageParts = [];
+					if (createdUsers.length > 0) {
+						const createdLabel =
+							createdUsers.length === 1
+								? `Utilisateur invité : ${createdUsers[0]}`
+								: `${createdUsers.length} nouveaux utilisateurs invités.`;
+						messageParts.push(createdLabel);
 					}
+					if (updatedUsers.length > 0) {
+						const updatedLabel =
+							updatedUsers.length === 1
+								? `Projet ajouté pour ${updatedUsers[0]}.`
+								: `Projet ajouté pour ${updatedUsers.length} utilisateurs.`;
+						messageParts.push(updatedLabel);
+					}
+					if (alreadyLinked.length > 0) {
+						messageParts.push(`Déjà associés à ce projet : ${alreadyLinked.join(', ')}`);
+					}
+					if (failures.length > 0) {
+						const failureEmails = failures.map((f) => f.email).join(', ');
+						messageParts.push(
+							`Échec pour : ${failureEmails}. Consultez la console pour plus de détails.`
+						);
+						console.error('Import utilisateurs échoué pour certains comptes', failures);
+					}
+
+					const message = messageParts.join('\n');
 
 					new SucessModal({
 						target: document.body,
 						props: {
-							message: 'Utilisateur ajouté avec succès',
+							message,
 							onClose: () => {
 								window.location.reload();
 							}
