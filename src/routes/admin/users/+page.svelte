@@ -20,15 +20,15 @@
 	let admin_supabase = null;
 
 	let allProjects = [
-		{ name: 'CDR', value: '1' },
-		{ name: 'Travelers', value: '2' },
-		{ name: 'Exodus', value: '3' },
-		{ name: 'Bureau', value: '8' },
-		{ name: 'SmartScreen', value: '10' },
-		{ name: 'BallBalancing', value: '11' },
-		{ name: 'Mur Végétal', value: '12' },
-		{ name: 'E-Dog', value: '13' },
-		{ name: 'CDR Nantes', value: '14' }
+		{ text: 'CDR', value: '1' },
+		{ text: 'Travelers', value: '2' },
+		{ text: 'Exodus', value: '3' },
+		{ text: 'Bureau', value: '8' },
+		{ text: 'SmartScreen', value: '10' },
+		{ text: 'BallBalancing', value: '11' },
+		{ text: 'Mur Végétal', value: '12' },
+		{ text: 'E-Dog', value: '13' },
+		{ text: 'CDR Nantes', value: '14' }
 	];
 
 	let filters = [
@@ -51,9 +51,8 @@
 
 	userdata.subscribe((user) => {
 		if (user && user.allProjects) {
-			console.log(user.allProjects);
-			allProjects = user.allProjects.map((p) => ({ value: p.id, text: p.name }));
-			filters[0].options = user.allProjects.map((p) => ({ name: p.name, value: p.id })); // Update the project filter options
+			allProjects = user.allProjects.map((p) => ({ value: p.value, text: p.name }));
+			filters[0].options = user.allProjects.map((p) => ({ text: p.name, value: p.id })); // Update the project filter options
 		}
 	});
 
@@ -154,8 +153,6 @@
 							form.id = data.user.id;
 						}
 					}
-
-					console.log(form);
 
 					{
 						const { data, error } = await supabase.from('profiles').insert({
