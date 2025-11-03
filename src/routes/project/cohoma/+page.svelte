@@ -6,7 +6,7 @@
 	const keyFigures = [
 		{
 			value: '2027',
-			label: 'Édition CoHoMa',
+			label: 'Édition CoHoMa IV',
 			description:
 				'Participation à la quatrième édition du challenge CoHaMa organisé par le Battle Lab Terre.'
 		},
@@ -51,12 +51,12 @@
 		{
 			title: 'Perception et fusion de données',
 			description:
-				'LiDAR 360°, caméras RGB-D et odométrie sont fusionnés pour produire une carte locale dense et détecter les menaces.'
+				'LiDAR 3D Hémisphérique, caméras RGB-D et odométrie sont fusionnés pour produire une carte locale dense et détecter les menaces.'
 		},
 		{
 			title: 'Navigation adaptative',
 			description:
-				'Planification hybride : navigation autonome sur zones sûres, reprise manuelle instantanée via joystick militaire.'
+				'Planification hybride : navigation autonome sur zones sûres, reprise manuelle instantanée via logiciel de contrôle.'
 		},
 		{
 			title: 'Interaction homme-machine',
@@ -71,7 +71,7 @@
 			points: [
 				"Intégration d'un châssis à assistance électrique tout-terrain",
 				'Suspension modulaire pour franchir les obstacles du parcours de qualification',
-				"Gestion thermique et énergétique pour 90 minutes d'autonomie"
+				"Gestion thermique et énergétique pour 6h d'autonomie"
 			]
 		},
 		{
@@ -94,10 +94,9 @@
 
 	const milestones = [
 		{
-			period: 'Septembre 2025',
-			title: 'Définition du besoin tactique',
-			description:
-				'Analyse des scénarios fournis par le Battle Lab Terre et sélection des modules critiques à prototyper.'
+			period: 'Février 2026',
+			title: 'Définition du cahier des charges',
+			description: 'Reception du Cahier des Charges, analyse des besoins et des contraintes.'
 		},
 		{
 			period: 'Juin 2026',
@@ -172,7 +171,7 @@
 
 <main class="flex flex-col">
 	<section
-		class="relative overflow-hidden px-4 pt-24 pb-16 sm:px-8 md:px-16 lg:px-32 md:pt-28 lg:pt-36"
+		class="relative px-4 pt-24 pb-16 overflow-hidden sm:px-8 md:px-16 lg:px-32 md:pt-28 lg:pt-36"
 	>
 		<div
 			class="absolute inset-0 -z-10 opacity-70"
@@ -205,7 +204,7 @@
 				<img
 					src="/assets/projets/cohoma.png"
 					alt="Rendu 3D du robot CoHoMa développé par DaVinciBot"
-					class="relative w-full max-w-md rounded-3xl border border-white/10 shadow-2xl shadow-dark-light-blue/40"
+					class="relative w-full max-w-md border shadow-2xl rounded-3xl border-white/10 shadow-dark-light-blue/40"
 					loading="lazy"
 				/>
 			</div>
@@ -213,9 +212,9 @@
 	</section>
 
 	<section class="px-4 py-12 sm:px-8 md:px-16 lg:px-32">
-		<div class="max-w-6xl mx-auto grid gap-6 sm:grid-cols-2 xl:grid-cols-4">
+		<div class="grid max-w-6xl gap-6 mx-auto sm:grid-cols-2 xl:grid-cols-4">
 			{#each keyFigures as figure}
-				<article class="rounded-2xl border border-white/10 bg-white/5 p-6 backdrop-blur">
+				<article class="p-6 border rounded-2xl border-white/10 bg-white/5 backdrop-blur">
 					<h2 class="text-3xl font-extrabold text-dark-light-blue sm:text-4xl">{figure.value}</h2>
 					<p class="mt-2 text-lg font-semibold text-white/80">{figure.label}</p>
 					<p class="mt-4 text-sm leading-relaxed text-white/70">{figure.description}</p>
@@ -236,14 +235,14 @@
 				</p>
 				<ul class="space-y-4">
 					{#each missionPillars as item}
-						<li class="rounded-xl border border-white/10 bg-white/5 p-4">
+						<li class="p-4 border rounded-xl border-white/10 bg-white/5">
 							<h3 class="text-xl font-semibold text-white">{item.title}</h3>
 							<p class="mt-2 text-sm text-white/70">{item.description}</p>
 						</li>
 					{/each}
 				</ul>
 			</div>
-			<div class="relative rounded-3xl border border-white/10 bg-white/5 p-8 backdrop-blur">
+			<div class="relative p-8 border rounded-3xl border-white/10 bg-white/5 backdrop-blur">
 				<h3 class="text-2xl font-bold">Architecture système</h3>
 				<p class="mt-3 text-sm leading-relaxed text-white/75">
 					Le robot s'articule autour d'un châssis motorisé quatre roues motrices, d'un mât capteurs
@@ -252,7 +251,7 @@
 					de communications). Une architecture ROS&nbsp;2 distribue la prise de décision sur trois
 					ordinateurs embarqués reliés par un réseau temps réel.
 				</p>
-				<div class="mt-6 grid gap-4 rounded-2xl border border-white/10 bg-dark-blue/40 p-5 text-sm">
+				<div class="grid gap-4 p-5 mt-6 text-sm border rounded-2xl border-white/10 bg-dark-blue/40">
 					<p class="font-semibold uppercase tracking-[0.25em] text-white/60">Composants clés</p>
 					<ul class="space-y-2 text-white/75">
 						<li>• Compute Jetson Orin + MCU redondante pour la sécurité</li>
@@ -278,7 +277,7 @@
 			<div class="grid gap-6 md:grid-cols-3">
 				{#each capabilities as capability}
 					<article
-						class="flex flex-col gap-3 rounded-2xl border border-white/10 bg-dark-blue/60 p-6"
+						class="flex flex-col gap-3 p-6 border rounded-2xl border-white/10 bg-dark-blue/60"
 					>
 						<h3 class="text-xl font-semibold text-white">{capability.title}</h3>
 						<p class="text-sm leading-relaxed text-white/70">{capability.description}</p>
@@ -296,9 +295,9 @@
 				méthodes agiles se combinent à une approche V&V (Verification &amp; Validation) inspirée de
 				l'industrie défense.
 			</p>
-			<div class="mt-10 grid gap-6 lg:grid-cols-3">
+			<div class="grid gap-6 mt-10 lg:grid-cols-3">
 				{#each teamStreams as stream}
-					<article class="rounded-2xl border border-white/10 bg-white/5 p-6">
+					<article class="p-6 border rounded-2xl border-white/10 bg-white/5">
 						<h3 class="text-xl font-semibold text-white">{stream.title}</h3>
 						<ul class="mt-4 space-y-3 text-sm text-white/70">
 							{#each stream.points as point}
@@ -316,9 +315,9 @@
 			<h2 class="text-3xl font-extrabold sm:text-4xl">Feuille de route 2025-2027</h2>
 			<ol class="mt-10 space-y-8">
 				{#each milestones as milestone, index}
-					<li class="relative rounded-2xl border border-white/10 bg-dark-blue/60 p-6">
+					<li class="relative p-6 border rounded-2xl border-white/10 bg-dark-blue/60">
 						<div
-							class="absolute -left-8 top-6 hidden h-12 w-12 items-center justify-center rounded-full border border-white/20 bg-dark-light-blue text-xl font-bold text-dark-blue lg:flex"
+							class="absolute items-center justify-center hidden w-12 h-12 text-xl font-bold border rounded-full -left-8 top-6 border-white/20 bg-dark-light-blue text-dark-blue lg:flex"
 						>
 							{index + 1}
 						</div>
@@ -335,7 +334,7 @@
 
 	<section class="px-4 py-16 sm:px-8 md:px-16 lg:px-32">
 		<div
-			class="max-w-5xl mx-auto rounded-3xl border border-white/10 bg-gradient-to-br from-white/10 via-white/5 to-white/10 p-10 text-center backdrop-blur"
+			class="max-w-5xl p-10 mx-auto text-center border rounded-3xl border-white/10 bg-gradient-to-br from-white/10 via-white/5 to-white/10 backdrop-blur"
 		>
 			<h2 class="text-3xl font-extrabold sm:text-4xl">Collaborer autour de CoHoMa</h2>
 			<p class="mt-4 text-base leading-relaxed text-white/75 sm:text-lg">
@@ -343,7 +342,7 @@
 				accélérer le développement. Vous souhaitez contribuer à la prochaine génération de systèmes
 				robotisés ? Parlons-en.
 			</p>
-			<div class="mt-8 grid gap-4 sm:grid-cols-3">
+			<div class="grid gap-4 mt-8 sm:grid-cols-3">
 				{#each supportLinks as link}
 					<CTAButton href={link.href} secondary={link.href !== '/contact'}>
 						{link.label}

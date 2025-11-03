@@ -22,11 +22,6 @@
 	import FindUsLogo from '$lib/components/share/icon/FindUsLogo.svelte';
 	import Activity from '$lib/components/share/icon/Activity.svelte';
 	import Compass from '$lib/components/share/icon/Compass.svelte';
-	import SideBar from '$lib/components/admin/SideBar.svelte';
-
-	// SSR data from +page.server.js
-	export let data;
-	const posts = data?.posts ?? [];
 
 	let cdrImg = '/assets/projets/CDR.jpg';
 	let precoupeImg = '/assets/article/precoupe.jpg';
@@ -68,7 +63,7 @@
 <Topbar />
 
 <div
-	class="flex flex-col h-full gap-12 px-4 pt-20 mx-auto w-full max-w-screen-2xl sm:px-6 md:px-10 lg:px-16 md:pt-28 lg:pt-36"
+	class="flex flex-col w-full h-full gap-12 px-4 pt-20 mx-auto max-w-screen-2xl sm:px-6 md:px-10 lg:px-16 md:pt-28 lg:pt-36"
 >
 	<div class="justify-start">
 		<div class="grid items-center grid-cols-1 gap-10 md:grid-cols-[2fr_1.5fr]">
@@ -151,7 +146,7 @@
 			<Carousel time={90}>
 				<ResultCard
 					title={'2025 - The Show Must Go On'}
-					rank_and_points={'37e/102 - 230 pts'}
+					rank_and_points={'36/103 '}
 					image={cdrImg}
 					logo={TheShowMustGoOnLogo}
 					marginLeft={'30'}
@@ -159,7 +154,7 @@
 				/>
 				<ResultCard
 					title={'2024 - Farming Mars'}
-					rank_and_points={'56e/200 - 157 pts'}
+					rank_and_points={'44e/186 - 157 pts'}
 					image={precoupeImg}
 					logo={FarmingMars}
 					marginLeft={'35'}
@@ -167,26 +162,34 @@
 				/>
 				<ResultCard
 					title={'2023 - The Cherry on the Cake'}
-					rank_and_points={'46e/100 - 456 pts'}
+					rank_and_points={'46e/100 - 150 pts'}
 					image={coupe23Img}
 					logo={TheCherryOnTheCake}
 					marginLeft={'50'}
 					marginBottom={'35'}
 				/>
-				<ResultCard
-					title={'2025 - Age of Bots'}
-					rank_and_points={'36e/100 - 456 pts'}
+				<!-- <ResultCard
+					title={'2022 - Age of Bots'}
+					rank_and_points={''}
 					image={cdrImg}
 					logo={AgeOfBots}
 					marginLeft={'20'}
 					marginBottom={'5'}
 				/>
+				<ResultCard
+					title={'2019'}
+					rank_and_points={'54e/160 - 327 pts'}
+					image={cdrImg}
+					logo={AgeOfBots}
+					marginLeft={'20'}
+					marginBottom={'5'}
+				/> -->
 			</Carousel>
 		</div>
 	</div>
 	<section class="w-full pt-12 pb-16 sm:pt-16 md:pt-20 lg:pt-24">
-		<div class="flex flex-col items-center px-4 mx-auto max-w-6xl sm:px-6 gap-8 md:gap-12">
-			<div class="max-w-2xl text-center space-y-3 md:space-y-4">
+		<div class="flex flex-col items-center max-w-6xl gap-8 px-4 mx-auto sm:px-6 md:gap-12">
+			<div class="max-w-2xl space-y-3 text-center md:space-y-4">
 				<h2 class="text-4xl font-extrabold sm:text-5xl">Nos technologies</h2>
 				<p class="mb-0 text-lg text-dark-blue-gray">
 					Avec les années notre robot a accumulé de nombreuses technologies permettant d'être
@@ -201,7 +204,7 @@
 					class="flex flex-col items-center gap-10 text-center md:items-center md:text-center md:gap-20 md:justify-between"
 				>
 					<div class="flex flex-col items-center gap-2 md:-translate-x-6 lg:-translate-x-8">
-						<span class="flex h-11 w-11 items-center justify-center">
+						<span class="flex items-center justify-center h-11 w-11">
 							<EyeOpen />
 						</span>
 						<div class="max-w-xs space-y-1 md:max-w-sm lg:max-w-md">
@@ -212,7 +215,7 @@
 						</div>
 					</div>
 					<div class="flex flex-col items-center gap-2 md:-translate-x-1 lg:-translate-x-2">
-						<span class="flex h-11 w-11 items-center justify-center">
+						<span class="flex items-center justify-center h-11 w-11">
 							<Signal />
 						</span>
 						<div class="max-w-xs space-y-1 md:max-w-sm lg:max-w-md">
@@ -242,7 +245,7 @@
 					class="flex flex-col items-center gap-10 text-center md:items-center md:text-center md:gap-20 md:justify-between"
 				>
 					<div class="flex flex-col items-center gap-2 md:translate-x-6 lg:translate-x-8">
-						<span class="flex h-11 w-11 items-center justify-center">
+						<span class="flex items-center justify-center h-11 w-11">
 							<Compass />
 						</span>
 						<div class="max-w-xs space-y-1 md:max-w-sm lg:max-w-md">
@@ -253,7 +256,7 @@
 						</div>
 					</div>
 					<div class="flex flex-col items-center gap-2 md:-translate-x-1 lg:-translate-x-2">
-						<span class="flex h-11 w-11 items-center justify-center">
+						<span class="flex items-center justify-center h-11 w-11">
 							<Activity />
 						</span>
 						<div class="max-w-xs space-y-1 md:max-w-sm lg:max-w-md">
@@ -267,7 +270,7 @@
 			</div>
 
 			<div class="flex flex-col items-center justify-center gap-3 mt-6 text-center">
-				<span class="flex h-12 w-12 items-center justify-center">
+				<span class="flex items-center justify-center w-12 h-12">
 					<FindUsLogo />
 				</span>
 				<span class="text-sm font-semibold uppercase tracking-[0.35em]"> Retrouvez-nous </span>

@@ -165,15 +165,22 @@
 						>
 							<ul class="py-2 text-sm text-gray-400" aria-labelledby="dropdownLargeButton">
 								<li>
-									<a href="/project/cdr" class="block px-4 py-2 hover:bg-gray-600 hover:text-white"
-										>La CDR</a
+									<a
+										href="/project/coupe-de-robotique"
+										class="block px-4 py-2 hover:bg-gray-600 hover:text-white">La CDR</a
 									>
 								</li>
 								<li>
-									<a href="#" class="block px-4 py-2 hover:bg-gray-600 hover:text-white">Exodus</a>
+									<a
+										href="/project/exodus"
+										class="block px-4 py-2 hover:bg-gray-600 hover:text-white">Exodus</a
+									>
 								</li>
 								<li>
-									<a href="#" class="block px-4 py-2 hover:bg-gray-600 hover:text-white">CoHoMa</a>
+									<a
+										href="/project/cohoma"
+										class="block px-4 py-2 hover:bg-gray-600 hover:text-white">CoHoMa</a
+									>
 								</li>
 							</ul>
 							<div class="py-1">
@@ -278,11 +285,11 @@
 				{
 					title: 'À Propos',
 					icon: 'information-circle',
-						sub: [
-							{ title: "L'association", uri: '/a-propos' },
-							{ title: 'Nos écoles', uri: '/nos-ecoles' },
-							{ title: 'Soutenez-nous', uri: '#' }
-						]
+					sub: [
+						{ title: "L'association", uri: '/a-propos' },
+						{ title: 'Nos écoles', uri: '/nos-ecoles' },
+						{ title: 'Soutenez-nous', uri: '#' }
+					]
 				},
 				{ title: 'Partenaires', icon: 'people', uri: '/sponsors' },
 				{ title: 'Contact', icon: 'mail', uri: '/contact' }
