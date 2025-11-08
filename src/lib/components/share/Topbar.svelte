@@ -298,7 +298,7 @@
 				{#if user}
 					<CTAButton href="/admin" secondary={true} size="sm">Espace membre</CTAButton>
 				{:else}
-					<CTAButton href="/auth/register?redirect=/admin" secondary={true} size="sm"
+					<CTAButton href="/auth/login?redirect=/admin" secondary={true} size="sm"
 						>Se connecter</CTAButton
 					>
 				{/if}
