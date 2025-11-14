@@ -202,7 +202,7 @@
 					aria-hidden="true"
 				></div>
 				<img
-					src="/assets/projets/cohoma.png"
+					src="/assets/projets/cohoma.webp"
 					alt="Rendu 3D du robot CoHoMa développé par DaVinciBot"
 					class="relative w-full max-w-md border shadow-2xl rounded-3xl border-white/10 shadow-dark-light-blue/40"
 					loading="lazy"

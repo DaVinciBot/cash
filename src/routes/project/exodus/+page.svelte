@@ -143,7 +143,7 @@
 
 <main class="flex flex-col">
 	<section
-		class="relative overflow-hidden px-4 pt-24 pb-16 sm:px-8 md:px-16 lg:px-32 md:pt-28 lg:pt-36"
+		class="relative px-4 pt-24 pb-16 overflow-hidden sm:px-8 md:px-16 lg:px-32 md:pt-28 lg:pt-36"
 	>
 		<div class="max-w-6xl mx-auto grid items-center gap-12 lg:grid-cols-[1.1fr_0.9fr]">
 			<div class="space-y-6">
@@ -169,9 +169,9 @@
 					aria-hidden="true"
 				></div>
 				<img
-					src="/assets/projets/future_exodus.jpg"
+					src="/assets/projets/future_exodus.webp"
 					alt="Objectif d'Exodus"
-					class="relative w-full max-w-md rounded-3xl border border-white/10 shadow-2xl shadow-dark-light-blue/40"
+					class="relative w-full max-w-md border shadow-2xl rounded-3xl border-white/10 shadow-dark-light-blue/40"
 					loading="lazy"
 				/>
 			</div>
@@ -179,9 +179,9 @@
 	</section>
 
 	<section class="px-4 py-12 sm:px-8 md:px-16 lg:px-32">
-		<div class="max-w-6xl mx-auto grid gap-6 sm:grid-cols-2 xl:grid-cols-3">
+		<div class="grid max-w-6xl gap-6 mx-auto sm:grid-cols-2 xl:grid-cols-3">
 			{#each keyFigures as figure}
-				<article class="rounded-2xl border border-white/10 bg-white/5 p-6 backdrop-blur">
+				<article class="p-6 border rounded-2xl border-white/10 bg-white/5 backdrop-blur">
 					<h2 class="text-3xl font-extrabold text-dark-light-blue sm:text-4xl">{figure.value}</h2>
 					<p class="mt-2 text-lg font-semibold text-white/80">{figure.label}</p>
 					<p class="mt-4 text-sm leading-relaxed text-white/70">{figure.description}</p>
@@ -202,14 +202,14 @@
 				</p>
 				<ul class="space-y-4">
 					{#each missionPillars as item}
-						<li class="rounded-xl border border-white/10 bg-white/5 p-4">
+						<li class="p-4 border rounded-xl border-white/10 bg-white/5">
 							<h3 class="text-xl font-semibold text-white">{item.title}</h3>
 							<p class="mt-2 text-sm text-white/70">{item.description}</p>
 						</li>
 					{/each}
 				</ul>
 			</div>
-			<div class="relative rounded-3xl border border-white/10 bg-white/5 p-8 backdrop-blur">
+			<div class="relative p-8 border rounded-3xl border-white/10 bg-white/5 backdrop-blur">
 				<h3 class="text-2xl font-bold">Architecture système</h3>
 				<p class="mt-3 text-sm leading-relaxed text-white/75">
 					Exodus s'articule autour d'une liaison dorsale et de 2 bras. Des moteurs brushless dédiés
@@ -218,7 +218,7 @@
 					composants, et un écran intégré permet à l’utilisateur de configurer en temps réel les
 					paramètres d’assistance.
 				</p>
-				<div class="mt-6 grid gap-4 rounded-2xl border border-white/10 bg-dark-blue/40 p-5 text-sm">
+				<div class="grid gap-4 p-5 mt-6 text-sm border rounded-2xl border-white/10 bg-dark-blue/40">
 					<p class="font-semibold uppercase tracking-[0.25em] text-white/60">Composants clés</p>
 					<ul class="space-y-2 text-white/75">
 						<li>• Structure dorsale en TPU pour plus de flexibilité</li>
@@ -239,9 +239,9 @@
 				méthodes agiles permettent un protypage rapide afin de répondre efficacement aux besoins des
 				utilisateurs.
 			</p>
-			<div class="mt-10 grid gap-6 lg:grid-cols-3">
+			<div class="grid gap-6 mt-10 lg:grid-cols-3">
 				{#each teamStreams as stream}
-					<article class="rounded-2xl border border-white/10 bg-white/5 p-6">
+					<article class="p-6 border rounded-2xl border-white/10 bg-white/5">
 						<h3 class="text-xl font-semibold text-white">{stream.title}</h3>
 						<ul class="mt-4 space-y-3 text-sm text-white/70">
 							{#each stream.points as point}
@@ -259,9 +259,9 @@
 			<h2 class="text-3xl font-extrabold sm:text-4xl">Feuille de route du projet</h2>
 			<ol class="mt-10 space-y-8">
 				{#each milestones as milestone, index}
-					<li class="relative rounded-2xl border border-white/10 bg-dark-blue/60 p-6">
+					<li class="relative p-6 border rounded-2xl border-white/10 bg-dark-blue/60">
 						<div
-							class="absolute -left-8 top-6 hidden h-12 w-12 items-center justify-center rounded-full border border-white/20 bg-dark-light-blue text-xl font-bold text-dark-blue lg:flex"
+							class="absolute items-center justify-center hidden w-12 h-12 text-xl font-bold border rounded-full -left-8 top-6 border-white/20 bg-dark-light-blue text-dark-blue lg:flex"
 						>
 							{index + 1}
 						</div>
@@ -278,7 +278,7 @@
 
 	<section class="px-4 py-16 sm:px-8 md:px-16 lg:px-32">
 		<div
-			class="max-w-5xl mx-auto rounded-3xl border border-white/10 bg-gradient-to-br from-white/10 via-white/5 to-white/10 p-10 text-center backdrop-blur"
+			class="max-w-5xl p-10 mx-auto text-center border rounded-3xl border-white/10 bg-gradient-to-br from-white/10 via-white/5 to-white/10 backdrop-blur"
 		>
 			<h2 class="text-3xl font-extrabold sm:text-4xl">Sponsoriser le projet Exodus</h2>
 			<p class="mt-4 text-base leading-relaxed text-white/75 sm:text-lg">
@@ -286,7 +286,7 @@
 				accélérer le développement. Vous souhaitez contribuer à la prochaine génération de systèmes
 				robotisés ? Parlons-en.
 			</p>
-			<div class="mt-8 grid gap-4 sm:grid-cols-3">
+			<div class="grid gap-4 mt-8 sm:grid-cols-3">
 				{#each supportLinks as link}
 					<CTAButton href={link.href} secondary={link.href !== '/contact'}>
 						{link.label}

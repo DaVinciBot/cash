@@ -23,9 +23,9 @@
 	import Activity from '$lib/components/share/icon/Activity.svelte';
 	import Compass from '$lib/components/share/icon/Compass.svelte';
 
-	let cdrImg = '/assets/projets/CDR.jpg';
-	let precoupeImg = '/assets/article/precoupe.jpg';
-	let coupe23Img = '/assets/img/IMG_1179.jpg';
+	let cdrImg = '/assets/projets/CDR.webp';
+	let precoupeImg = '/assets/article/precoupe.webp';
+	let coupe23Img = '/assets/img/IMG_1179.webp';
 </script>
 
 <svelte:head>
@@ -45,7 +45,7 @@
 		content="DaVinciBot participe à la Coupe de France de Robotique"
 	/>
 	<meta property="og:image" content="/assets/projets/CDR.jpg" />
-	<meta property="og:url" content="https://davincibot.fr/project/cdr" />
+	<meta property="og:url" content="https://davincibot.fr/project/coupe-de-robotique" />
 	<meta property="og:type" content="website" />
 	<meta property="og:site_name" content="DaVinciBot" />
 	<meta property="og:locale" content="fr_FR" />
@@ -84,7 +84,7 @@
 				</div>
 			</div>
 			<img
-				src="/assets/projets/rob_shadows.png"
+				src="/assets/projets/rob_shadows.webp"
 				alt="Robot dessin stylisé pour DaVinciBot"
 				width="1280"
 				height="720"
@@ -234,7 +234,7 @@
 							class="absolute inset-x-12 bottom-1.5 h-[4.2rem] rounded-full bg-dark-blue-gray/15 blur-lg sm:bottom-2 sm:h-[4.8rem] lg:h-[5.6rem]"
 						></div>
 						<img
-							src="/assets/projets/rob_shadows.png"
+							src="/assets/projets/rob_shadows.webp"
 							alt="Robot bleu DaVinciBot"
 							class="relative z-10 h-full w-full object-contain drop-shadow-[0_30px_45px_rgba(2,50,255,0.28)]"
 							loading="lazy"

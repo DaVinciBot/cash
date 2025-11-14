@@ -19,13 +19,13 @@
 		}
 	}
 
-	const MAPS_KEY = 'AIzaSyAjdwBeu7JlmpeDFB7a3ghIE536u9z2F_4';
-	const MAPS_CENTER = '48.8969983,2.2224943'; // default (desktop) center
-	const MAPS_CENTER_MOBILE = '48.8900983,2.2354943';
-	const MAPS_MARKER = '48.8959983,2.2354943';
-	const MAP_ZOOM = 14;
-	const MAP_SIZE = '640x640';
-	const MAP_SCALE = 2;
+	// const MAPS_KEY = 'AIzaSyAjdwBeu7JlmpeDFB7a3ghIE536u9z2F_4';
+	// const MAPS_CENTER = '48.8969983,2.2224943'; // default (desktop) center
+	// const MAPS_CENTER_MOBILE = '48.8900983,2.2354943';
+	// const MAPS_MARKER = '48.8959983,2.2354943';
+	// const MAP_ZOOM = 14;
+	// const MAP_SIZE = '640x640';
+	// const MAP_SCALE = 2;
 
 	// Track viewport to adjust map centering on mobile
 	let isMobile = false;
@@ -40,30 +40,30 @@
 		return () => mql.removeEventListener('change', handler);
 	});
 
-	// Dark theme aligned with site colors (see tailwind.config.js)
-	const mapStyles = [
-		'element:geometry|color:0x010128', // deep navy background
-		'element:labels.text.fill|color:0xB3C2FF', // light blue labels
-		'element:labels.text.stroke|color:0x010128', // label stroke
-		'feature:road|element:geometry|color:0x5A6294', // roads base
-		'feature:road|element:geometry.stroke|color:0x828AB6', // road outlines
-		'feature:poi|element:geometry|color:0x575e7d', // points of interest
-		'feature:water|element:geometry|color:0x063B9F' // water accent
-	];
+	// // Dark theme aligned with site colors (see tailwind.config.js)
+	// const mapStyles = [
+	// 	'element:geometry|color:0x010128', // deep navy background
+	// 	'element:labels.text.fill|color:0xB3C2FF', // light blue labels
+	// 	'element:labels.text.stroke|color:0x010128', // label stroke
+	// 	'feature:road|element:geometry|color:0x5A6294', // roads base
+	// 	'feature:road|element:geometry.stroke|color:0x828AB6', // road outlines
+	// 	'feature:poi|element:geometry|color:0x575e7d', // points of interest
+	// 	'feature:water|element:geometry|color:0x063B9F' // water accent
+	// ];
 
-	$: mapsCenter = isMobile ? MAPS_CENTER_MOBILE : MAPS_CENTER;
+	// $: mapsCenter = isMobile ? MAPS_CENTER_MOBILE : MAPS_CENTER;
 
-	$: staticMapUrl =
-		`https://maps.googleapis.com/maps/api/staticmap?key=${MAPS_KEY}` +
-		`&center=${encodeURIComponent(mapsCenter)}` +
-		`&zoom=${MAP_ZOOM}` +
-		`&scale=${MAP_SCALE}` +
-		`&size=${MAP_SIZE}` +
-		`&markers=color:0x0232FF|icon:https%3A%2F%2Fdavincibot.fr%2Fassets%2Fimg%2Ficon%2Fpointer.png|${encodeURIComponent(MAPS_MARKER)}` +
-		`&maptype=roadmap` +
-		`&${mapStyles.map((s) => `style=${encodeURIComponent(s)}`).join('&')}`;
+	// $: staticMapUrl =
+	// 	`https://maps.googleapis.com/maps/api/staticmap?key=${MAPS_KEY}` +
+	// 	`&center=${encodeURIComponent(mapsCenter)}` +
+	// 	`&zoom=${MAP_ZOOM}` +
+	// 	`&scale=${MAP_SCALE}` +
+	// 	`&size=${MAP_SIZE}` +
+	// 	`&markers=color:0x0232FF|icon:https%3A%2F%2Fdavincibot.fr%2Fassets%2Fimg%2Ficon%2Fpointer.png|${encodeURIComponent(MAPS_MARKER)}` +
+	// 	`&maptype=roadmap` +
+	// 	`&${mapStyles.map((s) => `style=${encodeURIComponent(s)}`).join('&')}`;
 
-	$: mapsExternalLink = `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(mapsCenter)}`;
+	// $: mapsExternalLink = `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(mapsCenter)}`;
 </script>
 
 <Topbar />
@@ -113,20 +113,11 @@
 			</div>
 			<div id="teaser">
 				<img
-					src={staticMapUrl}
+					src={isMobile ? '/assets/img/mobilemap.webp' : '/assets/img/lgscreenmap.webp'}
 					alt="Carte statique Google Maps (thème sombre) montrant notre localisation"
 					class="absolute top-0 left-0 object-cover w-full h-full opacity-50 pointer-events-none -z-10"
 					loading="lazy"
 				/>
-			</div>
-			<div class="flex items-center justify-center gap-3 px-4 py-3 text-sm text-white/70 lg:hidden">
-				<span>Carte intégrée Google Maps</span>
-				<a
-					href={mapsExternalLink}
-					target="_blank"
-					rel="noopener noreferrer"
-					class="underline hover:text-white">Ouvrir Google Maps</a
-				>
 			</div>
 		</div>
 	</div>
