@@ -24,9 +24,9 @@
 			{ text: 'Exodus', href: '/project/exodus' }
 		],
 		[
-			{ text: 'CGU', href: '/cgu' },
-			{ text: 'Mentions légales', href: '/mentions-legales' },
-			{ text: 'Données personnelles', href: '/donnees-personnelles' }
+			{ text: 'CGU', href: '/legal/cgu' },
+			{ text: 'Mentions légales', href: '/legal/mentions-legales' },
+			{ text: 'Données personnelles', href: '/legal/donnees-personnelles' }
 		],
 		[
 			{
