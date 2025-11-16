@@ -72,7 +72,7 @@
 				</div>
 			</div>
 			<img
-				src="/assets/projets/rob_shadows.webp"
+				src="/assets/projets/boombot.webp"
 				alt="Robot dessin stylisé pour DaVinciBot"
 				width="1280"
 				height="720"
