@@ -25,8 +25,15 @@ export async function GET() {
         '/blog/',
         '/contact/',
         '/projets/cohoma/',
+        '/projets/coupe-de-robotique/',
+        '/projets/exodus/',
         '/sponsors/',
+        '/a-propos/',
         '/nos-ecoles/',
+        '/legal/',
+        '/legal/cgu',
+        '/legal/donnees-personnelles',
+        '/legal/mentions-legales'
     ];
 
     const urls = [];
