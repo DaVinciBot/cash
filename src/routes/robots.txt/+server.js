@@ -7,7 +7,7 @@ export async function GET() {
         'User-agent: *',
         'Allow: /',
         'Disallow: /admin/',
-        'Disallow: /auth/',
+        // 'Disallow: /auth/', // disabled to allow noindexing of auth-related pages
         'Disallow: /caroussel/',
         `Sitemap: ${SITE.origin}/sitemap.xml`
     ].join('\n');
