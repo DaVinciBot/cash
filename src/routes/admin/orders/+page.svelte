@@ -15,9 +15,15 @@
 	let orderedCount = 0;
 	let completedCount = 0;
 
+	let project = [];
+
 	userdata.subscribe((value) => {
 		if (value) {
 			user = value;
+			project = value?.projects.map((p) => ({ name: p.name, value: p.id })) || [];
+			if (user.role == 'bureau' || user.role == 'admin') {
+				project = value?.allProjects || [];
+			}
 		}
 	});
 
@@ -34,7 +40,7 @@
 	];
 	let dbInfo = {
 		table: 'orders',
-		key: 'id, creationDate, projectId(id, name), status, lastUpdate, items(*), requestedBy(*), name, tags',
+		key: 'id, creationDate, projectId(id, name), status, lastUpdate, requestedBy(*), name, tags, price',
 		ordering: 'lastUpdate:desc'
 	};
 
@@ -42,16 +48,8 @@
 		{
 			category: 'Projet',
 			value: 'projectId',
-			options: [
-				{ name: 'CDR', value: '1', active: true },
-				{ name: 'Travelers', value: '2', active: true },
-				{ name: 'Exodus', value: '3', active: true },
-				{ name: 'Pôle Event', value: '6', active: true },
-				{ name: 'Pôle Com', value: '4', active: true },
-				{ name: 'Pôle Formation', value: '5', active: true },
-				{ name: 'Bureau', value: '8', active: true },
-				{ name: 'Mini-projets', value: '9', active: true }
-			]
+			wide: true,
+			options: project
 		},
 		{
 			category: 'Status',
@@ -397,15 +395,11 @@
 	function parseItems(data) {
 		let items = [];
 		data.forEach((el) => {
-			const price =
-				Math.round(el.items.reduce((acc, item, i) => acc + item.price * item.quantity, 0) * 100) /
-				100;
-			const name = el.name.length > 30 ? el.name.slice(0, 30) + '...' : el.name;
 			items.push([
-				{ value: name, data: el.id },
+				{ value: el.name.length > 30 ? el.name.substring(0, 30) + '...' : el.name, data: el.id },
 				{ value: el.creationDate.toLocaleString().split('T')[0] },
 				{ value: el.lastUpdate.toLocaleString().split('T')[0] },
-				{ value: price + ' €' },
+				{ value: el.price + ' €' },
 				{ value: el.projectId.name, data: el.projectId.id },
 				{ value: el.requestedBy.username, data: el.requestedBy.id },
 				{ value: Array.isArray(el.tags) && el.tags.length ? el.tags.join(', ') : '-' },

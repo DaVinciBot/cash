@@ -40,6 +40,7 @@
 	const hash = Math.abs(hashCode(JSON.stringify(filters) + JSON.stringify(dbInfo) + searchable));
 	let can_update_settings = false;
 	const filtersStore = writable(filters);
+	$: hasWideFilter = filters?.some((f) => f?.wide);
 
 	$: {
 		filtersStore.set(filters);
@@ -133,14 +134,37 @@
 	function setupDropdown() {
 		// set position of the popup just below the button
 		const dropdown = document.querySelector('#filterDropdown-' + hash);
+		const button = document.getElementById('filterDropdownButton');
+		if (!dropdown || !button) return;
+
+		const wasHidden = dropdown.classList.contains('hidden');
+		if (wasHidden) {
+			dropdown.classList.remove('hidden');
+			dropdown.style.visibility = 'hidden';
+		}
 		const width = dropdown.offsetWidth;
-		const rect = document.getElementById('filterDropdownButton').getBoundingClientRect();
+		if (wasHidden) {
+			dropdown.classList.add('hidden');
+			dropdown.style.visibility = '';
+		}
+
+		const rect = button.getBoundingClientRect();
 		dropdown.style.top = 'calc(' + rect.bottom + 'px + 0.5rem)';
 		if (window.innerWidth < 768) {
-			dropdown.style.left = rect.left - width + 'px';
+			dropdown.style.left = rect.left + 'px';
 			dropdown.style.width = rect.width + 'px';
+		} else if (hasWideFilter) {
+			const margin = 16;
+			const centeredLeft = rect.left + rect.width / 2 - width / 2;
+			const clampedLeft = Math.max(
+				margin,
+				Math.min(centeredLeft, window.innerWidth - width - margin)
+			);
+			dropdown.style.left = clampedLeft + 'px';
+			dropdown.style.removeProperty('width');
 		} else {
 			dropdown.style.left = 'calc(' + rect.left + 'px - 1.5rem)';
+			dropdown.style.removeProperty('width');
 		}
 	}
 
@@ -262,38 +286,47 @@
 
 					<div
 						id={'filterDropdown-' + hash}
-						class="absolute z-10 hidden p-3 bg-gray-700 rounded-lg shadow md:w-36 w-72"
+						class={`absolute z-10 hidden p-3 bg-gray-700 rounded-lg shadow w-72 ${hasWideFilter ? 'md:w-[32rem]' : 'md:w-36'}`}
 					>
-						{#each filters as filter, i}
-							{#if filter.category != 'hidden'}
-								{#if i > 0}
-									<hr class="my-3 border-gray-600" />
+						<div class={hasWideFilter ? 'grid grid-cols-1 gap-4 md:grid-cols-2' : ''}>
+							{#each filters as filter, i}
+								{#if filter.category != 'hidden'}
+									{#if !hasWideFilter && i > 0}
+										<hr class="my-3 border-gray-600" />
+									{/if}
+									<div class={filter.wide ? 'md:col-span-2 p-2' : ''}>
+										<h6 class="mb-3 text-sm font-medium text-white">{filter.category}</h6>
+										<ul
+											class={filter.wide
+												? 'grid grid-cols-1 gap-2 text-sm md:grid-cols-2'
+												: 'space-y-2 text-sm'}
+											aria-labelledby="filterDropdownButton"
+										>
+											{#each filter.options as option}
+												<li class="flex items-center">
+													<input
+														id={option.name}
+														type="checkbox"
+														value={option.value}
+														checked={option.active}
+														class="w-4 h-4 bg-gray-600 border-gray-500 rounded focus:ring-primary-600 ring-offset-gray-700 focus:ring-2"
+														on:change={(e) => {
+															e.preventDefault();
+															can_update_settings = true;
+															option.active = e.target.checked;
+															filtersStore.set(filters);
+														}}
+													/>
+													<label for={option.name} class="ml-2 text-sm font-medium text-gray-100"
+														>{option.name}</label
+													>
+												</li>
+											{/each}
+										</ul>
+									</div>
 								{/if}
-								<h6 class="mb-3 text-sm font-medium text-white">{filter.category}</h6>
-								<ul class="space-y-2 text-sm" aria-labelledby="filterDropdownButton">
-									{#each filter.options as option}
-										<li class="flex items-center">
-											<input
-												id={option.name}
-												type="checkbox"
-												value={option.value}
-												checked={option.active}
-												class="w-4 h-4 bg-gray-600 border-gray-500 rounded focus:ring-primary-600 ring-offset-gray-700 focus:ring-2"
-												on:change={(e) => {
-													e.preventDefault();
-													can_update_settings = true;
-													option.active = e.target.checked;
-													filtersStore.set(filters);
-												}}
-											/>
-											<label for={option.name} class="ml-2 text-sm font-medium text-gray-100"
-												>{option.name}</label
-											>
-										</li>
-									{/each}
-								</ul>
-							{/if}
-						{/each}
+							{/each}
+						</div>
 					</div>
 
 					<button

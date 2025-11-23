@@ -190,15 +190,14 @@
 
 	let dbInfo = {
 		table: 'orders',
-		key: 'id, creationDate, projectId, status, lastUpdate, items(*), name'
+		key: 'id, creationDate, projectId, status, lastUpdate, items(*), name, price',
+		ordering: 'lastUpdate:desc'
 	};
 
 	function parseItems(data) {
 		let items = [];
 		data.forEach((el) => {
-			const price =
-				Math.round(el.items.reduce((acc, item, i) => acc + item.price * item.quantity, 0) * 100) /
-				100;
+			const price = Math.round(el.price * 100) / 100;
 			const name = el.name.length > 30 ? el.name.slice(0, 30) + '...' : el.name;
 			items.push([
 				{ value: name, data: el.id },
