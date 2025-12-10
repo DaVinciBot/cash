@@ -8,6 +8,7 @@
 	import DVBLogo from './Logo/DVBLogo.svelte';
 	import AislerLogo from './Logo/Aisler.svelte';
 	import IgusLogo from '$lib/components/share/Logo/Igus.svelte';
+	import KJLogo from '$lib/components/share/Logo/KJ.svelte';
 
 	import Carousel from '$lib/components/others/Carousel.svelte';
 	import CtaButton from '$lib/components/utils/CTAButton.svelte';
@@ -137,6 +138,7 @@
 				<IFTLogo />
 				<GotronicLogo />
 				<IgusLogo />
+				<KJLogo />
 			</Carousel>
 		</div>
 	</div>

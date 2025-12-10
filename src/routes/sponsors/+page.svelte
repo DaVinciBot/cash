@@ -60,6 +60,13 @@
 			link: 'https://www.igus.fr/',
 			blurb:
 				'Fournisseur de matériaux polymères innovants qui améliorent la durabilité et la performance de nos systèmes mécaniques.'
+		},
+		{
+			name: 'Ker Juliette',
+			logo: '/assets/parte/Ker_Juliette.svg',
+			link: 'https://kerjuliette.fr/',
+			blurb:
+				"Partenaire local engagé dans la promotion de l'artisanat et de la culture bretonne, soutenant nos initiatives à Nantes."
 		}
 	];
 
