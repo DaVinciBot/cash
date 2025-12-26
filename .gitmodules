@@ -1,0 +1,3 @@
+[submodule "src/lib/components"]
+	path = src/lib/components
+	url = https://github.com/davincibot/component-lib
