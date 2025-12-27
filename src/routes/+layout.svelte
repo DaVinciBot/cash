@@ -5,7 +5,8 @@
 
 	import UserBadge from '$lib/components/share/UserBadge.svelte';
 	import SideBar from '$lib/components/admin/SideBar.svelte';
-	import "../app.css";
+	import '../app.css';
+	
 
 
 	let current_user = {};
