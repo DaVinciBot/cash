@@ -86,7 +86,7 @@
 			const { data, error } = await supabase.auth.getUser();
 			if (error) {
 				console.error(error);
-				// window.location.href = `/auth/login?redirect=${window.location.pathname}`;
+				window.location.href = `/auth/login?redirect=${window.location.pathname}`;
 			}
 			current_user = data.user;
 		}
