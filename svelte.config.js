@@ -12,7 +12,6 @@ const config = {
 		adapter: adapter(),
 		prerender: {
 			entries: [
-				'/auth/reset/callback',
 				'/admin/projects',
 				'/admin/orders',
 				'/admin/screen-share',

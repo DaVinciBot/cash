@@ -5,6 +5,8 @@
 
 	import UserBadge from '$lib/components/share/UserBadge.svelte';
 	import SideBar from '$lib/components/admin/SideBar.svelte';
+	import "../app.css";
+
 
 	let current_user = {};
 	let current_role = '';
@@ -84,7 +86,7 @@
 			const { data, error } = await supabase.auth.getUser();
 			if (error) {
 				console.error(error);
-				window.location.href = `/auth/login?redirect=${window.location.pathname}`;
+				// window.location.href = `/auth/login?redirect=${window.location.pathname}`;
 			}
 			current_user = data.user;
 		}
@@ -203,7 +205,7 @@
 						<span class="sr-only">Toggle sidebar</span>
 					</button>
 					<a href="/admin" class="flex items-center justify-between mr-4">
-						<img src="/white_logo_notext.webp" class="h-8 mr-3" alt="Davincibot Logo" />
+						<img src="/admin/white_logo_notext.webp" class="h-8 mr-3" alt="Davincibot Logo" />
 						<span
 							class="self-center hidden text-2xl font-semibold text-white whitespace-nowrap sm:block"
 							>DaVinciBot</span
