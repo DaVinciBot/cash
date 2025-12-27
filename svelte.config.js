@@ -12,17 +12,6 @@ const config = {
 		adapter: adapter(),
 		prerender: {
 			entries: [
-				'/',
-				'/robots.txt',
-				'/blog',
-				'/sponsors',
-				'/contact',
-				'/admin',
-				'/caroussel',
-				'/auth/sign-up',
-				'/auth/login',
-				'/auth/oauth',
-				'/auth/reset',
 				'/auth/reset/callback',
 				'/admin/projects',
 				'/admin/orders',
@@ -33,7 +22,10 @@ const config = {
 				'/admin/wip',
 				'/admin/profile',
 			]
-		}
+		},
+		paths: {
+			base: '/admin',
+		},
 	},
 	preprocess: vitePreprocess(),
 
