@@ -157,7 +157,7 @@
 	<meta name="robots" content="noindex, nofollow" />
 	<meta name="googlebot" content="noindex, nofollow" />
 </svelte:head>
->
+
 <div class="min-h-screen antialiased bg-dark-blue text-white min-w-screen font-['Almarai']">
 	<div class="min-h-screen overflow-hidden antialiased bg-gray-900 min-w-screen">
 		<nav
