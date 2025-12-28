@@ -4,7 +4,7 @@
 	import { Carta, CartaEditor } from 'carta-md';
 	import 'carta-md/default.css';
 
-	import { supabase } from '$lib/supabaseClient';
+	import { supabase, supabaseUrl, supabaseKey } from '$lib/supabaseClient';
 
 	// Listing state
 	let articles = [];
@@ -90,6 +90,101 @@
 		}
 	}
 
+	async function transcodeHero() {
+		if (!meta.heroImage) return;
+		// Skip if already transcoded (heuristic: contains 'hero-large' and ends in .webp)
+		if (meta.heroImage.includes('hero-large') && meta.heroImage.endsWith('.webp')) return;
+
+		try {
+			const res = await fetch(`${supabaseUrl}functions/v1/transcode/blog-post-hero`, {
+				method: 'POST',
+				headers: {
+					'Content-Type': 'application/json',
+					Authorization: `Bearer ${supabaseKey}`
+				},
+				body: JSON.stringify({
+					image: meta.heroImage,
+					title: title,
+					bucketName: 'articles',
+					folder: slug
+				})
+			});
+			const data = await res.json();
+			if (data.success && data.images) {
+				meta.heroImage = data.images.large;
+				meta.heroImageSmall = data.images.small;
+				meta.heroImageSocial = data.images.social;
+			} else {
+				console.warn('Transcode hero failed:', data);
+			}
+		} catch (e) {
+			console.error('Transcode hero error:', e);
+		}
+	}
+
+	async function transcodeBodyImages() {
+		if (!body) return;
+
+		// Find all images: ![alt](url)
+		const regex = /!\[.*?\]\((.*?)\)/g;
+		let match;
+		const imagesToTranscode = [];
+
+		while ((match = regex.exec(body)) !== null) {
+			const url = match[1];
+			// Check if it's a supabase storage URL and not already transcoded
+			// Heuristic for already transcoded: ends with .webp and contains 'image-' and digits
+			const isTranscoded = /\/image-\d+-\d+\.webp$/.test(url);
+			if (url.includes(supabaseUrl) && !isTranscoded) {
+				imagesToTranscode.push(url);
+			}
+		}
+
+		if (imagesToTranscode.length === 0) return;
+
+		// Remove duplicates
+		const uniqueImages = [...new Set(imagesToTranscode)];
+
+		try {
+			const res = await fetch(`${supabaseUrl}functions/v1/transcode/blog-post-image`, {
+				method: 'POST',
+				headers: {
+					'Content-Type': 'application/json',
+					Authorization: `Bearer ${supabaseKey}`
+				},
+				body: JSON.stringify({
+					images: uniqueImages,
+					bucketName: 'articles',
+					folder: slug,
+					maxWidth: 1200,
+					quality: 85
+				})
+			});
+			const data = await res.json();
+
+			if (data.success && data.images) {
+				// Replace URLs in body
+				let newBody = body;
+				// data.images is array of { index, success, url }
+				// The index corresponds to the input array `uniqueImages`
+
+				for (const result of data.images) {
+					if (result.success) {
+						const originalUrl = uniqueImages[result.index];
+						const newUrl = result.url;
+						// Global replace of this URL
+						newBody = newBody.split(originalUrl).join(newUrl);
+					}
+				}
+				body = newBody;
+			} else {
+				console.warn('Transcode body images failed:', data);
+			}
+		} catch (e) {
+			console.error('Transcode body images error:', e);
+		}
+	}
+
 	async function save() {
 		message = '';
 		if (!title.trim()) {
@@ -104,6 +199,12 @@
 		saving = true;
 		try {
 			await ensureFolder(slug);
+
+			// Transcode images
+			message = 'Optimisation des images...';
+			await transcodeHero();
+			await transcodeBodyImages();
+
 			const row = {
 				title,
 				slug,
