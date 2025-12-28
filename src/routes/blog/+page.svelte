@@ -14,6 +14,7 @@
 	let title = '';
 	let slug = '';
 	let body = '';
+	let state = 'draft';
 	let meta = {
 		excerpt: '',
 		heroImage: '',
@@ -63,7 +64,7 @@
 			if (!slug) slug = toSlug(title) || crypto.randomUUID().slice(0, 8);
 			await ensureFolder(slug);
 			const fileName = `${Date.now()}-${file.name}`.replace(/[^a-zA-Z0-9_.-]/g, '_');
-			const filePath = `${slug}/${fileName}`;
+			const filePath = `tmp/${fileName}`;
 			const { error } = await supabase.storage
 				.from('articles')
 				.upload(filePath, file, { upsert: false });
@@ -106,14 +107,21 @@
 					image: meta.heroImage,
 					title: title,
 					bucketName: 'articles',
-					folder: slug
+					folder: slug,
+					quality: 40
 				})
 			});
 			const data = await res.json();
 			if (data.success && data.images) {
+				const oldUrl = meta.heroImage;
 				meta.heroImage = data.images.large;
 				meta.heroImageSmall = data.images.small;
 				meta.heroImageSocial = data.images.social;
+
+				if (oldUrl.includes('/articles/tmp/')) {
+					const path = oldUrl.split('/articles/')[1];
+					if (path) await supabase.storage.from('articles').remove([path]);
+				}
 			} else {
 				console.warn('Transcode hero failed:', data);
 			}
@@ -157,7 +165,7 @@
 					bucketName: 'articles',
 					folder: slug,
 					maxWidth: 1200,
-					quality: 85
+					quality: 60
 				})
 			});
 			const data = await res.json();
@@ -168,15 +176,24 @@
 				// data.images is array of { index, success, url }
 				// The index corresponds to the input array `uniqueImages`
 
+				const toDelete = [];
 				for (const result of data.images) {
 					if (result.success) {
 						const originalUrl = uniqueImages[result.index];
 						const newUrl = result.url;
 						// Global replace of this URL
 						newBody = newBody.split(originalUrl).join(newUrl);
+
+						if (originalUrl.includes('/articles/tmp/')) {
+							const path = originalUrl.split('/articles/')[1];
+							if (path) toDelete.push(path);
+						}
 					}
 				}
 				body = newBody;
+				if (toDelete.length) {
+					await supabase.storage.from('articles').remove(toDelete);
+				}
 			} else {
 				console.warn('Transcode body images failed:', data);
 			}
@@ -209,6 +226,7 @@
 				title,
 				slug,
 				body,
+				state,
 				data: meta
 			};
 			// upsert by primary key (slug)
@@ -264,7 +282,7 @@
 			loadingList = true;
 			const { data, error } = await supabase
 				.from('blog')
-				.select('title,slug,last_update,publish_date,data')
+				.select('title,slug,last_update,publish_date,data,state')
 				.order('publish_date', { ascending: false, nullsFirst: false });
 			if (error) {
 				console.error(error);
@@ -277,6 +295,7 @@
 					title: row.title,
 					slug: row.slug,
 					date,
+					state: row.state || 'draft',
 					cover: row.data?.heroImage || null
 				};
 			});
@@ -298,6 +317,7 @@
 			title = data.title || '';
 			slug = data.slug || '';
 			body = data.body || '';
+			state = data.state || 'draft';
 			meta = data.data || {
 				excerpt: '',
 				heroImage: '',
@@ -317,6 +337,7 @@
 		title = '';
 		slug = '';
 		body = '';
+		state = 'draft';
 		meta = { excerpt: '', heroImage: '', heroAlt: '', author: { name: '', role: '' }, tag: '' };
 		selectedSlug = '';
 		message = '';
@@ -329,7 +350,7 @@
 			if (!slug) slug = toSlug(title) || crypto.randomUUID().slice(0, 8);
 			await ensureFolder(slug);
 			const fileName = `cover-${Date.now()}-${file.name}`.replace(/[^a-zA-Z0-9_.-]/g, '_');
-			const filePath = `${slug}/${fileName}`;
+			const filePath = `tmp/${fileName}`;
 			const { error } = await supabase.storage
 				.from('articles')
 				.upload(filePath, file, { upsert: false });
@@ -409,7 +430,22 @@
 									on:click={() => loadArticle(a.slug)}
 								>
 									<div class="text-sm font-medium">{a.title}</div>
-									<div class="text-xs text-gray-400">{a.slug}</div>
+									<div class="flex items-center justify-between gap-2">
+										<div class="text-xs text-gray-400 truncate">{a.slug}</div>
+										<span
+											class="text-[10px] px-1.5 py-0.5 rounded-full {a.state === 'published'
+												? 'bg-green-900/50 text-green-300 border border-green-800'
+												: a.state === 'deleted'
+													? 'bg-red-900/50 text-red-300 border border-red-800'
+													: 'bg-gray-700 text-gray-300 border border-gray-600'}"
+										>
+											{a.state === 'published'
+												? 'Publié'
+												: a.state === 'deleted'
+													? 'Supprimé'
+													: 'Brouillon'}
+										</span>
+									</div>
 									{#if a.date}
 										<div class="text-[10px] text-gray-500">
 											{new Date(a.date).toLocaleDateString('fr-FR')}
@@ -437,6 +473,18 @@
 					class="w-full px-3 py-2 bg-gray-900 border border-gray-700 rounded"
 					bind:value={slug}
 				/>
+			</div>
+			<div>
+				<label class="block mb-1 text-sm" for="state">État</label>
+				<select
+					id="state"
+					class="w-full px-3 py-2 bg-gray-900 border border-gray-700 rounded"
+					bind:value={state}
+				>
+					<option value="draft">Brouillon</option>
+					<option value="published">Publié</option>
+					<option value="deleted">Supprimé</option>
+				</select>
 			</div>
 			<div>
 				<label class="block mb-1 text-sm" for="excerpt">Extrait</label>
@@ -514,12 +562,28 @@
 			>
 				{saving ? 'Enregistrement…' : 'Enregistrer'}
 			</button>
-			{#if message}
-				<div class="text-sm text-gray-300">{message}</div>
-			{/if}
 		</div>
 	</div>
 </div>
+
+{#if saving || message}
+	<div class="fixed inset-0 z-50 flex items-center justify-center bg-black/50">
+		<div class="p-6 bg-gray-800 rounded-lg shadow-xl border border-gray-700 max-w-sm w-full">
+			<div class="mb-4 text-lg font-semibold text-white">
+				{saving ? 'Enregistrement en cours...' : 'Information'}
+			</div>
+			<div class="text-gray-300 mb-4">{message}</div>
+			{#if !saving}
+				<div class="flex justify-end">
+					<button
+						class="px-4 py-2 text-white rounded bg-primary-600 hover:bg-primary-700"
+						on:click={() => (message = '')}>Fermer</button
+					>
+				</div>
+			{/if}
+		</div>
+	</div>
+{/if}
 
 <style>
 	:global(.carta-font-code) {
