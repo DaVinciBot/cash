@@ -523,8 +523,9 @@
 
 <style>
 	:global(.carta-font-code) {
-		font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, 'Liberation Mono',
-			'Courier New', monospace;
+		font-family:
+			ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, 'Liberation Mono', 'Courier New',
+			monospace;
 		font-size: 0.95rem;
 		line-height: 1.2rem;
 		letter-spacing: normal;

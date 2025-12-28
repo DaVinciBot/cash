@@ -24,7 +24,7 @@ const config = {
 		},
 		paths: {
 			base: '/admin',
-			relative: true,
+			relative: false,
 		},
 	},
 	preprocess: vitePreprocess(),
