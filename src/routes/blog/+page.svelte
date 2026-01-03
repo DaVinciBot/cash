@@ -116,7 +116,6 @@
 				const oldUrl = meta.heroImage;
 				meta.heroImage = data.images.large;
 				meta.heroImageSmall = data.images.small;
-				meta.heroImageSocial = data.images.social;
 
 				if (oldUrl.includes('/articles/tmp/')) {
 					const path = oldUrl.split('/articles/')[1];
@@ -127,6 +126,34 @@
 			}
 		} catch (e) {
 			console.error('Transcode hero error:', e);
+		}
+	}
+
+	async function transcodeOg() {
+		if (!meta.heroImage) return;
+
+		try {
+			const res = await fetch(`${supabaseUrl}functions/v1/transcode/blog-post-og`, {
+				method: 'POST',
+				headers: {
+					'Content-Type': 'application/json',
+					Authorization: `Bearer ${supabaseKey}`
+				},
+				body: JSON.stringify({
+					image: meta.heroImage,
+					title: title,
+					bucketName: 'articles',
+					folder: slug
+				})
+			});
+			const data = await res.json();
+			if (data.success && data.image) {
+				meta.heroImageSocial = data.image;
+			} else {
+				console.warn('Transcode OG failed:', data);
+			}
+		} catch (e) {
+			console.error('Transcode OG error:', e);
 		}
 	}
 
@@ -220,6 +247,7 @@
 			// Transcode images
 			message = 'Optimisation des images...';
 			await transcodeHero();
+			await transcodeOg();
 			await transcodeBodyImages();
 
 			const row = {
