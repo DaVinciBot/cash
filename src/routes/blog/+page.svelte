@@ -3,6 +3,7 @@
 	import { onMount } from 'svelte';
 	import { Carta, CartaEditor } from 'carta-md';
 	import 'carta-md/default.css';
+	import Stepper from '$lib/components/admin/Stepper.svelte';
 
 	import { supabase, supabaseUrl, supabaseKey } from '$lib/supabaseClient';
 
@@ -27,6 +28,7 @@
 	let message = '';
 	let canAccess = false;
 	let selectedSlug = '';
+	let saveSteps = [];
 
 	function toSlug(t = '') {
 		return (t || '')
@@ -48,9 +50,12 @@
 			});
 			if (error && !String(error.message || '').includes('The resource already exists')) {
 				// ignore if already exists
-				console.warn('ensureFolder:', error.message);
+				return false;
 			}
+			return true;
 		} catch (e) {
+			console.warn('ensureFolder exception', e);
+			return false;
 			console.warn('ensureFolder exception', e);
 		}
 	}
@@ -92,9 +97,9 @@
 	}
 
 	async function transcodeHero() {
-		if (!meta.heroImage) return;
+		if (!meta.heroImage) return true;
 		// Skip if already transcoded (heuristic: contains 'hero-large' and ends in .webp)
-		if (meta.heroImage.includes('hero-large') && meta.heroImage.endsWith('.webp')) return;
+		if (meta.heroImage.includes('hero-large') && meta.heroImage.endsWith('.webp')) return true;
 
 		try {
 			const res = await fetch(`${supabaseUrl}functions/v1/transcode/blog-post-hero`, {
@@ -121,16 +126,19 @@
 					const path = oldUrl.split('/articles/')[1];
 					if (path) await supabase.storage.from('articles').remove([path]);
 				}
+				return true;
 			} else {
 				console.warn('Transcode hero failed:', data);
+				return false;
 			}
 		} catch (e) {
 			console.error('Transcode hero error:', e);
+			return false;
 		}
 	}
 
 	async function transcodeOg() {
-		if (!meta.heroImage) return;
+		if (!meta.heroImage) return true;
 
 		try {
 			const res = await fetch(`${supabaseUrl}functions/v1/transcode/blog-post-og`, {
@@ -149,16 +157,19 @@
 			const data = await res.json();
 			if (data.success && data.image) {
 				meta.heroImageSocial = data.image;
+				return true;
 			} else {
 				console.warn('Transcode OG failed:', data);
+				return false;
 			}
 		} catch (e) {
 			console.error('Transcode OG error:', e);
+			return false;
 		}
 	}
 
 	async function transcodeBodyImages() {
-		if (!body) return;
+		if (!body) return true;
 
 		// Find all images: ![alt](url)
 		const regex = /!\[.*?\]\((.*?)\)/g;
@@ -175,7 +186,7 @@
 			}
 		}
 
-		if (imagesToTranscode.length === 0) return;
+		if (imagesToTranscode.length === 0) return true;
 
 		// Remove duplicates
 		const uniqueImages = [...new Set(imagesToTranscode)];
@@ -221,11 +232,14 @@
 				if (toDelete.length) {
 					await supabase.storage.from('articles').remove(toDelete);
 				}
+				return true;
 			} else {
 				console.warn('Transcode body images failed:', data);
+				return false;
 			}
 		} catch (e) {
 			console.error('Transcode body images error:', e);
+			return false;
 		}
 	}
 
@@ -241,14 +255,49 @@
 			return;
 		}
 		saving = true;
-		try {
-			await ensureFolder(slug);
+		saveSteps = [
+			{ done: false, icon: 'processing' },
+			{ done: false, icon: 'link' },
+			{ done: false, icon: 'shipping' },
+			{ done: false, icon: 'shipping' },
+			{ done: false, icon: 'checked-document' }
+		];
 
-			// Transcode images
-			message = 'Optimisation des images...';
-			await transcodeHero();
-			await transcodeOg();
-			await transcodeBodyImages();
+		try {
+			// 1. Ensure folder
+			if (await ensureFolder(slug)) {
+				saveSteps[0].done = true;
+			} else {
+				saveSteps[0].icon = 'cancel';
+			}
+			saveSteps = [...saveSteps];
+
+			// 2. Transcode OG
+			message = 'Génération OG...';
+			if (await transcodeOg()) {
+				saveSteps[1].done = true;
+			} else {
+				saveSteps[1].icon = 'cancel';
+			}
+			saveSteps = [...saveSteps];
+
+			// 3. Transcode Hero
+			message = 'Optimisation couverture...';
+			if (await transcodeHero()) {
+				saveSteps[2].done = true;
+			} else {
+				saveSteps[2].icon = 'cancel';
+			}
+			saveSteps = [...saveSteps];
+
+			// 4. Transcode Body
+			message = 'Optimisation contenu...';
+			if (await transcodeBodyImages()) {
+				saveSteps[3].done = true;
+			} else {
+				saveSteps[3].icon = 'cancel';
+			}
+			saveSteps = [...saveSteps];
 
 			const row = {
 				title,
@@ -262,11 +311,14 @@
 			if (error) {
 				console.error(error);
 				message = 'Erreur enregistrement: ' + error.message;
+				saveSteps[4].icon = 'cancel';
 			} else {
 				message = 'Article enregistré';
+				saveSteps[4].done = true;
 				selectedSlug = slug;
 				await loadArticles();
 			}
+			saveSteps = [...saveSteps];
 		} catch (e) {
 			console.error(e);
 			message = 'Erreur système';
@@ -597,6 +649,11 @@
 {#if saving || message}
 	<div class="fixed inset-0 z-50 flex items-center justify-center bg-black/50">
 		<div class="p-6 bg-gray-800 rounded-lg shadow-xl border border-gray-700 max-w-sm w-full">
+			{#if saveSteps.length > 0}
+				<div class="mb-4">
+					<Stepper steps={saveSteps} />
+				</div>
+			{/if}
 			<div class="mb-4 text-lg font-semibold text-white">
 				{saving ? 'Enregistrement en cours...' : 'Information'}
 			</div>
