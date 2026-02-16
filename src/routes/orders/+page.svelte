@@ -44,7 +44,16 @@
 		ordering: 'lastUpdate:desc'
 	};
 
-	let filters = [
+	let statusFilters = [
+		{ name: 'En attente', value: 'pendingCDP","pendingTreso' },
+		{ name: 'Validé par le CDP', value: 'approvedCDP', active: true },
+		{ name: 'A commander', value: 'approvedTreso' },
+		{ name: 'Commandé', value: 'ordered' },
+		{ name: 'Terminé', value: 'completed' },
+		{ name: 'Refusé', value: 'canceled","refusedTreso","refusedCDP' }
+	];
+
+	$: filters = [
 		{
 			category: 'Projet',
 			value: 'projectId',
@@ -54,14 +63,7 @@
 		{
 			category: 'Status',
 			value: 'status',
-			options: [
-				{ name: 'En attente', value: 'pendingCDP","pendingTreso' },
-				{ name: 'Validé par le CDP', value: 'approvedCDP', active: true },
-				{ name: 'A commander', value: 'approvedTreso' },
-				{ name: 'Commandé', value: 'ordered' },
-				{ name: 'Terminé', value: 'completed' },
-				{ name: 'Refusé', value: 'canceled","refusedTreso","refusedCDP' }
-			]
+			options: statusFilters
 		}
 	];
 
@@ -396,14 +398,17 @@
 		let items = [];
 		data.forEach((el) => {
 			items.push([
-				{ value: el.name.length > 30 ? el.name.substring(0, 30) + '...' : el.name, data: el.id },
-				{ value: el.creationDate.toLocaleString().split('T')[0] },
-				{ value: el.lastUpdate.toLocaleString().split('T')[0] },
-				{ value: el.price + ' €' },
-				{ value: el.projectId.name, data: el.projectId.id },
-				{ value: el.requestedBy.username, data: el.requestedBy.id },
+				{
+					value: el.name?.length > 30 ? el.name.substring(0, 30) + '...' : el.name || '-',
+					data: el.id
+				},
+				{ value: el.creationDate?.toLocaleString().split('T')[0] || '-' },
+				{ value: el.lastUpdate?.toLocaleString().split('T')[0] || '-' },
+				{ value: (el.price ?? '-') + ' €' },
+				{ value: el.projectId?.name || '-', data: el.projectId?.id || '' },
+				{ value: el.requestedBy?.username || '-', data: el.requestedBy?.id || '' },
 				{ value: Array.isArray(el.tags) && el.tags.length ? el.tags.join(', ') : '-' },
-				{ value: statusText[el.status] }
+				{ value: statusText[el.status] || el.status || '-' }
 			]);
 		});
 		return items;
