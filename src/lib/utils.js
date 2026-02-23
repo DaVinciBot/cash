@@ -1,6 +1,7 @@
 import { userdata } from '$lib/store';
 import { supabase } from '$lib/supabaseClient';
 import md5 from 'crypto-js/md5';
+import { hasAnyPermission } from '$lib/permissions';
 
 export async function loadUserdata() {
     let user = {};
@@ -30,7 +31,7 @@ export async function loadUserdata() {
         // fetch user data
         const { data, error } = await supabase
             .from('profiles')
-            .select('username,avatar_url,role, member_of(project(id, name, debut))')
+            .select('username,avatar_url,role,permissions, member_of(project(id, name, debut))')
             .eq('id', session.user.id)
             .single();
         if (error) {
@@ -53,7 +54,8 @@ export async function loadUserdata() {
             });
         });
         user.role = data.role || user.role;
-        if (user.role === 'bureau' || user.role === 'admin') {
+        user.permissions = data.permissions || [];
+        if (hasAnyPermission(user.permissions, ['view_all_orders', 'view_treso', 'view_members', 'edit_treso', 'edit_members'])) {
             user.projects.push({
                 id: 0,
                 name: 'Association',

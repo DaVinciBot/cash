@@ -4,6 +4,7 @@
 	import { supabase } from '$lib/supabaseClient';
 	import { statusText, loadUserdata } from '$lib/utils';
 	import { userdata } from '$lib/store';
+	import { hasAnyPermission } from '$lib/permissions';
 
 	import ReadDrawer from '$lib/components/drawers/ReadDrawer.svelte';
 	import Table from '$lib/components/admin/Table.svelte';
@@ -14,14 +15,20 @@
 	let approvedCount = 0;
 	let orderedCount = 0;
 	let completedCount = 0;
+	let canViewAllOrders = false;
+	let canEditProjectOrders = false;
+	let canEditOrders = false;
 
 	let project = [];
 
 	userdata.subscribe((value) => {
 		if (value) {
 			user = value;
+			canViewAllOrders = hasAnyPermission(user.permissions, ['view_all_orders']);
+			canEditProjectOrders = hasAnyPermission(user.permissions, ['edit_projects_orders']);
+			canEditOrders = hasAnyPermission(user.permissions, ['edit_orders', 'edit_treso']);
 			project = value?.projects.map((p) => ({ name: p.name, value: p.id })) || [];
-			if (user.role == 'bureau' || user.role == 'admin') {
+			if (canViewAllOrders) {
 				project = value?.allProjects || [];
 			}
 		}
@@ -141,7 +148,7 @@
 
 				let custom_actions = [];
 
-				if (user.role == 'bureau' || user.role == 'admin') {
+				if (canEditOrders) {
 					custom_actions = [
 						{
 							title: [
@@ -277,32 +284,34 @@
 						}
 					];
 				} else {
-					custom_actions = [
-						{
-							title: 'Valider',
-							type: 'validate',
-							handler: async (e) => {
-								let new_status = 'approvedCDP';
-								if (user.role == 'bureau' || user.role == 'admin') {
-									new_status = 'approvedTreso';
-								}
+					custom_actions = canEditProjectOrders
+						? [
+								{
+									title: 'Valider',
+									type: 'validate',
+									handler: async (e) => {
+										let new_status = 'approvedCDP';
+										if (canEditOrders) {
+											new_status = 'approvedTreso';
+										}
 
-								const { data, error } = await supabase
-									.from('orders')
-									.update({ status: new_status })
-									.eq('id', id)
-									.select();
+										const { data, error } = await supabase
+											.from('orders')
+											.update({ status: new_status })
+											.eq('id', id)
+											.select();
 
-								if (error) {
-									console.error(error);
-									return;
+										if (error) {
+											console.error(error);
+											return;
+										}
+										if (data) {
+											window.location.reload();
+										}
+									}
 								}
-								if (data) {
-									window.location.reload();
-								}
-							}
-						}
-					];
+							]
+						: [];
 				}
 
 				const updates = await supabase
@@ -363,30 +372,34 @@
 						},
 						actions: [
 							...custom_actions,
-							{
-								title: 'Refuser',
-								type: 'delete',
-								handler: async (e) => {
-									let new_status = 'refusedCDP';
-									if (user.role == 'bureau' || user.role == 'admin') {
-										new_status = 'refusedTreso';
-									}
+							...(canEditProjectOrders || canEditOrders
+								? [
+										{
+											title: 'Refuser',
+											type: 'delete',
+											handler: async (e) => {
+												let new_status = 'refusedCDP';
+												if (canEditOrders) {
+													new_status = 'refusedTreso';
+												}
 
-									const { data, error } = await supabase
-										.from('orders')
-										.update({ status: new_status })
-										.eq('id', id)
-										.select();
+												const { data, error } = await supabase
+													.from('orders')
+													.update({ status: new_status })
+													.eq('id', id)
+													.select();
 
-									if (error) {
-										console.error(error);
-										return;
-									}
-									if (data) {
-										window.location.reload();
-									}
-								}
-							}
+												if (error) {
+													console.error(error);
+													return;
+												}
+												if (data) {
+													window.location.reload();
+												}
+											}
+										}
+									]
+								: [])
 						],
 						id: 'readModal'
 					}
@@ -433,7 +446,7 @@
 		if (!user) {
 			await loadUserdata();
 		}
-		if (user.role == 'cdp') {
+		if (!canViewAllOrders) {
 			filters = filters.splice(1, 1);
 			filters = [
 				...filters,

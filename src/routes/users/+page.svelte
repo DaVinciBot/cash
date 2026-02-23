@@ -4,6 +4,7 @@
 	import { supabase, supabaseUrl } from '$lib/supabaseClient';
 	import { createClient } from '@supabase/supabase-js';
 	import { userdata } from '$lib/store.js';
+	import { hasAnyPermission } from '$lib/permissions';
 
 	import Table from '$lib/components/admin/Table.svelte';
 	import SucessModal from '$lib/components/modals/InfoModal.svelte';
@@ -19,6 +20,28 @@
 
 	let service_key = '';
 	let admin_supabase = null;
+	let canEditMembers = false;
+	let initializingAdminClient = false;
+
+	async function initAdminClient() {
+		if (!canEditMembers || admin_supabase !== null || initializingAdminClient) {
+			return;
+		}
+		initializingAdminClient = true;
+		const { data, error } = await supabase.rpc('get_service_key');
+		if (error) {
+			console.error(error);
+		} else {
+			service_key = data;
+			admin_supabase = createClient(supabaseUrl, service_key, {
+				auth: {
+					autoRefreshToken: false,
+					persistSession: false
+				}
+			});
+		}
+		initializingAdminClient = false;
+	}
 
 	let allProjects = [
 		{ text: 'CDR', value: '1' },
@@ -62,6 +85,8 @@
 			allProjects = user.allProjects.map((p) => ({ value: p.value, text: p.name }));
 			filters[0].options = user.allProjects.map((p) => ({ text: p.name, value: p.id })); // Update the project filter options
 		}
+		canEditMembers = hasAnyPermission(user?.permissions || [], ['edit_members']);
+		initAdminClient();
 	});
 
 	function parseItems(data) {
@@ -86,9 +111,9 @@
 				initialRole: 'membre',
 				title: 'Importer des utilisateurs',
 				onSubmit: async ({ role, project, users }) => {
-					if (admin_supabase === null) {
+					if (!canEditMembers || admin_supabase === null) {
 						throw new Error(
-							"Vous n'avez pas les permissions requises pour cette action (rôle admin nécessaire)."
+							"Vous n'avez pas les permissions requises pour cette action (edit_members nécessaire)."
 						);
 					}
 
@@ -276,6 +301,10 @@
 	// Action handlers for rows
 	async function viewUser(e) {
 		e.preventDefault();
+		if (!canEditMembers) {
+			alert("Vous n'avez pas les permissions requises pour modifier un utilisateur.");
+			return;
+		}
 		const tr = e.currentTarget.closest('tr');
 		const id = tr.querySelector('[data-utils]').getAttribute('data-utils');
 		const { data, error } = await supabase
@@ -416,7 +445,7 @@
 					});
 				},
 				id: id,
-				actions: [{ title: 'Delete', type: 'delete', handler: deleteUser }]
+				actions: canEditMembers ? [{ title: 'Delete', type: 'delete', handler: deleteUser }] : []
 			}
 		});
 	}
@@ -433,6 +462,10 @@
 
 	async function deleteUser(e) {
 		e.preventDefault();
+		if (!canEditMembers) {
+			alert("Vous n'avez pas les permissions requises pour supprimer un utilisateur.");
+			return;
+		}
 		if (!confirm('Voulez-vous vraiment supprimer cet utilisateur ?')) return;
 		const drawer = document.querySelector('div[id^=drawer-]');
 		const id = drawer.id.split('drawer-')[1]; // Extract the id from the drawer id
@@ -446,19 +479,7 @@
 	}
 
 	onMount(async () => {
-		const { data, error } = await supabase.rpc('get_service_key');
-		if (error) {
-			console.error(error);
-		} else {
-			service_key = data;
-			// create admin client
-			admin_supabase = createClient(supabaseUrl, service_key, {
-				auth: {
-					autoRefreshToken: false,
-					persistSession: false
-				}
-			});
-		}
+		initAdminClient();
 	});
 </script>
 

@@ -2,6 +2,7 @@
 	import { onMount, onDestroy } from 'svelte';
 	import { hideOnClickOutside, loadUserdata } from '$lib/utils';
 	import { userdata } from '$lib/store';
+	import { hasAnyPermission } from '$lib/permissions';
 
 	let user;
 	let ws: WebSocket | null = null;
@@ -10,12 +11,14 @@
 	let is_busy = true;
 	let connected = false;
 	let sharing = false;
+	let canManageTraining = false;
 	let wsUrl = 'wss://cast.davincibot.fr'; // Change if needed
 	let showToolbox = false; // Add this variable
 
 	userdata.subscribe((value) => {
 		if (value) {
 			user = value;
+			canManageTraining = hasAnyPermission(value.permissions, ['manage_training']);
 		}
 	});
 
@@ -164,8 +167,8 @@
 			</li>
 			<li>Pour arrêter le partage, arrêtez la diffusion ou fermez l'onglet.</li>
 			<li>
-				Si besoin, utilisez le <span class="font-semibold">Kill switch</span> pour forcer l'arrêt du
-				partage. C'est une commande résérvée aux admins et au bureau.
+				Si besoin, utilisez le <span class="font-semibold">Kill switch</span> pour forcer l'arrêt du partage.
+				C'est une commande résérvée aux admins et au bureau.
 			</li>
 		</ul>
 	</div>
@@ -271,7 +274,7 @@
 				</svg>
 				Caster
 			</button>
-			{#if user?.role === 'admin' || user?.role === 'bureau'}
+			{#if canManageTraining}
 				<button
 					on:click={sendKill}
 					class="flex-1 px-4 py-2 ml-4 font-semibold text-white transition bg-red-500 rounded hover:bg-red-600"

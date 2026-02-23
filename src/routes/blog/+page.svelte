@@ -4,6 +4,7 @@
 	import { Carta, CartaEditor } from 'carta-md';
 	import 'carta-md/default.css';
 	import Stepper from '$lib/components/admin/Stepper.svelte';
+	import { hasAnyPermission } from '$lib/permissions';
 
 	import { supabase, supabaseUrl, supabaseKey } from '$lib/supabaseClient';
 
@@ -328,32 +329,6 @@
 	}
 
 	onMount(async () => {
-		// Access control: allow roles admin/bureau, or members of project id 4 ("pole com")
-		const { data: sessionData } = await supabase.auth.getUser();
-		const user = sessionData?.user;
-		if (!user) {
-			window.location.href = `/auth/login?redirect=${encodeURIComponent(window.location.pathname)}`;
-			return;
-		}
-		// get role and memberships
-		const { data: profile, error: pErr } = await supabase
-			.from('profiles')
-			.select('role, member_of(project(id))')
-			.eq('id', user.id)
-			.single();
-		if (pErr) {
-			console.error(pErr);
-			return;
-		}
-		const role = profile?.role;
-		const isPrivileged = role === 'admin' || role === 'bureau';
-		const inPoleCom = Array.isArray(profile?.member_of)
-			? profile.member_of.some((m) => m?.project?.id === 4)
-			: false;
-		canAccess = isPrivileged || inPoleCom;
-		if (!canAccess) {
-			window.location.href = '/';
-		}
 		await loadArticles();
 	});
 
