@@ -10,6 +10,8 @@
 	import Table from '$lib/components/admin/Table.svelte';
 	import CrudForm from '$lib/components/modals/CrudForm.svelte';
 
+	export let data;
+
 	let user;
 	let pendingCount = 0;
 	let approvedCount = 0;
@@ -47,7 +49,7 @@
 	];
 	let dbInfo = {
 		table: 'orders',
-		key: 'id, creationDate, projectId(id, name), status, lastUpdate, requestedBy(*), name, tags, price',
+		key: 'id, creationDate, projectId(id, name), status, lastUpdate, requestedBy(id, username), name, tags, price',
 		ordering: 'lastUpdate:desc'
 	};
 
@@ -492,6 +494,7 @@
 			{dbInfo}
 			{filters}
 			{parseItems}
+			supabase={data.supabase}
 			type="commande"
 			type_accord="une"
 			searchable="name"

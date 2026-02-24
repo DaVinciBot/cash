@@ -8,6 +8,8 @@
 	import { onMount } from 'svelte';
 	import { triggerTableRefresh } from '$lib/store';
 
+	export let data;
+
 	// Charts (inspiration from projects page)
 	import { Bar } from 'svelte-chartjs';
 	import {

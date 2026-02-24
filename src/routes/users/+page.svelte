@@ -11,6 +11,8 @@
 	import ReadDrawer from '$lib/components/drawers/ReadDrawer.svelte';
 	import UserImportModal from '$lib/components/modals/UserImportModal.svelte';
 
+	export let data;
+
 	let headers = ['Nom', 'Rôle', 'Projets', 'Actions'];
 
 	let dbInfo = {
@@ -488,7 +490,7 @@
 </div>
 <div class="w-full py-2 sm:px-8 lg:px-16">
 	<div class="bg-gray-800 rounded-lg">
-		<Table {headers} {parseItems} {filters} {dbInfo} {addNew} {actions} />
+		<Table {headers} {parseItems} {filters} {dbInfo} {addNew} {actions} supabase={data.supabase} />
 	</div>
 </div>
 

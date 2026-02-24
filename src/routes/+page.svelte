@@ -8,6 +8,8 @@
 	import Table from '$lib/components/admin/Table.svelte';
 	import ReadDrawer from '$lib/components/drawers/ReadDrawer.svelte';
 
+	export let data;
+
 	let skip = false;
 	let user;
 
@@ -228,6 +230,15 @@
 </div>
 <div class="w-full py-2 sm:px-8 lg:px-16">
 	<div class="bg-gray-800 rounded-lg">
-		<Table {headers} {dbInfo} {parseItems} {actions} {filters} type="commande" type_accord="une" />
+		<Table
+			{headers}
+			{dbInfo}
+			{parseItems}
+			{actions}
+			{filters}
+			supabase={data.supabase}
+			type="commande"
+			type_accord="une"
+		/>
 	</div>
 </div>

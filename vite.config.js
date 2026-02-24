@@ -7,4 +7,8 @@ export default defineConfig({
 		tailwindcss(),
 		sveltekit(),
 	],
+	server: {
+		port: 5175,
+		origin: 'http://localhost:5173'
+	},
 });

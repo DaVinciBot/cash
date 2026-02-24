@@ -1,15 +1,9 @@
 <script>
 	// @ts-nocheck
-	import { onMount } from 'svelte';
-	import { supabase } from '$lib/supabaseClient';
+	import { onMount, onDestroy } from 'svelte';
+	import { invalidate } from '$app/navigation';
 	import { userdata } from '$lib/store';
-	import {
-		ADMIN_CUSTOM_URI,
-		ADMIN_MENU,
-		canAccessAdminPath,
-		filterMenuByPermissions,
-		hasAnyPermission
-	} from '$lib/permissions';
+	import { ADMIN_CUSTOM_URI } from '$lib/permissions';
 
 	import UserBadge from '$lib/components/share/UserBadge.svelte';
 	import SideBar from '$lib/components/admin/SideBar.svelte';
@@ -17,111 +11,53 @@
 
 	export let data;
 
-	let current_user = {};
-	let current_permissions = [];
-	let canCreateOrder = false;
+	// Use the SSR-aware supabase client provided by the layout load function
+	$: supabase = data.supabase;
+	$: canCreateOrder = data.canCreateOrder ?? false;
+	$: __menu = data.menu ?? [];
 
 	let open = false;
-
-	let menu = [...ADMIN_MENU];
-
 	let custom_uri = [...ADMIN_CUSTOM_URI];
 
-	let __menu = [];
-
-	onMount(async () => {
-		current_user = data?.user || {};
-		if (!current_user?.id) {
-			window.location.href = `/auth/login?redirect=${window.location.pathname}`;
-			return;
-		}
-
-		{
-			const { data, error } = await supabase
-				.from('profiles')
-				.select('username,avatar_url,role,permissions, member_of(project(id, name, debut))')
-				.eq('id', current_user.id);
-			if (error) {
-				console.error(error);
-				window.location.href = `/`;
-				return;
+	// Keep auth state in sync between server and browser
+	let authListener;
+	$: if (supabase) {
+		if (authListener) authListener.subscription.unsubscribe();
+		const { data: listenerData } = supabase.auth.onAuthStateChange((_, session) => {
+			if (session?.expires_at !== data.session?.expires_at) {
+				invalidate('supabase:auth');
 			}
+		});
+		authListener = listenerData;
+	}
+	onDestroy(() => {
+		authListener?.subscription?.unsubscribe();
+	});
 
-			const profile = data?.[0];
-			current_permissions = profile?.permissions || [];
-			canCreateOrder =
-				current_permissions.includes('edit_orders') ||
-				current_permissions.includes('edit_projects_orders');
+	onMount(() => {
+		console.log('User data on mount:', data);
 
-			const cachedUser = {
-				email: current_user?.email || '',
-				name: profile?.username || (current_user?.email ? current_user.email.split('@')[0] : ''),
-				avatar: profile?.avatar_url || 'https://avatar.iran.liara.run/public/boy',
-				id: current_user.id,
-				projects: (profile?.member_of || []).map((m) => ({
-					id: m?.project?.id,
-					name: m?.project?.name,
-					debut: m?.project?.debut || '0000-00-00'
-				})),
-				role: profile?.role || null,
-				permissions: current_permissions
-			};
+		const userProfile = data.userProfile;
+		if (!userProfile) return;
 
-			if (
-				hasAnyPermission(current_permissions, [
-					'view_all_orders',
-					'view_treso',
-					'view_members',
-					'edit_treso',
-					'edit_members'
-				])
-			) {
-				cachedUser.projects.push({
-					id: 0,
-					name: 'Association',
-					debut: '2014-09-01'
-				});
+		userdata.set(userProfile);
 
-				const { data: projects, error: projectsError } = await supabase
-					.from('projects')
-					.select('id, name, debut');
-				if (!projectsError) {
-					cachedUser.allProjects = (projects || []).map((p) => ({
-						value: p.id,
-						name: p.name,
-						debut: p.debut
-					}));
-				}
-			}
-
-			userdata.set(cachedUser);
-			localStorage.setItem(
-				'userdata_cache',
-				JSON.stringify({ user: cachedUser, timestamp: Date.now() })
-			);
-			localStorage.setItem(
-				'auth_metadata',
-				JSON.stringify({
-					id: current_user.id,
-					email: current_user?.email || null,
-					last_sign_in_at: current_user?.last_sign_in_at || null,
-					user_metadata: current_user?.user_metadata || {},
-					app_metadata: current_user?.app_metadata || {},
-					permissions: current_permissions,
-					timestamp: Date.now()
-				})
-			);
-		}
-		// remove trailing slash if present
-		const uri = window.location.pathname.endsWith('/')
-			? window.location.pathname.slice(0, -1)
-			: window.location.pathname;
-
-		if (!canAccessAdminPath(uri, current_permissions)) {
-			window.location.href = `/`;
-		}
-
-		__menu = filterMenuByPermissions(menu, current_permissions);
+		localStorage.setItem(
+			'userdata_cache',
+			JSON.stringify({ user: userProfile, timestamp: Date.now() })
+		);
+		localStorage.setItem(
+			'auth_metadata',
+			JSON.stringify({
+				id: userProfile.id,
+				email: userProfile.email || null,
+				last_sign_in_at: data.user?.last_sign_in_at || null,
+				user_metadata: data.user?.user_metadata || {},
+				app_metadata: data.user?.app_metadata || {},
+				permissions: userProfile.permissions,
+				timestamp: Date.now()
+			})
+		);
 	});
 </script>
 
