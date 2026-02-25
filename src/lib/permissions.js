@@ -81,7 +81,7 @@ export const ADMIN_CUSTOM_URI = [
 ];
 
 const ROUTE_RULES = [
-    { path: '/admin/orders/new', requiredPermissions: ['edit_orders'] },
+    { path: '/admin/orders/new', requiredPermissions: ['view_admin'] },
     { path: '/admin/orders', requiredPermissions: ['view_projects_orders', 'view_all_orders', 'edit_orders', 'edit_projects_orders'] },
     { path: '/admin/projects', requiredPermissions: ['view_projects_orders', 'edit_projects_orders'] },
     { path: '/admin/users', requiredPermissions: ['view_members', 'edit_members'] },
