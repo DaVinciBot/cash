@@ -76,7 +76,7 @@ export const ADMIN_CUSTOM_URI = [
         title: 'Nouvelle commande',
         uri: '/admin/orders/new',
         icon: 'add-outline',
-        requiredPermissions: ['edit_orders', 'edit_projects_orders']
+        requiredPermissions: ['view_admin']
     }
 ];
 
