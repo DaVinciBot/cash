@@ -11,7 +11,11 @@ export const PERMISSIONS = [
     'edit_members',
     'edit_orders',
     'edit_projects_orders',
-    'edit_treso'
+    'edit_treso',
+    'make_project_order',
+    'make_order',
+    'view_project_stats',
+    'view_all_stats',
 ];
 
 export const ADMIN_MENU = [
@@ -76,12 +80,12 @@ export const ADMIN_CUSTOM_URI = [
         title: 'Nouvelle commande',
         uri: '/admin/orders/new',
         icon: 'add-outline',
-        requiredPermissions: ['view_admin']
+        requiredPermissions: ['make_project_order']
     }
 ];
 
 const ROUTE_RULES = [
-    { path: '/admin/orders/new', requiredPermissions: ['view_admin'] },
+    { path: '/admin/orders/new', requiredPermissions: ['make_project_order'] },
     { path: '/admin/orders', requiredPermissions: ['view_projects_orders', 'view_all_orders', 'edit_orders', 'edit_projects_orders'] },
     { path: '/admin/projects', requiredPermissions: ['view_projects_orders', 'edit_projects_orders'] },
     { path: '/admin/users', requiredPermissions: ['view_members', 'edit_members'] },

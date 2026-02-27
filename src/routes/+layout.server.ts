@@ -25,7 +25,7 @@ export const load: LayoutServerLoad = async ({ locals: { safeGetSession, supabas
     if (!error && data) {
       permissions = (data.permissions as string[]) || []
       canCreateOrder =
-        permissions.includes('edit_orders') || permissions.includes('edit_projects_orders')
+        permissions.includes('make_project_order') || permissions.includes('make_order')
 
       userProfile = {
         email: user.email || '',
