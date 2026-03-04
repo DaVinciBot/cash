@@ -1,12 +1,12 @@
 <script>
 	// @ts-nocheck
-	import { onMount, onDestroy } from 'svelte';
 	import { invalidate } from '$app/navigation';
-	import { userdata } from '$lib/store';
 	import { ADMIN_CUSTOM_URI } from '$lib/permissions';
+	import { userdata } from '$lib/store';
+	import { onDestroy, onMount } from 'svelte';
 
-	import UserBadge from '$lib/components/share/UserBadge.svelte';
 	import SideBar from '$lib/components/admin/SideBar.svelte';
+	import UserBadge from '$lib/components/share/UserBadge.svelte';
 	import '../app.css';
 
 	export let data;
