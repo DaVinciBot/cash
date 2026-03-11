@@ -105,10 +105,73 @@
 						name: item.name,
 						quantity: item.quantity,
 						price: `${item.price} €`,
+						rawPrice: item.price,
 						id: item.id,
 						link: item.link
 					});
 				});
+
+				let canEditThisOrderItems = false;
+				if (data.status === 'pendingCDP' && (canEditProjectOrders || !canEditOrders)) {
+					canEditThisOrderItems = true;
+				} else if (data.status === 'approvedCDP' && canEditOrders) {
+					canEditThisOrderItems = true;
+				}
+
+				const editItemHandler = (itemToEdit) => {
+					new CrudForm({
+						target: document.body,
+						props: {
+							type: 'objet',
+							type_accord: 'un',
+							action: 'Modifier',
+							title: 'Modifier un objet',
+							fields: [
+								{ name: 'Nom', type: 'text', id: 'name', value: itemToEdit.name, required: true },
+								{ name: 'Lien', type: 'text', id: 'link', value: itemToEdit.link },
+								{ name: 'Quantité', type: 'number', id: 'quantity', value: itemToEdit.quantity, required: true, min: 1 },
+								{ name: 'Prix unitaire (€)', type: 'number', id: 'price', value: parseFloat(itemToEdit.rawPrice), required: true, step: 0.01 }
+							],
+							onSubmit: async (ev) => {
+								ev.preventDefault();
+								const form = ev.target.closest('form');
+								const fd = new FormData(form);
+								const name = fd.get('name');
+								const link = fd.get('link');
+								const quantity = parseInt(String(fd.get('quantity')));
+								const price = parseFloat(String(fd.get('price')));
+
+								if (Number.isNaN(quantity) || Number.isNaN(price) || !name) {
+									alert('Veuillez remplir correctement tous les champs.');
+									return;
+								}
+
+								const { error } = await supabase
+									.from('items')
+									.update({ name, link, quantity, price })
+									.eq('id', itemToEdit.id);
+
+								if (error) {
+									console.error(error);
+									alert("Échec de la mise à jour de l'objet.");
+									return;
+								}
+								// Trigger a reload or update local state
+								window.location.reload();
+							}
+						}
+					});
+				};
+
+				const deleteItemHandler = async (itemToRemove) => {
+					if (!confirm('Supprimer cet objet ?')) return;
+					const { error } = await supabase.from('items').delete().eq('id', itemToRemove.id);
+					if (error) {
+						alert('Erreur: ' + error.message);
+					} else {
+						window.location.reload(); // Quick refresh
+					}
+				};
 
 				console.log(items);
 
@@ -343,7 +406,13 @@
 							body: [
 								{
 									label: 'Objets',
-									value: { list: [...items], type: 'items' }
+									value: { 
+										list: [...items], 
+										type: 'items',
+										editable: canEditThisOrderItems,
+										onEdit: editItemHandler,
+										onDelete: deleteItemHandler
+									}
 								},
 								{
 									label: 'Détails',
