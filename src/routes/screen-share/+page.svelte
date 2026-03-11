@@ -1,8 +1,8 @@
 <script lang="ts">
-	import { onMount, onDestroy } from 'svelte';
-	import { hideOnClickOutside, loadUserdata } from '$lib/utils';
-	import { userdata } from '$lib/store';
 	import { hasAnyPermission } from '$lib/permissions';
+	import { userdata } from '$lib/store';
+	import { hideOnClickOutside, loadUserdata } from '$lib/utils';
+	import { onDestroy, onMount } from 'svelte';
 
 	let user;
 	let ws: WebSocket | null = null;

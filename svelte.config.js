@@ -1,8 +1,6 @@
 import adapter from '@sveltejs/adapter-node';
 import { vitePreprocess } from '@sveltejs/vite-plugin-svelte';
 
-
-
 /** @type {import('@sveltejs/kit').Config} */
 const config = {
 	kit: {
@@ -19,16 +17,15 @@ const config = {
 				'/admin/orders/new',
 				'/admin/users/',
 				'/admin/wip',
-				'/admin/profile',
+				'/admin/profile'
 			]
 		},
 		paths: {
 			base: '/admin',
-			relative: false,
-		},
+			relative: false
+		}
 	},
-	preprocess: vitePreprocess(),
-
+	preprocess: vitePreprocess()
 };
 
 export default config;

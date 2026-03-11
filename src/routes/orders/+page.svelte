@@ -129,8 +129,22 @@
 							fields: [
 								{ name: 'Nom', type: 'text', id: 'name', value: itemToEdit.name, required: true },
 								{ name: 'Lien', type: 'text', id: 'link', value: itemToEdit.link },
-								{ name: 'Quantité', type: 'number', id: 'quantity', value: itemToEdit.quantity, required: true, min: 1 },
-								{ name: 'Prix unitaire (€)', type: 'number', id: 'price', value: parseFloat(itemToEdit.rawPrice), required: true, step: 0.01 }
+								{
+									name: 'Quantité',
+									type: 'number',
+									id: 'quantity',
+									value: itemToEdit.quantity,
+									required: true,
+									min: 1
+								},
+								{
+									name: 'Prix unitaire (€)',
+									type: 'number',
+									id: 'price',
+									value: parseFloat(itemToEdit.rawPrice),
+									required: true,
+									step: 0.01
+								}
 							],
 							onSubmit: async (ev) => {
 								ev.preventDefault();
@@ -406,8 +420,8 @@
 							body: [
 								{
 									label: 'Objets',
-									value: { 
-										list: [...items], 
+									value: {
+										list: [...items],
 										type: 'items',
 										editable: canEditThisOrderItems,
 										onEdit: editItemHandler,
