@@ -12,29 +12,21 @@
 	export let data;
 
 	// Use the SSR-aware supabase client provided by the layout load function
-	$: supabase = data.supabase;
+	let { supabase, session } = data;
+	$: ({ supabase, session } = data);
 	$: canCreateOrder = data.canCreateOrder ?? false;
 	$: __menu = data.menu ?? [];
 
 	let open = false;
 	let custom_uri = [...ADMIN_CUSTOM_URI];
 
-	// Keep auth state in sync between server and browser
-	let authListener;
-	$: if (supabase) {
-		if (authListener) authListener.subscription.unsubscribe();
-		const { data: listenerData } = supabase.auth.onAuthStateChange((_, session) => {
-			if (session?.expires_at !== data.session?.expires_at) {
+	onMount(() => {
+		const { data: listenerData } = supabase.auth.onAuthStateChange((_, newSession) => {
+			if (newSession?.expires_at !== session?.expires_at) {
 				invalidate('supabase:auth');
 			}
 		});
-		authListener = listenerData;
-	}
-	onDestroy(() => {
-		authListener?.subscription?.unsubscribe();
-	});
 
-	onMount(() => {
 		console.log('User data on mount:', data);
 
 		const userProfile = data.userProfile;
@@ -58,6 +50,10 @@
 				timestamp: Date.now()
 			})
 		);
+
+		return () => {
+			listenerData.subscription.unsubscribe();
+		};
 	});
 </script>
 
