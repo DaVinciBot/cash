@@ -13,11 +13,11 @@
 
 	export let data;
 
-	let headers = ['Nom', 'Rôle', 'Projets', 'Actions'];
+	let headers = ['Nom', 'Projets', 'Actions'];
 
 	let dbInfo = {
 		table: 'profiles',
-		key: 'id, username, role, avatar_url, member_of(project!inner(id, name))'
+		key: 'id, username, avatar_url, member_of(project!inner(id, name))'
 	};
 
 	let service_key = '';
@@ -57,28 +57,11 @@
 		{ text: 'CDR Nantes', value: '14' }
 	];
 
-	const roleOptions = [
-		{ value: 'admin', text: 'Admin' },
-		{ value: 'bureau', text: 'Bureau' },
-		{ value: 'cdp', text: 'Chef de projet' },
-		{ value: 'membre', text: 'Membre' }
-	];
-
 	let filters = [
 		{
 			category: 'Projets',
 			value: 'member_of.project.id',
 			options: allProjects
-		},
-		{
-			category: 'Rôle',
-			value: 'role',
-			options: [
-				{ name: 'Admin', value: 'admin' },
-				{ name: 'Bureau', value: 'bureau' },
-				{ name: 'CDP', value: 'cdp' },
-				{ name: 'Membre', value: 'membre' }
-			]
 		}
 	];
 
@@ -97,7 +80,6 @@
 			const project = el.member_of.map((el) => el.project?.name).join(', ');
 			items.push([
 				{ value: el.username, data: el.id, avatar: el.avatar_url },
-				{ value: el.role },
 				{ value: project }
 			]);
 		});
@@ -109,10 +91,8 @@
 			target: document.body,
 			props: {
 				projectOptions: allProjects,
-				roleOptions,
-				initialRole: 'membre',
 				title: 'Importer des utilisateurs',
-				onSubmit: async ({ role, project, users }) => {
+				onSubmit: async ({ project, users }) => {
 					if (!canEditMembers || admin_supabase === null) {
 						throw new Error(
 							"Vous n'avez pas les permissions requises pour cette action (edit_members nécessaire)."
@@ -124,7 +104,6 @@
 					const alreadyLinked = [];
 					const failures = [];
 					const defaultProject = project && project !== 'NULL' ? project : '';
-					const effectiveRole = role || 'membre';
 
 					const existingAuthUsers = new Map();
 					try {
@@ -180,8 +159,7 @@
 								isNewlyCreated = true;
 								const { error: profileError } = await supabase.from('profiles').insert({
 									id: createdUserId,
-									username,
-									role: effectiveRole
+									username
 								});
 								if (profileError) throw new Error(profileError.message);
 								const { error: memberError } = await supabase.from('member_of').insert({
@@ -195,7 +173,7 @@
 								const profileId = createdUserId;
 								const { data: existingProfileRows, error: existingProfileError } = await supabase
 									.from('profiles')
-									.select('id, username, role')
+									.select('id, username')
 									.eq('id', profileId)
 									.limit(1);
 								if (existingProfileError) throw new Error(existingProfileError.message);
@@ -204,8 +182,7 @@
 									const fallbackUsername = username || email.split('@')[0];
 									const { error: profileInsertError } = await supabase.from('profiles').insert({
 										id: profileId,
-										username: fallbackUsername,
-										role: effectiveRole
+										username: fallbackUsername
 									});
 									if (profileInsertError) throw new Error(profileInsertError.message);
 								}
@@ -394,15 +371,11 @@
 		const id = tr.querySelector('[data-utils]').getAttribute('data-utils');
 		const { data, error } = await supabase
 			.from('profiles')
-			.select('id, username, role, permissions, member_of(role, project(id,name)), avatar_url')
+			.select('id, username, permissions, member_of(role, project(id,name)), avatar_url')
 			.eq('id', id)
 			.single();
 		if (error) return console.error(error);
 
-		const projectNames = data.member_of
-			.map((m) => m.project?.name)
-			.filter(Boolean)
-			.join(', ');
 		const projectsData = data.member_of
 			.map((m) => ({
 				project_id: m.project?.id,
@@ -430,10 +403,12 @@
 			.filter(Boolean);
 
 		const values = {
-			header: { title: 'Utilisateur', sub: data.role },
+			header: {
+				title: 'Utilisateur',
+				sub: `${(data.permissions || []).length} permission(s)`
+			},
 			body: [
 				{ label: 'Nom', value: data.username, avatar: data.avatar_url },
-				{ label: 'Rôle global', value: data.role, id: 'role' },
 				{
 					label: 'Permissions',
 					value: { type: 'badges', list: permBadges },
@@ -456,20 +431,6 @@
 				placeholder: 'Rob, aka Robert',
 				required: true,
 				wide: true
-			},
-			{
-				name: 'Rôle global',
-				id: 'role',
-				type: 'select',
-				options: [
-					{ value: 'admin', text: 'Admin' },
-					{ value: 'bureau', text: 'Bureau' },
-					{ value: 'cdp', text: 'Chef de projet' },
-					{ value: 'membre', text: 'Membre' },
-					{ value: 'guest', text: 'Invité' }
-				],
-				wide: true,
-				required: true
 			},
 			{
 				name: 'Permissions granulaires',
@@ -503,7 +464,6 @@
 					const formData = new FormData(forms);
 
 					const nom = formData.get('Nom') || newFields.find((f) => f.name === 'Nom').value;
-					const role = formData.get('role');
 
 					// permissions
 					const permsField = newFields.find((f) => f.id === 'permissions');
@@ -518,7 +478,6 @@
 						.from('profiles')
 						.update({
 							username: nom,
-							role: role,
 							permissions: extractedPermissions
 						})
 						.eq('id', id);

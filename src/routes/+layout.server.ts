@@ -22,7 +22,7 @@ export const load: LayoutServerLoad = async ({
 	if (user?.id) {
 		const { data, error } = await supabase
 			.from('profiles')
-			.select('username,avatar_url,role,permissions, member_of(project(id, name, debut))')
+			.select('username,avatar_url,permissions, member_of(project(id, name, debut))')
 			.eq('id', user.id)
 			.single();
 
@@ -41,7 +41,6 @@ export const load: LayoutServerLoad = async ({
 					name: m?.project?.name,
 					debut: m?.project?.debut || '0000-00-00'
 				})),
-				role: data.role || null,
 				permissions,
 				allProjects: null as any[] | null
 			};

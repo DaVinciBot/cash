@@ -144,7 +144,6 @@
 <div class="grid gap-5" id="p-box">
 	<div
 		id="user-profile"
-		data-role={user.role}
 		class="flex flex-col items-center justify-center w-full h-full p-8 text-white bg-gray-800 rounded-lg shadow-md sm:mx-auto"
 	>
 		<div class="z-20 flex items-center justify-center w-32 h-32 bg-gray-700 rounded-full" id="pp">
@@ -257,34 +256,8 @@
 </div>
 
 <style>
-	/* Add a after el to #user-profile, with the user role on the top right corner, and adjust color depending on the role */
 	#user-profile {
 		position: relative;
-	}
-
-	#user-profile::after {
-		content: attr(data-role);
-		position: absolute;
-		top: 0;
-		right: 0;
-		padding: 0.25rem 0.5rem;
-		border-radius: 0 0.5rem 0 0.5rem;
-	}
-	#user-profile[data-role='admin']::after {
-		background-color: #f50b0b;
-		color: #fff;
-	}
-	#user-profile[data-role='cdp']::after {
-		background-color: #10b981;
-		color: #fff;
-	}
-	#user-profile[data-role='member']::after {
-		background-color: #3b82f6;
-		color: #fff;
-	}
-	#user-profile[data-role='bureau']::after {
-		background-color: #ef4444;
-		color: #fff;
 	}
 
 	#-label {

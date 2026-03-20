@@ -31,7 +31,7 @@ export async function loadUserdata() {
         // fetch user data
         const { data, error } = await supabase
             .from('profiles')
-            .select('username,avatar_url,role,permissions, member_of(project(id, name, debut))')
+            .select('username,avatar_url,permissions, member_of(project(id, name, debut))')
             .eq('id', session.user.id)
             .single();
         if (error) {
@@ -53,7 +53,6 @@ export async function loadUserdata() {
                 debut: p.project.debut || "0000-00-00"
             });
         });
-        user.role = data.role || user.role;
         user.permissions = data.permissions || [];
         if (hasAnyPermission(user.permissions, ['view_all_orders', 'view_treso', 'view_members', 'edit_treso', 'edit_members'])) {
             user.projects.push({
