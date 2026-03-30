@@ -1,8 +1,8 @@
 export const trailingSlash = 'always'
 
 import { PUBLIC_SUPABASE_PUBLISHABLE_KEY, PUBLIC_SUPABASE_URL } from '$env/static/public'
-import type { LayoutLoad } from './$types'
 import { createBrowserClient, createServerClient, isBrowser } from '@supabase/ssr'
+import type { LayoutLoad } from './$types'
 
 export const load: LayoutLoad = async ({ fetch, data, depends }) => {
   depends('supabase:auth')
@@ -29,9 +29,9 @@ export const load: LayoutLoad = async ({ fetch, data, depends }) => {
    * safe, and on the server, it reads `session` from the `LayoutData`, which
    * safely checked the session using `safeGetSession`.
    */
-  const {
-    data: { session },
-  } = await supabase.auth.getSession()
+  const session = isBrowser()
+    ? (await supabase.auth.getSession()).data.session
+    : data.session
 
   return {
     supabase,

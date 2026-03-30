@@ -8,7 +8,7 @@ type CachedSession = {
 	timestamp: number;
 };
 
-const SESSION_CACHE_TTL_MS = 60 * 1000;
+const SESSION_CACHE_TTL_MS = 5 * 60 * 1000;
 const sessionCache = new Map<string, CachedSession>();
 
 const getCachedSession = (cacheKey: string) => {
