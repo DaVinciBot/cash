@@ -3,10 +3,11 @@
 	import { invalidate } from '$app/navigation';
 	import { ADMIN_CUSTOM_URI } from '$lib/permissions';
 	import { userdata } from '$lib/store';
-	import { onDestroy, onMount } from 'svelte';
+	import { onMount } from 'svelte';
 
 	import SideBar from '$lib/components/admin/SideBar.svelte';
 	import UserBadge from '$lib/components/share/UserBadge.svelte';
+	import DevAuthSwitcher from '$lib/components/utils/DevAuthSwitcher.svelte';
 	import '../app.css';
 
 	export let data;
@@ -19,6 +20,7 @@
 
 	let open = false;
 	let custom_uri = [...ADMIN_CUSTOM_URI];
+	const isDev = import.meta.env?.DEV;
 
 	onMount(() => {
 		const { data: listenerData } = supabase.auth.onAuthStateChange((_, newSession) => {
@@ -163,6 +165,10 @@
 		<main class="min-h-screen p-4 pt-20 md:ml-64">
 			<slot />
 		</main>
+
+		{#if isDev}
+			<DevAuthSwitcher positionClass="right-6 bottom-20" />
+		{/if}
 	</div>
 </div>
 
