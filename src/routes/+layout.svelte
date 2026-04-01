@@ -165,11 +165,11 @@
 		<main class="min-h-screen p-4 pt-20 md:ml-64">
 			<slot />
 		</main>
-
-		{#if isDev}
-			<DevAuthSwitcher positionClass="right-6 bottom-20" />
-		{/if}
 	</div>
+
+	{#if isDev}
+		<DevAuthSwitcher positionClass="right-6 bottom-20" />
+	{/if}
 </div>
 
 <style>
