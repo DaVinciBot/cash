@@ -7,11 +7,8 @@ import {
 import { redirect } from '@sveltejs/kit';
 import type { LayoutServerLoad } from './$types';
 
-export const load: LayoutServerLoad = async ({
-	locals: { safeGetSession, supabase },
-	cookies,
-	url
-}) => {
+export const load: LayoutServerLoad = async ({ locals, cookies, url }) => {
+	const { safeGetSession, supabase } = locals as any;
 	const { session, user } = await safeGetSession();
 
 	let userProfile = null;
@@ -80,6 +77,8 @@ export const load: LayoutServerLoad = async ({
 
 		menu = filterMenuByPermissions(ADMIN_MENU, permissions);
 	}
+
+	(locals as any).permissions = permissions;
 
 	return {
 		session,

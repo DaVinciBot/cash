@@ -1,8 +1,7 @@
 <script>
-	import { supabase } from '$lib/supabaseClient';
 	import { userdata } from '$lib/store';
+	import { supabase } from '$lib/supabaseClient';
 	import { onMount } from 'svelte';
-	import { loadUserdata } from '$lib/utils';
 
 	export let user = {
 		name: 'Urbain',
@@ -18,9 +17,8 @@
 	});
 
 	async function LogOut() {
-		supabase.auth.signOut().then(() => {
-			window.location.href = `${window.location.origin}/auth/login`;
-		});
+		await fetch('/auth/logout', { method: 'POST' });
+		window.location.href = `${window.location.origin}/auth/login`;
 	}
 
 	async function clearUserdataCache() {
@@ -36,8 +34,7 @@
 			}
 			keysToRemove.forEach((k) => localStorage.removeItem(k));
 
-			await loadUserdata();
-			alert('Cache utilisateur et paramètres des tableaux vidés.');
+			alert('Paramètres des tableaux vidés.');
 		} catch (e) {
 			console.error(e);
 			alert('Impossible de vider le cache utilisateur');
@@ -98,12 +95,14 @@
 			return;
 		}
 
-		const { data, error } = await supabase.auth.updateUser({
-			password: new_password
+		const response = await fetch('/auth/password', {
+			method: 'POST',
+			headers: { 'Content-Type': 'application/json' },
+			body: JSON.stringify({ password: new_password })
 		});
-
-		if (error) {
-			console.error(error);
+		if (!response.ok) {
+			const payload = await response.json().catch(() => ({}));
+			console.error(payload);
 			alert('Une erreur est survenue lors de la modification de votre mot de passe');
 		}
 

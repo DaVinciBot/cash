@@ -1,104 +1,15 @@
-import { hasAnyPermission } from '$lib/permissions';
 import { userdata } from '$lib/store';
-import { supabase } from '$lib/supabaseClient';
-import md5 from 'crypto-js/md5';
 
-let loadUserdataInFlight = null;
-
-export async function loadUserdata() {
-	if (loadUserdataInFlight) {
-		return loadUserdataInFlight;
+/**
+ * Loads the current user's profile into the `userdata` store from server data.
+ * @param {Record<string, unknown> | null} userFromServer
+ */
+export async function loadUserdata(userFromServer = null) {
+	if (!userFromServer) {
+		userdata.set(null);
+		return;
 	}
-
-	loadUserdataInFlight = (async () => {
-		let user = {};
-		const CACHE_KEY = 'userdata_cache';
-		const CACHE_DURATION = 60 * 60 * 1000; // 1 hour in ms
-
-		// Try to load from cache
-		try {
-			const cached = JSON.parse(localStorage.getItem(CACHE_KEY));
-			if (cached && cached.timestamp && Date.now() - cached.timestamp < CACHE_DURATION) {
-				userdata.set(cached.user);
-				return;
-			}
-		} catch (e) {
-			// Ignore cache errors
-		}
-
-		const {
-			data: { session },
-			error
-		} = await supabase.auth.getSession();
-		if (error) {
-			console.error(error);
-			return;
-		}
-		if (session) {
-			// fetch user data
-			const { data, error } = await supabase
-				.from('profiles')
-				.select('username,avatar_url,permissions, member_of(project(id, name, debut))')
-				.eq('id', session.user.id)
-				.single();
-			if (error) {
-				console.error(error);
-				return;
-			}
-			if (data.avatar_url == '') {
-				data.avatar_url = 'https://gravatar.com/avatar/' + md5(session.user.email) + '?d=identicon';
-			}
-			user.email = session.user.email || user.email;
-			user.name = data.username || user.email.split('@')[0];
-			user.avatar = data.avatar_url || user.avatar;
-			user.id = session.user.id;
-			user.projects = [];
-			data.member_of.forEach((p) => {
-				user.projects.push({
-					id: p.project.id,
-					name: p.project.name,
-					debut: p.project.debut || '0000-00-00'
-				});
-			});
-			user.permissions = data.permissions || [];
-			if (
-				hasAnyPermission(user.permissions, [
-					'view_all_orders',
-					'view_treso',
-					'view_members',
-					'edit_treso',
-					'edit_members'
-				])
-			) {
-				user.projects.push({
-					id: 0,
-					name: 'Association',
-					debut: '2014-09-01'
-				});
-				const { data: projects, error: projectsError } = await supabase
-					.from('projects')
-					.select('id, name, debut');
-				if (projectsError) {
-					console.error(projectsError);
-				} else {
-					user.allProjects = projects.map((p) => ({ value: p.id, name: p.name, debut: p.debut }));
-				}
-			}
-			userdata.set(user);
-			// Save to cache
-			try {
-				localStorage.setItem(CACHE_KEY, JSON.stringify({ user, timestamp: Date.now() }));
-			} catch (e) {
-				// Ignore cache errors
-			}
-		}
-	})();
-
-	try {
-		await loadUserdataInFlight;
-	} finally {
-		loadUserdataInFlight = null;
-	}
+	userdata.set(userFromServer);
 }
 
 export const statusText = {

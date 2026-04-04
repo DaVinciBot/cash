@@ -1,6 +1,5 @@
 <script>
 	// @ts-nocheck
-	import { invalidate } from '$app/navigation';
 	import { ADMIN_CUSTOM_URI } from '$lib/permissions';
 	import { userdata } from '$lib/store';
 	import { onMount } from 'svelte';
@@ -12,9 +11,7 @@
 
 	export let data;
 
-	// Use the SSR-aware supabase client provided by the layout load function
-	let { supabase, session } = data;
-	$: ({ supabase, session } = data);
+	$: userProfile = data.userProfile;
 	$: canCreateOrder = data.canCreateOrder ?? false;
 	$: __menu = data.menu ?? [];
 
@@ -23,40 +20,20 @@
 	const isDev = import.meta.env?.DEV;
 
 	onMount(() => {
-		const { data: listenerData } = supabase.auth.onAuthStateChange((_, newSession) => {
-			if (newSession?.expires_at !== session?.expires_at) {
-				invalidate('supabase:auth');
-			}
-		});
-
-		console.log('User data on mount:', data);
-
-		const userProfile = data.userProfile;
-		if (!userProfile) return;
-
-		userdata.set(userProfile);
-
-		localStorage.setItem(
-			'userdata_cache',
-			JSON.stringify({ user: userProfile, timestamp: Date.now() })
-		);
-		localStorage.setItem(
-			'auth_metadata',
-			JSON.stringify({
-				id: userProfile.id,
-				email: userProfile.email || null,
-				last_sign_in_at: data.user?.last_sign_in_at || null,
-				user_metadata: data.user?.user_metadata || {},
-				app_metadata: data.user?.app_metadata || {},
-				permissions: userProfile.permissions,
-				timestamp: Date.now()
-			})
-		);
-
-		return () => {
-			listenerData.subscription.unsubscribe();
-		};
+		if (userProfile) {
+			userdata.set(userProfile);
+		} else {
+			userdata.set(null);
+		}
 	});
+
+	$: {
+		if (userProfile) {
+			userdata.set(userProfile);
+		} else {
+			userdata.set(null);
+		}
+	}
 </script>
 
 <svelte:head>

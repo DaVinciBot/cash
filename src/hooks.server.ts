@@ -1,6 +1,4 @@
-import { PUBLIC_SUPABASE_PUBLISHABLE_KEY, PUBLIC_SUPABASE_URL } from '$env/static/public';
-import { createServerClient } from '@supabase/ssr';
-import type { Handle } from '@sveltejs/kit';
+import { createAnonClient, createUserClient, decodeJwt } from '$lib/server/sso';
 
 type CachedSession = {
 	session: any;
@@ -9,6 +7,7 @@ type CachedSession = {
 };
 
 const SESSION_CACHE_TTL_MS = 5 * 60 * 1000;
+const SESSION_REFRESH_GRACE_MS = 2 * 60 * 1000;
 const sessionCache = new Map<string, CachedSession>();
 
 const getCachedSession = (cacheKey: string) => {
@@ -21,72 +20,116 @@ const getCachedSession = (cacheKey: string) => {
 	return cached;
 };
 
-export const handle: Handle = async ({ event, resolve }) => {
-	event.locals.supabase = createServerClient(PUBLIC_SUPABASE_URL, PUBLIC_SUPABASE_PUBLISHABLE_KEY, {
-		cookies: {
-			getAll() {
-				return event.cookies.getAll();
-			},
-			setAll(cookiesToSet) {
-				/**
-				 * Note: You have to add the `path` variable to the
-				 * set and remove method due to sveltekit's cookie API
-				 * requiring this to be set, setting the path to an empty string
-				 * will replicate previous/standard behavior (https://kit.svelte.dev/docs/types#public-types-cookies)
-				 */
-				cookiesToSet.forEach(({ name, value, options }) =>
-					event.cookies.set(name, value, { ...options, path: '/' })
-				);
-			}
-		}
-	});
+const clearSessionCookie = (event: any) => {
+	event.cookies.delete('sid', { path: '/' });
+};
 
-	/**
-	 * Unlike `supabase.auth.getSession()`, which returns the session _without_
-	 * validating the JWT, this function also calls `getUser()` to validate the
-	 * JWT before returning the session.
-	 */
-	event.locals.safeGetSession = async () => {
-		const {
-			data: { session }
-		} = await event.locals.supabase.auth.getSession();
-		if (!session) {
-			return { session: null, user: null };
-		}
+export const handle = async ({ event, resolve }: any) => {
+	const rawSid = event.cookies.get('sid');
+	const [sessionId, sessionSecret] = rawSid ? rawSid.split('.') : [null, null];
+	let session: any = null;
+	let user: any = null;
 
-		const cacheKey = session.access_token;
-		if (cacheKey) {
-			const cached = getCachedSession(cacheKey);
-			if (cached) {
-				return { session: cached.session, user: cached.user };
-			}
-		}
+	if (sessionId && sessionSecret) {
+		const cached = getCachedSession(sessionId);
+		if (cached) {
+			session = cached.session;
+			user = cached.user;
+		} else {
+			const anon = createAnonClient();
+			const { data, error } = await anon.schema('sso').rpc('get_server_session', {
+				p_session_id: sessionId,
+				p_session_secret: sessionSecret
+			});
+			const sessionRow = Array.isArray(data) ? data[0] : data;
+			if (error || !sessionRow || sessionRow.revoked_at) {
+				clearSessionCookie(event);
+			} else {
+				const expiresAtMs = new Date(sessionRow.expires_at).getTime();
+				let accessToken = sessionRow.access_token;
+				let refreshToken = sessionRow.refresh_token;
+				let expiresAt = sessionRow.expires_at;
 
-		const {
-			data: { user },
-			error
-		} = await event.locals.supabase.auth.getUser();
-		if (error) {
-			// JWT validation has failed
-			if (error?.message?.includes('session id') || error?.message?.includes("doesn't exist")) {
-				try {
-					await event.locals.supabase.auth.signOut();
-				} catch {
-					// ignore
+				if (expiresAtMs - Date.now() < SESSION_REFRESH_GRACE_MS) {
+					const { data: refreshed, error: refreshError } = await anon.auth.refreshSession({
+						refresh_token: refreshToken
+					});
+					if (refreshError || !refreshed?.session) {
+						await anon.schema('sso').rpc('revoke_server_session', {
+							p_session_id: sessionId,
+							p_session_secret: sessionSecret
+						});
+						clearSessionCookie(event);
+					} else {
+						accessToken = refreshed.session.access_token;
+						refreshToken = refreshed.session.refresh_token;
+						expiresAt = new Date(refreshed.session.expires_at * 1000).toISOString();
+						await anon.schema('sso').rpc('update_server_session_tokens', {
+							p_session_id: sessionId,
+							p_session_secret: sessionSecret,
+							p_access_token: accessToken,
+							p_refresh_token: refreshToken,
+							p_expires_at: expiresAt
+						});
+						const jwt = decodeJwt(accessToken);
+						session = {
+							id: sessionId,
+							access_token: accessToken,
+							refresh_token: refreshToken,
+							expires_at: refreshed.session.expires_at,
+							user_id: jwt?.sub ?? sessionRow.user_id
+						};
+						user = jwt
+							? {
+									id: jwt.sub,
+									email: jwt.email,
+									app_metadata: jwt.app_metadata ?? {},
+									user_metadata: jwt.user_metadata ?? {}
+								}
+							: { id: sessionRow.user_id, email: null, app_metadata: {}, user_metadata: {} };
+						if (sessionId) {
+							sessionCache.set(sessionId, { session, user, timestamp: Date.now() });
+						}
+					}
+				} else {
+					const jwt = decodeJwt(accessToken);
+					session = {
+						id: sessionId,
+						access_token: accessToken,
+						refresh_token: refreshToken,
+						expires_at: Math.floor(new Date(expiresAt).getTime() / 1000),
+						user_id: jwt?.sub ?? sessionRow.user_id
+					};
+					user = jwt
+						? {
+								id: jwt.sub,
+								email: jwt.email,
+								app_metadata: jwt.app_metadata ?? {},
+								user_metadata: jwt.user_metadata ?? {}
+							}
+						: { id: sessionRow.user_id, email: null, app_metadata: {}, user_metadata: {} };
+					sessionCache.set(sessionId, { session, user, timestamp: Date.now() });
 				}
 			}
-			return { session: null, user: null };
 		}
+	}
 
-		if (cacheKey) {
-			sessionCache.set(cacheKey, { session, user, timestamp: Date.now() });
-		}
+	if (session?.access_token) {
+		event.locals.supabase = createUserClient(session.access_token);
+	} else {
+		event.locals.supabase = createAnonClient();
+	}
 
+	event.locals.session = session;
+	event.locals.user = user;
+	(event.locals as any).permissions = [];
+
+	event.locals.safeGetSession = async () => {
 		return { session, user };
 	};
 
 	return resolve(event, {
-		filterSerializedResponseHeaders(name) {
+		filterSerializedResponseHeaders(name: string) {
 			return name === 'content-range' || name === 'x-supabase-api-version';
 		}
 	});

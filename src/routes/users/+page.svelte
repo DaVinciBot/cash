@@ -1,14 +1,11 @@
 <script>
-	// @ts-nocheck
-	import { onMount } from 'svelte';
-	import { supabase, supabaseUrl } from '$lib/supabaseClient';
-	import { createClient } from '@supabase/supabase-js';
-	import { userdata } from '$lib/store.js';
 	import { hasAnyPermission } from '$lib/permissions';
+	import { userdata } from '$lib/store.js';
+	import { supabase } from '$lib/supabaseClient';
 
 	import Table from '$lib/components/admin/Table.svelte';
-	import SucessModal from '$lib/components/modals/InfoModal.svelte';
 	import ReadDrawer from '$lib/components/drawers/ReadDrawer.svelte';
+	import SucessModal from '$lib/components/modals/InfoModal.svelte';
 	import UserImportModal from '$lib/components/modals/UserImportModal.svelte';
 
 	export let data;
@@ -20,29 +17,38 @@
 		key: 'id, username, avatar_url, member_of(project!inner(id, name))'
 	};
 
-	let service_key = '';
-	let admin_supabase = null;
 	let canEditMembers = false;
-	let initializingAdminClient = false;
 
-	async function initAdminClient() {
-		if (!canEditMembers || admin_supabase !== null || initializingAdminClient) {
-			return;
+	async function listAuthUsers(page, perPage) {
+		const res = await fetch(`/api/admin/users?page=${page}&perPage=${perPage}`);
+		if (!res.ok) {
+			const payload = await res.json().catch(() => ({}));
+			throw new Error(payload?.error || 'Impossible de charger la liste des utilisateurs.');
 		}
-		initializingAdminClient = true;
-		const { data, error } = await supabase.rpc('get_service_key');
-		if (error) {
-			console.error(error);
-		} else {
-			service_key = data;
-			admin_supabase = createClient(supabaseUrl, service_key, {
-				auth: {
-					autoRefreshToken: false,
-					persistSession: false
-				}
-			});
+		const payload = await res.json();
+		return payload?.users ?? [];
+	}
+
+	async function inviteAuthUser(email) {
+		const res = await fetch('/api/admin/users', {
+			method: 'POST',
+			headers: { 'Content-Type': 'application/json' },
+			body: JSON.stringify({ email })
+		});
+		if (!res.ok) {
+			const payload = await res.json().catch(() => ({}));
+			throw new Error(payload?.error || `Invitation impossible pour ${email}.`);
 		}
-		initializingAdminClient = false;
+		return await res.json();
+	}
+
+	async function deleteAuthUser(id) {
+		const res = await fetch(`/api/admin/users/${id}`, { method: 'DELETE' });
+		if (!res.ok) {
+			const payload = await res.json().catch(() => ({}));
+			throw new Error(payload?.error || 'Suppression impossible côté auth.');
+		}
+		return await res.json();
 	}
 
 	let allProjects = [
@@ -71,17 +77,13 @@
 			filters[0].options = user.allProjects.map((p) => ({ text: p.name, value: p.id })); // Update the project filter options
 		}
 		canEditMembers = hasAnyPermission(user?.permissions || [], ['edit_members']);
-		initAdminClient();
 	});
 
 	function parseItems(data) {
 		let items = [];
 		data.forEach((el) => {
 			const project = el.member_of.map((el) => el.project?.name).join(', ');
-			items.push([
-				{ value: el.username, data: el.id, avatar: el.avatar_url },
-				{ value: project }
-			]);
+			items.push([{ value: el.username, data: el.id, avatar: el.avatar_url }, { value: project }]);
 		});
 		return items;
 	}
@@ -93,7 +95,7 @@
 				projectOptions: allProjects,
 				title: 'Importer des utilisateurs',
 				onSubmit: async ({ project, users }) => {
-					if (!canEditMembers || admin_supabase === null) {
+					if (!canEditMembers) {
 						throw new Error(
 							"Vous n'avez pas les permissions requises pour cette action (edit_members nécessaire)."
 						);
@@ -110,9 +112,7 @@
 						const perPage = 100;
 						let page = 1;
 						while (true) {
-							const { data, error } = await admin_supabase.auth.admin.listUsers({ page, perPage });
-							if (error) throw error;
-							const fetched = data?.users ?? [];
+							const fetched = await listAuthUsers(page, perPage);
 							for (const authUser of fetched) {
 								if (!authUser.email) continue;
 								existingAuthUsers.set(authUser.email.toLowerCase(), authUser);
@@ -152,10 +152,10 @@
 
 						try {
 							if (!existingAuth) {
-								const { data: inviteData, error: inviteError } =
-									await admin_supabase.auth.admin.inviteUserByEmail(email);
-								if (inviteError) throw new Error(inviteError.message);
-								createdUserId = inviteData.user.id;
+								const inviteData = await inviteAuthUser(email);
+								createdUserId = inviteData?.user?.id;
+								if (!createdUserId)
+									throw new Error('Invitation échouée : ID utilisateur manquant.');
 								isNewlyCreated = true;
 								const { error: profileError } = await supabase.from('profiles').insert({
 									id: createdUserId,
@@ -213,10 +213,10 @@
 								if (cleanupProfileError) {
 									console.error('Impossible de nettoyer le profil créé', cleanupProfileError);
 								}
-								const { error: cleanupUserError } =
-									await admin_supabase.auth.admin.deleteUser(createdUserId);
-								if (cleanupUserError) {
-									console.error('Impossible de supprimer le compte Supabase', cleanupUserError);
+								try {
+									await deleteAuthUser(createdUserId);
+								} catch (cleanupError) {
+									console.error('Impossible de supprimer le compte Supabase', cleanupError);
 								}
 							}
 						}
@@ -598,14 +598,15 @@
 		if (memberError) return console.error(memberError);
 		const { error: profileError } = await supabase.from('profiles').delete().eq('id', id);
 		if (profileError) return console.error(profileError);
-		const { data, error } = await admin_supabase.auth.admin.deleteUser(id);
-		if (error) return console.error(error);
+		try {
+			await deleteAuthUser(id);
+		} catch (error) {
+			console.error(error);
+			alert(error?.message || 'Erreur lors de la suppression du compte auth.');
+			return;
+		}
 		window.location.reload();
 	}
-
-	onMount(async () => {
-		initAdminClient();
-	});
 </script>
 
 <div class="w-full py-2 sm:px-8 lg:px-16">
