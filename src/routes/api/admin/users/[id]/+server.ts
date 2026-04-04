@@ -1,15 +1,16 @@
-import { env } from '$env/dynamic/private';
+import { PUBLIC_SUPABASE_URL } from '$env/static/public';
 import { createClient } from '@supabase/supabase-js';
 import { json } from '@sveltejs/kit';
 
-const supabaseUrl = env.SUPABASE_URL;
-const serviceRoleKey = env.SUPABASE_SERVICE_ROLE_KEY;
-
-const getAdminClient = () => {
-	if (!supabaseUrl || !serviceRoleKey) {
-		throw new Error('Missing SUPABASE_URL or SUPABASE_SERVICE_ROLE_KEY.');
+const getAdminClient = async (locals: any) => {
+	if (!PUBLIC_SUPABASE_URL) {
+		throw new Error('Missing PUBLIC_SUPABASE_URL.');
 	}
-	return createClient(supabaseUrl, serviceRoleKey, {
+	const { data, error } = await locals.supabase.rpc('get_service_key');
+	if (error || !data) {
+		throw new Error(error?.message || 'Unable to fetch service key.');
+	}
+	return createClient(PUBLIC_SUPABASE_URL, data, {
 		auth: { persistSession: false, autoRefreshToken: false }
 	});
 };
@@ -44,7 +45,7 @@ export const DELETE = async (event: any) => {
 	}
 
 	try {
-		const admin = getAdminClient();
+		const admin = await getAdminClient(locals);
 		const { error } = await admin.auth.admin.deleteUser(userId);
 		if (error) {
 			return json({ error: error.message }, { status: 500 });
