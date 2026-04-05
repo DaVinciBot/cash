@@ -1,9 +1,8 @@
 <script>
-	import { onMount } from 'svelte';
 	import { userdata } from '$lib/store';
-	import { loadUserdata } from '$lib/utils';
 	import { supabase } from '$lib/supabaseClient';
-	import { statusText, updateText } from '$lib/utils';
+	import { loadUserdata, statusText } from '$lib/utils';
+	import { onMount } from 'svelte';
 
 	import Table from '$lib/components/admin/Table.svelte';
 	import ReadDrawer from '$lib/components/drawers/ReadDrawer.svelte';

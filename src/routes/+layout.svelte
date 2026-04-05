@@ -1,7 +1,9 @@
 <script>
 	// @ts-nocheck
+	import { browser } from '$app/environment';
 	import { ADMIN_CUSTOM_URI } from '$lib/permissions';
 	import { userdata } from '$lib/store';
+	import { supabase } from '$lib/supabaseClient';
 	import { onMount } from 'svelte';
 
 	import SideBar from '$lib/components/admin/SideBar.svelte';
@@ -18,6 +20,7 @@
 	let open = false;
 	let custom_uri = [...ADMIN_CUSTOM_URI];
 	const isDev = import.meta.env?.DEV;
+	let sessionSynced = false;
 
 	onMount(() => {
 		if (userProfile) {
@@ -32,6 +35,22 @@
 			userdata.set(userProfile);
 		} else {
 			userdata.set(null);
+		}
+	}
+
+	$: {
+		if (
+			browser &&
+			!sessionSynced &&
+			data?.session?.access_token &&
+			data?.session?.refresh_token &&
+			supabase
+		) {
+			sessionSynced = true;
+			supabase.auth.setSession({
+				access_token: data.session.access_token,
+				refresh_token: data.session.refresh_token
+			});
 		}
 	}
 </script>
