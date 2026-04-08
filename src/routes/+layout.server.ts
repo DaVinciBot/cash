@@ -11,6 +11,10 @@ export const load: LayoutServerLoad = async ({ locals, cookies, url }) => {
 	const { safeGetSession, supabase } = locals as any;
 	const { session, user } = await safeGetSession();
 
+	if (!session) {
+		redirect(303, 'https://davincibot.fr');
+	}
+
 	let userProfile = null;
 	let permissions: string[] = [];
 	let canCreateOrder = false;
