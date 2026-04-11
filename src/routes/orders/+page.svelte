@@ -495,6 +495,7 @@
 	function parseItems(data) {
 		let items = [];
 		data.forEach((el) => {
+			const price = Math.round((el.price + el.shipping_cost || 0) * 100) / 100;
 			items.push([
 				{
 					value: el.name?.length > 30 ? el.name.substring(0, 30) + '...' : el.name || '-',
@@ -502,7 +503,7 @@
 				},
 				{ value: el.creationDate?.toLocaleString().split('T')[0] || '-' },
 				{ value: el.lastUpdate?.toLocaleString().split('T')[0] || '-' },
-				{ value: (el.price + el.shipping_cost || '-') + ' €' },
+				{ value: price + ' €' },
 				{ value: el.projectId?.name || '-', data: el.projectId?.id || '' },
 				{ value: el.requestedBy?.username || '-', data: el.requestedBy?.id || '' },
 				{ value: Array.isArray(el.tags) && el.tags.length ? el.tags.join(', ') : '-' },
