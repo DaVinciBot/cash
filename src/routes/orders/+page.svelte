@@ -49,13 +49,13 @@
 	];
 	let dbInfo = {
 		table: 'orders',
-		key: 'id, creationDate, projectId(id, name), status, lastUpdate, requestedBy(id, username), name, tags, price',
+		key: 'id, creationDate, projectId(id, name), status, lastUpdate, requestedBy(id, username), name, tags, price, shipping_cost',
 		ordering: 'lastUpdate:desc'
 	};
 
 	let statusFilters = [
 		{ name: 'En attente', value: 'pendingCDP","pendingTreso' },
-		{ name: 'Validé par le CDP', value: 'approvedCDP', active: true },
+		{ name: 'Validé par le CDP', value: 'approvedCDP' },
 		{ name: 'A commander', value: 'approvedTreso' },
 		{ name: 'Commandé', value: 'ordered' },
 		{ name: 'Terminé', value: 'completed' },
@@ -502,7 +502,7 @@
 				},
 				{ value: el.creationDate?.toLocaleString().split('T')[0] || '-' },
 				{ value: el.lastUpdate?.toLocaleString().split('T')[0] || '-' },
-				{ value: (el.price ?? '-') + ' €' },
+				{ value: (el.price + el.shipping_cost || '-') + ' €' },
 				{ value: el.projectId?.name || '-', data: el.projectId?.id || '' },
 				{ value: el.requestedBy?.username || '-', data: el.requestedBy?.id || '' },
 				{ value: Array.isArray(el.tags) && el.tags.length ? el.tags.join(', ') : '-' },

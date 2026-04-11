@@ -27,7 +27,7 @@
 			value: 'status',
 			options: [
 				{ name: 'En attente', value: 'pendingCDP","pendingTreso' },
-				{ name: 'Validé par le CDP', value: 'approvedCDP', active: true },
+				{ name: 'Validé par le CDP', value: 'approvedCDP' },
 				{ name: 'A commander', value: 'approvedTreso' },
 				{ name: 'Commandé', value: 'ordered' },
 				{ name: 'Terminé', value: 'completed' },
@@ -191,14 +191,14 @@
 
 	let dbInfo = {
 		table: 'orders',
-		key: 'id, creationDate, projectId, status, lastUpdate, items(*), name, price',
+		key: 'id, creationDate, projectId, status, lastUpdate, items(*), name, price, shipping_cost',
 		ordering: 'lastUpdate:desc'
 	};
 
 	function parseItems(data) {
 		let items = [];
 		data.forEach((el) => {
-			const price = Math.round(el.price * 100) / 100;
+			const price = Math.round((el.price + el.shipping_cost || 0) * 100) / 100;
 			const name = el.name.length > 30 ? el.name.slice(0, 30) + '...' : el.name;
 			items.push([
 				{ value: name, data: el.id },
