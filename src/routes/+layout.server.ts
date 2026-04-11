@@ -1,3 +1,5 @@
+import { base } from '$app/paths';
+
 import {
 	ADMIN_MENU,
 	canAccessAdminPath,
@@ -10,9 +12,16 @@ import type { LayoutServerLoad } from './$types';
 export const load: LayoutServerLoad = async ({ locals, cookies, url }) => {
 	const { safeGetSession, supabase } = locals as any;
 	const { session, user } = await safeGetSession();
+	const loginPath = `${base}/login`;
+	const normalizedPath =
+		url.pathname.endsWith('/') && url.pathname !== '/' ? url.pathname.slice(0, -1) : url.pathname;
+	const normalizedLoginPath =
+		loginPath.endsWith('/') && loginPath !== '/' ? loginPath.slice(0, -1) : loginPath;
+	const isLoginRoute = normalizedPath === normalizedLoginPath;
 
-	if (!session) {
-		redirect(303, 'https://davincibot.fr');
+	if (!session && !isLoginRoute) {
+		const redirectTarget = `${loginPath}?redirect=${encodeURIComponent(url.pathname + url.search)}`;
+		redirect(303, redirectTarget);
 	}
 
 	let userProfile = null;
@@ -70,12 +79,9 @@ export const load: LayoutServerLoad = async ({ locals, cookies, url }) => {
 			}
 
 			// Redirect if the user cannot access this path
-			const pathname =
-				url.pathname.endsWith('/') && url.pathname !== '/'
-					? url.pathname.slice(0, -1)
-					: url.pathname;
+			const pathname = normalizedPath;
 			if (!canAccessAdminPath(pathname, permissions)) {
-				redirect(302, '/');
+				redirect(302, `${base}/`);
 			}
 		}
 
