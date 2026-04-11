@@ -11,7 +11,7 @@ export const load: LayoutServerLoad = async ({ locals, cookies, url }) => {
 	const { safeGetSession, supabase } = locals as any;
 	const { session, user } = await safeGetSession();
 
-	if (!session) {
+	if (!session && !import.meta.env?.DEV) {
 		redirect(303, 'https://davincibot.fr');
 	}
 

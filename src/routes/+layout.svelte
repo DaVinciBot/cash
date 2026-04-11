@@ -8,7 +8,6 @@
 
 	import SideBar from '$lib/components/admin/SideBar.svelte';
 	import UserBadge from '$lib/components/share/UserBadge.svelte';
-	import DevAuthSwitcher from '$lib/components/utils/DevAuthSwitcher.svelte';
 	import '../app.css';
 
 	export let data;
@@ -19,7 +18,6 @@
 
 	let open = false;
 	let custom_uri = [...ADMIN_CUSTOM_URI];
-	const isDev = import.meta.env?.DEV;
 	let sessionSynced = false;
 
 	onMount(() => {
@@ -162,10 +160,6 @@
 			<slot />
 		</main>
 	</div>
-
-	{#if isDev}
-		<DevAuthSwitcher positionClass="right-6 bottom-20" />
-	{/if}
 </div>
 
 <style>
