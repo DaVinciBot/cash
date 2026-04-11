@@ -1,21 +1,21 @@
 export const PERMISSIONS = [
-	"manage_training",
-	"access_training",
-	"view_admin",
-	"view_projects_orders",
-	"view_all_orders",
-	"view_treso",
-	"view_members",
-	"edit_blog_draft",
-	"edit_blog",
-	"edit_members",
-	"edit_orders",
-	"edit_projects_orders",
-	"edit_treso",
-	"make_project_order",
-	"make_order",
-	"view_project_stats",
-	"view_all_stats"
+	'edit_trainings',
+	'view_trainings',
+	'view_admin',
+	'view_projects_orders',
+	'view_all_orders',
+	'view_treso',
+	'view_members',
+	'edit_blog_draft',
+	'edit_blog',
+	'edit_members',
+	'edit_orders',
+	'edit_projects_orders',
+	'edit_treso',
+	'make_project_order',
+	'make_order',
+	'view_project_stats',
+	'view_all_stats'
 ];
 
 export const ADMIN_MENU = [
@@ -29,13 +29,13 @@ export const ADMIN_MENU = [
 		title: 'SmartShare',
 		uri: '/admin/screen-share',
 		icon: 'albums-outline',
-		requiredPermissions: ['access_training', 'manage_training']
+		requiredPermissions: ['view_trainings', 'edit_trainings']
 	},
 	{
 		title: 'Formations',
 		uri: '/admin/training',
 		icon: 'school-outline',
-		requiredPermissions: ['access_training', 'manage_training']
+		requiredPermissions: ['view_trainings', 'edit_trainings']
 	},
 	{
 		title: 'Gestion des projets',
@@ -114,8 +114,8 @@ const ROUTE_RULES = [
 	{ path: '/admin/treso', requiredPermissions: ['view_treso', 'edit_treso'] },
 	{ path: '/admin/wip', requiredPermissions: ['view_treso', 'edit_treso'] },
 	{ path: '/admin/blog', requiredPermissions: ['edit_blog_draft', 'edit_blog'] },
-	{ path: '/admin/screen-share', requiredPermissions: ['access_training', 'manage_training'] },
-	{ path: '/admin/training', requiredPermissions: ['manage_training'] },
+	{ path: '/admin/screen-share', requiredPermissions: ['view_trainings', 'edit_trainings'] },
+	{ path: '/admin/training', requiredPermissions: ['edit_trainings'] },
 	{ path: '/admin', requiredPermissions: ['view_admin'] }
 ];
 

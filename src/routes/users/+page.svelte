@@ -306,8 +306,8 @@
 			{ label: 'Publier blog', value: 'edit_blog' }
 		],
 		Formation: [
-			{ label: 'Accès formations', value: 'access_training' },
-			{ label: 'Gérer formations', value: 'manage_training' }
+			{ label: 'Accès formations', value: 'view_trainings' },
+			{ label: 'Gérer formations', value: 'edit_trainings' }
 		]
 	};
 
@@ -330,8 +330,8 @@
 				'edit_treso',
 				'edit_blog_draft',
 				'edit_blog',
-				'access_training',
-				'manage_training'
+				'view_trainings',
+				'edit_trainings'
 			]
 		},
 		{
@@ -344,7 +344,7 @@
 				'view_project_stats',
 				'view_all_orders',
 				'view_treso',
-				'access_training'
+				'view_trainings'
 			]
 		},
 		{
@@ -354,7 +354,7 @@
 				'edit_projects_orders',
 				'make_project_order',
 				'view_project_stats',
-				'access_training'
+				'view_trainings'
 			]
 		},
 		{ label: 'Membre Projet Simple', perms: ['view_projects_orders'] }

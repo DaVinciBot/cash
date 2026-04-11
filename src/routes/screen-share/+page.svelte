@@ -18,7 +18,7 @@
 	userdata.subscribe((value) => {
 		if (value) {
 			user = value;
-			canManageTraining = hasAnyPermission(value.permissions, ['manage_training']);
+			canManageTraining = hasAnyPermission(value.permissions, ['edit_trainings']);
 		}
 	});
 
