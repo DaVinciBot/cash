@@ -107,7 +107,10 @@
 					const updatedUsers = [];
 					const alreadyLinked = [];
 					const failures = [];
-					const defaultProject = project && project !== 'NULL' ? project : '';
+					const defaultProject =
+						project !== undefined && project !== null && project !== '' && project !== 'NULL'
+							? project
+							: '';
 					const incomingPermissions = Array.isArray(permissions) ? permissions.filter(Boolean) : [];
 
 					const existingAuthUsers = new Map();
@@ -142,7 +145,7 @@
 							continue;
 						}
 						const projectId = parseInt(resolvedProjectValue, 10);
-						if (!Number.isInteger(projectId) || projectId <= 0) {
+						if (!Number.isInteger(projectId) || projectId < 0) {
 							failures.push({
 								email,
 								message: 'Projet invalide ou introuvable pour cet utilisateur.'
