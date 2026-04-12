@@ -1,4 +1,5 @@
 <script>
+	import { resolve } from '$app/paths';
 	import { hasAnyPermission } from '$lib/permissions';
 	import { userdata } from '$lib/store.js';
 	import { supabase } from '$lib/supabaseClient';
@@ -20,17 +21,30 @@
 	let canEditMembers = false;
 
 	async function listAuthUsers(page, perPage) {
-		const res = await fetch(`/api/admin/users?page=${page}&perPage=${perPage}`);
-		if (!res.ok) {
-			const payload = await res.json().catch(() => ({}));
-			throw new Error(payload?.error || 'Impossible de charger la liste des utilisateurs.');
+		const res = await fetch(`${resolve('/api/admin/users')}?page=${page}&perPage=${perPage}`);
+		const body = await res.text();
+		let payload = {};
+		try {
+			payload = body ? JSON.parse(body) : {};
+		} catch {
+			payload = {};
 		}
-		const payload = await res.json();
+		if (!res.ok) {
+			const fallback = body?.trim()
+				? body.trim()
+				: `Impossible de charger la liste des utilisateurs (status ${res.status}).`;
+			const message = payload?.error || fallback;
+			console.error('Erreur API /api/admin/users', {
+				status: res.status,
+				body
+			});
+			throw new Error(`${message} (status ${res.status})`);
+		}
 		return payload?.users ?? [];
 	}
 
 	async function inviteAuthUser(email) {
-		const res = await fetch('/api/admin/users', {
+		const res = await fetch(`${resolve('/api/admin/users')}`, {
 			method: 'POST',
 			headers: { 'Content-Type': 'application/json' },
 			body: JSON.stringify({ email })
@@ -43,7 +57,7 @@
 	}
 
 	async function deleteAuthUser(id) {
-		const res = await fetch(`/api/admin/users/${id}`, { method: 'DELETE' });
+		const res = await fetch(`${resolve('/api/admin/users')}/${id}`, { method: 'DELETE' });
 		if (!res.ok) {
 			const payload = await res.json().catch(() => ({}));
 			throw new Error(payload?.error || 'Suppression impossible côté auth.');
