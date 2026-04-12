@@ -93,8 +93,10 @@
 			target: document.body,
 			props: {
 				projectOptions: allProjects,
+				permissionCategories,
+				permissionPackages,
 				title: 'Importer des utilisateurs',
-				onSubmit: async ({ project, users }) => {
+				onSubmit: async ({ project, users, permissions }) => {
 					if (!canEditMembers) {
 						throw new Error(
 							"Vous n'avez pas les permissions requises pour cette action (edit_members nécessaire)."
@@ -106,6 +108,7 @@
 					const alreadyLinked = [];
 					const failures = [];
 					const defaultProject = project && project !== 'NULL' ? project : '';
+					const incomingPermissions = Array.isArray(permissions) ? permissions.filter(Boolean) : [];
 
 					const existingAuthUsers = new Map();
 					try {
@@ -159,7 +162,8 @@
 								isNewlyCreated = true;
 								const { error: profileError } = await supabase.from('profiles').insert({
 									id: createdUserId,
-									username
+									username,
+									permissions: incomingPermissions
 								});
 								if (profileError) throw new Error(profileError.message);
 								const { error: memberError } = await supabase.from('member_of').insert({
@@ -173,7 +177,7 @@
 								const profileId = createdUserId;
 								const { data: existingProfileRows, error: existingProfileError } = await supabase
 									.from('profiles')
-									.select('id, username')
+									.select('id, username, permissions')
 									.eq('id', profileId)
 									.limit(1);
 								if (existingProfileError) throw new Error(existingProfileError.message);
@@ -182,9 +186,24 @@
 									const fallbackUsername = username || email.split('@')[0];
 									const { error: profileInsertError } = await supabase.from('profiles').insert({
 										id: profileId,
-										username: fallbackUsername
+										username: fallbackUsername,
+										permissions: incomingPermissions
 									});
 									if (profileInsertError) throw new Error(profileInsertError.message);
+								} else if (incomingPermissions.length > 0) {
+									const currentPermissions = Array.isArray(existingProfile.permissions)
+										? existingProfile.permissions
+										: [];
+									const mergedPermissions = Array.from(
+										new Set([...currentPermissions, ...incomingPermissions])
+									);
+									if (mergedPermissions.length !== currentPermissions.length) {
+										const { error: permUpdateError } = await supabase
+											.from('profiles')
+											.update({ permissions: mergedPermissions })
+											.eq('id', profileId);
+										if (permUpdateError) throw new Error(permUpdateError.message);
+									}
 								}
 								const { count: memberCount, error: memberCheckError } = await supabase
 									.from('member_of')
@@ -344,7 +363,11 @@
 				'view_project_stats',
 				'view_all_orders',
 				'view_treso',
-				'view_trainings'
+				'view_trainings',
+				'edit_trainings',
+				'edit_blog_draft',
+				'edit_blog',
+				'make_order'
 			]
 		},
 		{
@@ -357,7 +380,10 @@
 				'view_trainings'
 			]
 		},
-		{ label: 'Membre Projet Simple', perms: ['view_projects_orders'] }
+		{
+			label: 'Membre Projet',
+			perms: ['view_admin', 'view_projects_orders', 'make_project_order', 'view_trainings']
+		}
 	];
 
 	// Action handlers for rows
