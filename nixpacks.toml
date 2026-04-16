@@ -1,8 +1,5 @@
 buildImage = 'ghcr.io/railwayapp/nixpacks:latest'
 
-[phases.setup]
-  nixPkgs = ['nodejs_24']
-
 [phases.install]
 cmds = ["npm install -g pnpm@10.33.0", "pnpm install --frozen-lockfile"]
 
