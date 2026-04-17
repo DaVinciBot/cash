@@ -61,9 +61,13 @@ export const handle = async ({ event, resolve }: any) => {
 						});
 						clearSessionCookie(event);
 					} else {
+						const refreshedExpiresAt =
+							typeof refreshed.session.expires_at === 'number'
+								? refreshed.session.expires_at
+								: Math.floor(new Date(expiresAt).getTime() / 1000);
 						accessToken = refreshed.session.access_token;
 						refreshToken = refreshed.session.refresh_token;
-						expiresAt = new Date(refreshed.session.expires_at * 1000).toISOString();
+						expiresAt = new Date(refreshedExpiresAt * 1000).toISOString();
 						await anon.schema('sso').rpc('update_server_session_tokens', {
 							p_session_id: sessionId,
 							p_session_secret: sessionSecret,
@@ -76,7 +80,7 @@ export const handle = async ({ event, resolve }: any) => {
 							id: sessionId,
 							access_token: accessToken,
 							refresh_token: refreshToken,
-							expires_at: refreshed.session.expires_at,
+							expires_at: refreshedExpiresAt,
 							user_id: jwt?.sub ?? sessionRow.user_id
 						};
 						user = jwt

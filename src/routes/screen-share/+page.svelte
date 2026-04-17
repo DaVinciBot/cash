@@ -4,7 +4,11 @@
 	import { hideOnClickOutside, loadUserdata } from '$lib/utils';
 	import { onDestroy, onMount } from 'svelte';
 
-	let user;
+	type ScreenShareUser = {
+		permissions?: string[];
+	};
+
+	let user: ScreenShareUser | null = null;
 	let ws: WebSocket | null = null;
 	let pc: RTCPeerConnection | null = null;
 	let stream: MediaStream | null = null;
@@ -15,10 +19,13 @@
 	let wsUrl = 'wss://cast.davincibot.fr'; // Change if needed
 	let showToolbox = false; // Add this variable
 
-	userdata.subscribe((value) => {
+	userdata.subscribe((value: ScreenShareUser | null) => {
 		if (value) {
 			user = value;
-			canManageTraining = hasAnyPermission(value.permissions, ['edit_trainings']);
+			canManageTraining = hasAnyPermission(
+				Array.isArray(value.permissions) ? value.permissions : [],
+				['edit_trainings']
+			);
 		}
 	});
 

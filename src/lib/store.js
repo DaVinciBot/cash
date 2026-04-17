@@ -1,5 +1,8 @@
 import { writable } from 'svelte/store';
 
+/** @typedef {{ permissions?: string[] } & Record<string, unknown>} UserData */
+
+/** @type {import('svelte/store').Writable<UserData | null>} */
 export const userdata = writable(null);
 
 // Lightweight cross-page event bus for UI refreshes
