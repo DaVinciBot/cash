@@ -1,16 +1,17 @@
-import { PUBLIC_SUPABASE_URL } from '$env/static/public';
+import { env } from '$env/dynamic/public';
 import { createClient } from '@supabase/supabase-js';
 import { json } from '@sveltejs/kit';
 
 const getAdminClient = async (locals: any) => {
-	if (!PUBLIC_SUPABASE_URL) {
+	const supabaseUrl = env.PUBLIC_SUPABASE_URL;
+	if (!supabaseUrl) {
 		throw new Error('Missing PUBLIC_SUPABASE_URL.');
 	}
 	const { data, error } = await locals.supabase.rpc('get_service_key');
 	if (error || !data) {
 		throw new Error(error?.message || 'Unable to fetch service key.');
 	}
-	return createClient(PUBLIC_SUPABASE_URL, data, {
+	return createClient(supabaseUrl, data, {
 		auth: { persistSession: false, autoRefreshToken: false }
 	});
 };

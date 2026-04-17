@@ -1,11 +1,18 @@
 
 import { createBrowserClient } from '@supabase/ssr';
-import { PUBLIC_SUPABASE_URL, PUBLIC_SUPABASE_PUBLISHABLE_KEY } from '$env/static/public';
+import { env } from '$env/dynamic/public';
 import { browser } from '$app/environment';
 
+const publicSupabaseUrl = env.PUBLIC_SUPABASE_URL ?? '';
+const publicSupabaseKey = env.PUBLIC_SUPABASE_PUBLISHABLE_KEY ?? '';
+
 // Kept for backward-compatibility (e.g. direct fetch calls to edge functions)
-export const supabaseUrl = PUBLIC_SUPABASE_URL.replace(/\/$/, '');
-export const supabaseKey = PUBLIC_SUPABASE_PUBLISHABLE_KEY;
+export const supabaseUrl = publicSupabaseUrl.replace(/\/$/, '');
+export const supabaseKey = publicSupabaseKey;
+
+if (browser && (!publicSupabaseUrl || !publicSupabaseKey)) {
+	throw new Error('Missing PUBLIC_SUPABASE_URL or PUBLIC_SUPABASE_PUBLISHABLE_KEY');
+}
 
 /**
  * Browser-side Supabase client that manages auth via cookies (SSR-compatible).
@@ -14,5 +21,5 @@ export const supabaseKey = PUBLIC_SUPABASE_PUBLISHABLE_KEY;
  * but every usage of this client is guarded by `onMount` (browser-only).
  */
 export const supabase = browser
-    ? createBrowserClient(PUBLIC_SUPABASE_URL, PUBLIC_SUPABASE_PUBLISHABLE_KEY)
+    ? createBrowserClient(publicSupabaseUrl, publicSupabaseKey)
     : /** @type {any} */ (null);
