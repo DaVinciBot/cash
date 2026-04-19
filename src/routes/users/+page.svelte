@@ -19,6 +19,11 @@
 	};
 
 	let canEditMembers = false;
+	let pendingInvites = [];
+	let pendingInvitesLoading = false;
+	let pendingInvitesError = '';
+	let reinvitingUserId = null;
+	let pendingInvitesInitialized = false;
 
 	async function listAuthUsers(page, perPage) {
 		const res = await fetch(`${resolve('/api/admin/users')}?page=${page}&perPage=${perPage}`);
@@ -65,6 +70,102 @@
 		return await res.json();
 	}
 
+	async function reinviteAuthUser(id) {
+		const res = await fetch(`${resolve('/api/admin/users')}/${id}/reinvite`, { method: 'POST' });
+		const body = await res.text();
+		let payload = {};
+		try {
+			payload = body ? JSON.parse(body) : {};
+		} catch {
+			payload = {};
+		}
+		if (!res.ok) {
+			const fallback = body?.trim()
+				? body.trim()
+				: `Réinvitation impossible pour cet utilisateur (status ${res.status}).`;
+			const message = payload?.error || fallback;
+			throw new Error(message);
+		}
+		return payload;
+	}
+
+	function isPendingInvitedUser(authUser) {
+		return (
+			Boolean(authUser?.email) && !authUser?.email_confirmed_at && Boolean(authUser?.invited_at)
+		);
+	}
+
+	function formatDate(value) {
+		if (!value) return 'Jamais';
+		const dt = new Date(value);
+		if (Number.isNaN(dt.getTime())) return value;
+		return dt.toLocaleString('fr-FR');
+	}
+
+	async function loadPendingInvites() {
+		if (!canEditMembers) {
+			pendingInvites = [];
+			pendingInvitesError = '';
+			return;
+		}
+
+		pendingInvitesLoading = true;
+		pendingInvitesError = '';
+		try {
+			const users = [];
+			const perPage = 100;
+			let page = 1;
+			while (true) {
+				const fetched = await listAuthUsers(page, perPage);
+				users.push(...fetched);
+				if (fetched.length < perPage) break;
+				page += 1;
+			}
+
+			pendingInvites = users.filter(isPendingInvitedUser).sort((a, b) => {
+				const aDate = new Date(a?.invited_at || 0).getTime();
+				const bDate = new Date(b?.invited_at || 0).getTime();
+				return bDate - aDate;
+			});
+		} catch (error) {
+			console.error('Impossible de charger les invitations en attente', error);
+			pendingInvites = [];
+			pendingInvitesError =
+				error?.message || 'Impossible de charger les invitations en attente pour le moment.';
+		} finally {
+			pendingInvitesLoading = false;
+		}
+	}
+
+	async function reinvitePendingUser(authUser) {
+		if (!canEditMembers) {
+			alert("Vous n'avez pas les permissions requises pour réinviter un utilisateur.");
+			return;
+		}
+		if (!authUser?.id || !authUser?.email) {
+			alert('Utilisateur invalide, impossible de renvoyer une invitation.');
+			return;
+		}
+
+		reinvitingUserId = authUser.id;
+		try {
+			await reinviteAuthUser(authUser.id);
+			new SucessModal({
+				target: document.body,
+				props: {
+					message: `Invitation renvoyée à ${authUser.email}.`,
+					onClose: () => {}
+				}
+			});
+			await loadPendingInvites();
+		} catch (error) {
+			console.error('Erreur de réinvitation', error);
+			alert(error?.message || 'Impossible de renvoyer cette invitation.');
+		} finally {
+			reinvitingUserId = null;
+		}
+	}
+
 	let allProjects = [
 		{ text: 'CDR', value: '1' },
 		{ text: 'Travelers', value: '2' },
@@ -92,6 +193,17 @@
 		}
 		canEditMembers = hasAnyPermission(user?.permissions || [], ['edit_members']);
 	});
+
+	$: if (canEditMembers && !pendingInvitesInitialized) {
+		pendingInvitesInitialized = true;
+		loadPendingInvites();
+	}
+
+	$: if (!canEditMembers) {
+		pendingInvitesInitialized = false;
+		pendingInvites = [];
+		pendingInvitesError = '';
+	}
 
 	function parseItems(data) {
 		let items = [];
@@ -660,5 +772,69 @@
 		<Table {headers} {parseItems} {filters} {dbInfo} {addNew} {actions} supabase={data.supabase} />
 	</div>
 </div>
+
+{#if canEditMembers}
+	<div class="w-full py-2 sm:px-8 lg:px-16">
+		<div class="rounded-lg bg-gray-800 p-4">
+			<div class="mb-4 flex items-center justify-between gap-3">
+				<h3 class="text-xl font-semibold text-white">Invitations en attente</h3>
+				<button
+					type="button"
+					class="rounded-lg border border-gray-600 px-3 py-2 text-sm font-medium text-gray-200 hover:bg-gray-700 disabled:cursor-not-allowed disabled:opacity-50"
+					on:click={loadPendingInvites}
+					disabled={pendingInvitesLoading || reinvitingUserId !== null}
+				>
+					Rafraîchir
+				</button>
+			</div>
+
+			{#if pendingInvitesError}
+				<p
+					class="mb-3 rounded-lg border border-red-600 bg-red-900/30 px-3 py-2 text-sm text-red-100"
+				>
+					{pendingInvitesError}
+				</p>
+			{/if}
+
+			{#if pendingInvitesLoading}
+				<p class="text-sm text-gray-300">Chargement des invitations en attente...</p>
+			{:else if pendingInvites.length === 0}
+				<p class="text-sm text-gray-300">Aucune invitation expirée/en attente détectée.</p>
+			{:else}
+				<div class="overflow-x-auto">
+					<table class="w-full text-left text-sm text-gray-300">
+						<thead class="border-b border-gray-700 text-xs uppercase tracking-wide text-gray-400">
+							<tr>
+								<th class="px-3 py-2">Email</th>
+								<th class="px-3 py-2">Invité le</th>
+								<th class="px-3 py-2">Dernière connexion</th>
+								<th class="px-3 py-2 text-right">Action</th>
+							</tr>
+						</thead>
+						<tbody>
+							{#each pendingInvites as authUser}
+								<tr class="border-b border-gray-700">
+									<td class="px-3 py-2 text-white">{authUser.email}</td>
+									<td class="px-3 py-2">{formatDate(authUser.invited_at)}</td>
+									<td class="px-3 py-2">{formatDate(authUser.last_sign_in_at)}</td>
+									<td class="px-3 py-2 text-right">
+										<button
+											type="button"
+											class="rounded-lg bg-primary-700 px-3 py-1.5 text-sm font-medium text-white hover:bg-primary-800 disabled:cursor-not-allowed disabled:opacity-50"
+											on:click={() => reinvitePendingUser(authUser)}
+											disabled={reinvitingUserId !== null}
+										>
+											{reinvitingUserId === authUser.id ? 'Envoi...' : 'Réinviter'}
+										</button>
+									</td>
+								</tr>
+							{/each}
+						</tbody>
+					</table>
+				</div>
+			{/if}
+		</div>
+	</div>
+{/if}
 
 <style></style>
