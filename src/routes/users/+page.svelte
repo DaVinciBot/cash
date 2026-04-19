@@ -765,7 +765,18 @@
 </script>
 
 <div class="w-full py-2 sm:px-8 lg:px-16">
-	<h2 class="mb-4 text-4xl font-bold tracking-tight text-white">Utilisateurs</h2>
+	<div class="mb-4 flex flex-wrap items-center gap-3">
+		<h2 class="text-4xl font-bold tracking-tight text-white">Utilisateurs</h2>
+		{#if canEditMembers}
+			<span
+				class="inline-flex items-center rounded-full border border-amber-500/60 bg-amber-900/40 px-3 py-1 text-xs font-semibold uppercase tracking-wide text-amber-200"
+			>
+				{pendingInvitesLoading
+					? 'Chargement...'
+					: `${pendingInvites.length} ${pendingInvites.length > 1 ? 'membres non validés' : 'membre non validé'}`}
+			</span>
+		{/if}
+	</div>
 </div>
 <div class="w-full py-2 sm:px-8 lg:px-16">
 	<div class="bg-gray-800 rounded-lg">
