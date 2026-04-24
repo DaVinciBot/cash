@@ -23,14 +23,14 @@ export const load: LayoutServerLoad = async ({ locals, cookies, url }) => {
 	if (user?.id) {
 		const { data, error } = await supabase
 			.from('profiles')
-			.select('username,avatar_url,permissions, member_of(project(id, name, debut))')
+			.select('username,avatar_url,permissions, member_of(role, project(id, name, debut))')
 			.eq('id', user.id)
 			.single();
 
 		if (!error && data) {
 			permissions = (data.permissions as string[]) || [];
 			canCreateOrder =
-				permissions.includes('make_project_order') || permissions.includes('make_order');
+				permissions.includes('orders.create.all') || permissions.includes('orders.cru.self');
 
 			userProfile = {
 				email: user.email || '',
@@ -40,7 +40,8 @@ export const load: LayoutServerLoad = async ({ locals, cookies, url }) => {
 				projects: ((data.member_of as any[]) || []).map((m: any) => ({
 					id: m?.project?.id,
 					name: m?.project?.name,
-					debut: m?.project?.debut || '0000-00-00'
+					debut: m?.project?.debut || '0000-00-00',
+					role: m?.role || 'membre'
 				})),
 				permissions,
 				allProjects: null as any[] | null
@@ -48,14 +49,20 @@ export const load: LayoutServerLoad = async ({ locals, cookies, url }) => {
 
 			if (
 				hasAnyPermission(permissions, [
-					'view_all_orders',
-					'view_treso',
-					'view_members',
-					'edit_treso',
-					'edit_members'
+					'orders.read.all',
+					'finance.read',
+					'members.profile.read.all',
+					'finance.write',
+					'members.profile.update.all',
+					'projects.stats.read.all'
 				])
 			) {
-				userProfile.projects.push({ id: 0, name: 'Association', debut: '2014-09-01' });
+				userProfile.projects.push({
+					id: 0,
+					name: 'Association',
+					debut: '2014-09-01',
+					role: 'association'
+				}); //TODO: review
 
 				const { data: projects, error: projectsError } = await supabase
 					.from('projects')

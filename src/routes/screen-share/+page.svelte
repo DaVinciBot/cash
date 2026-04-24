@@ -15,6 +15,7 @@
 	let is_busy = true;
 	let connected = false;
 	let sharing = false;
+	let canCastSmartShare = false;
 	let canManageTraining = false;
 	let wsUrl = 'wss://cast.davincibot.fr'; // Change if needed
 	let showToolbox = false; // Add this variable
@@ -22,10 +23,9 @@
 	userdata.subscribe((value: ScreenShareUser | null) => {
 		if (value) {
 			user = value;
-			canManageTraining = hasAnyPermission(
-				Array.isArray(value.permissions) ? value.permissions : [],
-				['edit_trainings']
-			);
+			const permissions = Array.isArray(value.permissions) ? value.permissions : [];
+			canCastSmartShare = hasAnyPermission(permissions, ['integration.smartshare.cast']);
+			canManageTraining = hasAnyPermission(permissions, ['training.slot.cu']);
 		}
 	});
 
@@ -71,6 +71,10 @@
 	}
 
 	async function startShare() {
+		if (!canCastSmartShare) {
+			return;
+		}
+
 		// Clean up previous connection if any
 		if (pc) {
 			pc.close();
@@ -256,7 +260,7 @@
 		<div class="flex">
 			<button
 				on:click={startShare}
-				disabled={is_busy || sharing}
+				disabled={!canCastSmartShare || is_busy || sharing}
 				class="flex-1 px-4 py-2 font-semibold text-white transition rounded bg-primary-600 hover:bg-primary-700 disabled:opacity-50 disabled:cursor-not-allowed"
 			>
 				<svg

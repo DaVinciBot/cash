@@ -31,8 +31,10 @@ const getPermissions = async (locals: any) => {
 
 const requireEditMembers = async (locals: any) => {
 	const permissions = await getPermissions(locals);
-	return permissions.includes('edit_members');
-};
+	return permissions.some((permission: string) =>
+		['members.profile.update.all', 'members.profile.status.update'].includes(permission)
+	);
+}; //TODO: accès si on peut lire mais pas edit ?
 
 const reinvitePendingUserByEmail = async (admin: any, email: string) => {
 	const { error: inviteError } = await admin.auth.admin.inviteUserByEmail(email);

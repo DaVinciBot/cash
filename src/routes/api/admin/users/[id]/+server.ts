@@ -1,20 +1,4 @@
-import { env } from '$env/dynamic/public';
-import { createClient } from '@supabase/supabase-js';
 import { json } from '@sveltejs/kit';
-
-const getAdminClient = async (locals: any) => {
-	const supabaseUrl = env.PUBLIC_SUPABASE_URL;
-	if (!supabaseUrl) {
-		throw new Error('Missing PUBLIC_SUPABASE_URL.');
-	}
-	const { data, error } = await locals.supabase.rpc('get_service_key');
-	if (error || !data) {
-		throw new Error(error?.message || 'Unable to fetch service key.');
-	}
-	return createClient(supabaseUrl, data, {
-		auth: { persistSession: false, autoRefreshToken: false }
-	});
-};
 
 const getPermissions = async (locals: any) => {
 	if (Array.isArray(locals?.permissions) && locals.permissions.length > 0) {
@@ -31,7 +15,9 @@ const getPermissions = async (locals: any) => {
 
 const requireEditMembers = async (locals: any) => {
 	const permissions = await getPermissions(locals);
-	return permissions.includes('edit_members');
+	return permissions.some((permission: string) =>
+		['members.profile.update.all', 'members.profile.status.update'].includes(permission)
+	);
 };
 
 export const DELETE = async (event: any) => {
@@ -46,14 +32,21 @@ export const DELETE = async (event: any) => {
 	}
 
 	try {
-		const admin = await getAdminClient(locals);
-		const { error } = await admin.auth.admin.deleteUser(userId);
+		const { error } = await locals.supabase
+			.from('profiles')
+			.update({
+				status: 'disabled',
+				status_reason: 'disabled_by_admin',
+				status_updated_at: new Date().toISOString(),
+				status_updated_by: locals?.user?.id ?? null
+			})
+			.eq('id', userId);
 		if (error) {
 			return json({ error: error.message }, { status: 500 });
 		}
-		return json({ ok: true });
+		return json({ ok: true, status: 'disabled' });
 	} catch (error) {
-		const message = error instanceof Error ? error.message : 'Failed to delete user';
+		const message = error instanceof Error ? error.message : 'Failed to disable user';
 		return json({ error: message }, { status: 500 });
 	}
 };

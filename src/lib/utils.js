@@ -13,16 +13,13 @@ export async function loadUserdata(userFromServer = null) {
 }
 
 export const statusText = {
-	pendingCDP: 'En attente de validation par le chef de projet',
-	pendingTreso: 'En attente de validation par le trésorier',
-	approvedCDP: 'Validé par le chef de projet',
-	approvedTreso: 'Validé par le trésorier',
-	refusedCDP: 'Refusé par le chef de projet',
-	refusedTreso: 'Refusé par le trésorier',
-	processingOrder: 'Commande en cours de traitement',
-	ordered: 'Commande passée',
-	received: 'Commande reçue',
-	canceled: 'Commande annulée',
+	pending_cdp: 'En revue par le chef de projet',
+	pending_treso: 'En revue par le trésorier',
+	pending_delivery: 'En attente de livraison',
+	refused_cdp: 'Refusée par le chef de projet',
+	refused_treso: 'Refusée par le trésorier',
+	canceled_user: 'Annulée par le demandeur',
+	canceled_ops: 'Annulée côté opérationnel',
 	completed: 'Commande complétée'
 };
 
@@ -36,9 +33,9 @@ export const updateText = {
 	'review-treso-requested': 'Validation par le trésorier demandée',
 	'review-treso-approved': 'Validation par le trésorier effectuée',
 	'review-treso-refused': 'Validation par le trésorier refusée',
-	'order-processed': 'Commande en cours de traitement',
-	'order-received': 'Commande reçue',
-	'order-canceled': 'Commande annulée',
+	'order-pending-delivery': 'Commande validée, en attente de livraison',
+	'order-canceled-user': 'Commande annulée par le demandeur',
+	'order-canceled-ops': 'Commande annulée côté opérationnel',
 	'order-completed': 'Commande complétée'
 };
 

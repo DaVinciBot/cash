@@ -1,21 +1,63 @@
 export const PERMISSIONS = [
-	'edit_trainings',
-	'view_trainings',
-	'view_admin',
-	'view_projects_orders',
-	'view_all_orders',
-	'view_treso',
-	'view_members',
-	'edit_blog_draft',
-	'edit_blog',
-	'edit_members',
-	'edit_orders',
-	'edit_projects_orders',
-	'edit_treso',
-	'make_project_order',
-	'make_order',
-	'view_project_stats',
-	'view_all_stats'
+	'members.profile.read.all',
+	'members.profile.create',
+	'members.profile.update.all',
+	'members.projects.read.all',
+	'members.projects.update.all',
+	'members.invite.send',
+	'members.profile.status.update',
+	'iam.permissions.catalog.read',
+	'iam.permissions.read.all',
+	'iam.permissions.assign.all',
+	'iam.permissions.assign.owned',
+	'iam.permissions.revoke.all',
+	'iam.permissions.revoke.owned',
+	'training.catalog.read',
+	'training.slot.read',
+	'training.slot.cu',
+	'training.registration.cru.self',
+	'training.registration.read.all',
+	'training.registration.cu.all',
+	'training.presence.update',
+	'training.summary_email.receive',
+	'orders.cru.self',
+	'orders.read.all',
+	'orders.create.all',
+	'orders.lifecycle.update.all',
+	'projects.stats.read.all',
+	'finance.read',
+	'finance.write',
+	'blog.draft.write',
+	'blog.publish',
+	'integration.smartshare.cast',
+	'integration.discord.summary_webhook.send',
+	'audit.logs.read',
+	'audit.logs.read.security',
+	'audit.events.export'
+];
+
+const ADMIN_ENTRY_PERMISSIONS = [
+	'orders.cru.self',
+	'orders.read.all',
+	'orders.create.all',
+	'orders.lifecycle.update.all',
+	'members.profile.read.all',
+	'members.profile.update.all',
+	'members.projects.read.all',
+	'members.projects.update.all',
+	'training.catalog.read',
+	'training.slot.read',
+	'training.slot.cu',
+	'finance.read',
+	'finance.write',
+	'blog.draft.write',
+	'blog.publish',
+	'integration.smartshare.cast',
+	'projects.stats.read.all',
+	'integration.discord.summary_webhook.send',
+	'audit.logs.read',
+	'audit.logs.read.security',
+	'audit.events.export'
 ];
 
 export const ADMIN_MENU = [
@@ -23,66 +65,65 @@ export const ADMIN_MENU = [
 		title: 'Mes commandes',
 		uri: '/admin',
 		icon: 'home-outline',
-		requiredPermissions: ['view_admin']
+		requiredPermissions: ['orders.cru.self', 'orders.read.all']
 	},
 	{
 		title: 'SmartShare',
 		uri: '/admin/screen-share',
 		icon: 'albums-outline',
-		requiredPermissions: ['view_trainings', 'edit_trainings']
+		requiredPermissions: ['integration.smartshare.cast']
 	},
 	{
 		title: 'Formations',
 		uri: '/admin/training',
 		icon: 'school-outline',
-		requiredPermissions: ['view_trainings', 'edit_trainings']
+		requiredPermissions: ['training.catalog.read', 'training.slot.read', 'training.slot.cu']
 	},
 	{
 		title: 'Gestion des projets',
 		uri: '/admin/projects',
 		icon: 'apps-outline',
-		requiredPermissions: ['view_projects_orders', 'edit_projects_orders']
+		requiredPermissions: [
+			'members.projects.read.all',
+			'members.projects.update.all',
+			'projects.stats.read.all'
+		]
 	},
 	{
 		title: 'Commandes',
 		uri: '/admin/orders',
 		icon: 'card-outline',
-		requiredPermissions: [
-			'view_projects_orders',
-			'view_all_orders',
-			'edit_orders',
-			'edit_projects_orders'
-		]
+		requiredPermissions: ['orders.read.all', 'orders.lifecycle.update.all', 'orders.cru.self']
 	},
 	{
 		title: 'Gestion des membres',
 		uri: '/admin/users',
 		icon: 'people-outline',
-		requiredPermissions: ['view_members', 'edit_members']
+		requiredPermissions: ['members.profile.read.all', 'members.profile.update.all']
 	},
 	{
-		title: 'Gestion de la trésorerie',
+		title: 'Gestion de la trésorerie',
 		uri: '/admin/treso',
 		icon: 'bar-chart-outline',
-		requiredPermissions: ['view_treso', 'edit_treso']
+		requiredPermissions: ['finance.read', 'finance.write']
 	},
 	{
 		title: 'Factures',
 		uri: '/admin/wip',
 		icon: 'attach-outline',
-		requiredPermissions: ['view_treso', 'edit_treso']
+		requiredPermissions: ['finance.read', 'finance.write']
 	},
 	{
 		title: 'Devis',
 		uri: '/admin/wip',
 		icon: 'briefcase-outline',
-		requiredPermissions: ['view_treso', 'edit_treso']
+		requiredPermissions: ['finance.read', 'finance.write']
 	},
 	{
 		title: 'Blog',
 		uri: '/admin/blog',
 		icon: 'create-outline',
-		requiredPermissions: ['edit_blog_draft', 'edit_blog']
+		requiredPermissions: ['blog.draft.write', 'blog.publish']
 	}
 ];
 
@@ -91,32 +132,40 @@ export const ADMIN_CUSTOM_URI = [
 		title: 'Nouvelle commande',
 		uri: '/admin/orders/new',
 		icon: 'add-outline',
-		requiredPermissions: ['make_project_order']
+		requiredPermissions: ['orders.create.all', 'orders.cru.self']
 	}
 ];
 
 const ROUTE_RULES = [
-	{ path: '/admin/orders/new', requiredPermissions: ['make_project_order'] },
+	{ path: '/admin/orders/new', requiredPermissions: ['orders.create.all', 'orders.cru.self'] },
 	{
 		path: '/admin/orders',
-		requiredPermissions: [
-			'view_projects_orders',
-			'view_all_orders',
-			'edit_orders',
-			'edit_projects_orders'
-		]
+		requiredPermissions: ['orders.read.all', 'orders.lifecycle.update.all', 'orders.cru.self']
 	},
 	{
 		path: '/admin/projects',
-		requiredPermissions: ['view_projects_orders', 'edit_projects_orders']
+		requiredPermissions: [
+			'members.projects.read.all',
+			'members.projects.update.all',
+			'projects.stats.read.all'
+		]
 	},
-	{ path: '/admin/users', requiredPermissions: ['view_members', 'edit_members'] },
-	{ path: '/admin/treso', requiredPermissions: ['view_treso', 'edit_treso'] },
-	{ path: '/admin/wip', requiredPermissions: ['view_treso', 'edit_treso'] },
-	{ path: '/admin/blog', requiredPermissions: ['edit_blog_draft', 'edit_blog'] },
-	{ path: '/admin/screen-share', requiredPermissions: ['view_trainings', 'edit_trainings'] },
-	{ path: '/admin/training', requiredPermissions: ['edit_trainings'] },
-	{ path: '/admin', requiredPermissions: ['view_admin'] }
+	{
+		path: '/admin/users',
+		requiredPermissions: ['members.profile.read.all', 'members.profile.update.all']
+	},
+	{ path: '/admin/treso', requiredPermissions: ['finance.read', 'finance.write'] },
+	{ path: '/admin/wip', requiredPermissions: ['finance.read', 'finance.write'] },
+	{ path: '/admin/blog', requiredPermissions: ['blog.draft.write', 'blog.publish'] },
+	{
+		path: '/admin/screen-share',
+		requiredPermissions: ['integration.smartshare.cast']
+	},
+	{
+		path: '/admin/training',
+		requiredPermissions: ['training.catalog.read', 'training.slot.read', 'training.slot.cu']
+	},
+	{ path: '/admin', requiredPermissions: ADMIN_ENTRY_PERMISSIONS }
 ];
 
 export function hasAnyPermission(userPermissions = [], requiredPermissions = []) {
@@ -135,7 +184,7 @@ export function normalizePath(path = '') {
 export function canAccessAdminPath(pathname = '', userPermissions = []) {
 	const path = normalizePath(pathname);
 	if (!(path === '/admin' || path.startsWith('/admin/'))) return true;
-	if (!hasAnyPermission(userPermissions, ['view_admin'])) return false;
+	if (!hasAnyPermission(userPermissions, ADMIN_ENTRY_PERMISSIONS)) return false;
 
 	const matchedRule = ROUTE_RULES.slice()
 		.sort((a, b) => b.path.length - a.path.length)

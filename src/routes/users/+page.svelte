@@ -191,7 +191,7 @@
 			allProjects = user.allProjects.map((p) => ({ value: p.value, text: p.name }));
 			filters[0].options = user.allProjects.map((p) => ({ text: p.name, value: p.id })); // Update the project filter options
 		}
-		canEditMembers = hasAnyPermission(user?.permissions || [], ['edit_members']);
+		canEditMembers = hasAnyPermission(user?.permissions || [], ['members.profile.update.all']);
 	});
 
 	$: if (canEditMembers && !pendingInvitesInitialized) {
@@ -225,7 +225,7 @@
 				onSubmit: async ({ project, users, permissions }) => {
 					if (!canEditMembers) {
 						throw new Error(
-							"Vous n'avez pas les permissions requises pour cette action (edit_members nécessaire)."
+							"Vous n'avez pas les permissions requises pour cette action (members.profile.update.all nécessaire)."
 						);
 					}
 
@@ -353,14 +353,17 @@
 							}
 						} catch (error) {
 							failures.push({ email, message: error?.message || 'Erreur inconnue' });
-							if (isNewlyCreated && createdUserId) {
-								const { error: cleanupProfileError } = await supabase
-									.from('profiles')
-									.delete()
-									.eq('id', createdUserId);
-								if (cleanupProfileError) {
-									console.error('Impossible de nettoyer le profil créé', cleanupProfileError);
-								}
+						if (isNewlyCreated && createdUserId) {
+							const { error: cleanupProfileError } = await supabase
+								.from('profiles')
+								.update({
+									status: 'disabled',
+									status_reason: 'rollback_import_failed'
+								})
+								.eq('id', createdUserId);
+							if (cleanupProfileError) {
+								console.error('Impossible de nettoyer le profil créé', cleanupProfileError);
+							}
 								try {
 									await deleteAuthUser(createdUserId);
 								} catch (cleanupError) {
@@ -426,36 +429,56 @@
 	}
 
 	const permissionCategories = {
-		Administration: [
-			{ label: 'Accès Admin', value: 'view_admin' },
-			{ label: 'Voir tous les stats', value: 'view_all_stats' }
-		],
 		Membres: [
-			{ label: 'Voir membres', value: 'view_members' },
-			{ label: 'Éditer membres', value: 'edit_members' }
+			{ label: 'Voir membres', value: 'members.profile.read.all' },
+			{ label: 'Créer profil membre', value: 'members.profile.create' },
+			{ label: 'Éditer membres', value: 'members.profile.update.all' },
+			{ label: 'Voir projets membres', value: 'members.projects.read.all' },
+			{ label: 'Éditer projets membres', value: 'members.projects.update.all' },
+			{ label: 'Inviter un membre', value: 'members.invite.send' },
+			{ label: 'Statut profil', value: 'members.profile.status.update' }
 		],
-		Projets: [
-			{ label: 'Voir projets/commandes', value: 'view_projects_orders' },
-			{ label: 'Éditer projets', value: 'edit_projects_orders' },
-			{ label: 'Créer commande projet', value: 'make_project_order' },
-			{ label: 'Voir stats projet', value: 'view_project_stats' }
-		],
-		'Commandes (Global)': [
-			{ label: 'Voir toutes les commandes', value: 'view_all_orders' },
-			{ label: 'Éditer commandes', value: 'edit_orders' },
-			{ label: 'Créer commande', value: 'make_order' }
-		],
-		Trésorerie: [
-			{ label: 'Voir la trésorerie', value: 'view_treso' },
-			{ label: 'Éditer la trésorerie', value: 'edit_treso' }
-		],
-		'Site & Blog': [
-			{ label: 'Éditer brouillons blog', value: 'edit_blog_draft' },
-			{ label: 'Publier blog', value: 'edit_blog' }
+		IAM: [
+			{ label: 'Voir catalogue permissions', value: 'iam.permissions.catalog.read' },
+			{ label: 'Voir permissions attribuées', value: 'iam.permissions.read.all' },
+			{ label: 'Attribuer (all)', value: 'iam.permissions.assign.all' },
+			{ label: 'Attribuer (owned)', value: 'iam.permissions.assign.owned' },
+			{ label: 'Retirer (all)', value: 'iam.permissions.revoke.all' },
+			{ label: 'Retirer (owned)', value: 'iam.permissions.revoke.owned' }
 		],
 		Formation: [
-			{ label: 'Accès formations', value: 'view_trainings' },
-			{ label: 'Gérer formations', value: 'edit_trainings' }
+			{ label: 'Voir catalogue formation', value: 'training.catalog.read' },
+			{ label: 'Voir sessions formation', value: 'training.slot.read' },
+			{ label: 'Créer/éditer session formation', value: 'training.slot.cu' },
+			{ label: 'Inscriptions self (CRU)', value: 'training.registration.cru.self' },
+			{ label: 'Voir toutes inscriptions', value: 'training.registration.read.all' },
+			{ label: 'Gérer inscriptions all (CU)', value: 'training.registration.cu.all' },
+			{ label: 'Éditer présence', value: 'training.presence.update' },
+			{ label: 'Recevoir récap formation', value: 'training.summary_email.receive' }
+		],
+		Commandes: [
+			{ label: 'Commandes self (CRU)', value: 'orders.cru.self' },
+			{ label: 'Voir toutes commandes', value: 'orders.read.all' },
+			{ label: 'Créer commande globale', value: 'orders.create.all' },
+			{ label: 'Workflow commandes global', value: 'orders.lifecycle.update.all' }
+		],
+		Projets: [{ label: 'Voir stats globales', value: 'projects.stats.read.all' }],
+		Finance: [
+			{ label: 'Voir la trésorerie', value: 'finance.read' },
+			{ label: 'Éditer la trésorerie', value: 'finance.write' }
+		],
+		Blog: [
+			{ label: 'Éditer brouillons blog', value: 'blog.draft.write' },
+			{ label: 'Publier blog', value: 'blog.publish' }
+		],
+		Intégrations: [
+			{ label: 'Caster SmartShare', value: 'integration.smartshare.cast' },
+			{ label: 'Webhook résumé Discord', value: 'integration.discord.summary_webhook.send' }
+		],
+		Audit: [
+			{ label: 'Voir logs', value: 'audit.logs.read' },
+			{ label: 'Voir logs sécurité', value: 'audit.logs.read.security' },
+			{ label: 'Exporter logs', value: 'audit.events.export' }
 		]
 	};
 
@@ -463,55 +486,80 @@
 		{
 			label: 'Admin Complet',
 			perms: [
-				'view_admin',
-				'view_all_stats',
-				'view_members',
-				'edit_members',
-				'view_projects_orders',
-				'edit_projects_orders',
-				'make_project_order',
-				'view_project_stats',
-				'view_all_orders',
-				'edit_orders',
-				'make_order',
-				'view_treso',
-				'edit_treso',
-				'edit_blog_draft',
-				'edit_blog',
-				'view_trainings',
-				'edit_trainings'
+				'members.profile.read.all',
+				'members.profile.create',
+				'members.profile.update.all',
+				'members.projects.read.all',
+				'members.projects.update.all',
+				'members.invite.send',
+				'members.profile.status.update',
+				'iam.permissions.catalog.read',
+				'iam.permissions.read.all',
+				'iam.permissions.assign.all',
+				'iam.permissions.revoke.all',
+				'training.catalog.read',
+				'training.slot.read',
+				'training.slot.cu',
+				'training.registration.cru.self',
+				'training.registration.read.all',
+				'training.registration.cu.all',
+				'training.presence.update',
+				'training.summary_email.receive',
+				'orders.cru.self',
+				'orders.read.all',
+				'orders.create.all',
+				'orders.lifecycle.update.all',
+				'projects.stats.read.all',
+				'finance.read',
+				'finance.write',
+				'blog.draft.write',
+				'blog.publish',
+				'integration.smartshare.cast',
+				'integration.discord.summary_webhook.send',
+				'audit.logs.read',
+				'audit.logs.read.security',
+				'audit.events.export'
 			]
 		},
 		{
-			label: 'Membre du Codir',
+			label: 'Responsable Formation',
 			perms: [
-				'view_admin',
-				'view_all_stats',
-				'view_members',
-				'view_projects_orders',
-				'view_project_stats',
-				'view_all_orders',
-				'view_treso',
-				'view_trainings',
-				'edit_trainings',
-				'edit_blog_draft',
-				'edit_blog',
-				'make_order'
+				'training.catalog.read',
+				'training.slot.read',
+				'training.slot.cu',
+				'training.registration.cru.self',
+				'training.registration.read.all',
+				'training.registration.cu.all',
+				'training.presence.update',
+				'training.summary_email.receive',
+				'integration.smartshare.cast',
+				'integration.discord.summary_webhook.send'
 			]
 		},
 		{
-			label: 'Chef de projet',
+			label: 'Gestion Membres',
 			perms: [
-				'view_projects_orders',
-				'edit_projects_orders',
-				'make_project_order',
-				'view_project_stats',
-				'view_trainings'
+				'members.profile.read.all',
+				'members.profile.create',
+				'members.profile.update.all',
+				'members.projects.read.all',
+				'members.projects.update.all',
+				'members.invite.send',
+				'members.profile.status.update',
+				'iam.permissions.catalog.read',
+				'iam.permissions.read.all',
+				'iam.permissions.assign.owned',
+				'iam.permissions.revoke.owned'
 			]
 		},
 		{
-			label: 'Membre Projet',
-			perms: ['view_admin', 'view_projects_orders', 'make_project_order', 'view_trainings']
+			label: 'Membre Standard',
+			perms: [
+				'orders.cru.self',
+				'training.catalog.read',
+				'training.slot.read',
+				'training.registration.cru.self'
+			]
 		}
 	];
 
@@ -725,7 +773,7 @@
 					});
 				},
 				id: id,
-				actions: canEditMembers ? [{ title: 'Delete', type: 'delete', handler: deleteUser }] : []
+				actions: canEditMembers ? [{ title: 'Désactiver', type: 'delete', handler: deleteUser }] : []
 			}
 		});
 	}
@@ -743,21 +791,17 @@
 	async function deleteUser(e) {
 		e.preventDefault();
 		if (!canEditMembers) {
-			alert("Vous n'avez pas les permissions requises pour supprimer un utilisateur.");
+			alert("Vous n'avez pas les permissions requises pour désactiver un utilisateur.");
 			return;
 		}
-		if (!confirm('Voulez-vous vraiment supprimer cet utilisateur ?')) return;
+		if (!confirm('Voulez-vous vraiment désactiver cet utilisateur ?')) return;
 		const drawer = document.querySelector('div[id^=drawer-]');
 		const id = drawer.id.split('drawer-')[1]; // Extract the id from the drawer id
-		const { error: memberError } = await supabase.from('member_of').delete().eq('profile', id);
-		if (memberError) return console.error(memberError);
-		const { error: profileError } = await supabase.from('profiles').delete().eq('id', id);
-		if (profileError) return console.error(profileError);
 		try {
 			await deleteAuthUser(id);
 		} catch (error) {
 			console.error(error);
-			alert(error?.message || 'Erreur lors de la suppression du compte auth.');
+			alert(error?.message || 'Erreur lors de la désactivation du compte.');
 			return;
 		}
 		window.location.reload();

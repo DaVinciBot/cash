@@ -26,12 +26,12 @@
 			category: 'Status',
 			value: 'status',
 			options: [
-				{ name: 'En attente', value: 'pendingCDP","pendingTreso' },
-				{ name: 'Validé par le CDP', value: 'approvedCDP' },
-				{ name: 'A commander', value: 'approvedTreso' },
-				{ name: 'Commandé', value: 'ordered' },
+				{ name: 'En revue CDP', value: 'pending_cdp' },
+				{ name: 'En revue Tréso', value: 'pending_treso' },
+				{ name: 'En attente livraison', value: 'pending_delivery' },
 				{ name: 'Terminé', value: 'completed' },
-				{ name: 'Refusé', value: 'canceled","refusedTreso","refusedCDP' }
+				{ name: 'Refusé', value: 'refused_cdp","refused_treso' },
+				{ name: 'Annulé', value: 'canceled_user","canceled_ops' }
 			]
 		},
 		{
@@ -55,7 +55,9 @@
 
 				const { data, error } = await supabase
 					.from('orders')
-					.select('id, creationDate, projectId, status, lastUpdate, items(*), comment, price, name')
+					.select(
+						'id, creationDate, projectId, status, status_reason, lastUpdate, items(*), comment, price, name'
+					)
 					.eq('id', id)
 					.single();
 
@@ -84,15 +86,17 @@
 						icon: 'link'
 					},
 					{
-						done: ['approvedCDP', 'approvedTreso', 'ordered', 'completed'].includes(data.status),
+						done: data.status !== 'pending_cdp',
 						icon: 'checked-document'
 					},
 					{
-						done: ['approvedTreso', 'ordered', 'completed'].includes(data.status),
+						done: ['completed', 'refused_treso', 'canceled_user', 'canceled_ops'].includes(
+							data.status
+						),
 						icon: 'processing'
 					},
 					{
-						done: ['ordered', 'completed'].includes(data.status),
+						done: data.status === 'pending_delivery' || data.status === 'completed',
 						icon: 'shipping'
 					},
 					{
@@ -101,16 +105,18 @@
 					}
 				];
 
-				if (
-					data.status === 'canceled' ||
-					data.status === 'refusedCDP' ||
-					data.status === 'refusedTreso'
-				) {
-					stepper.pop();
-					stepper.pop();
-					stepper.pop();
+				if (data.status === 'refused_cdp') {
+					stepper.splice(2);
 					stepper[1].done = true;
 					stepper[1].icon = 'cancel';
+				} else if (data.status === 'refused_treso') {
+					stepper.splice(3);
+					stepper[2].done = true;
+					stepper[2].icon = 'cancel';
+				} else if (data.status === 'canceled_user' || data.status === 'canceled_ops') {
+					stepper.splice(4);
+					stepper[3].done = true;
+					stepper[3].icon = 'cancel';
 				}
 
 				// fetch the updates for the order
@@ -148,6 +154,10 @@
 									value: data.comment ?? 'Pas de détails'
 								},
 								{
+									label: 'Raison statut',
+									value: data.status_reason?.trim() || 'Aucune'
+								},
+								{
 									label: 'Historique',
 									value: {
 										list: updatesList.map((update) => ({
@@ -163,12 +173,13 @@
 						},
 						actions: [
 							{
-								title: 'Supprimer',
+								title: 'Annuler',
 								type: 'delete',
 								handler: async (e) => {
+									const reason = prompt("Raison d'annulation (optionnelle)")?.trim() || null;
 									const { data, error } = await supabase
 										.from('orders')
-										.delete()
+										.update({ status: 'canceled_user', status_reason: reason })
 										.eq('id', id)
 										.select()
 										.single();
