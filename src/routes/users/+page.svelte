@@ -353,17 +353,17 @@
 							}
 						} catch (error) {
 							failures.push({ email, message: error?.message || 'Erreur inconnue' });
-						if (isNewlyCreated && createdUserId) {
-							const { error: cleanupProfileError } = await supabase
-								.from('profiles')
-								.update({
-									status: 'disabled',
-									status_reason: 'rollback_import_failed'
-								})
-								.eq('id', createdUserId);
-							if (cleanupProfileError) {
-								console.error('Impossible de nettoyer le profil créé', cleanupProfileError);
-							}
+							if (isNewlyCreated && createdUserId) {
+								const { error: cleanupProfileError } = await supabase
+									.from('profiles')
+									.update({
+										status: 'disabled',
+										status_reason: 'rollback_import_failed'
+									})
+									.eq('id', createdUserId);
+								if (cleanupProfileError) {
+									console.error('Impossible de nettoyer le profil créé', cleanupProfileError);
+								}
 								try {
 									await deleteAuthUser(createdUserId);
 								} catch (cleanupError) {
@@ -436,7 +436,7 @@
 			{ label: 'Voir projets membres', value: 'members.projects.read.all' },
 			{ label: 'Éditer projets membres', value: 'members.projects.update.all' },
 			{ label: 'Inviter un membre', value: 'members.invite.send' },
-			{ label: 'Statut profil', value: 'members.profile.status.update' }
+			{ label: 'Activer/Désactiver profil', value: 'members.profile.status.update' }
 		],
 		IAM: [
 			{ label: 'Voir catalogue permissions', value: 'iam.permissions.catalog.read' },
@@ -460,7 +460,7 @@
 			{ label: 'Commandes self (CRU)', value: 'orders.cru.self' },
 			{ label: 'Voir toutes commandes', value: 'orders.read.all' },
 			{ label: 'Créer commande globale', value: 'orders.create.all' },
-			{ label: 'Workflow commandes global', value: 'orders.lifecycle.update.all' }
+			{ label: 'Gérer le workflow commandes global', value: 'orders.lifecycle.update.all' }
 		],
 		Projets: [{ label: 'Voir stats globales', value: 'projects.stats.read.all' }],
 		Finance: [
@@ -473,7 +473,10 @@
 		],
 		Intégrations: [
 			{ label: 'Caster SmartShare', value: 'integration.smartshare.cast' },
-			{ label: 'Webhook résumé Discord', value: 'integration.discord.summary_webhook.send' }
+			{
+				label: 'Déclencher le Webhook résumé Discord',
+				value: 'integration.discord.summary_webhook.send'
+			}
 		],
 		Audit: [
 			{ label: 'Voir logs', value: 'audit.logs.read' },
@@ -553,13 +556,12 @@
 			]
 		},
 		{
+			label: 'Membre Projet',
+			perms: ['orders.cru.self']
+		},
+		{
 			label: 'Membre Standard',
-			perms: [
-				'orders.cru.self',
-				'training.catalog.read',
-				'training.slot.read',
-				'training.registration.cru.self'
-			]
+			perms: ['training.slot.read', 'training.registration.cru.self']
 		}
 	];
 
@@ -773,7 +775,9 @@
 					});
 				},
 				id: id,
-				actions: canEditMembers ? [{ title: 'Désactiver', type: 'delete', handler: deleteUser }] : []
+				actions: canEditMembers
+					? [{ title: 'Désactiver', type: 'delete', handler: deleteUser }]
+					: []
 			}
 		});
 	}
