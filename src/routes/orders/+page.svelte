@@ -23,16 +23,24 @@
 
 	let project = [];
 
+	const syncUserContext = (profile) => {
+		if (!profile) return;
+		user = profile;
+		const permissions = Array.isArray(profile.permissions) ? profile.permissions : [];
+		canViewAllOrders = hasAnyPermission(permissions, ['orders.read.all']);
+		canEditProjectOrders = (profile?.projects || []).some((p) => p?.role === 'cdp');
+		canEditOrders = hasAnyPermission(permissions, ['orders.lifecycle.update.all']);
+		project = profile?.projects.map((p) => ({ name: p.name, value: p.id })) || [];
+		if (canViewAllOrders) {
+			project = profile?.allProjects || [];
+		}
+	};
+
+	syncUserContext(data?.userProfile);
+
 	userdata.subscribe((value) => {
 		if (value) {
-			user = value;
-			canViewAllOrders = hasAnyPermission(user.permissions, ['orders.read.all']);
-			canEditProjectOrders = (value?.projects || []).some((p) => p?.role === 'cdp');
-			canEditOrders = hasAnyPermission(user.permissions, ['orders.lifecycle.update.all']);
-			project = value?.projects.map((p) => ({ name: p.name, value: p.id })) || [];
-			if (canViewAllOrders) {
-				project = value?.allProjects || [];
-			}
+			syncUserContext(value);
 		}
 	});
 
@@ -326,7 +334,7 @@
 																return;
 															}
 
-															const { data: upd, error: updErr } = await supabase
+															const { error: updErr } = await supabase
 																.from('orders')
 																.update({
 																	status: new_status,
@@ -334,11 +342,10 @@
 																	price: finalP,
 																	status_reason: null
 																})
-																.eq('id', id)
-																.select();
+																.eq('id', id);
 															if (updErr) {
 																console.error(updErr);
-																alert('Échec de la mise à jour de la commande');
+																alert(`Échec de la mise à jour de la commande: ${updErr.message}`);
 																return;
 															}
 
@@ -365,7 +372,7 @@
 												return;
 											}
 
-											const { data, error } = await supabase
+											const { error } = await supabase
 												.from('orders')
 												.update({
 													status: new_status,
@@ -373,16 +380,14 @@
 													price: parseFloat(finalPrice),
 													status_reason: null
 												})
-												.eq('id', id)
-												.select();
+												.eq('id', id);
 
 											if (error) {
 												console.error(error);
+												alert(`Échec de la mise à jour de la commande: ${error.message}`);
 												return;
 											}
-											if (data) {
-												window.location.reload();
-											}
+											window.location.reload();
 										}
 									}
 								]
@@ -397,22 +402,20 @@
 										handler: async (e) => {
 											let new_status = 'pending_treso';
 
-											const { data, error } = await supabase
+											const { error } = await supabase
 												.from('orders')
 												.update({ status: new_status, status_reason: null })
-												.eq('id', id)
-												.select();
+												.eq('id', id);
 
 											if (error) {
 												console.error(error);
+												alert(`Échec de la mise à jour de la commande: ${error.message}`);
 												return;
 											}
-											if (data) {
-												window.location.reload();
-											}
+											window.location.reload();
 										}
-									}
-								]
+								}
+							]
 							: [];
 				}
 
@@ -522,22 +525,20 @@
 													return;
 												}
 
-												const { data, error } = await supabase
+												const { error } = await supabase
 													.from('orders')
 													.update({ status: new_status, status_reason: reason })
-													.eq('id', id)
-													.select();
+													.eq('id', id);
 
 												if (error) {
 													console.error(error);
+													alert(`Échec du changement de statut: ${error.message}`);
 													return;
 												}
-												if (data) {
-													window.location.reload();
-												}
+												window.location.reload();
 											}
 										}
-									]
+								]
 								: [])
 						],
 						id: 'readModal'
@@ -580,7 +581,7 @@
 
 	onMount(async () => {
 		if (!user) {
-			await loadUserdata();
+			await loadUserdata(data?.userProfile ?? null);
 		}
 		if (!canViewAllOrders) {
 			filters = filters.splice(1, 1);

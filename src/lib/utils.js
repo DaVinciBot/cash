@@ -6,7 +6,6 @@ import { userdata } from '$lib/store';
  */
 export async function loadUserdata(userFromServer = null) {
 	if (!userFromServer) {
-		userdata.set(null);
 		return;
 	}
 	userdata.set(userFromServer);
