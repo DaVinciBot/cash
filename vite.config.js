@@ -4,7 +4,7 @@ import { defineConfig, loadEnv } from 'vite';
 
 export default defineConfig(({ mode }) => {
 	const env = loadEnv(mode, process.cwd(), '');
-	const authTarget = env.AUTH_PROXY_TARGET || 'http://localhost:5173';
+	const authTarget = env.AUTH_PROXY_TARGET || 'http://localhost:5174';
 
 	return {
 		plugins: [tailwindcss(), sveltekit()],
