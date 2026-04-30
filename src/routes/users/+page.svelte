@@ -70,6 +70,19 @@
 		return await res.json();
 	}
 
+	async function updateAuthUserStatus(id, status) {
+		const res = await fetch(`${resolve('/api/admin/users')}/${id}`, {
+			method: 'PATCH',
+			headers: { 'Content-Type': 'application/json' },
+			body: JSON.stringify({ status })
+		});
+		if (!res.ok) {
+			const payload = await res.json().catch(() => ({}));
+			throw new Error(payload?.error || 'Mise à jour du statut impossible.');
+		}
+		return await res.json();
+	}
+
 	async function reinviteAuthUser(id) {
 		const res = await fetch(`${resolve('/api/admin/users')}/${id}/reinvite`, { method: 'POST' });
 		const body = await res.text();
@@ -589,7 +602,7 @@
 		const id = tr.querySelector('[data-utils]').getAttribute('data-utils');
 		const { data, error } = await supabase
 			.from('profiles')
-			.select('id, username, permissions, member_of(role, project(id,name)), avatar_url')
+			.select('id, username, permissions, status, member_of(role, project(id,name)), avatar_url')
 			.eq('id', id)
 			.single();
 		if (error) return console.error(error);
@@ -789,7 +802,11 @@
 				},
 				id: id,
 				actions: canEditMembers
-					? [{ title: 'Désactiver', type: 'delete', handler: deleteUser }]
+					? [
+							data.status === 'disabled'
+								? { title: 'Réactiver', type: 'validate', handler: reactivateUser }
+								: { title: 'Désactiver', type: 'delete', handler: deleteUser }
+						]
 					: []
 			}
 		});
@@ -819,6 +836,25 @@
 		} catch (error) {
 			console.error(error);
 			alert(error?.message || 'Erreur lors de la désactivation du compte.');
+			return;
+		}
+		window.location.reload();
+	}
+
+	async function reactivateUser(e) {
+		e.preventDefault();
+		if (!canEditMembers) {
+			alert("Vous n'avez pas les permissions requises pour réactiver un utilisateur.");
+			return;
+		}
+		if (!confirm('Voulez-vous vraiment réactiver cet utilisateur ?')) return;
+		const drawer = document.querySelector('div[id^=drawer-]');
+		const id = drawer.id.split('drawer-')[1];
+		try {
+			await updateAuthUserStatus(id, 'active');
+		} catch (error) {
+			console.error(error);
+			alert(error?.message || 'Erreur lors de la réactivation du compte.');
 			return;
 		}
 		window.location.reload();
