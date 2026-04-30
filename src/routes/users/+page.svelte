@@ -167,15 +167,15 @@
 	}
 
 	let allProjects = [
-		{ text: 'CDR', value: '1' },
-		{ text: 'Travelers', value: '2' },
-		{ text: 'Exodus', value: '3' },
-		{ text: 'Bureau', value: '8' },
-		{ text: 'SmartScreen', value: '10' },
-		{ text: 'BallBalancing', value: '11' },
-		{ text: 'Mur Végétal', value: '12' },
-		{ text: 'E-Dog', value: '13' },
-		{ text: 'CDR Nantes', value: '14' }
+		{ name: 'CDR', value: '1' },
+		{ name: 'Travelers', value: '2' },
+		{ name: 'Exodus', value: '3' },
+		{ name: 'Bureau', value: '8' },
+		{ name: 'SmartScreen', value: '10' },
+		{ name: 'BallBalancing', value: '11' },
+		{ name: 'Mur Végétal', value: '12' },
+		{ name: 'E-Dog', value: '13' },
+		{ name: 'CDR Nantes', value: '14' }
 	];
 
 	let filters = [
@@ -186,10 +186,16 @@
 		}
 	];
 
+	function normalizeProjectOption(project) {
+		const value = project?.value ?? project?.id;
+		const name = project?.name ?? String(value ?? '');
+		return { name, value };
+	}
+
 	userdata.subscribe((user) => {
 		if (user && user.allProjects) {
-			allProjects = user.allProjects.map((p) => ({ value: p.value, text: p.name }));
-			filters[0].options = user.allProjects.map((p) => ({ text: p.name, value: p.id })); // Update the project filter options
+			allProjects = user.allProjects.map(normalizeProjectOption);
+			filters[0].options = allProjects;
 		}
 		canEditMembers = hasAnyPermission(user?.permissions || [], ['members.profile.update.all']);
 	});
