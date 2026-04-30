@@ -11,11 +11,11 @@
 
 	export let data;
 
-	let headers = ['Nom', 'Projets', 'Actions'];
+	let headers = ['Nom', 'Projets', 'Statut', 'Actions'];
 
 	let dbInfo = {
 		table: 'profiles',
-		key: 'id, username, avatar_url, member_of(project!inner(id, name))'
+		key: 'id, username, avatar_url, status, member_of(project!inner(id, name))'
 	};
 
 	let canEditMembers = false;
@@ -183,6 +183,14 @@
 			category: 'Projets',
 			value: 'member_of.project.id',
 			options: allProjects
+		},
+		{
+			category: 'Statut',
+			value: 'status',
+			options: [
+				{ name: 'Activé', value: 'active', active: true },
+				{ name: 'Désactivé', value: 'disabled' }
+			]
 		}
 	];
 
@@ -215,7 +223,12 @@
 		let items = [];
 		data.forEach((el) => {
 			const project = el.member_of.map((el) => el.project?.name).join(', ');
-			items.push([{ value: el.username, data: el.id, avatar: el.avatar_url }, { value: project }]);
+			const status = el.status === 'disabled' ? 'Désactivé' : 'Activé';
+			items.push([
+				{ value: el.username, data: el.id, avatar: el.avatar_url },
+				{ value: project },
+				{ value: status }
+			]);
 		});
 		return items;
 	}
@@ -437,7 +450,6 @@
 	const permissionCategories = {
 		Membres: [
 			{ label: 'Voir membres', value: 'members.profile.read.all' },
-			{ label: 'Créer profil membre', value: 'members.profile.create' },
 			{ label: 'Éditer membres', value: 'members.profile.update.all' },
 			{ label: 'Voir projets membres', value: 'members.projects.read.all' },
 			{ label: 'Éditer projets membres', value: 'members.projects.update.all' },
@@ -445,7 +457,6 @@
 			{ label: 'Activer/Désactiver profil', value: 'members.profile.status.update' }
 		],
 		IAM: [
-			{ label: 'Voir catalogue permissions', value: 'iam.permissions.catalog.read' },
 			{ label: 'Voir permissions attribuées', value: 'iam.permissions.read.all' },
 			{ label: 'Attribuer (all)', value: 'iam.permissions.assign.all' },
 			{ label: 'Attribuer (owned)', value: 'iam.permissions.assign.owned' },
@@ -496,13 +507,11 @@
 			label: 'Admin Complet',
 			perms: [
 				'members.profile.read.all',
-				'members.profile.create',
 				'members.profile.update.all',
 				'members.projects.read.all',
 				'members.projects.update.all',
 				'members.invite.send',
 				'members.profile.status.update',
-				'iam.permissions.catalog.read',
 				'iam.permissions.read.all',
 				'iam.permissions.assign.all',
 				'iam.permissions.revoke.all',
@@ -549,13 +558,11 @@
 			label: 'Gestion Membres',
 			perms: [
 				'members.profile.read.all',
-				'members.profile.create',
 				'members.profile.update.all',
 				'members.projects.read.all',
 				'members.projects.update.all',
 				'members.invite.send',
 				'members.profile.status.update',
-				'iam.permissions.catalog.read',
 				'iam.permissions.read.all',
 				'iam.permissions.assign.owned',
 				'iam.permissions.revoke.owned'

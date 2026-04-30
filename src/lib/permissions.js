@@ -1,12 +1,10 @@
 export const PERMISSIONS = [
 	'members.profile.read.all',
-	'members.profile.create',
 	'members.profile.update.all',
 	'members.projects.read.all',
 	'members.projects.update.all',
 	'members.invite.send',
 	'members.profile.status.update',
-	'iam.permissions.catalog.read',
 	'iam.permissions.read.all',
 	'iam.permissions.assign.all',
 	'iam.permissions.assign.owned',
