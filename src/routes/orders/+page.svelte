@@ -1,27 +1,29 @@
 <script>
+	import { run } from 'svelte/legacy';
 	// @ts-nocheck
 	import { hasAnyPermission } from '$lib/permissions';
 	import { userdata } from '$lib/store';
 	import { supabase } from '$lib/supabaseClient';
-	import { loadUserdata, statusText } from '$lib/utils';
+	import { loadUserdata, mountClosable, statusText } from '$lib/utils';
 	import { onMount } from 'svelte';
 
 	import Table from '$lib/components/admin/Table.svelte';
 	import ReadDrawer from '$lib/components/drawers/ReadDrawer.svelte';
 	import CrudForm from '$lib/components/modals/CrudForm.svelte';
 
-	export let data;
+	/** @type {{data: any}} */
+	let { data } = $props();
 
 	let user;
-	let pendingCount = 0;
-	let approvedCount = 0;
-	let deliveryCount = 0;
-	let completedCount = 0;
+	let pendingCount = $state(0);
+	let approvedCount = $state(0);
+	let deliveryCount = $state(0);
+	let completedCount = $state(0);
 	let canViewAllOrders = false;
 	let canEditProjectOrders = false;
 	let canEditOrders = false;
 
-	let project = [];
+	let project = $state([]);
 
 	const syncUserContext = (profile) => {
 		if (!profile) return;
@@ -70,19 +72,22 @@
 		{ name: 'Annulé', value: 'canceled_user","canceled_ops' }
 	];
 
-	$: filters = [
-		{
-			category: 'Projet',
-			value: 'projectId',
-			wide: true,
-			options: project
-		},
-		{
-			category: 'Status',
-			value: 'status',
-			options: statusFilters
-		}
-	];
+	let filters;
+	run(() => {
+		filters = [
+			{
+				category: 'Projet',
+				value: 'projectId',
+				wide: true,
+				options: project
+			},
+			{
+				category: 'Status',
+				value: 'status',
+				options: statusFilters
+			}
+		];
+	});
 
 	let actions = [
 		{
@@ -128,7 +133,7 @@
 				}
 
 				const editItemHandler = (itemToEdit) => {
-					new CrudForm({
+					mountClosable(CrudForm, {
 						target: document.body,
 						props: {
 							type: 'objet',
@@ -281,7 +286,7 @@
 													return;
 												}
 
-												new CrudForm({
+												mountClosable(CrudForm, {
 													target: document.body,
 													props: {
 														type: 'commande',
@@ -414,8 +419,8 @@
 											}
 											window.location.reload();
 										}
-								}
-							]
+									}
+								]
 							: [];
 				}
 
@@ -439,7 +444,7 @@
 					(canEditOrders &&
 						['pending_cdp', 'pending_treso', 'pending_delivery'].includes(data.status));
 
-				new ReadDrawer({
+				mountClosable(ReadDrawer, {
 					target: document.body,
 					props: {
 						values: {
@@ -538,7 +543,7 @@
 												window.location.reload();
 											}
 										}
-								]
+									]
 								: [])
 						],
 						id: 'readModal'

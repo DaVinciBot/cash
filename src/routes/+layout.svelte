@@ -1,4 +1,6 @@
 <script>
+	import { run } from 'svelte/legacy';
+
 	// @ts-nocheck
 	import { browser } from '$app/environment';
 	import { ADMIN_CUSTOM_URI } from '$lib/permissions';
@@ -10,15 +12,16 @@
 	import UserBadge from '$lib/components/share/UserBadge.svelte';
 	import '../app.css';
 
-	export let data;
+	/** @type {{data: any, children?: import('svelte').Snippet}} */
+	let { data, children } = $props();
 
-	$: userProfile = data.userProfile;
-	$: canCreateOrder = data.canCreateOrder ?? false;
-	$: __menu = data.menu ?? [];
+	let userProfile = $derived(data.userProfile);
+	let canCreateOrder = $derived(data.canCreateOrder ?? false);
+	let __menu = $derived(data.menu ?? []);
 
-	let open = false;
+	let open = $state(false);
 	let custom_uri = [...ADMIN_CUSTOM_URI];
-	let sessionSynced = false;
+	let sessionSynced = $state(false);
 
 	onMount(() => {
 		if (userProfile) {
@@ -28,15 +31,15 @@
 		}
 	});
 
-	$: {
+	run(() => {
 		if (userProfile) {
 			userdata.set(userProfile);
 		} else {
 			userdata.set(null);
 		}
-	}
+	});
 
-	$: {
+	run(() => {
 		if (
 			browser &&
 			!sessionSynced &&
@@ -50,7 +53,7 @@
 				refresh_token: data.session.refresh_token
 			});
 		}
-	}
+	});
 </script>
 
 <svelte:head>
@@ -84,7 +87,7 @@
 						data-drawer-toggle="drawer-navigation"
 						aria-controls="drawer-navigation"
 						class="p-2 mr-2 text-gray-400 rounded-lg cursor-pointer md:hidden focus:bg-gray-700 focus:ring-2 focus:ring-gray-100 focus:ring-gray-700 hover:bg-gray-700 hover:text-white"
-						on:click={(e) => {
+						onclick={(e) => {
 							open = !open;
 						}}
 					>
@@ -157,7 +160,7 @@
 		<SideBar menu={__menu} {open} />
 
 		<main class="min-h-screen p-4 pt-20 md:ml-64">
-			<slot />
+			{@render children?.()}
 		</main>
 	</div>
 </div>

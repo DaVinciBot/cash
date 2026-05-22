@@ -1,16 +1,19 @@
 <script>
+	import { run } from 'svelte/legacy';
+
 	import { userdata } from '$lib/store';
 	import { supabase } from '$lib/supabaseClient';
-	import { loadUserdata, statusText } from '$lib/utils';
+	import { loadUserdata, mountClosable, statusText } from '$lib/utils';
 	import { onMount } from 'svelte';
 
 	import Table from '$lib/components/admin/Table.svelte';
 	import ReadDrawer from '$lib/components/drawers/ReadDrawer.svelte';
 
-	export let data;
+	/** @type {{data: any}} */
+	let { data } = $props();
 
 	let skip = false;
-	let user;
+	let user = $state();
 
 	userdata.subscribe((value) => {
 		if (value) {
@@ -21,7 +24,7 @@
 
 	let headers = ['Objets', 'Date de création', 'Dernière mise à jour', 'Prix', 'Status', 'Actions'];
 
-	let filters = [
+	let filters = $state([
 		{
 			category: 'Status',
 			value: 'status',
@@ -39,11 +42,11 @@
 			value: 'requestedBy',
 			options: [{ name: 'current_user', value: user?.id, active: true }]
 		}
-	];
+	]);
 
-	$: {
+	run(() => {
 		filters[1].options[0].value = user?.id;
-	}
+	});
 
 	let actions = [
 		{
@@ -135,7 +138,7 @@
 					update.date = new Date(update.date).toLocaleString();
 				});
 
-				new ReadDrawer({
+				mountClosable(ReadDrawer, {
 					target: document.body,
 					props: {
 						values: {

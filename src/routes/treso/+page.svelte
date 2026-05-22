@@ -4,45 +4,45 @@
 	import SucessModal from '$lib/components/modals/InfoModal.svelte';
 	import ReadModal from '$lib/components/modals/ReadModal.svelte';
 
-	import { supabase } from '$lib/supabaseClient';
-	import { onMount } from 'svelte';
 	import { triggerTableRefresh } from '$lib/store';
-
-	export let data;
-
+	import { supabase } from '$lib/supabaseClient';
+	import { mountClosable } from '$lib/utils';
+	import { onMount, unmount } from 'svelte';
 	// Charts (inspiration from projects page)
-	import { Bar } from 'svelte-chartjs';
 	import {
-		Chart as ChartJS,
-		Title,
-		Tooltip,
-		Legend,
+		BarElement,
 		CategoryScale,
+		Chart as ChartJS,
+		Legend,
 		LinearScale,
-		BarElement
+		Title,
+		Tooltip
 	} from 'chart.js';
+	import { Bar } from 'svelte-chartjs';
+	/** @type {{data: any}} */
+	let { data } = $props();
 	ChartJS.register(Title, Tooltip, Legend, CategoryScale, LinearScale, BarElement);
 
 	// Bank accounts overview state
-	let banks = [];
-	let banksLoading = true;
-	let banksError = '';
-	let banksOpen = false; // collapsed by default
+	let banks = $state([]);
+	let banksLoading = $state(true);
+	let banksError = $state('');
+	let banksOpen = $state(false); // collapsed by default
 
 	// Tabs
-	let selectedTab = 'detail'; // 'detail' | 'cashflow'
+	let selectedTab = $state('detail'); // 'detail' | 'cashflow'
 
 	// Cashflow state
-	let isLoadingCashflow = false;
-	let startDate = '';
-	let endDate = '';
-	let cashflowChartData = {
+	let isLoadingCashflow = $state(false);
+	let startDate = $state('');
+	let endDate = $state('');
+	let cashflowChartData = $state({
 		labels: [],
 		datasets: [
 			{ label: 'Recettes', data: [], backgroundColor: '#36A2EB' },
 			{ label: 'Dépenses', data: [], backgroundColor: '#FF6384' }
 		]
-	};
+	});
 
 	const barOptions = {
 		responsive: true,
@@ -130,7 +130,9 @@
 		);
 	}
 
-	$: totalBanks = banks.reduce((acc, b) => acc + (parseFloat(b.current_amount ?? 0) || 0), 0);
+	let totalBanks = $derived(
+		banks.reduce((acc, b) => acc + (parseFloat(b.current_amount ?? 0) || 0), 0)
+	);
 
 	async function loadBanks() {
 		// fetch all bank accounts with their current amounts
@@ -167,7 +169,7 @@
 			return;
 		}
 
-		const crud = new CrudForm({
+		const crud = mountClosable(CrudForm, {
 			target: document.body,
 			props: {
 				fields: [
@@ -258,7 +260,7 @@
 					if (error) {
 						console.error(error);
 						alert('Une erreur est survenue lors de la création de la dépense');
-						crud.$destroy();
+						unmount(crud);
 						return;
 					}
 
@@ -277,7 +279,7 @@
 							if (err) {
 								console.error(err);
 								alert("Une erreur est survenue lors de l'envoi des justificatifs");
-								crud.$destroy();
+								unmount(crud);
 								return;
 							}
 						}
@@ -286,7 +288,7 @@
 						message += ' (sans justificatif)';
 					}
 
-					new SucessModal({
+					mountClosable(SucessModal, {
 						target: document.body,
 						props: {
 							message: message,
@@ -296,7 +298,7 @@
 								loadBanks();
 								// Close the creation form modal
 								try {
-									crud.$destroy();
+									unmount(crud);
 								} catch {}
 							}
 						}
@@ -336,7 +338,7 @@
 			console.log('No proof, skipping');
 		}
 
-		const crud = new CrudForm({
+		const crud = mountClosable(CrudForm, {
 			target: document.body,
 			props: {
 				fields: [
@@ -484,7 +486,7 @@
 						}
 					}
 
-					new SucessModal({
+					mountClosable(SucessModal, {
 						target: document.body,
 						props: {
 							message: 'La dépense a bien été ajoutée',
@@ -493,7 +495,7 @@
 								loadBanks();
 								// Close the edit form modal
 								try {
-									crud.$destroy();
+									unmount(crud);
 								} catch {}
 							}
 						}
@@ -646,7 +648,7 @@
 					bankName = data.bank_id.name ?? 'Aucun';
 				}
 
-				new ReadModal({
+				mountClosable(ReadModal, {
 					target: document.body,
 					props: {
 						values: {
@@ -708,7 +710,7 @@
 				{selectedTab === 'detail'
 				? 'bg-gray-700 border-gray-600 text-white'
 				: 'bg-gray-800 border-gray-700 text-gray-300 hover:bg-gray-750'}"
-			on:click={() => (selectedTab = 'detail')}
+			onclick={() => (selectedTab = 'detail')}
 			aria-pressed={selectedTab === 'detail'}
 		>
 			Détail
@@ -718,7 +720,7 @@
 				{selectedTab === 'cashflow'
 				? 'bg-gray-700 border-gray-600 text-white'
 				: 'bg-gray-800 border-gray-700 text-gray-300 hover:bg-gray-750'}"
-			on:click={() => (selectedTab = 'cashflow')}
+			onclick={() => (selectedTab = 'cashflow')}
 			aria-pressed={selectedTab === 'cashflow'}
 		>
 			Cashflow
@@ -735,7 +737,7 @@
 						type="date"
 						bind:value={startDate}
 						class="px-3 py-2 text-white bg-gray-900 border border-gray-800 rounded-md"
-						on:change={loadCashflow}
+						onchange={loadCashflow}
 					/>
 				</div>
 				<div class="flex flex-col">
@@ -745,7 +747,7 @@
 						type="date"
 						bind:value={endDate}
 						class="px-3 py-2 text-white bg-gray-900 border border-gray-800 rounded-md"
-						on:change={loadCashflow}
+						onchange={loadCashflow}
 					/>
 				</div>
 			</div>
@@ -765,7 +767,7 @@
 				<button
 					class="flex items-center justify-between w-full px-4 py-4 sm:px-6 focus:outline-none hover:bg-gray-750/50"
 					aria-expanded={banksOpen}
-					on:click={() => (banksOpen = !banksOpen)}
+					onclick={() => (banksOpen = !banksOpen)}
 				>
 					<div class="text-left">
 						<div class="text-sm text-gray-400">Total comptes</div>

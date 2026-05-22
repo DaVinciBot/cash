@@ -1,4 +1,6 @@
 <script>
+	import { preventDefault } from 'svelte/legacy';
+
 	// @ts-nocheck
 	import { onMount } from 'svelte';
 	import { Carta, CartaEditor } from 'carta-md';
@@ -9,27 +11,27 @@
 	import { supabase, supabaseUrl, supabaseKey } from '$lib/supabaseClient';
 
 	// Listing state
-	let articles = [];
-	let search = '';
-	let loadingList = false;
+	let articles = $state([]);
+	let search = $state('');
+	let loadingList = $state(false);
 
-	let title = '';
-	let slug = '';
-	let body = '';
-	let state = 'draft';
-	let meta = {
+	let title = $state('');
+	let slug = $state('');
+	let body = $state('');
+	let state = $state('draft');
+	let meta = $state({
 		excerpt: '',
 		heroImage: '',
 		heroAlt: '',
 		author: { name: '', role: '' },
 		tag: '' // space/comma/hashtag separated string
-	};
+	});
 
-	let saving = false;
-	let message = '';
+	let saving = $state(false);
+	let message = $state('');
 	let canAccess = false;
-	let selectedSlug = '';
-	let saveSteps = [];
+	let selectedSlug = $state('');
+	let saveSteps = $state([]);
 
 	function toSlug(t = '') {
 		return (t || '')
@@ -438,7 +440,7 @@
 		<h1 class="text-2xl font-bold">Articles</h1>
 		<button
 			class="px-3 py-1.5 text-sm text-white rounded bg-primary-600 hover:bg-primary-700"
-			on:click={newArticle}>Nouvel article</button
+			onclick={newArticle}>Nouvel article</button
 		>
 	</div>
 	<div class="grid grid-cols-1 gap-4 md:grid-cols-3">
@@ -451,7 +453,7 @@
 					<input
 						type="file"
 						class="text-xs file:mr-4 file:py-1 file:px-2 file:rounded file:border-0 file:text-xs file:bg-gray-700 file:text-white hover:file:bg-gray-600"
-						on:change={handleUpload}
+						onchange={handleUpload}
 					/>
 				</label>
 			</div>
@@ -482,7 +484,7 @@
 								<button
 									type="button"
 									class={`w-full text-left p-2 hover:bg-gray-700/40 cursor-pointer rounded ${a.slug === selectedSlug ? 'bg-gray-700/30' : ''}`}
-									on:click={() => loadArticle(a.slug)}
+									onclick={() => loadArticle(a.slug)}
 								>
 									<div class="text-sm font-medium">{a.title}</div>
 									<div class="flex items-center justify-between gap-2">
@@ -518,7 +520,7 @@
 					id="title"
 					class="w-full px-3 py-2 bg-gray-900 border border-gray-700 rounded"
 					bind:value={title}
-					on:input={() => (slug = toSlug(title))}
+					oninput={() => (slug = toSlug(title))}
 				/>
 			</div>
 			<div>
@@ -548,7 +550,7 @@
 					rows="3"
 					class="w-full px-3 py-2 bg-gray-900 border border-gray-700 rounded"
 					bind:value={meta.excerpt}
-				/>
+				></textarea>
 			</div>
 			<div>
 				<label class="block mb-1 text-sm" for="tags"
@@ -571,7 +573,7 @@
 					<input
 						type="file"
 						accept="image/*"
-						on:change={handleCoverUpload}
+						onchange={handleCoverUpload}
 						class="text-xs file:mr-4 file:py-1 file:px-2 file:rounded file:border-0 file:text-xs file:bg-gray-700 file:text-white hover:file:bg-gray-600"
 					/>
 					{#if meta.heroImage}
@@ -612,7 +614,7 @@
 
 			<button
 				class="px-4 py-2 text-white rounded bg-primary-600 hover:bg-primary-700 disabled:opacity-50"
-				on:click|preventDefault={save}
+				onclick={preventDefault(save)}
 				disabled={saving}
 			>
 				{saving ? 'Enregistrement…' : 'Enregistrer'}
@@ -637,7 +639,7 @@
 				<div class="flex justify-end">
 					<button
 						class="px-4 py-2 text-white rounded bg-primary-600 hover:bg-primary-700"
-						on:click={() => (message = '')}>Fermer</button
+						onclick={() => (message = '')}>Fermer</button
 					>
 				</div>
 			{/if}

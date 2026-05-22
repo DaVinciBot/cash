@@ -1,13 +1,16 @@
 <script>
+	import { preventDefault } from 'svelte/legacy';
+
 	import { userdata } from '$lib/store';
 	import { supabase } from '$lib/supabaseClient';
 	import { onMount } from 'svelte';
 
-	export let user = {
+	/** @type {{user?: any}} */
+	let { user = $bindable({
 		name: 'Urbain',
 		email: 'davincibot@devinci.fr',
 		avatar: 'https://flowbite.s3.amazonaws.com/blocks/marketing-ui/avatars/michael-gough.png'
-	};
+	}) } = $props();
 
 	userdata.subscribe((value) => {
 		if (value) {
@@ -80,11 +83,11 @@
 		}
 	}
 
-	let new_password = '';
-	let new_password_confirmation = '';
-	let new_username = '';
+	let new_password = $state('');
+	let new_password_confirmation = $state('');
+	let new_username = $state('');
 
-	let loading = false;
+	let loading = $state(false);
 
 	async function handlePassword() {
 		loading = true;
@@ -154,7 +157,7 @@
 				name="file"
 				id="file"
 				accept="image/png, image/jpeg"
-				on:change={handleImage}
+				onchange={handleImage}
 			/>
 			<img src={user?.avatar} alt="avatar" class="w-32 h-32 rounded-full" />
 		</div>
@@ -174,7 +177,7 @@
 	<div
 		class="flex flex-col items-center justify-center w-full h-full p-8 text-white bg-gray-800 rounded-lg shadow-md sm:mx-auto"
 	>
-		<form class="w-full space-y-4 md:space-y-6" on:submit|preventDefault={handleSubmit}>
+		<form class="w-full space-y-4 md:space-y-6" onsubmit={preventDefault(handleSubmit)}>
 			<div>
 				<label for="username" class="block mb-2 text-sm font-medium text-white">Votre nom</label>
 				<input
@@ -197,14 +200,14 @@
 			<button
 				type="button"
 				class="w-full px-4 py-2 mb-2 text-sm font-medium text-white bg-gray-600 rounded-lg hover:bg-gray-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-offset-gray-800 focus:ring-gray-700"
-				on:click={clearUserdataCache}
+				onclick={clearUserdataCache}
 			>
 				Vider le cache utilisateur
 			</button>
 			<button
 				type="button"
 				class="w-full px-4 py-2 text-sm font-medium text-white bg-red-500 rounded-lg hover:bg-red-600 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-offset-gray-800 focus:ring-red-700"
-				on:click={LogOut}
+				onclick={LogOut}
 			>
 				Se déconnecter
 			</button>
@@ -215,7 +218,7 @@
 	>
 		<form
 			class="w-full space-y-4 border-gray-700 md:space-y-6"
-			on:submit|preventDefault={handlePassword}
+			onsubmit={preventDefault(handlePassword)}
 		>
 			<div>
 				<label for="password" class="block mb-2 text-sm font-medium text-white"

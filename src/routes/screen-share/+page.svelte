@@ -12,13 +12,13 @@
 	let ws: WebSocket | null = null;
 	let pc: RTCPeerConnection | null = null;
 	let stream: MediaStream | null = null;
-	let is_busy = true;
-	let connected = false;
-	let sharing = false;
-	let canCastSmartShare = false;
-	let canManageTraining = false;
+	let is_busy = $state(true);
+	let connected = $state(false);
+	let sharing = $state(false);
+	let canCastSmartShare = $state(false);
+	let canManageTraining = $state(false);
 	let wsUrl = 'wss://cast.davincibot.fr'; // Change if needed
-	let showToolbox = false; // Add this variable
+	let showToolbox = $state(false); // Add this variable
 
 	userdata.subscribe((value: ScreenShareUser | null) => {
 		if (value) {
@@ -129,7 +129,7 @@
 <!-- Info Button (top right, outside layout) -->
 <button
 	class="fixed z-20 p-2 rounded-full top-20 right-4 hover:bg-gray-600 focus:outline-none"
-	on:click={(e) => {
+	onclick={(e) => {
 		e.stopPropagation();
 		showToolbox = !showToolbox;
 	}}
@@ -259,7 +259,7 @@
 		</div>
 		<div class="flex">
 			<button
-				on:click={startShare}
+				onclick={startShare}
 				disabled={!canCastSmartShare || is_busy || sharing}
 				class="flex-1 px-4 py-2 font-semibold text-white transition rounded bg-primary-600 hover:bg-primary-700 disabled:opacity-50 disabled:cursor-not-allowed"
 			>
@@ -287,7 +287,7 @@
 			</button>
 			{#if canManageTraining}
 				<button
-					on:click={sendKill}
+					onclick={sendKill}
 					class="flex-1 px-4 py-2 ml-4 font-semibold text-white transition bg-red-500 rounded hover:bg-red-600"
 				>
 					<svg

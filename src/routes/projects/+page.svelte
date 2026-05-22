@@ -1,35 +1,35 @@
 <script>
-	import { onMount } from 'svelte';
 	import { supabase } from '$lib/supabaseClient';
+	import { onMount } from 'svelte';
 
-	import { loadUserdata } from '$lib/utils';
 	import { userdata } from '$lib/store';
+	import { loadUserdata } from '$lib/utils';
 
-	import { Pie, Bar } from 'svelte-chartjs';
+	import { Bar, Pie } from 'svelte-chartjs';
 
 	import {
-		Chart as ChartJS,
-		Title,
-		Tooltip,
-		Legend,
 		ArcElement,
+		BarElement,
 		CategoryScale,
+		Chart as ChartJS,
+		Legend,
 		LinearScale,
-		BarElement
+		Title,
+		Tooltip
 	} from 'chart.js';
 
 	ChartJS.register(Title, Tooltip, Legend, ArcElement, CategoryScale, LinearScale, BarElement);
 
-	let selectedProjectId;
-	let project = {};
-	let stats = { websites: [], users: [], tags: [], banks: [] };
+	let selectedProjectId = $state();
+	let project = $state({});
+	let stats = $state({ websites: [], users: [], tags: [], banks: [] });
 	let skip = false;
-	let user;
-	let showDropdown = false;
+	let user = $state();
+	let showDropdown = $state(false);
 	let isLoading = false;
-	let dropdownEl;
-	let selectedYear;
-	let budgets = [];
+	let dropdownEl = $state();
+	let selectedYear = $state();
+	let budgets = $state([]);
 
 	const barOptions = {
 		responsive: true,
@@ -83,22 +83,21 @@
 		}
 	});
 
-	let data = {
+	let budgetChartData = $derived({
 		labels: ['Budget restant', 'Dépenses'],
 		datasets: [
 			{
-				data: [1, 1],
+				data: [
+					project.budget?.budget - project.budget?.cost < 0
+						? 0
+						: project.budget?.budget - project.budget?.cost,
+					project.budget?.cost
+				],
 				backgroundColor: ['#36A2EB', '#FF6384'],
 				hoverBackgroundColor: ['#36A2EB', '#FF6384']
 			}
 		]
-	};
-	$: data.datasets[0].data = [
-		project.budget?.budget - project.budget?.cost < 0
-			? 0
-			: project.budget?.budget - project.budget?.cost,
-		project.budget?.cost
-	];
+	});
 
 	async function fetchProject() {
 		if (!selectedProjectId) {
@@ -191,7 +190,7 @@
 	}
 </script>
 
-<svelte:window on:click={handleWindowClick} />
+<svelte:window onclick={handleWindowClick} />
 
 <div class="flex flex-col items-start justify-center w-full gap-6 px-4 py-8 mx-auto max-w-7xl">
 	<div class="flex items-center justify-between w-full h-14">
@@ -200,7 +199,7 @@
 				<div class="relative inline-block h-full min-w-64 md:min-w-72" bind:this={dropdownEl}>
 					<button
 						class="flex items-center justify-between w-full h-full px-6 py-2 text-2xl font-bold text-white bg-gray-900 border border-gray-800 rounded-md hover:bg-gray-800"
-						on:click={() => (showDropdown = !showDropdown)}
+						onclick={() => (showDropdown = !showDropdown)}
 						type="button"
 					>
 						{user.projects.find((p) => p.id === selectedProjectId)?.name ||
@@ -222,7 +221,7 @@
 								<li>
 									<button
 										class="w-full px-4 py-2 text-left text-white hover:bg-gray-700"
-										on:click={() => {
+										onclick={() => {
 											selectedProjectId = p.id;
 											showDropdown = false;
 											handleSelect({ target: { value: p.id } });
@@ -244,7 +243,7 @@
 			<select
 				id="year"
 				class="h-full px-3 py-2 text-white bg-gray-900 border border-gray-800 rounded-md"
-				on:change={handleYearChange}
+				onchange={handleYearChange}
 				bind:value={selectedYear}
 				aria-label="Sélection de l'année du budget"
 			>
@@ -273,7 +272,7 @@
 			</div>
 			<div class="grid items-center gap-4 mt-4 sm:grid-cols-2">
 				<div class="h-56">
-					<Pie {data} options={{ responsive: true, maintainAspectRatio: false }} />
+					<Pie data={budgetChartData} options={{ responsive: true, maintainAspectRatio: false }} />
 				</div>
 				<div class="space-y-2 text-white">
 					<div class="flex items-center justify-between">

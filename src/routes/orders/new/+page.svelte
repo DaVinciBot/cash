@@ -1,16 +1,17 @@
 <script>
-	import { supabase } from '$lib/supabaseClient';
-	import { userdata } from '$lib/store';
 	import { goto } from '$app/navigation';
+	import { userdata } from '$lib/store';
+	import { supabase } from '$lib/supabaseClient';
 
 	import InfoModal from '$lib/components/modals/InfoModal.svelte';
+	import { mountClosable } from '$lib/utils';
 
-	let items = [{ nom: '', lien: '', price: '', quantity: '' }];
-	let projectId = -1;
-	let projectTitle = {};
+	let items = $state([{ nom: '', lien: '', price: '', quantity: '' }]);
+	let projectId = $state(-1);
+	let projectTitle = $state({});
 
 	let name = '';
-	let selectedTags = [];
+	let selectedTags = $state([]);
 	const TAG_OPTIONS = ['méca', 'info', 'élek'];
 
 	async function updateProjectTitle() {
@@ -96,7 +97,7 @@
 				return;
 			}
 		}
-		new InfoModal({
+		mountClosable(InfoModal, {
 			target: document.body,
 			props: {
 				message: 'La commande a été proposé avec succès.',
@@ -119,7 +120,7 @@
 					<div class="w-20 sm:mr-5">
 						<button
 							class="justify-center w-full px-4 py-2 text-sm font-medium text-white align-middle transition-all border-2 border-dashed rounded-lg focus:ring-4 hover:bg-primary-600 hover:border-transparent focus:outline-none focus:ring-primary-800"
-							on:click={(e) => {
+							onclick={(e) => {
 								e.preventDefault();
 								if (items.length > 1) {
 									items = items.filter((item, index) => index !== i);
@@ -197,7 +198,7 @@
 				<button
 					type="button"
 					class="w-full px-4 text-xl text-white align-middle transition-all border-2 border-gray-100 border-dashed rounded-lg focus:ring-4 hover:bg-primary-600 hover:border-transparent focus:outline-none focus:ring-primary-800"
-					on:click={(e) => {
+					onclick={(e) => {
 						e.preventDefault();
 						items = [...items, { nom: '', lien: '', price: '', quantity: '' }];
 					}}
@@ -253,7 +254,7 @@
 				<button
 					type="submit"
 					class="px-4 py-2 text-sm font-medium text-white transition-all rounded-lg bg-primary-600 focus:ring-4 hover:bg-primary-800 hover:border-transparent focus:outline-none focus:ring-primary-800"
-					on:click={onSubmit}>Envoyer</button
+					onclick={onSubmit}>Envoyer</button
 				>
 			</div>
 		</div>

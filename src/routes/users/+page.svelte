@@ -1,15 +1,19 @@
 <script>
+	import { run } from 'svelte/legacy';
+
 	import { resolve } from '$app/paths';
 	import { hasAnyPermission } from '$lib/permissions';
 	import { userdata } from '$lib/store.js';
 	import { supabase } from '$lib/supabaseClient';
+	import { mountClosable } from '$lib/utils';
 
 	import Table from '$lib/components/admin/Table.svelte';
 	import ReadDrawer from '$lib/components/drawers/ReadDrawer.svelte';
 	import SucessModal from '$lib/components/modals/InfoModal.svelte';
 	import UserImportModal from '$lib/components/modals/UserImportModal.svelte';
 
-	export let data;
+	/** @type {{data: any}} */
+	let { data } = $props();
 
 	let headers = ['Nom', 'Projets', 'Statut', 'Actions'];
 
@@ -18,12 +22,12 @@
 		key: 'id, username, avatar_url, status, member_of(project!inner(id, name))'
 	};
 
-	let canEditMembers = false;
-	let pendingInvites = [];
-	let pendingInvitesLoading = false;
-	let pendingInvitesError = '';
-	let reinvitingUserId = null;
-	let pendingInvitesInitialized = false;
+	let canEditMembers = $state(false);
+	let pendingInvites = $state([]);
+	let pendingInvitesLoading = $state(false);
+	let pendingInvitesError = $state('');
+	let reinvitingUserId = $state(null);
+	let pendingInvitesInitialized = $state(false);
 
 	async function listAuthUsers(page, perPage) {
 		const res = await fetch(`${resolve('/api/admin/users')}?page=${page}&perPage=${perPage}`);
@@ -163,7 +167,7 @@
 		reinvitingUserId = authUser.id;
 		try {
 			await reinviteAuthUser(authUser.id);
-			new SucessModal({
+			mountClosable(SucessModal, {
 				target: document.body,
 				props: {
 					message: `Invitation renvoyée à ${authUser.email}.`,
@@ -191,7 +195,7 @@
 		{ name: 'CDR Nantes', value: '14' }
 	];
 
-	let filters = [
+	let filters = $state([
 		{
 			category: 'Projets',
 			value: 'member_of.project.id',
@@ -205,7 +209,7 @@
 				{ name: 'Désactivé', value: 'disabled' }
 			]
 		}
-	];
+	]);
 
 	function normalizeProjectOption(project) {
 		const value = project?.value ?? project?.id;
@@ -221,16 +225,20 @@
 		canEditMembers = hasAnyPermission(user?.permissions || [], ['members.profile.update.all']);
 	});
 
-	$: if (canEditMembers && !pendingInvitesInitialized) {
-		pendingInvitesInitialized = true;
-		loadPendingInvites();
-	}
+	run(() => {
+		if (canEditMembers && !pendingInvitesInitialized) {
+			pendingInvitesInitialized = true;
+			loadPendingInvites();
+		}
+	});
 
-	$: if (!canEditMembers) {
-		pendingInvitesInitialized = false;
-		pendingInvites = [];
-		pendingInvitesError = '';
-	}
+	run(() => {
+		if (!canEditMembers) {
+			pendingInvitesInitialized = false;
+			pendingInvites = [];
+			pendingInvitesError = '';
+		}
+	});
 
 	function parseItems(data) {
 		let items = [];
@@ -247,7 +255,7 @@
 	}
 
 	async function addNew() {
-		new UserImportModal({
+		mountClosable(UserImportModal, {
 			target: document.body,
 			props: {
 				projectOptions: allProjects,
@@ -446,7 +454,7 @@
 
 					const message = messageParts.join('\n');
 
-					new SucessModal({
+					mountClosable(SucessModal, {
 						target: document.body,
 						props: {
 							message,
@@ -686,7 +694,7 @@
 				wide: true
 			}
 		];
-		new ReadDrawer({
+		mountClosable(ReadDrawer, {
 			target: document.body,
 			props: {
 				values,
@@ -789,7 +797,7 @@
 						}
 					}
 
-					new SucessModal({
+					mountClosable(SucessModal, {
 						target: document.body,
 						props: {
 							message: 'Utilisateur mis à jour avec succès',
@@ -889,7 +897,7 @@
 				<button
 					type="button"
 					class="rounded-lg border border-gray-600 px-3 py-2 text-sm font-medium text-gray-200 hover:bg-gray-700 disabled:cursor-not-allowed disabled:opacity-50"
-					on:click={loadPendingInvites}
+					onclick={loadPendingInvites}
 					disabled={pendingInvitesLoading || reinvitingUserId !== null}
 				>
 					Rafraîchir
@@ -929,7 +937,7 @@
 										<button
 											type="button"
 											class="rounded-lg bg-primary-700 px-3 py-1.5 text-sm font-medium text-white hover:bg-primary-800 disabled:cursor-not-allowed disabled:opacity-50"
-											on:click={() => reinvitePendingUser(authUser)}
+											onclick={() => reinvitePendingUser(authUser)}
 											disabled={reinvitingUserId !== null}
 										>
 											{reinvitingUserId === authUser.id ? 'Envoi...' : 'Réinviter'}

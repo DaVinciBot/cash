@@ -1,4 +1,5 @@
 import { userdata } from '$lib/store';
+import { mount, unmount } from 'svelte';
 
 /**
  * Loads the current user's profile into the `userdata` store from server data.
@@ -9,6 +10,29 @@ export async function loadUserdata(userFromServer = null) {
 		return;
 	}
 	userdata.set(userFromServer);
+}
+
+export function mountClosable(component, options = {}) {
+	const props = options.props || {};
+	let instance;
+
+	const close = (event) => {
+		try {
+			if (typeof props.onClose === 'function') props.onClose(event);
+		} finally {
+			if (instance) unmount(instance);
+		}
+	};
+
+	instance = mount(component, {
+		...options,
+		props: {
+			...props,
+			onClose: close
+		}
+	});
+
+	return instance;
 }
 
 export const statusText = {
