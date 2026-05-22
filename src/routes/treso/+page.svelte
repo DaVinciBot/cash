@@ -8,7 +8,8 @@
 	import { supabase } from '$lib/supabaseClient';
 	import { mountClosable } from '$lib/utils';
 	import { onMount, unmount } from 'svelte';
-	// Charts (inspiration from projects page)
+	import { Bar } from 'svelte5-chartjs';
+
 	import {
 		BarElement,
 		CategoryScale,
@@ -18,10 +19,11 @@
 		Title,
 		Tooltip
 	} from 'chart.js';
-	import { Bar } from 'svelte-chartjs';
+
+	ChartJS.register(Title, Tooltip, Legend, CategoryScale, LinearScale, BarElement);
+
 	/** @type {{data: any}} */
 	let { data } = $props();
-	ChartJS.register(Title, Tooltip, Legend, CategoryScale, LinearScale, BarElement);
 
 	// Bank accounts overview state
 	let banks = $state([]);

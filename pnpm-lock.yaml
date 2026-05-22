@@ -50,9 +50,9 @@ importers:
       sanitize-html:
         specifier: ^2.17.0
         version: 2.17.2
-      svelte-chartjs:
-        specifier: ^3.1.5
-        version: 3.1.5(chart.js@4.5.1)(svelte@5.55.9(@typescript-eslint/types@8.58.2))
+      svelte5-chartjs:
+        specifier: 1.0.0
+        version: 1.0.0(chart.js@4.5.1)(svelte@5.55.9(@typescript-eslint/types@8.58.2))
       tailwind-merge:
         specifier: ^2.4.0
         version: 2.6.1
@@ -1977,12 +1977,6 @@ packages:
     resolution: {integrity: sha512-ot0WnXS9fgdkgIcePe6RHNk1WA8+muPa6cSjeR3V8K27q9BB1rTE3R1p7Hv0z1ZyAc8s6Vvv8DIyWf681MAt0w==}
     engines: {node: '>= 0.4'}
 
-  svelte-chartjs@3.1.5:
-    resolution: {integrity: sha512-ka2zh7v5FiwfAX1oMflZ0HkNkgjHjFqANgRyC+vNYXfxtx2ku68Zo+2KgbKeBH2nS1ThDqkIACPzGxy4T0UaoA==}
-    peerDependencies:
-      chart.js: ^3.5.0 || ^4.0.0
-      svelte: ^4.0.0
-
   svelte-check@4.4.6:
     resolution: {integrity: sha512-kP1zG81EWaFe9ZyTv4ZXv44Csi6Pkdpb7S3oj6m+K2ec/IcDg/a8LsFsnVLqm2nxtkSwsd5xPj/qFkTBgXHXjg==}
     engines: {node: '>= 18.0.0'}
@@ -2036,6 +2030,12 @@ packages:
         optional: true
       typescript:
         optional: true
+
+  svelte5-chartjs@1.0.0:
+    resolution: {integrity: sha512-SMk+D5ECbsoeFurKE/Nr9sqD4H3WqZkQ4eLxwchDSh8gu7YSGN3ASXYCz9kzFhrH2QGQYpebHwLIMHg7FOI/7A==}
+    peerDependencies:
+      chart.js: ^3.5.0 || ^4.0.0
+      svelte: ^5.0.0
 
   svelte@5.55.9:
     resolution: {integrity: sha512-fTjjT8cHLDwigcu2j3pv7Jq04LklXevPB8uBgyHNiTXv+RMNvVnrjS4UEYrLMkhuq1vpCodHjiW+z/95SDs/fg==}
@@ -4093,11 +4093,6 @@ snapshots:
 
   supports-preserve-symlinks-flag@1.0.0: {}
 
-  svelte-chartjs@3.1.5(chart.js@4.5.1)(svelte@5.55.9(@typescript-eslint/types@8.58.2)):
-    dependencies:
-      chart.js: 4.5.1
-      svelte: 5.55.9(@typescript-eslint/types@8.58.2)
-
   svelte-check@4.4.6(picomatch@4.0.4)(svelte@5.55.9(@typescript-eslint/types@8.58.2))(typescript@5.9.3):
     dependencies:
       '@jridgewell/trace-mapping': 0.3.31
@@ -4127,6 +4122,11 @@ snapshots:
       postcss: 8.5.10
       postcss-load-config: 3.1.4(postcss@8.5.10)
       typescript: 5.9.3
+
+  svelte5-chartjs@1.0.0(chart.js@4.5.1)(svelte@5.55.9(@typescript-eslint/types@8.58.2)):
+    dependencies:
+      chart.js: 4.5.1
+      svelte: 5.55.9(@typescript-eslint/types@8.58.2)
 
   svelte@5.55.9(@typescript-eslint/types@8.58.2):
     dependencies:

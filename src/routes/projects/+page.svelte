@@ -5,7 +5,7 @@
 	import { userdata } from '$lib/store';
 	import { loadUserdata } from '$lib/utils';
 
-	import { Bar, Pie } from 'svelte-chartjs';
+	import { Bar, Pie } from 'svelte5-chartjs';
 
 	import {
 		ArcElement,
@@ -26,7 +26,6 @@
 	let skip = false;
 	let user = $state();
 	let showDropdown = $state(false);
-	let isLoading = false;
 	let dropdownEl = $state();
 	let selectedYear = $state();
 	let budgets = $state([]);
@@ -88,10 +87,10 @@
 		datasets: [
 			{
 				data: [
-					project.budget?.budget - project.budget?.cost < 0
+					Number(project.budget?.budget ?? 0) - Number(project.budget?.cost ?? 0) < 0
 						? 0
-						: project.budget?.budget - project.budget?.cost,
-					project.budget?.cost
+						: Number(project.budget?.budget ?? 0) - Number(project.budget?.cost ?? 0),
+					Number(project.budget?.cost ?? 0)
 				],
 				backgroundColor: ['#36A2EB', '#FF6384'],
 				hoverBackgroundColor: ['#36A2EB', '#FF6384']
@@ -129,7 +128,6 @@
 	});
 
 	async function loadPage() {
-		isLoading = true;
 		project = await fetchProject();
 		if (selectedProjectId == 0) {
 			project.budget = { budget: 0, year: year, cost: 0 };
@@ -140,7 +138,6 @@
 		});
 		if (costErr) {
 			console.error(costErr);
-			isLoading = false;
 			return;
 		}
 		project.budget.cost = costData;
@@ -165,7 +162,6 @@
 		} else {
 			stats = statsData ?? { websites: [], users: [], tags: [], banks: [] };
 		}
-		isLoading = false;
 	}
 	async function handleSelect(event) {
 		selectedProjectId = event.target.value;
@@ -217,7 +213,7 @@
 						<ul
 							class="absolute z-20 w-full mt-1 overflow-hidden bg-gray-800 border border-gray-700 shadow-xl rounded-xl"
 						>
-							{#each user.projects as p}
+							{#each user.projects as p (p.id)}
 								<li>
 									<button
 										class="w-full px-4 py-2 text-left text-white hover:bg-gray-700"
@@ -248,7 +244,7 @@
 				aria-label="Sélection de l'année du budget"
 			>
 				{#if budgets?.length}
-					{#each budgets as b}
+					{#each budgets.sort((a, b) => b.year - a.year) as b (b.year)}
 						<option value={b.year}>{b.year}</option>
 					{/each}
 				{:else}
