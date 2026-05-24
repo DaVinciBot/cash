@@ -82,7 +82,7 @@ export const load: LayoutServerLoad = async ({ locals, cookies, url }) => {
 					? url.pathname.slice(0, -1)
 					: url.pathname;
 			if (!canAccessAdminPath(pathname, permissions)) {
-				redirect(302, '/');
+				redirect(302, `/unauthorized?redirect=${encodeURIComponent(url.href)}`);
 			}
 		}
 

@@ -73,7 +73,7 @@ export const ADMIN_MENU = [
 	},
 	{
 		title: 'Formations',
-		uri: '/admin/training',
+		uri: '/admin/trainings',
 		icon: 'school-outline',
 		requiredPermissions: ['training.catalog.read', 'training.slot.read', 'training.slot.cu']
 	},
@@ -160,7 +160,7 @@ const ROUTE_RULES = [
 		requiredPermissions: ['integration.smartshare.cast']
 	},
 	{
-		path: '/admin/training',
+		path: '/admin/trainings',
 		requiredPermissions: ['training.catalog.read', 'training.slot.read', 'training.slot.cu']
 	},
 	{ path: '/admin', requiredPermissions: ADMIN_ENTRY_PERMISSIONS }
