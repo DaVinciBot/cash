@@ -3,9 +3,6 @@
 	"version": "0.2.0",
 	"private": true,
 	"packageManager": "pnpm@10.33.0",
-	"engines": {
-		"node": "^20.19.0 || ^22.13.0 || >=24.0.0"
-	},
 	"scripts": {
 		"dev": "vite dev --host",
 		"build": "vite build",
@@ -23,7 +20,7 @@
 		"@playwright/test": "^1.60.0",
 		"@sveltejs/adapter-auto": "^7.0.1",
 		"@sveltejs/adapter-node": "^5.5.4",
-		"@sveltejs/kit": "^2.61.0",
+		"@sveltejs/kit": "^2.61.1",
 		"@sveltejs/vite-plugin-svelte": "^7.1.2",
 		"@tsconfig/svelte": "^5.0.8",
 		"@types/eslint": "^9.6.1",
