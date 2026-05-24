@@ -1,7 +1,7 @@
 import { redirect } from '@sveltejs/kit';
-import type { LayoutServerLoad } from './$types';
+import type { PageServerLoad } from './$types';
 
-export const load: LayoutServerLoad = async ({ locals, url }) => {
+export const load: PageServerLoad = async ({ locals, url }) => {
 	const { session, user } = await locals.safeGetSession();
 
 	if ((!session || !user) && !import.meta.env?.DEV) {
