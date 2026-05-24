@@ -540,6 +540,18 @@ DVBisous ! :robot:`;
 
 <section class="px-4 py-6 sm:px-6 sm:py-8">
 	<div class="mx-auto flex w-full max-w-6xl flex-col gap-8">
+		<section class="rounded-[22px] border border-light-blue/10 bg-dark-blue/70 p-4 sm:p-5">
+			<div class="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+				<div>
+					<h2 class="text-base font-semibold text-white">Calendrier public</h2>
+					<p class="text-xs text-light-blue/60">Consulter les formations publiées.</p>
+				</div>
+				<CTAButton href="/formation" variant="secondary" size="sm" fullWidth={false}>
+					Voir le calendrier
+				</CTAButton>
+			</div>
+		</section>
+
 		<AdminHeader
 			trainingsCount={trainings.length}
 			upcomingCount={upcomingSlots.length}
