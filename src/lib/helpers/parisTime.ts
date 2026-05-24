@@ -1,15 +1,32 @@
 export const PARIS_TIMEZONE = 'Europe/Paris';
 
-function toDate(value) {
+type DateInput = Date | string;
+
+type DateParts = {
+	year: string;
+	month: string;
+	day: string;
+	hour: string;
+	minute: string;
+	second: string;
+};
+
+type ParisDateParts = {
+	year: number;
+	month: number;
+	day: number;
+};
+
+function toDate(value: DateInput) {
 	return value instanceof Date ? value : new Date(value);
 }
 
-function isValidDate(date) {
+function isValidDate(date: Date) {
 	return !Number.isNaN(date.getTime());
 }
 
-function getPartMap(parts) {
-	const map = {};
+function getPartMap(parts: Intl.DateTimeFormatPart[]) {
+	const map: Record<string, string> = {};
 	for (const part of parts) {
 		if (part.type !== 'literal') {
 			map[part.type] = part.value;
@@ -18,7 +35,7 @@ function getPartMap(parts) {
 	return map;
 }
 
-function getParisParts(date) {
+function getParisParts(date: Date): DateParts {
 	const formatter = new Intl.DateTimeFormat('en-GB', {
 		timeZone: PARIS_TIMEZONE,
 		year: 'numeric',
@@ -40,11 +57,11 @@ function getParisParts(date) {
 	};
 }
 
-function pad2(value) {
+function pad2(value: number) {
 	return String(value).padStart(2, '0');
 }
 
-function getTimeZoneOffset(date, timeZone) {
+function getTimeZoneOffset(date: Date, timeZone: string) {
 	const formatter = new Intl.DateTimeFormat('en-GB', {
 		timeZone,
 		year: 'numeric',
@@ -66,28 +83,28 @@ function getTimeZoneOffset(date, timeZone) {
 	return (asUtc - date.getTime()) / 60000;
 }
 
-export function formatParisDate(value) {
+export function formatParisDate(value: DateInput) {
 	const date = toDate(value);
 	if (!isValidDate(date)) return '--/--/----';
 	const { day, month, year } = getParisParts(date);
 	return `${day}/${month}/${year}`;
 }
 
-export function formatParisDayShort(value) {
+export function formatParisDayShort(value: DateInput) {
 	const date = toDate(value);
 	if (!isValidDate(date)) return '--/--';
 	const { day, month } = getParisParts(date);
 	return `${day}/${month}`;
 }
 
-export function formatParisTime(value) {
+export function formatParisTime(value: DateInput) {
 	const date = toDate(value);
 	if (!isValidDate(date)) return '--h--';
 	const { hour, minute } = getParisParts(date);
 	return `${hour}h${minute}`;
 }
 
-export function formatParisTimeRange(startValue, durationHours) {
+export function formatParisTimeRange(startValue: DateInput, durationHours: number) {
 	const start = toDate(startValue);
 	if (!isValidDate(start)) return '--h-- - --h--';
 	const safeDuration = Number.isFinite(durationHours) ? Math.max(0.25, durationHours) : 1;
@@ -95,7 +112,7 @@ export function formatParisTimeRange(startValue, durationHours) {
 	return `${formatParisTime(start)} - ${formatParisTime(end)}`;
 }
 
-export function formatParisDateTimeShort(value) {
+export function formatParisDateTimeShort(value: DateInput) {
 	const date = toDate(value);
 	if (!isValidDate(date)) return '--';
 	return new Intl.DateTimeFormat('fr-FR', {
@@ -108,14 +125,14 @@ export function formatParisDateTimeShort(value) {
 	}).format(date);
 }
 
-export function formatParisDatetimeLocal(value) {
+export function formatParisDatetimeLocal(value: DateInput) {
 	const date = toDate(value);
 	if (!isValidDate(date)) return '';
 	const { year, month, day, hour, minute } = getParisParts(date);
 	return `${year}-${month}-${day}T${hour}:${minute}`;
 }
 
-export function parseParisDatetimeLocal(value) {
+export function parseParisDatetimeLocal(value: string) {
 	if (!value) return '';
 	const [datePart, timePart] = value.split('T');
 	if (!datePart || !timePart) return '';
@@ -135,14 +152,14 @@ export function parseParisDatetimeLocal(value) {
 	return new Date(utcLike - offset * 60000).toISOString();
 }
 
-export function getParisDateKey(value) {
+export function getParisDateKey(value: DateInput) {
 	const date = toDate(value);
 	if (!isValidDate(date)) return '';
 	const { year, month, day } = getParisParts(date);
 	return `${year}-${month}-${day}`;
 }
 
-export function getParisDateParts(value) {
+export function getParisDateParts(value: DateInput): ParisDateParts | null {
 	const date = toDate(value);
 	if (!isValidDate(date)) return null;
 	const { year, month, day } = getParisParts(date);
@@ -153,14 +170,14 @@ export function getParisDateParts(value) {
 	};
 }
 
-export function getParisMidnightUtcFromParts(parts) {
+export function getParisMidnightUtcFromParts(parts: ParisDateParts) {
 	const iso = parseParisDatetimeLocal(
 		`${parts.year}-${pad2(parts.month)}-${pad2(parts.day)}T00:00`
 	);
 	return iso ? new Date(iso) : null;
 }
 
-export function getParisDateUtc(value) {
+export function getParisDateUtc(value: DateInput) {
 	const parts = getParisDateParts(value);
 	if (!parts) return null;
 	return getParisMidnightUtcFromParts(parts);

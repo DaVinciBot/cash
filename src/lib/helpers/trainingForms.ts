@@ -1,11 +1,48 @@
 import { formatParisDatetimeLocal } from '$lib/helpers/parisTime';
 import { categoryOptions, statusOptions } from '$lib/helpers/trainingOptions';
+import type { TrainingListItem, TrainingSlotListItem } from '$lib/services/training';
 
-export function toDatetimeLocal(dateString) {
-	return formatParisDatetimeLocal(dateString);
+export type SummaryFieldsConfig = {
+	from: string;
+	to: string;
+	text: string;
+};
+
+export function buildSummaryFields({ from, to, text }: SummaryFieldsConfig) {
+	return [
+		{
+			id: 'summary_from',
+			name: 'Date de début',
+			type: 'date',
+			required: true,
+			value: from
+		},
+		{
+			id: 'summary_to',
+			name: 'Date de fin',
+			type: 'date',
+			required: true,
+			value: to
+		},
+		{
+			id: 'summary_text',
+			name: 'Texte',
+			type: 'textarea',
+			placeholder: 'Optionnel',
+			value: text,
+			wide: true
+		}
+	];
 }
 
-export function buildTrainingFields(training) {
+export type ProfileOption = {
+	id: string;
+	username: string | null;
+	avatar_url: string | null;
+	email: string | null;
+};
+
+export function buildTrainingFields(training: TrainingListItem | null) {
 	return [
 		{
 			name: 'Nom',
@@ -20,7 +57,7 @@ export function buildTrainingFields(training) {
 			type: 'select',
 			required: true,
 			options: categoryOptions,
-			value: training?.category || ''
+			value: training?.category
 		},
 		{
 			name: 'Description',
@@ -39,15 +76,27 @@ export function buildTrainingFields(training) {
 	];
 }
 
+export type SlotFieldsConfig = {
+	slot: TrainingSlotListItem | null;
+	trainings: TrainingListItem[];
+	profiles: ProfileOption[];
+	selectedTrainingId?: number | null;
+	searchTrainings: (search: string) => Promise<{ value: number; text: string }[]>;
+	searchProfiles: (search: string) => Promise<{ value: string; text: string; image?: string }[]>;
+	onTrainerChange?: (nextId: string | null) => void;
+	onTrainingChange?: (nextId: number | null) => void;
+};
+
 export function buildSlotFields({
 	slot,
 	trainings,
 	profiles,
 	selectedTrainingId,
+	searchTrainings,
 	searchProfiles,
 	onTrainerChange,
 	onTrainingChange
-}) {
+}: SlotFieldsConfig) {
 	const baseTrainingId = selectedTrainingId ?? slot?.training_id ?? null;
 	const baseTraining = baseTrainingId
 		? (trainings.find((training) => training.training_id === baseTrainingId) ?? null)
@@ -61,17 +110,19 @@ export function buildSlotFields({
 		{
 			name: 'Formation',
 			id: 'training_id',
-			type: 'select',
+			type: 'autocomplete',
 			required: true,
-			options: trainings.map((training) => ({
-				value: training.training_id,
-				text: training.name
-			})),
-			value: slot?.training_id ?? selectedTrainingId ?? '',
-			onChange: (event) => {
-				const target = event.target;
-				const nextId = target?.value ? Number(target.value) : null;
-				onTrainingChange?.(Number.isNaN(nextId) ? null : nextId);
+			placeholder: 'Rechercher une formation',
+			value: baseTraining?.name || '',
+			data: baseTraining?.training_id ?? '',
+			onChange: (event: Event) => {
+				const target = event.target as HTMLInputElement | null;
+				const search = target?.value?.toLowerCase().trim() || '';
+				return search ? searchTrainings(search) : [];
+			},
+			onSelect: (nextId: string) => {
+				const parsedId = Number(nextId);
+				onTrainingChange?.(Number.isNaN(parsedId) ? null : parsedId);
 			}
 		},
 		{
@@ -103,14 +154,14 @@ export function buildSlotFields({
 			value: selectedTrainer?.username || slot?.trainer_username || '',
 			image: selectedTrainer?.avatar_url || slot?.trainer_avatar_url || null,
 			data: selectedTrainer?.id || slot?.trainer_id || '',
-			onChange: async (event) => {
-				const target = event.target;
+			onChange: async (event: Event) => {
+				const target = event.target as HTMLInputElement | null;
 				onTrainerChange?.(null);
 				const search = target?.value?.toLowerCase().trim() || '';
 				if (!search) return [];
 				return searchProfiles(search);
 			},
-			onSelect: (nextId) => {
+			onSelect: (nextId: string) => {
 				onTrainerChange?.(nextId);
 			}
 		},
@@ -119,7 +170,7 @@ export function buildSlotFields({
 			id: 'start',
 			type: 'datetime-local',
 			required: true,
-			value: slot ? toDatetimeLocal(slot.start) : ''
+			value: slot ? formatParisDatetimeLocal(slot.start) : ''
 		},
 		{
 			name: 'Durée (h)',
@@ -169,7 +220,7 @@ export function buildSlotFields({
 			type: 'select',
 			required: true,
 			options: statusOptions,
-			value: slot?.status || 'draft'
+			value: slot?.status
 		}
 	];
 }

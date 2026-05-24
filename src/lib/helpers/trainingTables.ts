@@ -1,25 +1,27 @@
 import Badge from '$lib/components/utils/Badge.svelte';
 import { formatParisDateTimeShort } from '$lib/helpers/parisTime';
 import { categoryOptions, statusOptions } from '$lib/helpers/trainingOptions';
+import type { TrainingListItem, TrainingSlotListItem } from '$lib/services/training';
 
-export function formatSlotDate(dateString) {
+export function formatSlotDate(dateString: string) {
 	return formatParisDateTimeShort(dateString);
 }
 
-export function findTrainingName(trainingId, trainings) {
+export function findTrainingName(trainingId: number, trainings: TrainingListItem[]) {
 	return trainings.find((training) => training.training_id === trainingId)?.name || 'Formation';
 }
 
-function getCategoryLabel(category) {
+function getCategoryLabel(category: string) {
 	return categoryOptions.find((opt) => opt.value === category)?.text || 'Autre';
 }
 
-function getStatusOption(status) {
+function getStatusOption(status: string) {
 	return statusOptions.find((opt) => opt.value === status);
 }
 
-export function createTrainingTableItems(data) {
-	const index = new Map(
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+export function createTrainingTableItems(data: any[]) {
+	const index = new Map<number, TrainingListItem>(
 		data.map((training) => [
 			training.id,
 			{
@@ -47,8 +49,9 @@ export function createTrainingTableItems(data) {
 	return { index, rows };
 }
 
-export function createSlotTableItems(data) {
-	const index = new Map(
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+export function createSlotTableItems(data: any[]) {
+	const index = new Map<number, TrainingSlotListItem>(
 		data.map((slot) => {
 			const training = slot.training || {};
 			const trainer = slot.profiles || {};
