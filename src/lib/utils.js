@@ -46,22 +46,6 @@ export const statusText = {
 	completed: 'Commande complétée'
 };
 
-export const updateText = {
-	'order-creation': 'Création de la commande',
-	comment: 'Commentaire ajouté',
-	update: 'Mise à jour de la commande',
-	'review-cdp-requested': 'Validation par le chef de projet demandée',
-	'review-cdp-approved': 'Validation par le chef de projet effectuée',
-	'review-cdp-refused': 'Validation par le chef de projet refusée',
-	'review-treso-requested': 'Validation par le trésorier demandée',
-	'review-treso-approved': 'Validation par le trésorier effectuée',
-	'review-treso-refused': 'Validation par le trésorier refusée',
-	'order-pending-delivery': 'Commande validée, en attente de livraison',
-	'order-canceled-user': 'Commande annulée par le demandeur',
-	'order-canceled-ops': 'Commande annulée côté opérationnel',
-	'order-completed': 'Commande complétée'
-};
-
 export function loadSettings(key) {
 	let settings_;
 	try {
