@@ -5,7 +5,7 @@
 	import { browser } from '$app/environment';
 	import { ADMIN_CUSTOM_URI } from '$lib/permissions';
 	import { userdata } from '$lib/store';
-	import { supabase } from '$lib/supabaseClient';
+	import { getSupabaseBrowserClient } from '$lib/supabaseClient';
 	import { onMount } from 'svelte';
 
 	import SideBar from '$lib/components/admin/SideBar.svelte';
@@ -40,14 +40,9 @@
 	});
 
 	run(() => {
-		if (
-			browser &&
-			!sessionSynced &&
-			data?.session?.access_token &&
-			data?.session?.refresh_token &&
-			supabase
-		) {
+		if (browser && !sessionSynced && data?.session?.access_token && data?.session?.refresh_token) {
 			sessionSynced = true;
+			const supabase = getSupabaseBrowserClient();
 			supabase.auth.setSession({
 				access_token: data.session.access_token,
 				refresh_token: data.session.refresh_token
