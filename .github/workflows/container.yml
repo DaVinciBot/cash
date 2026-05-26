@@ -35,7 +35,7 @@ jobs:
     name: Deploy Dev
     if: github.event_name == 'push' && github.ref == 'refs/heads/develop'
     needs: build-and-publish
-    uses: DaVinciBot/shared-workflows/.github/workflows/deploy.yml@v1.0.0
+    uses: DaVinciBot/shared-workflows/.github/workflows/deploy.yml@v1.1.0
     with:
       environment: dev
       image_ref: ${{ needs.build-and-publish.outputs.image }}@${{ needs.build-and-publish.outputs.digest }}
