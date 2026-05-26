@@ -2,42 +2,21 @@ name: E2E
 
 on:
   push:
-    branches: [staging, main]
+    branches: [staging, main, master]
   pull_request:
-    branches: [staging, main]
+    branches: [staging, main, master, 'release/**', 'hotfix/**']
 
 concurrency:
   group: ${{ github.workflow }}-${{ github.ref }}
   cancel-in-progress: true
 
+permissions:
+  contents: read
+
 jobs:
   e2e:
-    name: E2E Tests
-    runs-on: ubuntu-latest
-    timeout-minutes: 30
-    steps:
-      - uses: actions/checkout@v4
-        with:
-          submodules: recursive
-      - uses: pnpm/action-setup@v4
-        with:
-          version: 10.33.0
-      - uses: actions/setup-node@v4
-        with:
-          node-version-file: .nvmrc
-          cache: pnpm
-      - name: Install dependencies
-        run: pnpm install --frozen-lockfile
-      - name: Install Playwright browsers
-        run: pnpm exec playwright install --with-deps
-      - name: Run e2e tests
-        run: pnpm test:e2e
-      - name: Upload Playwright report
-        if: always()
-        uses: actions/upload-artifact@v4
-        with:
-          name: playwright-report
-          path: |
-            playwright-report/
-            test-results/
-          if-no-files-found: ignore
+    name: Playwright
+    uses: DaVinciBot/shared-workflows/.github/workflows/e2e.yml@v1.0.0
+    with:
+      pnpm_version: 10.33.0
+      node_version_file: .nvmrc

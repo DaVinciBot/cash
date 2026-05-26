@@ -1,0 +1,55 @@
+name: Deploy
+
+on:
+  workflow_dispatch:
+    inputs:
+      environment:
+        description: Target environment.
+        required: true
+        type: choice
+        options:
+          - dev
+          - staging
+          - prod
+      image_ref:
+        description: GHCR image reference to deploy, preferably image@sha256:digest.
+        required: true
+        type: string
+
+concurrency:
+  group: ${{ github.workflow }}-${{ inputs.environment }}
+  cancel-in-progress: false
+
+permissions:
+  contents: read
+
+jobs:
+  deploy-dev:
+    name: Deploy Dev
+    if: inputs.environment == 'dev'
+    uses: DaVinciBot/shared-workflows/.github/workflows/deploy.yml@v1.0.0
+    with:
+      environment: dev
+      image_ref: ${{ inputs.image_ref }}
+    secrets:
+      webhook_url: ${{ secrets.DOKPLOY_WEBHOOK_DEV }}
+
+  deploy-staging:
+    name: Deploy Staging
+    if: inputs.environment == 'staging'
+    uses: DaVinciBot/shared-workflows/.github/workflows/deploy.yml@v1.0.0
+    with:
+      environment: staging
+      image_ref: ${{ inputs.image_ref }}
+    secrets:
+      webhook_url: ${{ secrets.DOKPLOY_WEBHOOK_STAGING }}
+
+  deploy-prod:
+    name: Deploy Prod
+    if: inputs.environment == 'prod'
+    uses: DaVinciBot/shared-workflows/.github/workflows/deploy.yml@v1.0.0
+    with:
+      environment: prod
+      image_ref: ${{ inputs.image_ref }}
+    secrets:
+      webhook_url: ${{ secrets.DOKPLOY_WEBHOOK_PROD }}

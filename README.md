@@ -8,21 +8,21 @@ If you're seeing this, you've probably already done this step. Congrats!
 
 ```bash
 # create a new project in the current directory
-bun create svelte@latest
+pnpm dlx sv create
 
 # create a new project in my-app
-bun create svelte@latest my-app
+pnpm dlx sv create my-app
 ```
 
 ## Developing
 
-Once you've created a project and installed dependencies with `bun install`, start a development server:
+Once you've created a project and installed dependencies with `pnpm install`, start a development server:
 
 ```bash
-bun run dev
+pnpm dev
 
 # or start the server and open the app in a new browser tab
-bun run dev -- --open
+pnpm dev -- --open
 ```
 
 ## Building
@@ -30,10 +30,10 @@ bun run dev -- --open
 To create a production version of your app:
 
 ```bash
-bun run build
+pnpm build
 ```
 
-You can preview the production build with `bun run preview`.
+You can preview the production build with `pnpm preview`.
 
 > To deploy your app, you may need to install an [adapter](https://kit.svelte.dev/docs/adapters) for your target environment.
 

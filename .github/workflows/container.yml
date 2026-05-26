@@ -1,0 +1,44 @@
+name: Container
+
+on:
+  push:
+    branches: [develop, staging, main, master, 'release/**', 'hotfix/**']
+    tags: ['v*.*.*']
+  pull_request:
+    branches: [develop, staging, main, master, 'release/**', 'hotfix/**']
+  workflow_dispatch:
+    inputs:
+      publish:
+        description: Push the image to GHCR.
+        required: true
+        type: boolean
+        default: true
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+permissions:
+  contents: read
+  packages: write
+  id-token: write
+  security-events: write
+
+jobs:
+  build-and-publish:
+    name: Build and Publish
+    uses: DaVinciBot/shared-workflows/.github/workflows/container.yml@v1.0.0
+    with:
+      push: ${{ github.event_name == 'push' || (github.event_name == 'workflow_dispatch' && inputs.publish) }}
+
+  deploy-dev:
+    name: Deploy Dev
+    if: github.event_name == 'push' && github.ref == 'refs/heads/develop'
+    needs: build-and-publish
+    uses: DaVinciBot/shared-workflows/.github/workflows/deploy.yml@v1.0.0
+    with:
+      environment: dev
+      image_ref: ${{ needs.build-and-publish.outputs.image }}@${{ needs.build-and-publish.outputs.digest }}
+      allow_missing_webhook: true
+    secrets:
+      webhook_url: ${{ secrets.DOKPLOY_WEBHOOK_DEV }}
