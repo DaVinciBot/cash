@@ -99,6 +99,7 @@ DVBisous ! :robot:`;
 
 		return (data ?? []).map(
 			(profile: { id: string; username: string | null; avatar_url: string | null }) => ({
+				id: profile.id,
 				value: profile.id,
 				text: profile.username || 'Membre',
 				image: profile.avatar_url || undefined
