@@ -6,11 +6,13 @@
 	import { onMount } from 'svelte';
 
 	/** @type {{user?: any}} */
-	let { user = $bindable({
-		name: 'Urbain',
-		email: 'davincibot@devinci.fr',
-		avatar: 'https://flowbite.s3.amazonaws.com/blocks/marketing-ui/avatars/michael-gough.png'
-	}) } = $props();
+	let {
+		user = $bindable({
+			name: 'Urbain',
+			email: 'davincibot@devinci.fr',
+			avatar: 'https://flowbite.s3.amazonaws.com/blocks/marketing-ui/avatars/michael-gough.png'
+		})
+	} = $props();
 
 	userdata.subscribe((value) => {
 		if (value) {

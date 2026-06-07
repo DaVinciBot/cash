@@ -1,12 +1,10 @@
 <script>
-	import { run } from 'svelte/legacy';
-
-	// @ts-nocheck
 	import { browser } from '$app/environment';
 	import { ADMIN_CUSTOM_URI } from '$lib/permissions';
 	import { userdata } from '$lib/store';
 	import { getSupabaseBrowserClient } from '$lib/supabaseClient';
 	import { onMount } from 'svelte';
+	import { run } from 'svelte/legacy';
 
 	import SideBar from '$lib/components/admin/SideBar.svelte';
 	import UserBadge from '$lib/components/share/UserBadge.svelte';
@@ -159,6 +157,3 @@
 		</main>
 	</div>
 </div>
-
-<style>
-</style>

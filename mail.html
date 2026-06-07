@@ -1,107 +1,109 @@
-<head>
-
-</head>
+<head> </head>
 
 <body>
+	<div class="card">
+		<div class="header">
+			<img
+				src="https://lxilsopqfrtwsitzalkm.supabase.co/storage/v1/object/public/avatars/dvb_signature.png"
+			/>
+		</div>
 
-    <div class="card">
-        <div class="header">
-            <img src="https://lxilsopqfrtwsitzalkm.supabase.co/storage/v1/object/public/avatars/dvb_signature.png">
-        </div>
+		<div class="body sushi">
+			<h2>Bravo pour ta sélection en tant que membre projet !</h2>
+			<p>
+				Tu as maintenant accès au portail des commandes de DaVinciBot, viens vite créer ton compte
+				pour transformer tes idées en prototype concret !
+			</p>
+			<a href="https://www.davincibot.fr/login" class="btn">Créer mon compte</a>
+		</div>
 
-        <div class="body sushi">
-            <h2>Bravo pour ta sélection en tant que membre projet !</h2>
-            <p>Tu as maintenant accès au portail des commandes de DaVinciBot, viens vite créer ton compte pour
-                transformer tes idées en prototype concret !</p>
-            <a href="https://www.davincibot.fr/login" class="btn">Créer mon compte</a>
-        </div>
+		<div class="footer">
+			<p>DaVinciBot ©️ 2024</p>
+			<div class="url">
+				<a href="https://www.davincibot.fr">Site web</a>
+				<a href="https://www.linkedin.com/company/davincibot">Linkedin</a>
+				<a href="https://www.instagram.com/davincibot_pulv">Instagram</a>
+				<a href="mailto:davincibot@devinci.fr">Contact</a>
+			</div>
+			<div>
+				<p class="ftext">
+					Made with ❤️ by <a href="http://github.com/urbskali" id="github">@urbskali</a>
+				</p>
+			</div>
+		</div>
+	</div>
 
-        <div class="footer">
-            <p>DaVinciBot ©️ 2024</p>
-            <div class="url">
-                <a href="https://www.davincibot.fr">Site web</a>
-                <a href="https://www.linkedin.com/company/davincibot">Linkedin</a>
-                <a href="https://www.instagram.com/davincibot_pulv">Instagram</a>
-                <a href="mailto:davincibot@devinci.fr">Contact</a>
-            </div>
-            <div>
-                <p class="ftext">Made with ❤️ by <a href="http://github.com/urbskali" id="github">@urbskali</a></p>
-            </div>
+	<style>
+		* {
+			font-family: 'Helvetica', 'Arial', sans-serif;
+		}
 
-        </div>
+		body,
+		html {
+			margin: 0;
+			padding: 0;
+		}
 
-    </div>
+		.card {
+			display: flex;
+			flex-direction: column;
+			align-content: center;
+			flex-wrap: wrap;
+			justify-content: center;
+			align-items: center;
+			border-radius: 0.625rem;
+			background-color: #f8fafd;
+			padding: 5px;
+			text-align: center;
+		}
 
-    <style>
-        * {
-            font-family: "Helvetica", "Arial", sans-serif;
-        }
+		img {
+			width: 100px;
+			margin-bottom: 20px;
+			margin-top: 20px;
+		}
 
-        body, html {
-            margin: 0;
-            padding: 0;
-        }
+		.sushi {
+			padding: 20px;
+			border-radius: 0.625rem;
+			background-color: #fff;
+			margin-bottom: 20px;
+		}
 
-        .card {
-            display: flex;
-            flex-direction: column;
-            align-content: center;
-            flex-wrap: wrap;
-            justify-content: center;
-            align-items: center;
-            border-radius: .625rem;
-            background-color: #f8fafd;
-            padding: 5px;
-            text-align: center;
-        }
+		.btn {
+			display: inline-block;
+			padding: 10px 20px;
+			margin: 10px 0;
+			border-radius: 0.625rem;
+			background-color: #0333ff;
+			color: #fff !important;
+			text-decoration: none;
+		}
 
-        img {
-            width: 100px;
-            margin-bottom: 20px;
-            margin-top: 20px;
-        }
+		.ftext {
+			--tab-thickness: 2px;
+			font-family: 'Segoe UI', Tahoma, sans-serif;
+			font-size: 75%;
+			--google-font-color-materialiconstwotone: none;
+			scrollbar-color: #23da87 #ffffff;
+			color: rgb(197, 197, 197);
+		}
 
-        .sushi {
-            padding: 20px;
-            border-radius: .625rem;
-            background-color: #fff;
-            margin-bottom: 20px;
-        }
+		#github {
+			--tab-thickness: 2px;
+			font-family: 'Segoe UI', Tahoma, sans-serif;
+			--google-font-color-materialiconstwotone: none;
+			scrollbar-color: #23da87 #ffffff;
+			color: rgb(197, 197, 197);
+		}
 
-        .btn {
-            display: inline-block;
-            padding: 10px 20px;
-            margin: 10px 0;
-            border-radius: .625rem;
-            background-color: #0333ff;
-            color: #fff !important;
-            text-decoration: none;
-        }
-
-        .ftext {
-            --tab-thickness: 2px;
-            font-family: "Segoe UI", Tahoma, sans-serif;
-            font-size: 75%;
-            --google-font-color-materialiconstwotone: none;
-            scrollbar-color: #23da87 #ffffff;
-            color: rgb(197, 197, 197);
-        }
-
-        #github {
-            --tab-thickness: 2px;
-            font-family: "Segoe UI", Tahoma, sans-serif;
-            --google-font-color-materialiconstwotone: none;
-            scrollbar-color: #23da87 #ffffff;
-            color: rgb(197, 197, 197);
-        }
-
-        .url a {
-            margin: 0 10px;
-            color: #0333ff;
-            text-decoration: none;
-        }
-        #made-with-supabase {
-            display: none !important;
-        }
-    </style>
+		.url a {
+			margin: 0 10px;
+			color: #0333ff;
+			text-decoration: none;
+		}
+		#made-with-supabase {
+			display: none !important;
+		}
+	</style>
 </body>

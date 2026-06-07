@@ -40,7 +40,11 @@ describe('paris time helpers', () => {
 
 	it('builds date keys and parts', () => {
 		expect(getParisDateKey('2025-01-10T12:00:00.000Z')).toBe('2025-01-10');
-		expect(getParisDateParts('2025-01-10T12:00:00.000Z')).toEqual({ year: 2025, month: 1, day: 10 });
+		expect(getParisDateParts('2025-01-10T12:00:00.000Z')).toEqual({
+			year: 2025,
+			month: 1,
+			day: 10
+		});
 		expect(getParisDateParts('invalid')).toBeNull();
 	});
 

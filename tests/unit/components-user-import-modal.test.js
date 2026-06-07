@@ -1,7 +1,7 @@
 import { describe, expect, it, vi } from 'vitest';
 
 import UserImportModal from '../../src/lib/components/modals/UserImportModal.svelte';
-import { mount } from "svelte";
+import { mount } from 'svelte';
 
 describe('UserImportModal (components submodule)', () => {
 	it('submits a valid simple user payload', async () => {
@@ -11,15 +11,15 @@ describe('UserImportModal (components submodule)', () => {
 		document.body.appendChild(target);
 
 		mount(UserImportModal, {
-        			target,
-        			props: {
-        				permissionCategories: {},
-        				permissionPackages: [],
-        				projectOptions: [{ value: 'project-1', text: 'Project 1' }],
-        				onSubmit,
-        				onClose
-        			}
-        		});
+			target,
+			props: {
+				permissionCategories: {},
+				permissionPackages: [],
+				projectOptions: [{ value: 'project-1', text: 'Project 1' }],
+				onSubmit,
+				onClose
+			}
+		});
 
 		const nameInput = target.querySelector('#simple-name');
 		const emailInput = target.querySelector('#simple-email');

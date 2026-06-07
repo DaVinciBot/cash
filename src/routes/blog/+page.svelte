@@ -1,14 +1,12 @@
 <script>
 	import { preventDefault } from 'svelte/legacy';
 
-	// @ts-nocheck
-	import { onMount } from 'svelte';
+	import Stepper from '$lib/components/admin/Stepper.svelte';
 	import { Carta, CartaEditor } from 'carta-md';
 	import 'carta-md/default.css';
-	import Stepper from '$lib/components/admin/Stepper.svelte';
-	import { hasAnyPermission } from '$lib/permissions';
+	import { onMount } from 'svelte';
 
-	import { supabase, supabaseUrl, supabaseKey } from '$lib/supabaseClient';
+	import { supabase, supabaseKey, supabaseUrl } from '$lib/supabaseClient';
 
 	// Listing state
 	let articles = $state([]);

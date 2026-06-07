@@ -34,10 +34,7 @@
 			"command": "npm run build",
 			"args": [],
 			"isBackground": false,
-			"problemMatcher": [
-				"$tsc",
-				"$eslint-stylish"
-			],
+			"problemMatcher": ["$tsc", "$eslint-stylish"],
 			"group": "build"
 		},
 		{
@@ -46,10 +43,7 @@
 			"command": "npm run build",
 			"args": [],
 			"isBackground": false,
-			"problemMatcher": [
-				"$tsc",
-				"$eslint-stylish"
-			],
+			"problemMatcher": ["$tsc", "$eslint-stylish"],
 			"group": "build"
 		},
 		{
@@ -58,10 +52,7 @@
 			"command": "npm run build",
 			"args": [],
 			"isBackground": false,
-			"problemMatcher": [
-				"$tsc",
-				"$eslint-stylish"
-			],
+			"problemMatcher": ["$tsc", "$eslint-stylish"],
 			"group": "build"
 		},
 		{
@@ -70,10 +61,7 @@
 			"command": "npm run build",
 			"args": [],
 			"isBackground": false,
-			"problemMatcher": [
-				"$tsc",
-				"$eslint-stylish"
-			],
+			"problemMatcher": ["$tsc", "$eslint-stylish"],
 			"group": "build"
 		},
 		{
@@ -82,10 +70,7 @@
 			"command": "npm run build",
 			"args": [],
 			"isBackground": false,
-			"problemMatcher": [
-				"$tsc",
-				"$eslint-stylish"
-			],
+			"problemMatcher": ["$tsc", "$eslint-stylish"],
 			"group": "build"
 		}
 	]

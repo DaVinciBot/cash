@@ -1,11 +1,10 @@
 <script>
-	import { run } from 'svelte/legacy';
-	// @ts-nocheck
 	import { hasAnyPermission } from '$lib/permissions';
 	import { userdata } from '$lib/store';
 	import { supabase } from '$lib/supabaseClient';
 	import { loadUserdata, mountClosable, statusText } from '$lib/utils';
 	import { onMount } from 'svelte';
+	import { run } from 'svelte/legacy';
 
 	import Table from '$lib/components/admin/Table.svelte';
 	import ReadDrawer from '$lib/components/drawers/ReadDrawer.svelte';
@@ -641,5 +640,3 @@
 		/>
 	</div>
 </div>
-
-<style></style>

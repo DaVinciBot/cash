@@ -4,7 +4,11 @@ vi.mock('$lib/helpers/parisTime', () => ({
 	formatParisDatetimeLocal: vi.fn((value) => `local:${value}`)
 }));
 
-import { buildSlotFields, buildTrainingFields, toDatetimeLocal } from '../../src/lib/helpers/trainingForms.js';
+import {
+	buildSlotFields,
+	buildTrainingFields,
+	toDatetimeLocal
+} from '../../src/lib/helpers/trainingForms.js';
 
 describe('training form helpers', () => {
 	it('toDatetimeLocal delegates to paris helper', () => {

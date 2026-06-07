@@ -9,4 +9,3 @@ declare module '@supabase/phoenix/priv/static/types/types' {
 declare module '@speed-highlight/core/index' {
 	export type ShjLanguageDefinition = Record<string, unknown>;
 }
-

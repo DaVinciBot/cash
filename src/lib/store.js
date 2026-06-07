@@ -11,5 +11,5 @@ export const userdata = writable(null);
 //  - components can subscribe or use Table.svelte's refreshTopic prop
 export const tableRefresh = writable({ topic: null, at: 0, payload: null });
 export function triggerTableRefresh(topic, payload = null) {
-    tableRefresh.set({ topic, at: Date.now(), payload });
+	tableRefresh.set({ topic, at: Date.now(), payload });
 }
