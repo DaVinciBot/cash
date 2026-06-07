@@ -32,9 +32,11 @@ export const PERMISSIONS = [
 	'audit.logs.read',
 	'audit.logs.read.security',
 	'audit.events.export'
-];
+] as const;
 
-const ADMIN_ENTRY_PERMISSIONS = [
+export type Permission = (typeof PERMISSIONS)[number];
+
+const ADMIN_ENTRY_PERMISSIONS: Permission[] = [
 	'orders.cru.self',
 	'orders.read.all',
 	'orders.create.all',
@@ -58,7 +60,12 @@ const ADMIN_ENTRY_PERMISSIONS = [
 	'audit.events.export'
 ];
 
-export const ADMIN_MENU = [
+export const ADMIN_MENU: {
+	title: string;
+	uri: string;
+	icon: string;
+	requiredPermissions: Permission[];
+}[] = [
 	{
 		title: 'Mes commandes',
 		uri: '/admin',
@@ -125,7 +132,12 @@ export const ADMIN_MENU = [
 	}
 ];
 
-export const ADMIN_CUSTOM_URI = [
+export const ADMIN_CUSTOM_URI: {
+	title: string;
+	uri: string;
+	icon: string;
+	requiredPermissions: Permission[];
+}[] = [
 	{
 		title: 'Nouvelle commande',
 		uri: '/admin/orders/new',
@@ -134,7 +146,7 @@ export const ADMIN_CUSTOM_URI = [
 	}
 ];
 
-const ROUTE_RULES = [
+const ROUTE_RULES: { path: string; requiredPermissions: Permission[] }[] = [
 	{ path: '/admin/orders/new', requiredPermissions: ['orders.create.all', 'orders.cru.self'] },
 	{
 		path: '/admin/orders',
@@ -166,32 +178,71 @@ const ROUTE_RULES = [
 	{ path: '/admin', requiredPermissions: ADMIN_ENTRY_PERMISSIONS }
 ];
 
-export function hasAnyPermission(userPermissions = [], requiredPermissions = []) {
-	if (!Array.isArray(requiredPermissions) || requiredPermissions.length === 0) return true;
-	if (!Array.isArray(userPermissions) || userPermissions.length === 0) return false;
+export interface PermissionUser {
+	permissions?: readonly Permission[];
+}
+
+export function hasPermission(
+	user: PermissionUser | null | undefined,
+	permission: Permission
+): boolean {
+	if (!user || !Array.isArray(user.permissions)) {
+		return false;
+	}
+	return user.permissions.includes(permission);
+}
+
+export function hasAnyPermission(
+	userPermissions: readonly Permission[] = [],
+	requiredPermissions: readonly Permission[] = []
+): boolean {
+	if (!Array.isArray(requiredPermissions) || requiredPermissions.length === 0) {
+		return true;
+	}
+	if (!Array.isArray(userPermissions) || userPermissions.length === 0) {
+		return false;
+	}
 	const permissionsSet = new Set(userPermissions);
 	return requiredPermissions.some((permission) => permissionsSet.has(permission));
 }
 
 export function normalizePath(path = '') {
-	if (!path) return '/';
-	if (path !== '/' && path.endsWith('/')) return path.slice(0, -1);
+	if (!path) {
+		return '/';
+	}
+	if (path !== '/' && path.endsWith('/')) {
+		return path.slice(0, -1);
+	}
 	return path;
 }
 
-export function canAccessAdminPath(pathname = '', userPermissions = []) {
+export function canAccessAdminPath(pathname = '', userPermissions: Permission[] = []) {
 	const path = normalizePath(pathname);
-	if (!(path === '/admin' || path.startsWith('/admin/'))) return true;
-	if (!hasAnyPermission(userPermissions, ADMIN_ENTRY_PERMISSIONS)) return false;
+	if (!(path === '/admin' || path.startsWith('/admin/'))) {
+		return true;
+	}
+	if (!hasAnyPermission(userPermissions, ADMIN_ENTRY_PERMISSIONS)) {
+		return false;
+	}
 
 	const matchedRule = ROUTE_RULES.slice()
 		.sort((a, b) => b.path.length - a.path.length)
 		.find((rule) => path === rule.path || path.startsWith(`${rule.path}/`));
 
-	if (!matchedRule) return true;
+	if (!matchedRule) {
+		return true;
+	}
 	return hasAnyPermission(userPermissions, matchedRule.requiredPermissions);
 }
 
-export function filterMenuByPermissions(menu = [], userPermissions = []) {
-	return (menu || []).filter((item) => hasAnyPermission(userPermissions, item.requiredPermissions));
+export function filterMenuByPermissions(
+	menu: {
+		title: string;
+		uri: string;
+		icon: string;
+		requiredPermissions: Permission[];
+	}[] = [],
+	userPermissions: Permission[] = []
+) {
+	return menu.filter((item) => hasAnyPermission(userPermissions, item.requiredPermissions));
 }

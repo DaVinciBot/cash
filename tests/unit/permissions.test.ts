@@ -6,7 +6,7 @@ import {
 	filterMenuByPermissions,
 	hasAnyPermission,
 	normalizePath
-} from '../../src/lib/permissions.js';
+} from '../../src/lib/permissions';
 
 describe('permissions helpers', () => {
 	it('hasAnyPermission returns true when a match exists', () => {

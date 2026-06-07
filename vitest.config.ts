@@ -10,14 +10,11 @@ export default defineConfig({
 		coverage: {
 			provider: 'v8',
 			include: [
-				'src/lib/permissions.js',
-				'src/lib/server/blogPosts.js',
-				'src/lib/helpers/parisTime.js',
-				'src/lib/helpers/trainingForms.js',
-				'src/lib/utils.js',
-				'src/lib/config/site.js',
-				'src/lib/markdown/parse.js',
-				'src/lib/components/modals/UserImportModal.svelte'
+				'src/lib/permissions.ts',
+				'src/lib/helpers/parisTime.ts',
+				'src/lib/helpers/trainingForms.ts',
+				'src/lib/utils.ts',
+				'src/lib/config/site.ts'
 			],
 			reporter: ['text', 'html', 'lcov'],
 			thresholds: {

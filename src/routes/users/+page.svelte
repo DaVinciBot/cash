@@ -3,7 +3,7 @@
 
 	import { resolve } from '$app/paths';
 	import { hasAnyPermission } from '$lib/permissions';
-	import { userdata } from '$lib/store.js';
+	import { userdata } from '$lib/store';
 	import { supabase } from '$lib/supabaseClient';
 	import { mountClosable } from '$lib/utils';
 

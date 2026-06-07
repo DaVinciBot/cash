@@ -1,4 +1,14 @@
-export const SITE = {
+export interface SiteConfig {
+	name: string;
+	domain: string;
+	origin: string;
+	description: string;
+	twitter: string;
+	ogImage: string;
+	locale: string;
+}
+
+export const SITE: SiteConfig = {
 	name: 'DaVinciBot',
 	domain: 'davincibot.fr',
 	origin: 'https://davincibot.fr',
@@ -8,8 +18,11 @@ export const SITE = {
 	locale: 'fr_FR'
 };
 
-export function canonicalFor(pathname = '/') {
+export function canonicalFor(pathname: string | null | undefined = '/'): string {
 	try {
+		if (typeof pathname !== 'string') {
+			throw new TypeError('pathname must be a string');
+		}
 		// Ensure leading slash
 		const p = pathname.startsWith('/') ? pathname : `/${pathname}`;
 		// Trailing slash as per project setting
