@@ -49,13 +49,19 @@ export default [
 
 			'svelte/no-at-html-tags': 'error',
 			'svelte/no-target-blank': 'error',
-			'svelte/no-useless-mustaches': 'warn'
+			'svelte/no-useless-mustaches': 'warn',
+
+			'@typescript-eslint/no-unused-vars': [
+				'error',
+				{ argsIgnorePattern: '^_', varsIgnorePattern: '^_' }
+			]
 		}
 	},
 	{
 		files: ['**/*.svelte', '**/*.svelte.ts', '**/*.svelte.js'],
 		languageOptions: {
 			parserOptions: {
+				projectService: true,
 				tsconfigRootDir,
 				parser: tseslint.parser,
 				extraFileExtensions: ['.svelte'],
@@ -63,7 +69,13 @@ export default [
 			}
 		},
 		rules: {
-			'@typescript-eslint/no-explicit-any': 'error'
+			'@typescript-eslint/no-explicit-any': 'error',
+			'@typescript-eslint/no-unused-vars': [
+				'error',
+				{ argsIgnorePattern: '^_', varsIgnorePattern: '^_' }
+			],
+			'@typescript-eslint/no-unsafe-assignment': 'off',
+			'@typescript-eslint/no-unsafe-argument': 'warn'
 		}
 	}
 ];
