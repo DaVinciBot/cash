@@ -47,6 +47,7 @@
 	},
 	"_note": "don't update prettier-plugin-svelte to 4.x until a compatible version of Prettier is released",
 	"dependencies": {
+		"@lucide/svelte": "^1.16.0",
 		"@popperjs/core": "^2.11.8",
 		"@supabase/phoenix": "^0.4.2",
 		"@supabase/ssr": "^0.10.3",
