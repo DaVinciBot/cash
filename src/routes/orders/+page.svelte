@@ -1,4 +1,4 @@
-<script>
+<script lang="ts">
 	import { hasAnyPermission } from '$lib/permissions';
 	import { userdata } from '$lib/store';
 	import { supabase } from '$lib/supabaseClient';
@@ -107,7 +107,6 @@
 					.single();
 
 				if (error) {
-					console.error(error);
 					return;
 				}
 				const price = data.price.toFixed(2);
@@ -181,7 +180,6 @@
 									.eq('id', itemToEdit.id);
 
 								if (error) {
-									console.error(error);
 									alert("Échec de la mise à jour de l'objet.");
 									return;
 								}
@@ -203,8 +201,6 @@
 						window.location.reload(); // Quick refresh
 					}
 				};
-
-				console.log(items);
 
 				// Stepper logic based on order status
 				const stepper = [
@@ -284,7 +280,6 @@
 													.select('id, name')
 													.order('name');
 												if (bankErr) {
-													console.error(bankErr);
 													alert('Impossible de charger la liste des banques.');
 													return;
 												}
@@ -352,7 +347,6 @@
 																})
 																.eq('id', id);
 															if (updErr) {
-																console.error(updErr);
 																alert(`Échec de la mise à jour de la commande: ${updErr.message}`);
 																return;
 															}
@@ -367,7 +361,6 @@
 																}
 															]);
 															if (spendErr) {
-																console.error(spendErr);
 																alert(
 																	'URGENT : CONTACTER ADMIN \n Commande mise à jour mais écriture trésorerie échouée'
 																);
@@ -391,7 +384,6 @@
 												.eq('id', id);
 
 											if (error) {
-												console.error(error);
 												alert(`Échec de la mise à jour de la commande: ${error.message}`);
 												return;
 											}
@@ -416,7 +408,6 @@
 												.eq('id', id);
 
 											if (error) {
-												console.error(error);
 												alert(`Échec de la mise à jour de la commande: ${error.message}`);
 												return;
 											}
@@ -434,7 +425,6 @@
 					.order('date', { ascending: false });
 
 				if (updates.error) {
-					console.error(updates.error);
 					return;
 				}
 				const updatesList = updates.data;
@@ -539,7 +529,6 @@
 													.eq('id', id);
 
 												if (error) {
-													console.error(error);
 													alert(`Échec du changement de statut: ${error.message}`);
 													return;
 												}

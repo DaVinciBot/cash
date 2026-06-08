@@ -1,4 +1,4 @@
-<script>
+<script lang="ts">
 	import { goto } from '$app/navigation';
 	import { userdata } from '$lib/store';
 	import { supabase } from '$lib/supabaseClient';
@@ -17,7 +17,6 @@
 	async function updateProjectTitle() {
 		const { data: projects, error } = await supabase.from('projects').select().in('id', projectId);
 		if (error) {
-			console.error(error);
 			return;
 		}
 		projects.forEach((project) => {
@@ -76,7 +75,6 @@
 
 		const { data: orders, error } = await supabase.from('orders').insert([order]).select();
 		if (error) {
-			console.error(error);
 			return;
 		}
 
@@ -93,7 +91,6 @@
 		{
 			const { error } = await supabase.from('items').insert(items_);
 			if (error) {
-				console.error(error);
 				return;
 			}
 		}

@@ -1,4 +1,4 @@
-<script>
+<script lang="ts">
 	import { run } from 'svelte/legacy';
 
 	import { userdata } from '$lib/store';
@@ -72,7 +72,6 @@
 					.single();
 
 				if (error) {
-					console.error(error);
 					return;
 				}
 				const price = data.price.toFixed(2);
@@ -137,7 +136,6 @@
 					.order('date', { ascending: false });
 
 				if (updates.error) {
-					console.error(updates.error);
 					return;
 				}
 				const updatesList = updates.data;
@@ -165,7 +163,7 @@
 								},
 								{
 									label: 'Raison statut',
-									value: data.status_reason?.trim() || 'Aucune'
+									value: data.status_reason?.trim() ?? 'Aucune'
 								},
 								{
 									label: 'Historique',
@@ -174,7 +172,7 @@
 											message: update.message,
 											date: update.date,
 											type: update.type,
-											user: update.author?.username || 'Système'
+											user: update.author.username ?? 'Système'
 										})),
 										type: 'updates'
 									}
@@ -186,7 +184,7 @@
 								title: 'Annuler',
 								type: 'delete',
 								handler: async (e) => {
-									const reason = prompt("Raison d'annulation (optionnelle)")?.trim() || null;
+									const reason = prompt("Raison d'annulation (optionnelle)")?.trim() ?? null;
 									const { data, error } = await supabase
 										.from('orders')
 										.update({ status: 'canceled_user', status_reason: reason })
@@ -194,7 +192,6 @@
 										.select()
 										.single();
 									if (error) {
-										console.error(error);
 										return;
 									}
 									if (data) {
@@ -219,7 +216,7 @@
 	function parseItems(data) {
 		const items = [];
 		data.forEach((el) => {
-			const price = Math.round((el.price + el.shipping_cost || 0) * 100) / 100;
+			const price = Math.round((el.price + el.shipping_cost ?? 0) * 100) / 100;
 			const name = el.name.length > 30 ? el.name.slice(0, 30) + '...' : el.name;
 			items.push([
 				{ value: name, data: el.id },

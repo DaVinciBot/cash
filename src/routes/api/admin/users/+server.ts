@@ -9,7 +9,7 @@ const getAdminClient = async (locals: any) => {
 	}
 	const { data, error } = await locals.supabase.rpc('get_service_key');
 	if (error || !data) {
-		throw new Error(error?.message || 'Unable to fetch service key.');
+		throw new Error(error?.message ?? 'Unable to fetch service key.');
 	}
 	return createClient(supabaseUrl, data, {
 		auth: { persistSession: false, autoRefreshToken: false }

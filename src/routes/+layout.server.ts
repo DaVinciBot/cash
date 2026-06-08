@@ -28,20 +28,20 @@ export const load: LayoutServerLoad = async ({ locals, cookies, url }) => {
 			.single();
 
 		if (!error && data) {
-			permissions = (data.permissions as string[]) || [];
+			permissions = (data.permissions as string[]) ?? [];
 			canCreateOrder =
 				permissions.includes('orders.create.all') || permissions.includes('orders.cru.self');
 
 			userProfile = {
-				email: user.email || '',
-				name: data.username || (user.email ? user.email.split('@')[0] : ''),
-				avatar: data.avatar_url || 'https://avatar.iran.liara.run/public/boy',
+				email: user.email ?? '',
+				name: data.username ?? (user.email ? user.email.split('@')[0] : ''),
+				avatar: data.avatar_url ?? 'https://avatar.iran.liara.run/public/boy',
 				id: user.id,
 				projects: ((data.member_of as any[]) || []).map((m: any) => ({
 					id: m?.project?.id,
 					name: m?.project?.name,
-					debut: m?.project?.debut || '0000-00-00',
-					role: m?.role || 'membre'
+					debut: m?.project?.debut ?? '0000-00-00',
+					role: m?.role ?? 'membre'
 				})),
 				permissions,
 				allProjects: null as any[] | null

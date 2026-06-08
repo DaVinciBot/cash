@@ -9,7 +9,7 @@ const getAdminClient = async (locals: any) => {
 	}
 	const { data, error } = await locals.supabase.rpc('get_service_key');
 	if (error || !data) {
-		throw new Error(error?.message || 'Unable to fetch service key.');
+		throw new Error(error?.message ?? 'Unable to fetch service key.');
 	}
 	return createClient(supabaseUrl, data, {
 		auth: { persistSession: false, autoRefreshToken: false }
@@ -44,19 +44,19 @@ const reinvitePendingUserByEmail = async (admin: any, email: string) => {
 		return { method: 'invite' };
 	}
 
-	const normalizedMessage = (inviteError.message || '').toLowerCase();
+	const normalizedMessage = (inviteError.message ?? '').toLowerCase();
 	const canFallbackToResend =
 		normalizedMessage.includes('already') ||
 		normalizedMessage.includes('registered') ||
 		normalizedMessage.includes('exists');
 
 	if (!canFallbackToResend) {
-		throw new Error(inviteError.message || 'Failed to invite user');
+		throw new Error(inviteError.message ?? 'Failed to invite user');
 	}
 
 	const { error: resendError } = await admin.auth.resend({ type: 'signup', email });
 	if (resendError) {
-		throw new Error(resendError.message || inviteError.message || 'Failed to resend invitation');
+		throw new Error(resendError.message ?? inviteError.message ?? 'Failed to resend invitation');
 	}
 
 	return { method: 'resend' };

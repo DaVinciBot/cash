@@ -99,12 +99,12 @@ DVBisous ! :robot:`;
 			return [];
 		}
 
-		return (data ?? []).map(
+		return data.map(
 			(profile: { id: string; username: string | null; avatar_url: string | null }) => ({
 				id: profile.id,
 				value: profile.id,
-				text: profile.username || 'Membre',
-				image: profile.avatar_url || undefined
+				text: profile.username ?? 'Membre',
+				image: profile.avatar_url ?? undefined
 			})
 		);
 	}
@@ -121,7 +121,7 @@ DVBisous ! :robot:`;
 			return [];
 		}
 
-		return (data ?? []).map((training: { id: number; name: string }) => ({
+		return data.map((training: { id: number; name: string }) => ({
 			id: training.id,
 			value: training.id,
 			text: training.name
@@ -136,7 +136,7 @@ DVBisous ! :robot:`;
 		if (profilesError) {
 			throw profilesError;
 		}
-		profiles = (data ?? []).map(
+		profiles = data.map(
 			(profile: { id: string; username: string | null; avatar_url: string | null }) => ({
 				...profile,
 				email: null
@@ -155,8 +155,7 @@ DVBisous ! :robot:`;
 			trainings = trainingList;
 			slots = slotList;
 			await loadProfiles();
-		} catch (err) {
-			console.error(err);
+		} catch {
 			error = "Impossible de charger l'espace admin.";
 		} finally {
 			loading = false;
@@ -304,8 +303,7 @@ DVBisous ! :robot:`;
 			await loadData();
 			triggerTableRefresh(trainingTableTopic);
 			closeTrainingModal();
-		} catch (err) {
-			console.error(err);
+		} catch {
 			formError = "Impossible d'enregistrer la formation.";
 		}
 	}
@@ -343,9 +341,9 @@ DVBisous ! :robot:`;
 		const customPrerequisites =
 			(formData.get('custom_prerequisites') || '').toString().trim() || null;
 		const baseTraining = trainings.find((training) => training.training_id === trainingId) ?? null;
-		const baseName = baseTraining?.name || null;
-		const baseDescription = baseTraining?.description || null;
-		const basePrerequisites = baseTraining?.prerequisites || null;
+		const baseName = baseTraining?.name ?? null;
+		const baseDescription = baseTraining?.description ?? null;
+		const basePrerequisites = baseTraining?.prerequisites ?? null;
 
 		if (!trainingId || !startIso || !duration || !trainerId) {
 			formError = 'Formation, formateur·ice, date et durée sont obligatoires.';
@@ -403,8 +401,7 @@ DVBisous ! :robot:`;
 			await loadData();
 			triggerTableRefresh(slotTableTopic);
 			closeSlotModal();
-		} catch (err) {
-			console.error(err);
+		} catch {
 			formError = "Impossible d'enregistrer le slot.";
 		}
 	}
@@ -442,7 +439,7 @@ DVBisous ! :robot:`;
 		}
 		summarySending = true;
 		try {
-			const cleanText = text?.trim();
+			const cleanText = text.trim();
 			const { data, error: invokeError } = await supabaseClient.functions.invoke(
 				'discord-summary',
 				{
@@ -460,8 +457,7 @@ DVBisous ! :robot:`;
 				return false;
 			}
 			return true;
-		} catch (err) {
-			console.error(err);
+		} catch {
 			summaryError =
 				mode === 'test'
 					? "Impossible d'envoyer le test webhook."

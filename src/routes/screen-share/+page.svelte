@@ -67,10 +67,8 @@
 			const messageText = event.data instanceof Blob ? await event.data.text() : event.data;
 			const data = JSON.parse(messageText);
 			if (data.type === 'answer') {
-				console.log('Received answer:', data);
 				await pc?.setRemoteDescription(new RTCSessionDescription(data));
 			} else if (data.candidate) {
-				console.log('Received ICE candidate:', data);
 				await pc?.addIceCandidate(new RTCIceCandidate(data));
 			} else if (data.type === 'busy_update') {
 				is_busy = data.message;
@@ -91,7 +89,6 @@
 		if (stream) {
 			stream.getTracks().forEach((track) => {
 				track.stop();
-				console.log('Stopped track:', track);
 			});
 			stream = null;
 		}
@@ -100,7 +97,6 @@
 		pc = new RTCPeerConnection();
 		pc.onicecandidate = (event) => {
 			if (event.candidate && ws) {
-				console.log('Sending ICE candidate:', event.candidate);
 				ws.send(JSON.stringify(event.candidate));
 			}
 		};
@@ -109,7 +105,6 @@
 			pc?.addTrack(track, stream!);
 
 			track.onended = () => {
-				console.log('Screen sharing stopped');
 				ws?.send(JSON.stringify({ type: 'disconnect' }));
 				pc?.close();
 				pc = null;

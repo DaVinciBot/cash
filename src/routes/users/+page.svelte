@@ -1,4 +1,4 @@
-<script>
+<script lang="ts">
 	import { run } from 'svelte/legacy';
 
 	import { resolve } from '$app/paths';
@@ -43,7 +43,6 @@
 				? body.trim()
 				: `Impossible de charger la liste des utilisateurs (status ${res.status}).`;
 			const message = payload?.error || fallback;
-			console.error('Erreur API /api/admin/users', {
 				status: res.status,
 				body
 			});
@@ -151,7 +150,6 @@
 				return bDate - aDate;
 			});
 		} catch (error) {
-			console.error('Impossible de charger les invitations en attente', error);
 			pendingInvites = [];
 			pendingInvitesError =
 				error?.message || 'Impossible de charger les invitations en attente pour le moment.';
@@ -182,7 +180,6 @@
 			});
 			await loadPendingInvites();
 		} catch (error) {
-			console.error('Erreur de réinvitation', error);
 			alert(error?.message || 'Impossible de renvoyer cette invitation.');
 		} finally {
 			reinvitingUserId = null;
@@ -303,7 +300,6 @@
 							page += 1;
 						}
 					} catch (error) {
-						console.error('Impossible de récupérer les utilisateurs existants', error);
 						throw new Error('Impossible de récupérer la liste des utilisateurs existants.');
 					}
 
@@ -427,12 +423,10 @@
 									})
 									.eq('id', createdUserId);
 								if (cleanupProfileError) {
-									console.error('Impossible de nettoyer le profil créé', cleanupProfileError);
 								}
 								try {
 									await deleteAuthUser(createdUserId);
 								} catch (cleanupError) {
-									console.error('Impossible de supprimer le compte Supabase', cleanupError);
 								}
 							}
 						}
@@ -472,9 +466,7 @@
 					if (failures.length > 0) {
 						const failureEmails = failures.map((f) => f.email).join(', ');
 						messageParts.push(
-							`Échec pour : ${failureEmails}. Consultez la console pour plus de détails.`
 						);
-						console.error('Import utilisateurs échoué pour certains comptes', failures);
 					}
 
 					const message = messageParts.join('\n');
@@ -639,7 +631,6 @@
 			.eq('id', id)
 			.single();
 		if (error) {
-			console.error(error);
 			return;
 		}
 
@@ -753,7 +744,6 @@
 						})
 						.eq('id', id);
 					if (profileError) {
-						console.error(profileError);
 						alert('Erreur lors de la mise à jour du profil : ' + profileError.message);
 						return;
 					}
@@ -764,7 +754,6 @@
 						.select('project, role')
 						.eq('profile', id);
 					if (memberError) {
-						console.error(memberError);
 						alert('Erreur lors de la récupération des projets existants : ' + memberError.message);
 						return;
 					}
@@ -795,7 +784,6 @@
 							}))
 						);
 						if (addError) {
-							console.error(addError);
 							alert("Erreur lors de l'ajout aux projets : " + addError.message);
 							return;
 						}
@@ -809,7 +797,6 @@
 							.eq('profile', id)
 							.eq('project', p.project_id);
 						if (updateRoleError) {
-							console.error(updateRoleError);
 							alert(
 								'Erreur lors de la mise à jour du rôle pour le projet : ' + updateRoleError.message
 							);
@@ -825,7 +812,6 @@
 							.eq('profile', id)
 							.in('project', projectsToRemove);
 						if (removeError) {
-							console.error(removeError);
 							alert('Erreur lors de la suppression des projets : ' + removeError.message);
 							return;
 						}
@@ -878,7 +864,6 @@
 		try {
 			await deleteAuthUser(id);
 		} catch (error) {
-			console.error(error);
 			alert(error?.message || 'Erreur lors de la désactivation du compte.');
 			return;
 		}
@@ -899,7 +884,6 @@
 		try {
 			await updateAuthUserStatus(id, 'active');
 		} catch (error) {
-			console.error(error);
 			alert(error?.message || 'Erreur lors de la réactivation du compte.');
 			return;
 		}

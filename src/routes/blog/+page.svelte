@@ -1,4 +1,4 @@
-<script>
+<script lang="ts">
 	import { preventDefault } from 'svelte/legacy';
 
 	import Stepper from '$lib/components/admin/Stepper.svelte';
@@ -25,14 +25,14 @@
 		tag: '' // space/comma/hashtag separated string
 	});
 
-	let saving = $state(false);
+	let saving = $state<boolean>(false);
 	let message = $state('');
 	const canAccess = false;
 	let selectedSlug = $state('');
 	let saveSteps = $state([]);
 
 	function toSlug(t = '') {
-		return (t || '')
+		return t
 			.toLowerCase()
 			.normalize('NFD')
 			.replace(/\p{Diacritic}+/gu, '')
@@ -49,15 +49,13 @@
 				upsert: false,
 				contentType: 'application/octet-stream'
 			});
-			if (error && !String(error.message || '').includes('The resource already exists')) {
+			if (error && !String(error.message ?? '').includes('The resource already exists')) {
 				// ignore if already exists
 				return false;
 			}
 			return true;
 		} catch (e) {
-			console.warn('ensureFolder exception', e);
 			return false;
-			console.warn('ensureFolder exception', e);
 		}
 	}
 
@@ -70,7 +68,7 @@
 		}
 		try {
 			if (!slug) {
-				slug = toSlug(title) || crypto.randomUUID().slice(0, 8);
+				slug = toSlug(title);
 			}
 			await ensureFolder(slug);
 			const fileName = `${Date.now()}-${file.name}`.replace(/[^a-zA-Z0-9_.-]/g, '_');
@@ -78,8 +76,7 @@
 			const { error } = await supabase.storage
 				.from('articles')
 				.upload(filePath, file, { upsert: false });
-			if (error && !String(error.message || '').includes('The resource already exists')) {
-				console.error(error);
+			if (error && !String(error.message ?? '').includes('The resource already exists')) {
 				message = 'Erreur upload: ' + error.message;
 				return;
 			}
@@ -89,11 +86,10 @@
 				// Append markdown reference at end
 				const isImage = file.type.startsWith('image/');
 				const snippet = isImage ? `\n\n![](${url})\n` : `\n\n[${file.name}](${url})\n`;
-				body = (body || '') + snippet;
+				body = body + snippet;
 				message = 'Fichier téléversé';
 			}
-		} catch (e) {
-			console.error(e);
+		} catch {
 			message = 'Erreur upload';
 		} finally {
 			// reset input value to allow re-uploading same file name
@@ -139,10 +135,8 @@
 				}
 				return true;
 			}
-			console.warn('Transcode hero failed:', data);
 			return false;
 		} catch (e) {
-			console.error('Transcode hero error:', e);
 			return false;
 		}
 	}
@@ -171,10 +165,8 @@
 				meta.heroImageSocial = data.image;
 				return true;
 			}
-			console.warn('Transcode OG failed:', data);
 			return false;
 		} catch (e) {
-			console.error('Transcode OG error:', e);
 			return false;
 		}
 	}
@@ -251,10 +243,8 @@
 				}
 				return true;
 			}
-			console.warn('Transcode body images failed:', data);
 			return false;
-		} catch (e) {
-			console.error('Transcode body images error:', e);
+		} catch {
 			return false;
 		}
 	}
@@ -265,7 +255,7 @@
 			message = 'Le titre est requis';
 			return;
 		}
-		slug = toSlug(slug || title);
+		slug = toSlug(slug);
 		if (!slug) {
 			message = 'Slug invalide';
 			return;
@@ -325,7 +315,6 @@
 			// upsert by primary key (slug)
 			const { error } = await supabase.from('blog').upsert(row).select('slug').single();
 			if (error) {
-				console.error(error);
 				message = 'Erreur enregistrement: ' + error.message;
 				saveSteps[4].icon = 'cancel';
 			} else {
@@ -335,8 +324,7 @@
 				await loadArticles();
 			}
 			saveSteps = [...saveSteps];
-		} catch (e) {
-			console.error(e);
+		} catch {
 			message = 'Erreur système';
 		} finally {
 			saving = false;
@@ -355,21 +343,20 @@
 				.select('title,slug,last_update,publish_date,data,state')
 				.order('publish_date', { ascending: false, nullsFirst: false });
 			if (error) {
-				console.error(error);
 				return;
 			}
 			// normalize and sort fallback by last_update
 			const list = (data || []).map((row) => {
-				const date = row.publish_date || row.last_update || null;
+				const date = row.publish_date ?? row.last_update ?? null;
 				return {
 					title: row.title,
 					slug: row.slug,
 					date,
-					state: row.state || 'draft',
-					cover: row.data?.heroImage || null
+					state: row.state ?? 'draft',
+					cover: row.data?.heroImage ?? null
 				};
 			});
-			list.sort((a, b) => new Date(b.date || 0) - new Date(a.date || 0));
+			list.sort((a, b) => new Date(b.date ?? 0) - new Date(a.date ?? 0));
 			articles = list;
 		} finally {
 			loadingList = false;
@@ -380,15 +367,14 @@
 		try {
 			const { data, error } = await supabase.from('blog').select('*').eq('slug', s).single();
 			if (error) {
-				console.error(error);
 				message = 'Erreur chargement: ' + error.message;
 				return;
 			}
-			title = data.title || '';
-			slug = data.slug || '';
-			body = data.body || '';
-			state = data.state || 'draft';
-			meta = data.data || {
+			title = data.title ?? '';
+			slug = data.slug ?? '';
+			body = data.body ?? '';
+			state = data.state ?? 'draft';
+			meta = data.data ?? {
 				excerpt: '',
 				heroImage: '',
 				heroAlt: '',
@@ -397,8 +383,7 @@
 			};
 			selectedSlug = slug;
 			message = '';
-		} catch (e) {
-			console.error(e);
+		} catch {
 			message = 'Erreur chargement';
 		}
 	}
@@ -420,7 +405,7 @@
 		}
 		try {
 			if (!slug) {
-				slug = toSlug(title) || crypto.randomUUID().slice(0, 8);
+				slug = toSlug(title);
 			}
 			await ensureFolder(slug);
 			const fileName = `cover-${Date.now()}-${file.name}`.replace(/[^a-zA-Z0-9_.-]/g, '_');
@@ -428,8 +413,7 @@
 			const { error } = await supabase.storage
 				.from('articles')
 				.upload(filePath, file, { upsert: false });
-			if (error && !String(error.message || '').includes('The resource already exists')) {
-				console.error(error);
+			if (error && !String(error.message).includes('The resource already exists')) {
 				message = 'Erreur upload cover: ' + error.message;
 				return;
 			}
@@ -439,8 +423,7 @@
 				meta = { ...meta, heroImage: url };
 				message = 'Image de couverture téléversée';
 			}
-		} catch (e) {
-			console.error(e);
+		} catch {
 			message = 'Erreur upload cover';
 		} finally {
 			ev.target.value = '';

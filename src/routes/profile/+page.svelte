@@ -1,4 +1,4 @@
-<script>
+<script lang="ts">
 	import { preventDefault } from 'svelte/legacy';
 
 	import { userdata } from '$lib/store';
@@ -17,7 +17,7 @@
 	userdata.subscribe((value) => {
 		if (value) {
 			user = value;
-			loadPage().catch(console.error);
+			loadPage().catch(() => undefined);
 		}
 	});
 
@@ -44,8 +44,7 @@
 			});
 
 			alert('Paramètres des tableaux vidés.');
-		} catch (e) {
-			console.error(e);
+		} catch {
 			alert('Impossible de vider le cache utilisateur');
 		}
 	}
@@ -60,7 +59,6 @@
 			});
 
 		if (error) {
-			console.error(error);
 			if (error.message === 'Request failed with status code 413') {
 				alert('Votre avatar est trop lourd (max 5 Mo)');
 			} else {
@@ -79,7 +77,6 @@
 				.eq('id', user.id);
 
 			if (error2) {
-				console.error(error2);
 				alert('Une erreur est survenue lors de la modification de votre avatar');
 			}
 
@@ -110,8 +107,6 @@
 			body: JSON.stringify({ password: new_password })
 		});
 		if (!response.ok) {
-			const payload = await response.json().catch(() => ({}));
-			console.error(payload);
 			alert('Une erreur est survenue lors de la modification de votre mot de passe');
 		}
 
@@ -130,7 +125,6 @@
 			.eq('id', user.id);
 
 		if (error) {
-			console.error(error);
 			alert('Une erreur est survenue lors de la modification de votre nom');
 		}
 

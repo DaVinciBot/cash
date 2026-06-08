@@ -49,7 +49,7 @@ export function buildTrainingFields(training: TrainingListItem | null) {
 			id: 'name',
 			type: 'text',
 			required: true,
-			value: training?.name || ''
+			value: training?.name ?? ''
 		},
 		{
 			name: 'Catégorie',
@@ -64,14 +64,14 @@ export function buildTrainingFields(training: TrainingListItem | null) {
 			id: 'description',
 			type: 'textarea',
 			wide: true,
-			value: training?.description || ''
+			value: training?.description ?? ''
 		},
 		{
 			name: 'Prérequis',
 			id: 'prerequisites',
 			type: 'textarea',
 			wide: true,
-			value: training?.prerequisites || ''
+			value: training?.prerequisites ?? ''
 		}
 	];
 }
@@ -113,11 +113,11 @@ export function buildSlotFields({
 			type: 'autocomplete',
 			required: true,
 			placeholder: 'Rechercher une formation',
-			value: baseTraining?.name || '',
+			value: baseTraining?.name ?? '',
 			data: baseTraining?.training_id ?? '',
 			onChange: (event: Event) => {
 				const target = event.target as HTMLInputElement | null;
-				const search = target?.value?.toLowerCase().trim() || '';
+				const search = target?.value.toLowerCase().trim() ?? '';
 				return search ? searchTrainings(search) : [];
 			},
 			onSelect: (nextId: string) => {
@@ -129,21 +129,21 @@ export function buildSlotFields({
 			name: 'Nom',
 			id: 'custom_name',
 			type: 'text',
-			placeholder: baseTraining?.name || '',
-			value: slot ? (slot.name ?? '') : ''
+			placeholder: baseTraining?.name ?? '',
+			value: slot ? slot.name : ''
 		},
 		{
 			name: 'Description',
 			id: 'custom_description',
 			type: 'textarea',
-			placeholder: baseTraining?.description || '',
+			placeholder: baseTraining?.description ?? '',
 			value: slot ? (slot.description ?? '') : ''
 		},
 		{
 			name: 'Prérequis',
 			id: 'custom_prerequisites',
 			type: 'textarea',
-			placeholder: baseTraining?.prerequisites || '',
+			placeholder: baseTraining?.prerequisites ?? '',
 			value: slot ? (slot.prerequisites ?? '') : ''
 		},
 		{
@@ -151,13 +151,13 @@ export function buildSlotFields({
 			id: 'trainer_id',
 			type: 'autocomplete',
 			required: true,
-			value: selectedTrainer?.username || slot?.trainer_username || '',
-			image: selectedTrainer?.avatar_url || slot?.trainer_avatar_url || null,
-			data: selectedTrainer?.id || slot?.trainer_id || '',
+			value: selectedTrainer?.username ?? slot?.trainer_username ?? '',
+			image: selectedTrainer?.avatar_url ?? slot?.trainer_avatar_url ?? null,
+			data: selectedTrainer?.id ?? slot?.trainer_id ?? '',
 			onChange: async (event: Event) => {
 				const target = event.target as HTMLInputElement | null;
 				onTrainerChange?.(null);
-				const search = target?.value?.toLowerCase().trim() || '';
+				const search = target?.value.toLowerCase().trim() ?? '';
 				if (!search) {
 					return [];
 				}
@@ -187,7 +187,7 @@ export function buildSlotFields({
 			name: 'Lieu',
 			id: 'location',
 			type: 'text',
-			value: slot?.location || ''
+			value: slot?.location ?? ''
 		},
 		{
 			name: 'Places sur site',
@@ -208,7 +208,7 @@ export function buildSlotFields({
 			id: 'video_conference_link',
 			type: 'text',
 			wide: true,
-			value: slot?.video_conference_link || ''
+			value: slot?.video_conference_link ?? ''
 		},
 		{
 			name: 'Excusable',

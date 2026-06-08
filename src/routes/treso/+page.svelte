@@ -1,4 +1,4 @@
-<script>
+<script lang="ts">
 	import Table from '$lib/components/admin/Table.svelte';
 	import CrudForm from '$lib/components/modals/CrudForm.svelte';
 	import SucessModal from '$lib/components/modals/InfoModal.svelte';
@@ -126,8 +126,6 @@
 					}
 				]
 			};
-		} catch (err) {
-			console.error(err);
 		} finally {
 			isLoadingCashflow = false;
 		}
@@ -154,8 +152,7 @@
 			.select('id, name, description, current_amount, category')
 			.order('name', { ascending: true });
 		if (error) {
-			console.error(error);
-			banksError = 'Impossible de charger les comptes bancaires';
+			banksEr	ror = 'Impossible de charger les comptes bancaires';
 		} else {
 			banks = data || [];
 		}
@@ -177,8 +174,7 @@
 			.select('id, name')
 			.order('name');
 		if (bankErr) {
-			console.error(bankErr);
-			alert('Impossible de charger la liste des banques.');
+			alert('	Impossible de charger la liste des banques.');
 			return;
 		}
 
@@ -271,8 +267,7 @@
 						.single();
 
 					if (error) {
-						console.error(error);
-						alert('Une erreur est survenue lors de la création de la dépense');
+						alert('	Une erreur est survenue lors de la création de la dépense');
 						unmount(crud);
 						return;
 					}
@@ -290,15 +285,13 @@
 									upsert: true
 								});
 							if (err) {
-								console.error(err);
-								alert("Une erreur est survenue lors de l'envoi des justificatifs");
+								alert("	Une erreur est survenue lors de l'envoi des justificatifs");
 								unmount(crud);
 								return;
 							}
 						}
 					} else {
-						console.log('No proof to upload, skipping');
-						message += ' (sans justificatif)';
+						message	 += ' (sans justificatif)';
 					}
 
 					mountClosable(SucessModal, {
@@ -332,7 +325,6 @@
 
 		const { data, error } = await supabase.from('spending').select('*').eq('id', id).single();
 		if (error) {
-			console.error(error);
 			return;
 		}
 		if (data.description === null || data.description === '') {
@@ -347,8 +339,6 @@
 				sortBy: { column: 'name', order: 'asc' }
 			});
 		if (err) {
-			console.error(err);
-			console.log('No proof, skipping');
 		}
 
 		const crud = mountClosable(CrudForm, {
@@ -376,8 +366,7 @@
 								.from('proof')
 								.remove([`invoices/${id}/${value}`]);
 							if (error) {
-								console.error(error);
-								alert('Une erreur est survenue lors de la suppression du justificatif');
+								alert('	Une erreur est survenue lors de la suppression du justificatif');
 							}
 						}
 					},
@@ -424,7 +413,6 @@
 								.ilike('username', `${e.target.value}*`)
 								.range(0, 4);
 							if (error) {
-								console.error(error);
 								return;
 							}
 							// create options
@@ -475,12 +463,10 @@
 						.select('id')
 						.single();
 					if (error) {
-						console.error(error);
-						alert("Une erreur est survenue lors de l'édition de la dépense");
+						alert("	Une erreur est survenue lors de l'édition de la dépense");
 					}
 
 					const logoFile = Array.isArray(fdata.justificatif) ? fdata.justificatif : [];
-					console.log(logoFile);
 
 					// upload all files
 					for (let i = 0; i < logoFile.length; i++) {
@@ -493,8 +479,7 @@
 								upsert: true
 							});
 						if (error) {
-							console.error(error);
-							alert("Une erreur est survenue lors de l'envoi des justificatifs");
+							alert("	Une erreur est survenue lors de l'envoi des justificatifs");
 							return;
 						}
 					}
@@ -591,7 +576,6 @@
 					.single();
 
 				if (error) {
-					console.error(error);
 					return;
 				}
 
@@ -624,8 +608,6 @@
 					});
 
 				if (err) {
-					console.error(err);
-					console.log('No proof, skipping');
 				}
 
 				const fileList = Array.isArray(dat) ? dat : [];

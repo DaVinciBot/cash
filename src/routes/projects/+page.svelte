@@ -1,4 +1,4 @@
-<script>
+<script lang="ts">
 	import { supabase } from '$lib/supabaseClient';
 	import { onMount } from 'svelte';
 
@@ -111,7 +111,6 @@
 			.single();
 
 		if (error) {
-			console.error(error);
 			return;
 		}
 		budgets = (data.budget || []).sort((a, b) => String(b.year).localeCompare(String(a.year)));
@@ -136,10 +135,9 @@
 		}
 		const { data: costData, error: costErr } = await supabase.rpc('get_project_cost', {
 			projectid: selectedProjectId,
-			year: selectedYear || project?.budget?.year
+			year: selectedYear ?? project?.budget?.year
 		});
 		if (costErr) {
-			console.error(costErr);
 			return;
 		}
 		project.budget.cost = costData;
@@ -151,16 +149,11 @@
 			year: selectedYear || project?.budget?.year
 		}));
 		if (statsErr) {
-			console.warn(
-				'get_project_stats with year failed, retrying without year',
-				statsErr?.message || statsErr
-			);
 			({ data: statsData, error: statsErr } = await supabase.rpc('get_project_stats', {
 				projectid: selectedProjectId
 			}));
 		}
 		if (statsErr) {
-			console.error(statsErr);
 		} else {
 			stats = statsData ?? { websites: [], users: [], tags: [], banks: [] };
 		}
