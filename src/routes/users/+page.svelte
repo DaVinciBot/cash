@@ -43,9 +43,6 @@
 				? body.trim()
 				: `Impossible de charger la liste des utilisateurs (status ${res.status}).`;
 			const message = payload?.error || fallback;
-				status: res.status,
-				body
-			});
 			throw new Error(`${message} (status ${res.status})`);
 		}
 		return payload?.users ?? [];
@@ -426,8 +423,7 @@
 								}
 								try {
 									await deleteAuthUser(createdUserId);
-								} catch (cleanupError) {
-								}
+								} catch (cleanupError) {}
 							}
 						}
 					}
@@ -466,6 +462,7 @@
 					if (failures.length > 0) {
 						const failureEmails = failures.map((f) => f.email).join(', ');
 						messageParts.push(
+							`Échec pour : ${failureEmails}. Consultez la console pour plus de détails.`
 						);
 					}
 

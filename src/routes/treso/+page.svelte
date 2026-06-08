@@ -152,7 +152,7 @@
 			.select('id, name, description, current_amount, category')
 			.order('name', { ascending: true });
 		if (error) {
-			banksEr	ror = 'Impossible de charger les comptes bancaires';
+			banksError = 'Impossible de charger les comptes bancaires';
 		} else {
 			banks = data || [];
 		}
@@ -291,7 +291,7 @@
 							}
 						}
 					} else {
-						message	 += ' (sans justificatif)';
+						message += ' (sans justificatif)';
 					}
 
 					mountClosable(SucessModal, {
