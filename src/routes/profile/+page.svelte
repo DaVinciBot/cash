@@ -148,9 +148,9 @@
 <div class="grid gap-5" id="p-box">
 	<div
 		id="user-profile"
-		class="flex flex-col items-center justify-center w-full h-full p-8 text-white bg-gray-800 rounded-lg shadow-md sm:mx-auto"
+		class="flex h-full w-full flex-col items-center justify-center rounded-lg bg-gray-800 p-8 text-white shadow-md sm:mx-auto"
 	>
-		<div class="z-20 flex items-center justify-center w-32 h-32 bg-gray-700 rounded-full" id="pp">
+		<div class="z-20 flex h-32 w-32 items-center justify-center rounded-full bg-gray-700" id="pp">
 			<label id="-label" class="z-10 w-32 rounded-full" for="file">
 				<span>Modifier</span>
 			</label>
@@ -161,7 +161,7 @@
 				accept="image/png, image/jpeg"
 				onchange={handleImage}
 			/>
-			<img src={user?.avatar} alt="avatar" class="w-32 h-32 rounded-full" />
+			<img src={user?.avatar} alt="avatar" class="h-32 w-32 rounded-full" />
 		</div>
 		<div class="mt-4 text-center">
 			<h3 class="text-lg font-semibold text-white">{user?.name}</h3>
@@ -177,17 +177,17 @@
 		</div>
 	</div>
 	<div
-		class="flex flex-col items-center justify-center w-full h-full p-8 text-white bg-gray-800 rounded-lg shadow-md sm:mx-auto"
+		class="flex h-full w-full flex-col items-center justify-center rounded-lg bg-gray-800 p-8 text-white shadow-md sm:mx-auto"
 	>
 		<form class="w-full space-y-4 md:space-y-6" onsubmit={preventDefault(handleSubmit)}>
 			<div>
-				<label for="username" class="block mb-2 text-sm font-medium text-white">Votre nom</label>
+				<label for="username" class="mb-2 block text-sm font-medium text-white">Votre nom</label>
 				<input
 					type="text"
 					name="username"
 					id="username"
 					placeholder="DaVinciBot"
-					class=" border rounded-lg block w-full p-2.5 bg-gray-700 border-gray-600 placeholder-gray-400 text-white focus:ring-blue-500 focus:border-blue-500 disabled:opacity-50"
+					class=" block w-full rounded-lg border border-gray-600 bg-gray-700 p-2.5 text-white placeholder-gray-400 focus:border-blue-500 focus:ring-blue-500 disabled:opacity-50"
 					bind:value={new_username}
 				/>
 			</div>
@@ -195,20 +195,20 @@
 			<button
 				type="submit"
 				disabled={loading}
-				class="w-full text-white focus:ring-4 focus:outline-none font-medium rounded-lg text-sm px-5 py-2.5 text-center bg-primary-600 hover:bg-primary-700 focus:ring-primary-800"
+				class="bg-primary-600 hover:bg-primary-700 focus:ring-primary-800 w-full rounded-lg px-5 py-2.5 text-center text-sm font-medium text-white focus:ring-4 focus:outline-none"
 				>{loading ? 'Chargement ...' : 'Modifer mes informations'}</button
 			>
 			<hr />
 			<button
 				type="button"
-				class="w-full px-4 py-2 mb-2 text-sm font-medium text-white bg-gray-600 rounded-lg hover:bg-gray-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-offset-gray-800 focus:ring-gray-700"
+				class="mb-2 w-full rounded-lg bg-gray-600 px-4 py-2 text-sm font-medium text-white hover:bg-gray-700 focus:ring-2 focus:ring-gray-700 focus:ring-offset-2 focus:ring-offset-gray-800 focus:outline-none"
 				onclick={clearUserdataCache}
 			>
 				Vider le cache utilisateur
 			</button>
 			<button
 				type="button"
-				class="w-full px-4 py-2 text-sm font-medium text-white bg-red-500 rounded-lg hover:bg-red-600 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-offset-gray-800 focus:ring-red-700"
+				class="w-full rounded-lg bg-red-500 px-4 py-2 text-sm font-medium text-white hover:bg-red-600 focus:ring-2 focus:ring-red-700 focus:ring-offset-2 focus:ring-offset-gray-800 focus:outline-none"
 				onclick={LogOut}
 			>
 				Se déconnecter
@@ -216,35 +216,35 @@
 		</form>
 	</div>
 	<div
-		class="flex flex-col items-center justify-center w-full h-full p-8 text-white bg-gray-800 rounded-lg shadow-md sm:mx-auto"
+		class="flex h-full w-full flex-col items-center justify-center rounded-lg bg-gray-800 p-8 text-white shadow-md sm:mx-auto"
 	>
 		<form
 			class="w-full space-y-4 border-gray-700 md:space-y-6"
 			onsubmit={preventDefault(handlePassword)}
 		>
 			<div>
-				<label for="password" class="block mb-2 text-sm font-medium text-white"
+				<label for="password" class="mb-2 block text-sm font-medium text-white"
 					>Nouveau mot de passe</label
 				>
 				<input
 					type="password"
 					name="password"
 					id="password"
-					class=" border rounded-lg block w-full p-2.5 bg-gray-700 border-gray-600 placeholder-gray-400 text-white focus:ring-blue-500 focus:border-blue-500 disabled:opacity-50"
+					class=" block w-full rounded-lg border border-gray-600 bg-gray-700 p-2.5 text-white placeholder-gray-400 focus:border-blue-500 focus:ring-blue-500 disabled:opacity-50"
 					placeholder="********"
 					bind:value={new_password}
 				/>
 			</div>
 
 			<div>
-				<label for="password" class="block mb-2 text-sm font-medium text-white"
+				<label for="password" class="mb-2 block text-sm font-medium text-white"
 					>Confirmer le mot de passe</label
 				>
 				<input
 					type="password"
 					name="password"
 					id="password"
-					class="border rounded-lg block w-full p-2.5 bg-gray-700 border-gray-600 placeholder-gray-400 text-white focus:ring-blue-500 focus:border-blue-500 disabled:opacity-50"
+					class="block w-full rounded-lg border border-gray-600 bg-gray-700 p-2.5 text-white placeholder-gray-400 focus:border-blue-500 focus:ring-blue-500 disabled:opacity-50"
 					placeholder="********"
 					bind:value={new_password_confirmation}
 				/>
@@ -252,7 +252,7 @@
 			<button
 				type="submit"
 				disabled={loading}
-				class="w-full text-white focus:ring-4 focus:outline-none font-medium rounded-lg text-sm px-5 py-2.5 text-center bg-primary-600 hover:bg-primary-700 focus:ring-primary-800"
+				class="bg-primary-600 hover:bg-primary-700 focus:ring-primary-800 w-full rounded-lg px-5 py-2.5 text-center text-sm font-medium text-white focus:ring-4 focus:outline-none"
 				>{loading ? 'Chargement ...' : 'Changer mon mot de passe'}</button
 			>
 		</form>

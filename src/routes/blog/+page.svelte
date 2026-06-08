@@ -433,24 +433,24 @@
 	<meta name="robots" content="noindex, nofollow" />
 </svelte:head>
 
-<div class="max-w-6xl mx-auto">
-	<div class="flex items-center justify-between mb-4">
+<div class="mx-auto max-w-6xl">
+	<div class="mb-4 flex items-center justify-between">
 		<h1 class="text-2xl font-bold">Articles</h1>
 		<button
-			class="px-3 py-1.5 text-sm text-white rounded bg-primary-600 hover:bg-primary-700"
+			class="bg-primary-600 hover:bg-primary-700 rounded px-3 py-1.5 text-sm text-white"
 			onclick={newArticle}>Nouvel article</button
 		>
 	</div>
 	<div class="grid grid-cols-1 gap-4 md:grid-cols-3">
 		<!-- Editor -->
-		<div class="p-3 border border-gray-700 rounded-lg md:col-span-2 bg-gray-800/40">
-			<div class="flex items-center justify-between mb-2">
+		<div class="rounded-lg border border-gray-700 bg-gray-800/40 p-3 md:col-span-2">
+			<div class="mb-2 flex items-center justify-between">
 				<div class="text-sm">Contenu</div>
 				<label class="flex items-center gap-2 text-xs">
 					<span class="opacity-80">Ajouter un fichier</span>
 					<input
 						type="file"
-						class="text-xs file:mr-4 file:py-1 file:px-2 file:rounded file:border-0 file:text-xs file:bg-gray-700 file:text-white hover:file:bg-gray-600"
+						class="text-xs file:mr-4 file:rounded file:border-0 file:bg-gray-700 file:px-2 file:py-1 file:text-xs file:text-white hover:file:bg-gray-600"
 						onchange={handleUpload}
 					/>
 				</label>
@@ -458,17 +458,17 @@
 			<CartaEditor {carta} bind:value={body} />
 		</div>
 		<!-- Sidebar -->
-		<div class="flex flex-col gap-4 p-3 border border-gray-700 rounded-lg bg-gray-800/40">
+		<div class="flex flex-col gap-4 rounded-lg border border-gray-700 bg-gray-800/40 p-3">
 			<div>
-				<label for="search" class="block mb-1 text-sm">Rechercher par titre</label>
+				<label for="search" class="mb-1 block text-sm">Rechercher par titre</label>
 				<input
 					id="search"
 					placeholder="Rechercher..."
-					class="w-full px-3 py-2 bg-gray-900 border border-gray-700 rounded"
+					class="w-full rounded border border-gray-700 bg-gray-900 px-3 py-2"
 					bind:value={search}
 				/>
 			</div>
-			<div class="overflow-auto border border-gray-700 rounded max-h-64">
+			<div class="max-h-64 overflow-auto rounded border border-gray-700">
 				{#if loadingList}
 					<div class="p-3 text-sm text-gray-400">Chargement…</div>
 				{:else if !articles.length}
@@ -481,18 +481,18 @@
 							<li>
 								<button
 									type="button"
-									class={`w-full text-left p-2 hover:bg-gray-700/40 cursor-pointer rounded ${a.slug === selectedSlug ? 'bg-gray-700/30' : ''}`}
+									class={`w-full cursor-pointer rounded p-2 text-left hover:bg-gray-700/40 ${a.slug === selectedSlug ? 'bg-gray-700/30' : ''}`}
 									onclick={() => loadArticle(a.slug)}
 								>
 									<div class="text-sm font-medium">{a.title}</div>
 									<div class="flex items-center justify-between gap-2">
-										<div class="text-xs text-gray-400 truncate">{a.slug}</div>
+										<div class="truncate text-xs text-gray-400">{a.slug}</div>
 										<span
-											class="text-[10px] px-1.5 py-0.5 rounded-full {a.state === 'published'
-												? 'bg-green-900/50 text-green-300 border border-green-800'
+											class="rounded-full px-1.5 py-0.5 text-[10px] {a.state === 'published'
+												? 'border border-green-800 bg-green-900/50 text-green-300'
 												: a.state === 'deleted'
-													? 'bg-red-900/50 text-red-300 border border-red-800'
-													: 'bg-gray-700 text-gray-300 border border-gray-600'}"
+													? 'border border-red-800 bg-red-900/50 text-red-300'
+													: 'border border-gray-600 bg-gray-700 text-gray-300'}"
 										>
 											{a.state === 'published'
 												? 'Publié'
@@ -513,27 +513,27 @@
 				{/if}
 			</div>
 			<div>
-				<label class="block mb-1 text-sm" for="title">Titre</label>
+				<label class="mb-1 block text-sm" for="title">Titre</label>
 				<input
 					id="title"
-					class="w-full px-3 py-2 bg-gray-900 border border-gray-700 rounded"
+					class="w-full rounded border border-gray-700 bg-gray-900 px-3 py-2"
 					bind:value={title}
 					oninput={() => (slug = toSlug(title))}
 				/>
 			</div>
 			<div>
-				<label class="block mb-1 text-sm" for="slug">Slug</label>
+				<label class="mb-1 block text-sm" for="slug">Slug</label>
 				<input
 					id="slug"
-					class="w-full px-3 py-2 bg-gray-900 border border-gray-700 rounded"
+					class="w-full rounded border border-gray-700 bg-gray-900 px-3 py-2"
 					bind:value={slug}
 				/>
 			</div>
 			<div>
-				<label class="block mb-1 text-sm" for="state">État</label>
+				<label class="mb-1 block text-sm" for="state">État</label>
 				<select
 					id="state"
-					class="w-full px-3 py-2 bg-gray-900 border border-gray-700 rounded"
+					class="w-full rounded border border-gray-700 bg-gray-900 px-3 py-2"
 					bind:value={state}
 				>
 					<option value="draft">Brouillon</option>
@@ -542,76 +542,76 @@
 				</select>
 			</div>
 			<div>
-				<label class="block mb-1 text-sm" for="excerpt">Extrait</label>
+				<label class="mb-1 block text-sm" for="excerpt">Extrait</label>
 				<textarea
 					id="excerpt"
 					rows="3"
-					class="w-full px-3 py-2 bg-gray-900 border border-gray-700 rounded"
+					class="w-full rounded border border-gray-700 bg-gray-900 px-3 py-2"
 					bind:value={meta.excerpt}
 				></textarea>
 			</div>
 			<div>
-				<label class="block mb-1 text-sm" for="tags"
+				<label class="mb-1 block text-sm" for="tags"
 					>Tags (séparés par espaces, virgules ou #)</label
 				>
 				<input
 					id="tags"
-					class="w-full px-3 py-2 bg-gray-900 border border-gray-700 rounded"
+					class="w-full rounded border border-gray-700 bg-gray-900 px-3 py-2"
 					bind:value={meta.tag}
 				/>
 			</div>
 			<div>
-				<label class="block mb-1 text-sm" for="heroImage">Image de couverture (URL)</label>
+				<label class="mb-1 block text-sm" for="heroImage">Image de couverture (URL)</label>
 				<input
 					id="heroImage"
-					class="w-full px-3 py-2 bg-gray-900 border border-gray-700 rounded"
+					class="w-full rounded border border-gray-700 bg-gray-900 px-3 py-2"
 					bind:value={meta.heroImage}
 				/>
-				<div class="flex items-center gap-2 mt-2">
+				<div class="mt-2 flex items-center gap-2">
 					<input
 						type="file"
 						accept="image/*"
 						onchange={handleCoverUpload}
-						class="text-xs file:mr-4 file:py-1 file:px-2 file:rounded file:border-0 file:text-xs file:bg-gray-700 file:text-white hover:file:bg-gray-600"
+						class="text-xs file:mr-4 file:rounded file:border-0 file:bg-gray-700 file:px-2 file:py-1 file:text-xs file:text-white hover:file:bg-gray-600"
 					/>
 					{#if meta.heroImage}
 						<img
 							src={meta.heroImage}
 							alt="couverture"
-							class="object-cover w-10 h-10 border border-gray-700 rounded"
+							class="h-10 w-10 rounded border border-gray-700 object-cover"
 						/>
 					{/if}
 				</div>
 			</div>
 			<div>
-				<label class="block mb-1 text-sm" for="heroAlt">Texte alternatif</label>
+				<label class="mb-1 block text-sm" for="heroAlt">Texte alternatif</label>
 				<input
 					id="heroAlt"
-					class="w-full px-3 py-2 bg-gray-900 border border-gray-700 rounded"
+					class="w-full rounded border border-gray-700 bg-gray-900 px-3 py-2"
 					bind:value={meta.heroAlt}
 				/>
 			</div>
 			<div class="grid grid-cols-2 gap-2">
 				<div>
-					<label class="block mb-1 text-sm" for="authorName">Auteur</label>
+					<label class="mb-1 block text-sm" for="authorName">Auteur</label>
 					<input
 						id="authorName"
-						class="w-full px-3 py-2 bg-gray-900 border border-gray-700 rounded"
+						class="w-full rounded border border-gray-700 bg-gray-900 px-3 py-2"
 						bind:value={meta.author.name}
 					/>
 				</div>
 				<div>
-					<label class="block mb-1 text-sm" for="authorRole">Rôle</label>
+					<label class="mb-1 block text-sm" for="authorRole">Rôle</label>
 					<input
 						id="authorRole"
-						class="w-full px-3 py-2 bg-gray-900 border border-gray-700 rounded"
+						class="w-full rounded border border-gray-700 bg-gray-900 px-3 py-2"
 						bind:value={meta.author.role}
 					/>
 				</div>
 			</div>
 
 			<button
-				class="px-4 py-2 text-white rounded bg-primary-600 hover:bg-primary-700 disabled:opacity-50"
+				class="bg-primary-600 hover:bg-primary-700 rounded px-4 py-2 text-white disabled:opacity-50"
 				onclick={preventDefault(save)}
 				disabled={saving}
 			>
@@ -623,7 +623,7 @@
 
 {#if saving || message}
 	<div class="fixed inset-0 z-50 flex items-center justify-center bg-black/50">
-		<div class="p-6 bg-gray-800 rounded-lg shadow-xl border border-gray-700 max-w-sm w-full">
+		<div class="w-full max-w-sm rounded-lg border border-gray-700 bg-gray-800 p-6 shadow-xl">
 			{#if saveSteps.length > 0}
 				<div class="mb-4">
 					<Stepper steps={saveSteps} />
@@ -632,11 +632,11 @@
 			<div class="mb-4 text-lg font-semibold text-white">
 				{saving ? 'Enregistrement en cours...' : 'Information'}
 			</div>
-			<div class="text-gray-300 mb-4">{message}</div>
+			<div class="mb-4 text-gray-300">{message}</div>
 			{#if !saving}
 				<div class="flex justify-end">
 					<button
-						class="px-4 py-2 text-white rounded bg-primary-600 hover:bg-primary-700"
+						class="bg-primary-600 hover:bg-primary-700 rounded px-4 py-2 text-white"
 						onclick={() => (message = '')}>Fermer</button
 					>
 				</div>

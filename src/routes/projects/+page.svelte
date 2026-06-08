@@ -188,19 +188,19 @@
 
 <svelte:window onclick={handleWindowClick} />
 
-<div class="flex flex-col items-start justify-center w-full gap-6 px-4 py-8 mx-auto max-w-7xl">
-	<div class="flex items-center justify-between w-full h-14">
-		<h2 class="self-center w-full h-full text-3xl font-bold tracking-tight text-white align-middle">
+<div class="mx-auto flex w-full max-w-7xl flex-col items-start justify-center gap-6 px-4 py-8">
+	<div class="flex h-14 w-full items-center justify-between">
+		<h2 class="h-full w-full self-center align-middle text-3xl font-bold tracking-tight text-white">
 			{#if user?.projects?.length > 1}
 				<div class="relative inline-block h-full min-w-64 md:min-w-72" bind:this={dropdownEl}>
 					<button
-						class="flex items-center justify-between w-full h-full px-6 py-2 text-2xl font-bold text-white bg-gray-900 border border-gray-800 rounded-md hover:bg-gray-800"
+						class="flex h-full w-full items-center justify-between rounded-md border border-gray-800 bg-gray-900 px-6 py-2 text-2xl font-bold text-white hover:bg-gray-800"
 						onclick={() => (showDropdown = !showDropdown)}
 						type="button"
 					>
 						{user.projects.find((p) => p.id === selectedProjectId)?.name ||
 							'Sélectionner un projet'}
-						<svg class="w-6 h-6 ml-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+						<svg class="ml-2 h-6 w-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
 							<path
 								stroke-linecap="round"
 								stroke-linejoin="round"
@@ -211,7 +211,7 @@
 					</button>
 					{#if showDropdown}
 						<ul
-							class="absolute z-20 w-full mt-1 overflow-hidden bg-gray-800 border border-gray-700 shadow-xl rounded-xl"
+							class="absolute z-20 mt-1 w-full overflow-hidden rounded-xl border border-gray-700 bg-gray-800 shadow-xl"
 						>
 							{#each user.projects as p (p.id)}
 								<li>
@@ -232,13 +232,13 @@
 				</div>
 			{:else}
 				{project.name}
-				<span class="text-xl italic text-gray-400">({project.debut?.split('-')[0]})</span>
+				<span class="text-xl text-gray-400 italic">({project.debut?.split('-')[0]})</span>
 			{/if}
 		</h2>
-		<div class="flex items-center h-full gap-2">
+		<div class="flex h-full items-center gap-2">
 			<select
 				id="year"
-				class="h-full px-3 py-2 text-white bg-gray-900 border border-gray-800 rounded-md"
+				class="h-full rounded-md border border-gray-800 bg-gray-900 px-3 py-2 text-white"
 				onchange={handleYearChange}
 				bind:value={selectedYear}
 				aria-label="Sélection de l'année du budget"
@@ -256,17 +256,17 @@
 
 	<!-- Top summary and budget card -->
 	<div class="grid w-full gap-6 md:grid-cols-2">
-		<div class="p-5 bg-gray-900 border border-gray-800 rounded-xl">
+		<div class="rounded-xl border border-gray-800 bg-gray-900 p-5">
 			<div class="flex items-center justify-between">
 				<h3 class="text-2xl font-bold tracking-tight text-white">Budget</h3>
 				<div class="flex items-center space-x-3 text-white/80">
 					<span class="text-lg font-semibold">{fmt(project.budget?.budget ?? 0)} €</span>
-					<span class="px-2 py-0.5 text-sm rounded bg-gray-800 border border-gray-700"
+					<span class="rounded border border-gray-700 bg-gray-800 px-2 py-0.5 text-sm"
 						>{project.budget?.year ?? 0}</span
 					>
 				</div>
 			</div>
-			<div class="grid items-center gap-4 mt-4 sm:grid-cols-2">
+			<div class="mt-4 grid items-center gap-4 sm:grid-cols-2">
 				<div class="h-56">
 					<Pie data={budgetChartData} options={{ responsive: true, maintainAspectRatio: false }} />
 				</div>
@@ -290,19 +290,19 @@
 
 		<!-- Quick facts card -->
 		<div class="grid grid-cols-2 gap-4">
-			<div class="p-5 bg-gray-900 border border-gray-800 rounded-xl">
+			<div class="rounded-xl border border-gray-800 bg-gray-900 p-5">
 				<p class="text-sm text-white/70">Nombre de sites</p>
 				<p class="mt-1 text-2xl font-bold text-white">{stats.websites.length}</p>
 			</div>
-			<div class="p-5 bg-gray-900 border border-gray-800 rounded-xl">
+			<div class="rounded-xl border border-gray-800 bg-gray-900 p-5">
 				<p class="text-sm text-white/70">Tags</p>
 				<p class="mt-1 text-2xl font-bold text-white">{stats.tags.length}</p>
 			</div>
-			<div class="p-5 bg-gray-900 border border-gray-800 rounded-xl">
+			<div class="rounded-xl border border-gray-800 bg-gray-900 p-5">
 				<p class="text-sm text-white/70">Utilisateurs</p>
 				<p class="mt-1 text-2xl font-bold text-white">{stats.users.length}</p>
 			</div>
-			<div class="p-5 bg-gray-900 border border-gray-800 rounded-xl">
+			<div class="rounded-xl border border-gray-800 bg-gray-900 p-5">
 				<p class="text-sm text-white/70">Banques</p>
 				<p class="mt-1 text-2xl font-bold text-white">{stats.banks.length}</p>
 			</div>
@@ -310,8 +310,8 @@
 	</div>
 
 	<!-- Aggregated charts -->
-	<div class="grid w-full gap-6 mt-4 md:grid-cols-2">
-		<div class="p-5 bg-gray-900 border border-gray-800 rounded-xl">
+	<div class="mt-4 grid w-full gap-6 md:grid-cols-2">
+		<div class="rounded-xl border border-gray-800 bg-gray-900 p-5">
 			<h3 class="mb-2 text-xl font-bold text-white">Sites les plus utilisés</h3>
 			<div class="h-72">
 				<Bar
@@ -330,7 +330,7 @@
 			</div>
 		</div>
 
-		<div class="p-5 bg-gray-900 border border-gray-800 rounded-xl">
+		<div class="rounded-xl border border-gray-800 bg-gray-900 p-5">
 			<h3 class="mb-2 text-xl font-bold text-white">Plus gros utilisateurs</h3>
 			<div class="h-72">
 				<Bar
@@ -349,7 +349,7 @@
 			</div>
 		</div>
 
-		<div class="p-5 bg-gray-900 border border-gray-800 rounded-xl">
+		<div class="rounded-xl border border-gray-800 bg-gray-900 p-5">
 			<h3 class="mb-2 text-xl font-bold text-white">Tags les plus utilisés</h3>
 			<div class="h-72">
 				<Bar
@@ -368,7 +368,7 @@
 			</div>
 		</div>
 
-		<div class="p-5 bg-gray-900 border border-gray-800 rounded-xl">
+		<div class="rounded-xl border border-gray-800 bg-gray-900 p-5">
 			<h3 class="mb-2 text-xl font-bold text-white">Banques les plus utilisées</h3>
 			<div class="h-72">
 				<Bar

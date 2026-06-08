@@ -1,0 +1,69 @@
+import { describe, expect, it, vi } from 'vitest';
+
+vi.mock('$lib/helpers/parisTime', () => ({
+	formatParisDateTimeShort: vi.fn((value: string) => `short:${value}`)
+}));
+
+import {
+	createSlotTableItems,
+	createTrainingTableItems,
+	findTrainingName,
+	formatSlotDate
+} from '../../src/lib/helpers/trainingTables';
+
+describe('training table helpers', () => {
+	it('formatSlotDate uses paris short datetime formatter', () => {
+		expect(formatSlotDate('2025-01-10T10:00:00.000Z')).toBe('short:2025-01-10T10:00:00.000Z');
+	});
+
+	it('findTrainingName resolves known and unknown ids', () => {
+		expect(findTrainingName(2, [{ training_id: 2, name: 'TS' }] as any)).toBe('TS');
+		expect(findTrainingName(9, [{ training_id: 2, name: 'TS' }] as any)).toBe('Formation');
+	});
+
+	it('createTrainingTableItems returns index and display rows', () => {
+		const { index, rows } = createTrainingTableItems([
+			{ id: 1, name: 'Svelte', description: '', prerequisites: '', category: 'software' }
+		]);
+
+		expect(index.get(1)).toMatchObject({ training_id: 1, name: 'Svelte' });
+		expect(rows[0][0]).toEqual({ value: 'Svelte', data: 1 });
+		expect(rows[0][2]).toEqual({ value: 'Aucune description' });
+	});
+
+	it('createSlotTableItems maps nested slot/trainer data', () => {
+		const { index, rows } = createSlotTableItems([
+			{
+				id: 3,
+				training_id: 1,
+				custom_name: null,
+				custom_description: null,
+				custom_prerequisites: null,
+				start: '2025-01-10T10:00:00.000Z',
+				duration_hours: 2,
+				on_site_seats: 10,
+				remote_seats: 5,
+				location: 'Fablab',
+				video_conference_link: null,
+				excusable: true,
+				status: 'draft',
+				trainer_id: 't-1',
+				training: {
+					name: 'Svelte',
+					description: 'Desc',
+					prerequisites: 'JS',
+					category: 'software'
+				},
+				profiles: {}
+			}
+		]);
+
+		expect(index.get(3)).toMatchObject({
+			slot_id: 3,
+			name: 'Svelte',
+			trainer_username: null
+		});
+		expect(rows[0][0].value).toBe('short:2025-01-10T10:00:00.000Z');
+		expect(rows[0][2].value).toBe('À définir');
+	});
+});

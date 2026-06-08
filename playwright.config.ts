@@ -1,6 +1,7 @@
 import { defineConfig } from '@playwright/test';
 
 const PORT = 4173;
+const HOST = `http://127.0.0.1:${String(PORT)}`;
 
 export default defineConfig({
 	testDir: 'tests/e2e',
@@ -11,11 +12,11 @@ export default defineConfig({
 	workers: process.env.CI ? 1 : undefined,
 	reporter: process.env.CI ? [['github'], ['html', { open: 'never' }]] : 'list',
 	use: {
-		baseURL: `http://127.0.0.1:${PORT}`,
+		baseURL: HOST,
 		trace: 'retain-on-failure'
 	},
 	webServer: {
-		command: `pnpm build && pnpm preview --host 127.0.0.1 --port ${PORT}`,
+		command: `pnpm build && pnpm preview --host 127.0.0.1 --port ${String(PORT)}`,
 		port: PORT,
 		reuseExistingServer: !process.env.CI,
 		timeout: 120000

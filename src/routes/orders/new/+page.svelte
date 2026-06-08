@@ -119,7 +119,7 @@
 				<div class="flex flex-col items-end sm:flex-row">
 					<div class="w-20 sm:mr-5">
 						<button
-							class="justify-center w-full px-4 py-2 text-sm font-medium text-white align-middle transition-all border-2 border-dashed rounded-lg focus:ring-4 hover:bg-primary-600 hover:border-transparent focus:outline-none focus:ring-primary-800"
+							class="hover:bg-primary-600 focus:ring-primary-800 w-full justify-center rounded-lg border-2 border-dashed px-4 py-2 align-middle text-sm font-medium text-white transition-all hover:border-transparent focus:ring-4 focus:outline-none"
 							onclick={(e) => {
 								e.preventDefault();
 								if (items.length > 1) {
@@ -130,14 +130,14 @@
 							-
 						</button>
 					</div>
-					<form class="grid w-full grid-flow-row gap-5 objects md:grid-flow-col">
+					<form class="objects grid w-full grid-flow-row gap-5 md:grid-flow-col">
 						<div>
 							<label for="name">Nom</label>
 							<input
 								type="text"
 								name={`name-${i}`}
 								id={`name-${i}`}
-								class=" border text-sm rounded-lg w-full p-2.5 bg-gray-700 border-gray-600 placeholder-gray-400 text-white focus:ring-primary-500 focus:border-primary-500"
+								class=" focus:ring-primary-500 focus:border-primary-500 w-full rounded-lg border border-gray-600 bg-gray-700 p-2.5 text-sm text-white placeholder-gray-400"
 								placeholder="Vis"
 								required
 								bind:value={item.nom}
@@ -149,7 +149,7 @@
 								type="text"
 								name={`lien-${i}`}
 								id={`lien-${i}`}
-								class=" border text-sm rounded-lg w-full p-2.5 bg-gray-700 border-gray-600 placeholder-gray-400 text-white focus:ring-primary-500 focus:border-primary-500"
+								class=" focus:ring-primary-500 focus:border-primary-500 w-full rounded-lg border border-gray-600 bg-gray-700 p-2.5 text-sm text-white placeholder-gray-400"
 								placeholder="https://fr.rs-online.com/web/"
 								required
 								bind:value={item.lien}
@@ -162,7 +162,7 @@
 									type="number"
 									name={`price-${i}`}
 									id={`price-${i}`}
-									class=" border-s border-y text-sm rounded-s-lg w-full p-2.5 bg-gray-700 border-gray-600 placeholder-gray-400 text-white focus:ring-primary-500 focus:border-primary-500"
+									class=" focus:ring-primary-500 focus:border-primary-500 w-full rounded-s-lg border-y border-s border-gray-600 bg-gray-700 p-2.5 text-sm text-white placeholder-gray-400"
 									placeholder="15.5"
 									required
 									bind:value={item.price}
@@ -170,7 +170,7 @@
 									min="0"
 								/>
 								<div
-									class=" border text-sm rounded-e-lg block w-7 p-2.5 bg-gray-700 border-gray-600 placeholder-gray-400 text-gray-400 focus:ring-primary-500 focus:border-primary-500"
+									class=" focus:ring-primary-500 focus:border-primary-500 block w-7 rounded-e-lg border border-gray-600 bg-gray-700 p-2.5 text-sm text-gray-400 placeholder-gray-400"
 								>
 									€
 								</div>
@@ -182,7 +182,7 @@
 								type="number"
 								name={`quantity-${i}`}
 								id={`quantity-${i}`}
-								class=" border text-sm rounded-lg w-full p-2.5 bg-gray-700 border-gray-600 placeholder-gray-400 text-white focus:ring-primary-500 focus:border-primary-500"
+								class=" focus:ring-primary-500 focus:border-primary-500 w-full rounded-lg border border-gray-600 bg-gray-700 p-2.5 text-sm text-white placeholder-gray-400"
 								placeholder="5"
 								required
 								bind:value={item.quantity}
@@ -197,7 +197,7 @@
 			<div class="my-5">
 				<button
 					type="button"
-					class="w-full px-4 text-xl text-white align-middle transition-all border-2 border-gray-100 border-dashed rounded-lg focus:ring-4 hover:bg-primary-600 hover:border-transparent focus:outline-none focus:ring-primary-800"
+					class="hover:bg-primary-600 focus:ring-primary-800 w-full rounded-lg border-2 border-dashed border-gray-100 px-4 align-middle text-xl text-white transition-all hover:border-transparent focus:ring-4 focus:outline-none"
 					onclick={(e) => {
 						e.preventDefault();
 						items = [...items, { nom: '', lien: '', price: '', quantity: '' }];
@@ -208,13 +208,13 @@
 			</div>
 		</div>
 		<h3 class="mb-2 text-2xl font-bold tracking-tight text-white">Détails</h3>
-		<div class="grid gap-5 ml-5 details">
+		<div class="details ml-5 grid gap-5">
 			<div class="col-span-2">
 				<label for="comment">Commentaire</label>
 				<textarea
 					name="comment"
 					id="comment"
-					class=" border text-sm rounded-lg block w-full p-2.5 bg-gray-700 border-gray-600 placeholder-gray-400 text-white focus:ring-primary-500 focus:border-primary-500"
+					class=" focus:ring-primary-500 focus:border-primary-500 block w-full rounded-lg border border-gray-600 bg-gray-700 p-2.5 text-sm text-white placeholder-gray-400"
 					placeholder="Commentaire"
 				></textarea>
 			</div>
@@ -224,7 +224,7 @@
 					id="tags"
 					multiple
 					size="3"
-					class=" border text-sm rounded-lg block w-full p-2.5 bg-gray-700 border-gray-600 placeholder-gray-400 text-white focus:ring-primary-500 focus:border-primary-500"
+					class=" focus:ring-primary-500 focus:border-primary-500 block w-full rounded-lg border border-gray-600 bg-gray-700 p-2.5 text-sm text-white placeholder-gray-400"
 					bind:value={selectedTags}
 				>
 					{#each TAG_OPTIONS as t}
@@ -241,7 +241,7 @@
 					<select
 						name="project"
 						id="project"
-						class=" border text-sm rounded-lg block w-full p-2.5 bg-gray-700 border-gray-600 placeholder-gray-400 text-white focus:ring-primary-500 focus:border-primary-500"
+						class=" focus:ring-primary-500 focus:border-primary-500 block w-full rounded-lg border border-gray-600 bg-gray-700 p-2.5 text-sm text-white placeholder-gray-400"
 					>
 						{#each Object.entries(projectTitle) as [key, value]}
 							<option value={key}>{value}</option>
@@ -253,7 +253,7 @@
 			<div class="col-span-2">
 				<button
 					type="submit"
-					class="px-4 py-2 text-sm font-medium text-white transition-all rounded-lg bg-primary-600 focus:ring-4 hover:bg-primary-800 hover:border-transparent focus:outline-none focus:ring-primary-800"
+					class="bg-primary-600 hover:bg-primary-800 focus:ring-primary-800 rounded-lg px-4 py-2 text-sm font-medium text-white transition-all hover:border-transparent focus:ring-4 focus:outline-none"
 					onclick={onSubmit}>Envoyer</button
 				>
 			</div>

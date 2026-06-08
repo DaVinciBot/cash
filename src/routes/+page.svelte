@@ -231,7 +231,7 @@
 	});
 </script>
 
-<div class="flex items-center justify-between w-full sm:px-8 lg:px-16">
+<div class="flex w-full items-center justify-between sm:px-8 lg:px-16">
 	<h2 class="mb-4 text-4xl font-bold tracking-tight text-white">
 		Bonjour {user?.name ?? 'utilisateur'}
 	</h2>
@@ -242,7 +242,7 @@
 	</p>
 </div>
 <div class="w-full py-2 sm:px-8 lg:px-16">
-	<div class="bg-gray-800 rounded-lg">
+	<div class="rounded-lg bg-gray-800">
 		<Table
 			{headers}
 			{dbInfo}

@@ -706,22 +706,22 @@
 	<hr class="mt-2 border-gray-700" />
 
 	<!-- Tabs header -->
-	<div class="flex gap-2 mt-4">
+	<div class="mt-4 flex gap-2">
 		<button
-			class="px-4 py-2 text-sm font-medium rounded-md border transition-colors
+			class="rounded-md border px-4 py-2 text-sm font-medium transition-colors
 				{selectedTab === 'detail'
-				? 'bg-gray-700 border-gray-600 text-white'
-				: 'bg-gray-800 border-gray-700 text-gray-300 hover:bg-gray-750'}"
+				? 'border-gray-600 bg-gray-700 text-white'
+				: 'hover:bg-gray-750 border-gray-700 bg-gray-800 text-gray-300'}"
 			onclick={() => (selectedTab = 'detail')}
 			aria-pressed={selectedTab === 'detail'}
 		>
 			Détail
 		</button>
 		<button
-			class="px-4 py-2 text-sm font-medium rounded-md border transition-colors
+			class="rounded-md border px-4 py-2 text-sm font-medium transition-colors
 				{selectedTab === 'cashflow'
-				? 'bg-gray-700 border-gray-600 text-white'
-				: 'bg-gray-800 border-gray-700 text-gray-300 hover:bg-gray-750'}"
+				? 'border-gray-600 bg-gray-700 text-white'
+				: 'hover:bg-gray-750 border-gray-700 bg-gray-800 text-gray-300'}"
 			onclick={() => (selectedTab = 'cashflow')}
 			aria-pressed={selectedTab === 'cashflow'}
 		>
@@ -738,7 +738,7 @@
 						id="start"
 						type="date"
 						bind:value={startDate}
-						class="px-3 py-2 text-white bg-gray-900 border border-gray-800 rounded-md"
+						class="rounded-md border border-gray-800 bg-gray-900 px-3 py-2 text-white"
 						onchange={loadCashflow}
 					/>
 				</div>
@@ -748,13 +748,13 @@
 						id="end"
 						type="date"
 						bind:value={endDate}
-						class="px-3 py-2 text-white bg-gray-900 border border-gray-800 rounded-md"
+						class="rounded-md border border-gray-800 bg-gray-900 px-3 py-2 text-white"
 						onchange={loadCashflow}
 					/>
 				</div>
 			</div>
 
-			<div class="p-4 mt-4 bg-gray-900 border border-gray-800 h-80 rounded-xl">
+			<div class="mt-4 h-80 rounded-xl border border-gray-800 bg-gray-900 p-4">
 				{#if isLoadingCashflow}
 					<div class="text-sm text-gray-400">Chargement du cashflow…</div>
 				{:else}
@@ -765,9 +765,9 @@
 	{:else}
 		<div class="mt-4">
 			<!-- Bank accounts aggregate + collapsible details -->
-			<div class="overflow-hidden bg-gray-800 border border-gray-700 rounded-lg">
+			<div class="overflow-hidden rounded-lg border border-gray-700 bg-gray-800">
 				<button
-					class="flex items-center justify-between w-full px-4 py-4 sm:px-6 focus:outline-none hover:bg-gray-750/50"
+					class="hover:bg-gray-750/50 flex w-full items-center justify-between px-4 py-4 focus:outline-none sm:px-6"
 					aria-expanded={banksOpen}
 					onclick={() => (banksOpen = !banksOpen)}
 				>
@@ -784,7 +784,7 @@
 							>
 						{/if}
 						<svg
-							class="w-5 h-5 text-gray-400 transition-transform duration-200 transform"
+							class="h-5 w-5 transform text-gray-400 transition-transform duration-200"
 							viewBox="0 0 20 20"
 							fill="currentColor"
 							style={`transform: rotate(${banksOpen ? 180 : 0}deg)`}
@@ -816,7 +816,7 @@
 												<span class="font-medium text-white">{bank.name ?? 'Compte sans nom'}</span>
 												{#if bank.category}
 													<span
-														class="text-xs px-2 py-0.5 rounded-full bg-gray-700 text-gray-300 border border-gray-600"
+														class="rounded-full border border-gray-600 bg-gray-700 px-2 py-0.5 text-xs text-gray-300"
 														>{bank.category}</span
 													>
 												{/if}
@@ -840,8 +840,8 @@
 				{/if}
 			</div>
 
-			<div class="w-full mt-4">
-				<div class="bg-gray-800 rounded-lg">
+			<div class="mt-4 w-full">
+				<div class="rounded-lg bg-gray-800">
 					<Table
 						{addNew}
 						{parseItems}

@@ -68,10 +68,10 @@
 	<meta name="googlebot" content="noindex, nofollow" />
 </svelte:head>
 
-<div class="min-h-screen antialiased bg-dark-blue text-white min-w-screen font-['Almarai']">
-	<div class="min-h-screen overflow-hidden antialiased bg-gray-900 min-w-screen">
+<div class="bg-dark-blue min-h-screen min-w-screen font-['Almarai'] text-white antialiased">
+	<div class="min-h-screen min-w-screen overflow-hidden bg-gray-900 antialiased">
 		<nav
-			class=" border-b px-4 py-2.5 bg-gray-800 border-gray-700 fixed left-0 right-0 top-0 z-50 w-screen"
+			class=" fixed top-0 right-0 left-0 z-50 w-screen border-b border-gray-700 bg-gray-800 px-4 py-2.5"
 		>
 			<div class="flex flex-wrap items-center justify-between">
 				<div class="flex items-center justify-start">
@@ -79,14 +79,14 @@
 						data-drawer-target="drawer-navigation"
 						data-drawer-toggle="drawer-navigation"
 						aria-controls="drawer-navigation"
-						class="p-2 mr-2 text-gray-400 rounded-lg cursor-pointer md:hidden focus:bg-gray-700 focus:ring-2 focus:ring-gray-100 focus:ring-gray-700 hover:bg-gray-700 hover:text-white"
+						class="mr-2 cursor-pointer rounded-lg p-2 text-gray-400 hover:bg-gray-700 hover:text-white focus:bg-gray-700 focus:ring-2 focus:ring-gray-100 focus:ring-gray-700 md:hidden"
 						onclick={(e) => {
 							open = !open;
 						}}
 					>
 						<svg
 							aria-hidden="true"
-							class="w-6 h-6"
+							class="h-6 w-6"
 							fill="currentColor"
 							viewBox="0 0 20 20"
 							xmlns="http://www.w3.org/2000/svg"
@@ -99,7 +99,7 @@
 						</svg>
 						<svg
 							aria-hidden="true"
-							class="hidden w-6 h-6"
+							class="hidden h-6 w-6"
 							fill="currentColor"
 							viewBox="0 0 20 20"
 							xmlns="http://www.w3.org/2000/svg"
@@ -112,10 +112,10 @@
 						</svg>
 						<span class="sr-only">Toggle sidebar</span>
 					</button>
-					<a href="/admin" class="flex items-center justify-between mr-4">
-						<img src="/admin/white_logo_notext.webp" class="h-8 mr-3" alt="Davincibot Logo" />
+					<a href="/admin" class="mr-4 flex items-center justify-between">
+						<img src="/admin/white_logo_notext.webp" class="mr-3 h-8" alt="Davincibot Logo" />
 						<span
-							class="self-center hidden text-2xl font-semibold text-white whitespace-nowrap sm:block"
+							class="hidden self-center text-2xl font-semibold whitespace-nowrap text-white sm:block"
 							>DaVinciBot</span
 						>
 					</a>
@@ -125,7 +125,7 @@
 					{#if canCreateOrder}
 						<a
 							type="button"
-							class="flex items-center justify-center p-2 py-2 mr-2 text-sm font-medium text-white rounded-lg focus:ring-4 sm:px-4 bg-primary-600 hover:bg-primary-800 focus:outline-none focus:ring-primary-800"
+							class="bg-primary-600 hover:bg-primary-800 focus:ring-primary-800 mr-2 flex items-center justify-center rounded-lg p-2 py-2 text-sm font-medium text-white focus:ring-4 focus:outline-none sm:px-4"
 							href="/admin/orders/new"
 						>
 							<svg

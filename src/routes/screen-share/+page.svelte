@@ -128,7 +128,7 @@
 
 <!-- Info Button (top right, outside layout) -->
 <button
-	class="fixed z-20 p-2 rounded-full top-20 right-4 hover:bg-gray-600 focus:outline-none"
+	class="fixed top-20 right-4 z-20 rounded-full p-2 hover:bg-gray-600 focus:outline-none"
 	onclick={(e) => {
 		e.stopPropagation();
 		showToolbox = !showToolbox;
@@ -136,7 +136,7 @@
 	aria-label="Afficher les instructions"
 >
 	<svg
-		class="w-6 h-6 text-blue-500"
+		class="h-6 w-6 text-blue-500"
 		fill="none"
 		stroke="currentColor"
 		stroke-width="2"
@@ -151,12 +151,12 @@
 <!-- Info Toolbox (top right, outside layout) -->
 <div
 	id="infoToolbox"
-	class="fixed top-16 w-[400px] right-4 md:w-[500px] max-w-full z-20 flex items-start p-4 mb-6 text-blue-900 bg-blue-100 border-l-4 border-blue-500 rounded shadow-lg transition-transform {showToolbox
+	class="fixed top-16 right-4 z-20 mb-6 flex w-[400px] max-w-full items-start rounded border-l-4 border-blue-500 bg-blue-100 p-4 text-blue-900 shadow-lg transition-transform md:w-[500px] {showToolbox
 		? ''
 		: 'translate-x-[120%]'}"
 >
 	<svg
-		class="flex-shrink-0 w-6 h-6 mr-3 text-blue-500"
+		class="mr-3 h-6 w-6 flex-shrink-0 text-blue-500"
 		fill="none"
 		stroke="currentColor"
 		stroke-width="2"
@@ -168,7 +168,7 @@
 	</svg>
 	<div>
 		<p class="mb-1 font-semibold">Comment se connecter&nbsp;?</p>
-		<ul class="text-sm list-disc list-inside">
+		<ul class="list-inside list-disc text-sm">
 			<li>
 				Vous devez être connecté au réseau <span class="font-semibold">Wi-Fi DVB</span>
 			</li>
@@ -185,11 +185,11 @@
 	</div>
 </div>
 
-<div class="flex flex-col items-center justify-center px-4 h-page">
-	<div class="w-full max-w-md p-8 bg-gray-800 shadow-lg rounded-xl">
-		<div class="flex items-center mb-6">
+<div class="h-page flex flex-col items-center justify-center px-4">
+	<div class="w-full max-w-md rounded-xl bg-gray-800 p-8 shadow-lg">
+		<div class="mb-6 flex items-center">
 			<svg
-				class="w-8 h-8 mr-3 text-white"
+				class="mr-3 h-8 w-8 text-white"
 				fill="none"
 				stroke="currentColor"
 				stroke-width="2"
@@ -210,9 +210,9 @@
 			</svg>
 			<h1 class="text-2xl font-bold text-gray-200">SmartShare</h1>
 		</div>
-		<div class="flex items-center mb-4">
+		<div class="mb-4 flex items-center">
 			<svg
-				class="w-5 h-5 mr-2 {connected ? 'text-green-600' : 'text-red-600'}"
+				class="mr-2 h-5 w-5 {connected ? 'text-green-600' : 'text-red-600'}"
 				fill="none"
 				stroke={connected ? 'green' : 'red'}
 				stroke-width="2"
@@ -223,15 +223,15 @@
 			<p class="text-gray-300">
 				Statut WebSocket
 				<span
-					class="{connected ? 'text-green-600 font-semibold' : 'text-red-600 font-semibold'} pl-5"
+					class="{connected ? 'font-semibold text-green-600' : 'font-semibold text-red-600'} pl-5"
 				>
 					{connected ? 'Connecté' : 'Déconnecté'}
 				</span>
 			</p>
 		</div>
-		<div class="flex items-center mb-6">
+		<div class="mb-6 flex items-center">
 			<svg
-				class="w-5 h-5 mr-2 {sharing ? 'text-primary-600' : 'text-gray-400'}"
+				class="mr-2 h-5 w-5 {sharing ? 'text-primary-600' : 'text-gray-400'}"
 				fill="none"
 				stroke={sharing ? 'blue' : 'gray'}
 				stroke-width="2"
@@ -251,7 +251,7 @@
 			<p class="text-gray-300">
 				Statut partage
 				<span
-					class="{sharing ? 'text-primary-600 font-semibold' : 'text-gray-400 font-semibold'} pl-5"
+					class="{sharing ? 'text-primary-600 font-semibold' : 'font-semibold text-gray-400'} pl-5"
 				>
 					{sharing ? 'En cours' : 'Non démarré'}
 				</span>
@@ -261,10 +261,10 @@
 			<button
 				onclick={startShare}
 				disabled={!canCastSmartShare || is_busy || sharing}
-				class="flex-1 px-4 py-2 font-semibold text-white transition rounded bg-primary-600 hover:bg-primary-700 disabled:opacity-50 disabled:cursor-not-allowed"
+				class="bg-primary-600 hover:bg-primary-700 flex-1 rounded px-4 py-2 font-semibold text-white transition disabled:cursor-not-allowed disabled:opacity-50"
 			>
 				<svg
-					class="inline w-5 h-5 mr-2 -mt-1"
+					class="-mt-1 mr-2 inline h-5 w-5"
 					fill="none"
 					stroke="currentColor"
 					stroke-width="2"
@@ -288,10 +288,10 @@
 			{#if canManageTraining}
 				<button
 					onclick={sendKill}
-					class="flex-1 px-4 py-2 ml-4 font-semibold text-white transition bg-red-500 rounded hover:bg-red-600"
+					class="ml-4 flex-1 rounded bg-red-500 px-4 py-2 font-semibold text-white transition hover:bg-red-600"
 				>
 					<svg
-						class="inline w-5 h-5 mr-2 -mt-1"
+						class="-mt-1 mr-2 inline h-5 w-5"
 						fill="none"
 						stroke="currentColor"
 						stroke-width="2"

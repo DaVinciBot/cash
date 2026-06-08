@@ -541,11 +541,11 @@ DVBisous ! :robot:`;
 
 <section class="px-4 py-6 sm:px-6 sm:py-8">
 	<div class="mx-auto flex w-full max-w-6xl flex-col gap-8">
-		<section class="rounded-[22px] border border-light-blue/10 bg-dark-blue/70 p-4 sm:p-5">
+		<section class="border-light-blue/10 bg-dark-blue/70 rounded-[22px] border p-4 sm:p-5">
 			<div class="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
 				<div>
 					<h2 class="text-base font-semibold text-white">Calendrier public</h2>
-					<p class="text-xs text-light-blue/60">Consulter les formations publiées.</p>
+					<p class="text-light-blue/60 text-xs">Consulter les formations publiées.</p>
 				</div>
 				<CTAButton href="/formation" variant="secondary" size="sm" fullWidth={false}>
 					Voir le calendrier
@@ -562,11 +562,11 @@ DVBisous ! :robot:`;
 			onAddSlot={() => openSlotModal()}
 		/>
 
-		<section class="rounded-[22px] border border-light-blue/10 bg-dark-blue/70 p-4 sm:p-5">
+		<section class="border-light-blue/10 bg-dark-blue/70 rounded-[22px] border p-4 sm:p-5">
 			<div class="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
 				<div>
 					<h2 class="text-base font-semibold text-white">Discord</h2>
-					<p class="text-xs text-light-blue/60">Synthèse des formations.</p>
+					<p class="text-light-blue/60 text-xs">Synthèse des formations.</p>
 				</div>
 				<div class="flex flex-wrap gap-2">
 					<CTAButton
@@ -582,7 +582,7 @@ DVBisous ! :robot:`;
 				</div>
 			</div>
 			{#if summaryError}
-				<p class="mt-3 text-sm text-waiting">{summaryError}</p>
+				<p class="text-waiting mt-3 text-sm">{summaryError}</p>
 			{/if}
 		</section>
 
@@ -594,14 +594,14 @@ DVBisous ! :robot:`;
 			</Spinner>
 		{:else if error}
 			<div
-				class="flex flex-col items-center justify-center gap-3 rounded-[26px] border border-light-blue/20 bg-dark-blue/80 p-10 text-waiting"
+				class="border-light-blue/20 bg-dark-blue/80 text-waiting flex flex-col items-center justify-center gap-3 rounded-[26px] border p-10"
 			>
 				<p class="text-sm">{error}</p>
 				<CTAButton type="button" variant="peps" size="sm" onclick={loadData}>Réessayer</CTAButton>
 			</div>
 		{:else}
 			{#if formError}
-				<p class="text-sm text-waiting">{formError}</p>
+				<p class="text-waiting text-sm">{formError}</p>
 			{/if}
 
 			<div class="grid gap-8">

@@ -606,27 +606,27 @@
 	<h2 class="mb-4 text-4xl font-bold tracking-tight text-white">Gestion des Commandes</h2>
 	<p class="text-gray-400">Liste des commandes en cours</p>
 	<hr class="mt-2 border-gray-700" />
-	<div class="grid grid-cols-1 gap-4 my-6 sm:grid-cols-2 lg:grid-cols-4">
-		<div class="flex flex-col items-center p-6 bg-gray-800 rounded-lg">
+	<div class="my-6 grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-4">
+		<div class="flex flex-col items-center rounded-lg bg-gray-800 p-6">
 			<span class="text-3xl font-bold text-white">{pendingCount}</span>
 			<span class="mt-2 text-gray-400">En revue CDP</span>
 		</div>
-		<div class="flex flex-col items-center p-6 bg-gray-800 rounded-lg">
+		<div class="flex flex-col items-center rounded-lg bg-gray-800 p-6">
 			<span class="text-3xl font-bold text-white">{approvedCount}</span>
 			<span class="mt-2 text-gray-400">En revue Tréso</span>
 		</div>
-		<div class="flex flex-col items-center p-6 bg-gray-800 rounded-lg">
+		<div class="flex flex-col items-center rounded-lg bg-gray-800 p-6">
 			<span class="text-3xl font-bold text-white">{deliveryCount}</span>
 			<span class="mt-2 text-gray-400">À livrer</span>
 		</div>
-		<div class="flex flex-col items-center p-6 bg-gray-800 rounded-lg">
+		<div class="flex flex-col items-center rounded-lg bg-gray-800 p-6">
 			<span class="text-3xl font-bold text-white">{completedCount}</span>
 			<span class="mt-2 text-gray-400">Terminées</span>
 		</div>
 	</div>
 </div>
 <div class="w-full py-2 sm:px-8 lg:px-16">
-	<div class="bg-gray-800 rounded-lg">
+	<div class="rounded-lg bg-gray-800">
 		<Table
 			{headers}
 			{actions}

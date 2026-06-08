@@ -874,7 +874,7 @@
 		<h2 class="text-4xl font-bold tracking-tight text-white">Utilisateurs</h2>
 		{#if canEditMembers}
 			<span
-				class="inline-flex items-center rounded-full border border-amber-500/60 bg-amber-900/40 px-3 py-1 text-xs font-semibold uppercase tracking-wide text-amber-200"
+				class="inline-flex items-center rounded-full border border-amber-500/60 bg-amber-900/40 px-3 py-1 text-xs font-semibold tracking-wide text-amber-200 uppercase"
 			>
 				{pendingInvitesLoading
 					? 'Chargement...'
@@ -884,7 +884,7 @@
 	</div>
 </div>
 <div class="w-full py-2 sm:px-8 lg:px-16">
-	<div class="bg-gray-800 rounded-lg">
+	<div class="rounded-lg bg-gray-800">
 		<Table {headers} {parseItems} {filters} {dbInfo} {addNew} {actions} supabase={data.supabase} />
 	</div>
 </div>
@@ -919,7 +919,7 @@
 			{:else}
 				<div class="overflow-x-auto">
 					<table class="w-full text-left text-sm text-gray-300">
-						<thead class="border-b border-gray-700 text-xs uppercase tracking-wide text-gray-400">
+						<thead class="border-b border-gray-700 text-xs tracking-wide text-gray-400 uppercase">
 							<tr>
 								<th class="px-3 py-2">Email</th>
 								<th class="px-3 py-2">Invité le</th>
@@ -936,7 +936,7 @@
 									<td class="px-3 py-2 text-right">
 										<button
 											type="button"
-											class="rounded-lg bg-primary-700 px-3 py-1.5 text-sm font-medium text-white hover:bg-primary-800 disabled:cursor-not-allowed disabled:opacity-50"
+											class="bg-primary-700 hover:bg-primary-800 rounded-lg px-3 py-1.5 text-sm font-medium text-white disabled:cursor-not-allowed disabled:opacity-50"
 											onclick={() => reinvitePendingUser(authUser)}
 											disabled={reinvitingUserId !== null}
 										>
@@ -952,5 +952,3 @@
 		</div>
 	</div>
 {/if}
-
-<style></style>
