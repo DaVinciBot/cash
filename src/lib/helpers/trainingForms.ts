@@ -2,11 +2,11 @@ import { formatParisDatetimeLocal } from '$lib/helpers/parisTime';
 import { categoryOptions, statusOptions } from '$lib/helpers/trainingOptions';
 import type { TrainingListItem, TrainingSlotListItem } from '$lib/services/training';
 
-export type SummaryFieldsConfig = {
+export interface SummaryFieldsConfig {
 	from: string;
 	to: string;
 	text: string;
-};
+}
 
 export function buildSummaryFields({ from, to, text }: SummaryFieldsConfig) {
 	return [
@@ -35,12 +35,12 @@ export function buildSummaryFields({ from, to, text }: SummaryFieldsConfig) {
 	];
 }
 
-export type ProfileOption = {
+export interface ProfileOption {
 	id: string;
 	username: string | null;
 	avatar_url: string | null;
 	email: string | null;
-};
+}
 
 export function buildTrainingFields(training: TrainingListItem | null) {
 	return [
@@ -76,7 +76,7 @@ export function buildTrainingFields(training: TrainingListItem | null) {
 	];
 }
 
-export type SlotFieldsConfig = {
+export interface SlotFieldsConfig {
 	slot: TrainingSlotListItem | null;
 	trainings: TrainingListItem[];
 	profiles: ProfileOption[];
@@ -85,7 +85,7 @@ export type SlotFieldsConfig = {
 	searchProfiles: (search: string) => Promise<{ value: string; text: string; image?: string }[]>;
 	onTrainerChange?: (nextId: string | null) => void;
 	onTrainingChange?: (nextId: number | null) => void;
-};
+}
 
 export function buildSlotFields({
 	slot,
@@ -158,7 +158,9 @@ export function buildSlotFields({
 				const target = event.target as HTMLInputElement | null;
 				onTrainerChange?.(null);
 				const search = target?.value?.toLowerCase().trim() || '';
-				if (!search) return [];
+				if (!search) {
+					return [];
+				}
 				return searchProfiles(search);
 			},
 			onSelect: (nextId: string) => {

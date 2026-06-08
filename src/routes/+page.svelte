@@ -10,7 +10,7 @@
 	import ReadDrawer from '$lib/components/drawers/ReadDrawer.svelte';
 
 	/** @type {{data: any}} */
-	let { data } = $props();
+	const { data } = $props();
 
 	let skip = false;
 	let user = $state();
@@ -22,9 +22,16 @@
 		}
 	});
 
-	let headers = ['Objets', 'Date de création', 'Dernière mise à jour', 'Prix', 'Status', 'Actions'];
+	const headers = [
+		'Objets',
+		'Date de création',
+		'Dernière mise à jour',
+		'Prix',
+		'Status',
+		'Actions'
+	];
 
-	let filters = $state([
+	const filters = $state([
 		{
 			category: 'Status',
 			value: 'status',
@@ -48,7 +55,7 @@
 		filters[1].options[0].value = user?.id;
 	});
 
-	let actions = [
+	const actions = [
 		{
 			title: 'Voir',
 			type: 'view',
@@ -71,7 +78,7 @@
 				const price = data.price.toFixed(2);
 				const name = data.name;
 
-				let items = [];
+				const items = [];
 				data.items.forEach((item, i) => {
 					items.push({
 						name: item.name.length > 30 ? item.name.slice(0, 30) + '...' : item.name,
@@ -203,14 +210,14 @@
 		}
 	];
 
-	let dbInfo = {
+	const dbInfo = {
 		table: 'orders',
 		key: 'id, creationDate, projectId, status, lastUpdate, items(*), name, price, shipping_cost',
 		ordering: 'lastUpdate:desc'
 	};
 
 	function parseItems(data) {
-		let items = [];
+		const items = [];
 		data.forEach((el) => {
 			const price = Math.round((el.price + el.shipping_cost || 0) * 100) / 100;
 			const name = el.name.length > 30 ? el.name.slice(0, 30) + '...' : el.name;
@@ -226,7 +233,9 @@
 	}
 
 	onMount(async () => {
-		if (skip) return;
+		if (skip) {
+			return;
+		}
 		await loadUserdata();
 	});
 </script>

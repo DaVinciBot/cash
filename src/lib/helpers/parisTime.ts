@@ -2,20 +2,20 @@ export const PARIS_TIMEZONE = 'Europe/Paris';
 
 type DateInput = Date | string;
 
-type DateParts = {
+interface DateParts {
 	year: string;
 	month: string;
 	day: string;
 	hour: string;
 	minute: string;
 	second: string;
-};
+}
 
-type ParisDateParts = {
+interface ParisDateParts {
 	year: number;
 	month: number;
 	day: number;
-};
+}
 
 function toDate(value: DateInput) {
 	return value instanceof Date ? value : new Date(value);
@@ -85,28 +85,36 @@ function getTimeZoneOffset(date: Date, timeZone: string) {
 
 export function formatParisDate(value: DateInput) {
 	const date = toDate(value);
-	if (!isValidDate(date)) return '--/--/----';
+	if (!isValidDate(date)) {
+		return '--/--/----';
+	}
 	const { day, month, year } = getParisParts(date);
 	return `${day}/${month}/${year}`;
 }
 
 export function formatParisDayShort(value: DateInput) {
 	const date = toDate(value);
-	if (!isValidDate(date)) return '--/--';
+	if (!isValidDate(date)) {
+		return '--/--';
+	}
 	const { day, month } = getParisParts(date);
 	return `${day}/${month}`;
 }
 
 export function formatParisTime(value: DateInput) {
 	const date = toDate(value);
-	if (!isValidDate(date)) return '--h--';
+	if (!isValidDate(date)) {
+		return '--h--';
+	}
 	const { hour, minute } = getParisParts(date);
 	return `${hour}h${minute}`;
 }
 
 export function formatParisTimeRange(startValue: DateInput, durationHours: number) {
 	const start = toDate(startValue);
-	if (!isValidDate(start)) return '--h-- - --h--';
+	if (!isValidDate(start)) {
+		return '--h-- - --h--';
+	}
 	const safeDuration = Number.isFinite(durationHours) ? Math.max(0.25, durationHours) : 1;
 	const end = new Date(start.getTime() + safeDuration * 60 * 60 * 1000);
 	return `${formatParisTime(start)} - ${formatParisTime(end)}`;
@@ -114,7 +122,9 @@ export function formatParisTimeRange(startValue: DateInput, durationHours: numbe
 
 export function formatParisDateTimeShort(value: DateInput) {
 	const date = toDate(value);
-	if (!isValidDate(date)) return '--';
+	if (!isValidDate(date)) {
+		return '--';
+	}
 	return new Intl.DateTimeFormat('fr-FR', {
 		timeZone: PARIS_TIMEZONE,
 		weekday: 'short',
@@ -127,15 +137,21 @@ export function formatParisDateTimeShort(value: DateInput) {
 
 export function formatParisDatetimeLocal(value: DateInput) {
 	const date = toDate(value);
-	if (!isValidDate(date)) return '';
+	if (!isValidDate(date)) {
+		return '';
+	}
 	const { year, month, day, hour, minute } = getParisParts(date);
 	return `${year}-${month}-${day}T${hour}:${minute}`;
 }
 
 export function parseParisDatetimeLocal(value: string) {
-	if (!value) return '';
+	if (!value) {
+		return '';
+	}
 	const [datePart, timePart] = value.split('T');
-	if (!datePart || !timePart) return '';
+	if (!datePart || !timePart) {
+		return '';
+	}
 	const [yearRaw, monthRaw, dayRaw] = datePart.split('-');
 	const [hourRaw, minuteRaw, secondRaw] = timePart.split(':');
 	const year = Number(yearRaw);
@@ -154,14 +170,18 @@ export function parseParisDatetimeLocal(value: string) {
 
 export function getParisDateKey(value: DateInput) {
 	const date = toDate(value);
-	if (!isValidDate(date)) return '';
+	if (!isValidDate(date)) {
+		return '';
+	}
 	const { year, month, day } = getParisParts(date);
 	return `${year}-${month}-${day}`;
 }
 
 export function getParisDateParts(value: DateInput): ParisDateParts | null {
 	const date = toDate(value);
-	if (!isValidDate(date)) return null;
+	if (!isValidDate(date)) {
+		return null;
+	}
 	const { year, month, day } = getParisParts(date);
 	return {
 		year: Number(year),
@@ -179,6 +199,8 @@ export function getParisMidnightUtcFromParts(parts: ParisDateParts) {
 
 export function getParisDateUtc(value: DateInput) {
 	const parts = getParisDateParts(value);
-	if (!parts) return null;
+	if (!parts) {
+		return null;
+	}
 	return getParisMidnightUtcFromParts(parts);
 }

@@ -32,12 +32,16 @@
 			const keysToRemove = [];
 			for (let i = 0; i < localStorage.length; i++) {
 				const key = localStorage.key(i);
-				if (!key) continue;
+				if (!key) {
+					continue;
+				}
 				if (key === 'userdata_cache' || key.startsWith('settings_')) {
 					keysToRemove.push(key);
 				}
 			}
-			keysToRemove.forEach((k) => localStorage.removeItem(k));
+			keysToRemove.forEach((k) => {
+				localStorage.removeItem(k);
+			});
 
 			alert('Paramètres des tableaux vidés.');
 		} catch (e) {
@@ -47,7 +51,7 @@
 	}
 	async function handleImage(e) {
 		const avatarFile = e.target.files[0];
-		let extension = avatarFile.name.split('.').pop();
+		const extension = avatarFile.name.split('.').pop();
 		const { data, error } = await supabase.storage
 			.from('avatars')
 			.upload(`${user.id}/avatar.${extension}`, avatarFile, {

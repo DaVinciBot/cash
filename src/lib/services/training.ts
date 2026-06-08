@@ -10,15 +10,15 @@ export type RegistrationStatus =
 
 export type SlotStatus = 'draft' | 'pending' | 'done' | 'postponed' | 'canceled';
 
-export type TrainingListItem = {
+export interface TrainingListItem {
 	training_id: number;
 	name: string;
 	description: string | null;
 	prerequisites: string | null;
 	category: TrainingCategory;
-};
+}
 
-export type TrainingSlotListItem = {
+export interface TrainingSlotListItem {
 	slot_id: number;
 	training_id: number;
 	name: string;
@@ -42,9 +42,9 @@ export type TrainingSlotListItem = {
 	trainer_id: string;
 	trainer_username: string | null;
 	trainer_avatar_url: string | null;
-};
+}
 
-export type RegistrationListItem = {
+export interface RegistrationListItem {
 	slot_id: number;
 	member_id: string;
 	date_hour: string;
@@ -55,22 +55,22 @@ export type RegistrationListItem = {
 	feedback: string | null;
 	member_username: string | null;
 	member_avatar_url: string | null;
-};
+}
 
-export type RegistrationSummary = {
+export interface RegistrationSummary {
 	remote: boolean;
 	status: RegistrationStatus;
 	to_excuse: boolean | null;
-};
+}
 
-export type CreateTrainingPayload = {
+export interface CreateTrainingPayload {
 	name: string;
 	description?: string | null;
 	prerequisites?: string | null;
 	category: TrainingCategory;
-};
+}
 
-export type CreateTrainingSlotPayload = {
+export interface CreateTrainingSlotPayload {
 	training_id: number;
 	custom_name?: string | null;
 	custom_description?: string | null;
@@ -84,18 +84,18 @@ export type CreateTrainingSlotPayload = {
 	video_conference_link?: string | null;
 	excusable: boolean;
 	status: SlotStatus;
-};
+}
 
 export type UpdateTrainingPayload = Partial<CreateTrainingPayload>;
 
 export type UpdateTrainingSlotPayload = Partial<CreateTrainingSlotPayload>;
 
-export type UpdateRegistrationPayload = {
+export interface UpdateRegistrationPayload {
 	status?: RegistrationStatus;
 	present?: boolean | null;
 	to_excuse?: boolean | null;
 	feedback?: string | null;
-};
+}
 
 export type TrainingSupabaseClient = SupabaseClient;
 
@@ -103,7 +103,9 @@ export async function getTrainingList(
 	supabase: TrainingSupabaseClient
 ): Promise<TrainingListItem[]> {
 	const { data, error } = await supabase.rpc('training_list');
-	if (error) throw error;
+	if (error) {
+		throw error;
+	}
 	return data;
 }
 
@@ -119,7 +121,9 @@ export async function getTrainingSlots(
 				? null
 				: new Date(fromDate.getTime() + number_of_days * 24 * 60 * 60 * 1000).toISOString()
 	});
-	if (error) throw error;
+	if (error) {
+		throw error;
+	}
 	return data;
 }
 
@@ -130,7 +134,9 @@ export async function getTrainingSlotDetail(
 	const { data, error } = await supabase.rpc('training_slot_detail', {
 		p_slot_id: slotId
 	});
-	if (error) throw error;
+	if (error) {
+		throw error;
+	}
 	return data?.[0] ?? null;
 }
 
@@ -143,7 +149,9 @@ export async function getSlotRegistrations(
 			p_slot_id: slotId
 		})
 		.in('status', ['registered', 'waitlisted']);
-	if (error) throw error;
+	if (error) {
+		throw error;
+	}
 	return data;
 }
 
@@ -159,7 +167,9 @@ export async function getTrainerSlotRegistrations(
 		.eq('slot_id', slotId)
 		.in('status', ['registered', 'waitlisted'])
 		.order('date_hour', { ascending: true });
-	if (error) throw error;
+	if (error) {
+		throw error;
+	}
 	return data;
 }
 
@@ -168,7 +178,9 @@ export async function getMyRegistrationForSlot(
 	slotId: number,
 	userId: string | null
 ): Promise<RegistrationSummary | null> {
-	if (!userId) return null;
+	if (!userId) {
+		return null;
+	}
 
 	const { data, error } = await supabase
 		.from('registration')
@@ -176,9 +188,15 @@ export async function getMyRegistrationForSlot(
 		.eq('slot_id', slotId)
 		.eq('member_id', userId)
 		.maybeSingle();
-	if (error) throw error;
-	if (!data) return null;
-	if (data.status !== 'registered' && data.status !== 'waitlisted') return null;
+	if (error) {
+		throw error;
+	}
+	if (!data) {
+		return null;
+	}
+	if (data.status !== 'registered' && data.status !== 'waitlisted') {
+		return null;
+	}
 	return {
 		remote: data.remote,
 		status: data.status,
@@ -197,7 +215,9 @@ export async function registerToSlot(
 		p_remote: remote,
 		p_to_excuse: toExcuse
 	});
-	if (error) throw error;
+	if (error) {
+		throw error;
+	}
 	return data;
 }
 
@@ -208,7 +228,9 @@ export async function cancelRegistration(
 	const { data, error } = await supabase.rpc('cancel_my_registration', {
 		p_slot_id: slotId
 	});
-	if (error) throw error;
+	if (error) {
+		throw error;
+	}
 	return data;
 }
 
@@ -218,14 +240,18 @@ export async function updateMyRegistrationExcuse(
 	toExcuse: boolean,
 	userId: string | null
 ): Promise<unknown> {
-	if (!userId) throw new Error('User not authenticated');
+	if (!userId) {
+		throw new Error('User not authenticated');
+	}
 
 	const { data, error } = await supabase
 		.from('registration')
 		.update({ to_excuse: toExcuse })
 		.eq('slot_id', slotId)
 		.eq('member_id', userId);
-	if (error) throw error;
+	if (error) {
+		throw error;
+	}
 	return data;
 }
 
@@ -240,7 +266,9 @@ export async function updateRegistration(
 		.update(updates)
 		.eq('slot_id', slotId)
 		.eq('member_id', memberId);
-	if (error) throw error;
+	if (error) {
+		throw error;
+	}
 	return data;
 }
 
@@ -255,7 +283,9 @@ export async function updateTrainerPresence(
 		p_member_id: memberId,
 		p_present: present
 	});
-	if (error) throw error;
+	if (error) {
+		throw error;
+	}
 	return data;
 }
 
@@ -264,7 +294,9 @@ export async function createTraining(
 	payload: CreateTrainingPayload
 ): Promise<unknown> {
 	const { data, error } = await supabase.from('training').insert(payload).select().single();
-	if (error) throw error;
+	if (error) {
+		throw error;
+	}
 	return data;
 }
 
@@ -279,7 +311,9 @@ export async function updateTraining(
 		.eq('id', trainingId)
 		.select()
 		.single();
-	if (error) throw error;
+	if (error) {
+		throw error;
+	}
 	return data;
 }
 
@@ -288,7 +322,9 @@ export async function createTrainingSlot(
 	payload: CreateTrainingSlotPayload
 ): Promise<unknown> {
 	const { data, error } = await supabase.from('training_slot').insert(payload).select().single();
-	if (error) throw error;
+	if (error) {
+		throw error;
+	}
 	return data;
 }
 
@@ -303,6 +339,8 @@ export async function updateTrainingSlot(
 		.eq('id', slotId)
 		.select()
 		.single();
-	if (error) throw error;
+	if (error) {
+		throw error;
+	}
 	return data;
 }

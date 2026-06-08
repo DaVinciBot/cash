@@ -9,14 +9,14 @@ const assertEnv = () => {
 
 export const createAnonClient = () => {
 	assertEnv();
-	return createClient(env.PUBLIC_SUPABASE_URL!, env.PUBLIC_SUPABASE_PUBLISHABLE_KEY!, {
+	return createClient(env.PUBLIC_SUPABASE_URL, env.PUBLIC_SUPABASE_PUBLISHABLE_KEY, {
 		auth: { persistSession: false, autoRefreshToken: false }
 	});
 };
 
 export const createUserClient = (accessToken: string) => {
 	assertEnv();
-	return createClient(env.PUBLIC_SUPABASE_URL!, env.PUBLIC_SUPABASE_PUBLISHABLE_KEY!, {
+	return createClient(env.PUBLIC_SUPABASE_URL, env.PUBLIC_SUPABASE_PUBLISHABLE_KEY, {
 		global: {
 			headers: {
 				Authorization: `Bearer ${accessToken}`
@@ -29,7 +29,9 @@ export const createUserClient = (accessToken: string) => {
 export const decodeJwt = (token: string) => {
 	try {
 		const payload = token.split('.')[1];
-		if (!payload) return null;
+		if (!payload) {
+			return null;
+		}
 		const decoded = Buffer.from(payload, 'base64').toString('utf8');
 		return JSON.parse(decoded);
 	} catch {

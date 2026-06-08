@@ -4,9 +4,9 @@
 	import { hideOnClickOutside, loadUserdata } from '$lib/utils';
 	import { onDestroy, onMount } from 'svelte';
 
-	type ScreenShareUser = {
+	interface ScreenShareUser {
 		permissions?: string[];
-	};
+	}
 
 	let user: ScreenShareUser | null = null;
 	let ws: WebSocket | null = null;
@@ -17,7 +17,7 @@
 	let sharing = $state(false);
 	let canCastSmartShare = $state(false);
 	let canManageTraining = $state(false);
-	let wsUrl = 'wss://cast.davincibot.fr'; // Change if needed
+	const wsUrl = 'wss://cast.davincibot.fr'; // Change if needed
 	let showToolbox = $state(false); // Add this variable
 
 	userdata.subscribe((value: ScreenShareUser | null) => {
@@ -44,9 +44,17 @@
 	});
 
 	onDestroy(() => {
-		if (ws) ws.close();
-		if (pc) pc.close();
-		if (stream) stream.getTracks().forEach((track) => track.stop());
+		if (ws) {
+			ws.close();
+		}
+		if (pc) {
+			pc.close();
+		}
+		if (stream) {
+			stream.getTracks().forEach((track) => {
+				track.stop();
+			});
+		}
 	});
 
 	function setupWebSocket() {
@@ -109,8 +117,8 @@
 				is_busy = false;
 			};
 		});
-		const offer = await pc!.createOffer();
-		await pc!.setLocalDescription(offer);
+		const offer = await pc.createOffer();
+		await pc.setLocalDescription(offer);
 		ws!.send(JSON.stringify(offer));
 		sharing = true;
 	}

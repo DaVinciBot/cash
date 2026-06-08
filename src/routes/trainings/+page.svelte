@@ -95,7 +95,9 @@ DVBisous ! :robot:`;
 			.ilike('username', `%${search}%`)
 			.range(0, 4);
 
-		if (error) return [];
+		if (error) {
+			return [];
+		}
 
 		return (data ?? []).map(
 			(profile: { id: string; username: string | null; avatar_url: string | null }) => ({
@@ -115,7 +117,9 @@ DVBisous ! :robot:`;
 			.order('name')
 			.range(0, 6);
 
-		if (error) return [];
+		if (error) {
+			return [];
+		}
 
 		return (data ?? []).map((training: { id: number; name: string }) => ({
 			id: training.id,
@@ -129,7 +133,9 @@ DVBisous ! :robot:`;
 			.from('profiles')
 			.select('id, username, avatar_url')
 			.order('username');
-		if (profilesError) throw profilesError;
+		if (profilesError) {
+			throw profilesError;
+		}
 		profiles = (data ?? []).map(
 			(profile: { id: string; username: string | null; avatar_url: string | null }) => ({
 				...profile,
@@ -194,13 +200,21 @@ DVBisous ! :robot:`;
 
 			slotFields = nextFields.map((field) => {
 				const previous = field.id ? previousById.get(field.id) : null;
-				if (!previous || field.id === 'training_id') return field;
+				if (!previous || field.id === 'training_id') {
+					return field;
+				}
 				if (previous.value !== undefined) {
 					field.value = previous.value;
 				}
-				if (previous.checked !== undefined) field.checked = previous.checked;
-				if (previous.data !== undefined) field.data = previous.data;
-				if (previous.image !== undefined) field.image = previous.image;
+				if (previous.checked !== undefined) {
+					field.checked = previous.checked;
+				}
+				if (previous.data !== undefined) {
+					field.data = previous.data;
+				}
+				if (previous.image !== undefined) {
+					field.image = previous.image;
+				}
 				return field;
 			});
 			selectedTrainingId = nextTrainingId;
@@ -256,8 +270,10 @@ DVBisous ! :robot:`;
 
 	async function handleTrainingSubmit(event: Event) {
 		event.preventDefault();
-		const form = document.querySelector('#TrainingModal form') as HTMLFormElement | null;
-		if (!form) return;
+		const form = document.querySelector('#TrainingModal form');
+		if (!form) {
+			return;
+		}
 		const formData = new FormData(form);
 		const name = (formData.get('name') || '').toString().trim();
 		const category = (formData.get('category') || '').toString();
@@ -296,8 +312,10 @@ DVBisous ! :robot:`;
 
 	async function handleSlotSubmit(event: Event) {
 		event.preventDefault();
-		const form = document.querySelector('#SlotModal form') as HTMLFormElement | null;
-		if (!form) return;
+		const form = document.querySelector('#SlotModal form');
+		if (!form) {
+			return;
+		}
 		const formData = new FormData(form);
 		const trainingField = slotFields.find((field) => field.id === 'training_id');
 		const trainingFromField = trainingField?.data ?? null;
@@ -348,11 +366,15 @@ DVBisous ! :robot:`;
 					excusable,
 					status
 				};
-				if (customName && customName !== baseName) updates.custom_name = customName;
-				if (customDescription && customDescription !== baseDescription)
+				if (customName && customName !== baseName) {
+					updates.custom_name = customName;
+				}
+				if (customDescription && customDescription !== baseDescription) {
 					updates.custom_description = customDescription;
-				if (customPrerequisites && customPrerequisites !== basePrerequisites)
+				}
+				if (customPrerequisites && customPrerequisites !== basePrerequisites) {
 					updates.custom_prerequisites = customPrerequisites;
+				}
 
 				await updateTrainingSlot(supabaseClient, editingSlot.slot_id, {
 					...updates
@@ -452,9 +474,13 @@ DVBisous ! :robot:`;
 
 	async function handleSummarySubmit(event: Event) {
 		event.preventDefault();
-		if (summarySending) return;
-		const form = document.querySelector('#SummaryModal form') as HTMLFormElement | null;
-		if (!form) return;
+		if (summarySending) {
+			return;
+		}
+		const form = document.querySelector('#SummaryModal form');
+		if (!form) {
+			return;
+		}
 		const formData = new FormData(form);
 		const from = (formData.get('summary_from') || '').toString();
 		const to = (formData.get('summary_to') || '').toString();
@@ -469,7 +495,9 @@ DVBisous ! :robot:`;
 			text,
 			mode: 'test'
 		});
-		if (!testSent) return;
+		if (!testSent) {
+			return;
+		}
 
 		const shouldSendLive = window.confirm(
 			'Test envoyé sans ping sur le webhook de test. Envoyer maintenant la synthèse sur le webhook réel ?'
@@ -480,7 +508,9 @@ DVBisous ! :robot:`;
 		}
 
 		const liveSent = await sendDiscordSummary({ from, to, text, mode: 'live' });
-		if (liveSent) closeSummaryModal();
+		if (liveSent) {
+			closeSummaryModal();
+		}
 	}
 
 	const trainingActions = [
@@ -493,7 +523,9 @@ DVBisous ! :robot:`;
 				);
 				const training =
 					trainingIndex.get(id) ?? trainings.find((item) => item.training_id === id) ?? null;
-				if (training) openTrainingModal(training);
+				if (training) {
+					openTrainingModal(training);
+				}
 			}
 		}
 	];
@@ -507,12 +539,14 @@ DVBisous ! :robot:`;
 					(event.target as HTMLElement | null)?.closest('tr')?.querySelector('th')?.dataset.utils
 				);
 				const slot = slotIndex.get(id) ?? slots.find((item) => item.slot_id === id) ?? null;
-				if (slot) openSlotModal(slot);
+				if (slot) {
+					openSlotModal(slot);
+				}
 			}
 		}
 	];
 
-	let trainingFilters = [
+	const trainingFilters = [
 		{
 			category: 'Catégorie',
 			value: 'category',
@@ -520,7 +554,7 @@ DVBisous ! :robot:`;
 		}
 	];
 
-	let slotFilters = [
+	const slotFilters = [
 		{
 			category: 'Statut',
 			value: 'status',
@@ -532,9 +566,15 @@ DVBisous ! :robot:`;
 	$: draftSlots = slots.filter((slot) => slot.status === 'draft');
 
 	onMount(() => {
-		if (!summaryFrom) summaryFrom = getParisDateKey(new Date());
-		if (!summaryTo) summaryTo = getParisDateKey(new Date(Date.now() + 7 * 24 * 60 * 60 * 1000));
-		if (!summaryText) summaryText = defaultSummaryText;
+		if (!summaryFrom) {
+			summaryFrom = getParisDateKey(new Date());
+		}
+		if (!summaryTo) {
+			summaryTo = getParisDateKey(new Date(Date.now() + 7 * 24 * 60 * 60 * 1000));
+		}
+		if (!summaryText) {
+			summaryText = defaultSummaryText;
+		}
 		void loadData();
 	});
 </script>
@@ -558,8 +598,12 @@ DVBisous ! :robot:`;
 			upcomingCount={upcomingSlots.length}
 			draftCount={draftSlots.length}
 			{slotRangeDays}
-			onAddTraining={() => openTrainingModal()}
-			onAddSlot={() => openSlotModal()}
+			onAddTraining={() => {
+				openTrainingModal();
+			}}
+			onAddSlot={() => {
+				openSlotModal();
+			}}
 		/>
 
 		<section class="border-light-blue/10 bg-dark-blue/70 rounded-[22px] border p-4 sm:p-5">
@@ -616,8 +660,12 @@ DVBisous ! :robot:`;
 					{formatSlotDate}
 					{findTrainingName}
 					{trainings}
-					onAddSlot={() => openSlotModal()}
-					onEditSlot={(slot: TrainingSlotListItem) => openSlotModal(slot)}
+					onAddSlot={() => {
+						openSlotModal();
+					}}
+					onEditSlot={(slot: TrainingSlotListItem) => {
+						openSlotModal(slot);
+					}}
 				/>
 				<AdminTrainingSection
 					{trainings}
@@ -627,8 +675,12 @@ DVBisous ! :robot:`;
 					{trainingFilters}
 					{trainingTableTopic}
 					{parseTrainingItems}
-					onAddTraining={() => openTrainingModal()}
-					onEditTraining={(training: TrainingListItem) => openTrainingModal(training)}
+					onAddTraining={() => {
+						openTrainingModal();
+					}}
+					onEditTraining={(training: TrainingListItem) => {
+						openTrainingModal(training);
+					}}
 				/>
 			</div>
 		{/if}

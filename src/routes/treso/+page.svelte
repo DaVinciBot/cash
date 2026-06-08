@@ -23,7 +23,7 @@
 	ChartJS.register(Title, Tooltip, Legend, CategoryScale, LinearScale, BarElement);
 
 	/** @type {{data: any}} */
-	let { data } = $props();
+	const { data } = $props();
 
 	// Bank accounts overview state
 	let banks = $state([]);
@@ -91,18 +91,27 @@
 				.select('id, amount, is_positive, date')
 				.gte('date', startDate)
 				.lte('date', endDate);
-			if (error) throw error;
+			if (error) {
+				throw error;
+			}
 
 			// Group by week
 			const buckets = new Map();
 			for (const row of data || []) {
-				if (!row?.date) continue;
+				if (!row?.date) {
+					continue;
+				}
 				const { key, label, date } = weekStart(row.date);
-				if (!buckets.has(key)) buckets.set(key, { label, date, in: 0, out: 0 });
+				if (!buckets.has(key)) {
+					buckets.set(key, { label, date, in: 0, out: 0 });
+				}
 				const b = buckets.get(key);
 				const amt = parseFloat(row.amount ?? 0) || 0;
-				if (row.is_positive) b.in += amt;
-				else b.out += amt;
+				if (row.is_positive) {
+					b.in += amt;
+				} else {
+					b.out += amt;
+				}
 			}
 			const sorted = Array.from(buckets.values()).sort((a, b) => a.date - b.date);
 			cashflowChartData = {
@@ -126,13 +135,15 @@
 
 	function formatEUR(value) {
 		const num = typeof value === 'number' ? value : parseFloat(value ?? 0);
-		if (Number.isNaN(num)) return '0,00 €';
+		if (Number.isNaN(num)) {
+			return '0,00 €';
+		}
 		return (
 			num.toLocaleString('fr-FR', { minimumFractionDigits: 2, maximumFractionDigits: 2 }) + ' €'
 		);
 	}
 
-	let totalBanks = $derived(
+	const totalBanks = $derived(
 		banks.reduce((acc, b) => acc + (parseFloat(b.current_amount ?? 0) || 0), 0)
 	);
 
@@ -231,14 +242,14 @@
 					// get forms data
 					e.preventDefault();
 					const form_data = new FormData(e.target.closest('form'));
-					let data = {};
-					for (let [key, value] of form_data.entries()) {
+					const data = {};
+					for (const [key, value] of form_data.entries()) {
 						if (key.startsWith('justificatif')) {
 							const files = form_data.getAll('justificatif').filter((v) => v instanceof File);
 							if (files[0]?.name == '') {
 								files.pop();
 							}
-							data['justificatif'] = files;
+							data.justificatif = files;
 						} else {
 							data[key.toLowerCase()] = value;
 						}
@@ -267,7 +278,7 @@
 					}
 
 					// upload proof
-					const logoFile = Array.isArray(data['justificatif']) ? data['justificatif'] : [];
+					const logoFile = Array.isArray(data.justificatif) ? data.justificatif : [];
 					let message = `La dépense a bien été ajoutée`;
 
 					if (logoFile.length > 0) {
@@ -293,7 +304,7 @@
 					mountClosable(SucessModal, {
 						target: document.body,
 						props: {
-							message: message,
+							message,
 							onClose: () => {
 								// Ask any listening table to refresh and update banks overview
 								triggerTableRefresh('spending', { resetPage: true });
@@ -417,10 +428,10 @@
 								return;
 							}
 							// create options
-							let options = [];
+							const options = [];
 							for (let i = 0; i < data.length; i++) {
-								let el = data[i];
-								let avatar = el.avatar_url;
+								const el = data[i];
+								const avatar = el.avatar_url;
 								options.push({ value: el.id, text: el.username, image: avatar });
 							}
 							return options;
@@ -433,8 +444,8 @@
 					// get forms data
 					e.preventDefault();
 					const form_data = new FormData(e.target.closest('form'));
-					let fdata = {};
-					for (let [key, value] of form_data.entries()) {
+					const fdata = {};
+					for (const [key, value] of form_data.entries()) {
 						if (key.startsWith('author')) {
 							const label = document.querySelector('label[for="author"]');
 							const uid = label?.getAttribute('data-utils') || '';
@@ -444,7 +455,7 @@
 							if (files[0]?.name == '') {
 								files.pop();
 							}
-							fdata['justificatif'] = files;
+							fdata.justificatif = files;
 						} else {
 							fdata[key.toLowerCase()] = value;
 						}
@@ -468,7 +479,7 @@
 						alert("Une erreur est survenue lors de l'édition de la dépense");
 					}
 
-					const logoFile = Array.isArray(fdata['justificatif']) ? fdata['justificatif'] : [];
+					const logoFile = Array.isArray(fdata.justificatif) ? fdata.justificatif : [];
 					console.log(logoFile);
 
 					// upload all files
@@ -536,7 +547,7 @@
 		);
 		const byId = new Map(checks.map((c) => [c.id, c.hasProof]));
 
-		let parsedItems = [];
+		const parsedItems = [];
 		(items || []).forEach((item) => {
 			const hasProof = byId.get(item.id) ?? false;
 			// normalize order relation for tags
@@ -553,7 +564,7 @@
 					value: item.author?.username ?? 'Aucun',
 					data: `${item.author?.id}+${item.author?.avatar_url}`
 				},
-				{ value: item.description && item.description.length ? item.description : '-' },
+				{ value: item.description?.length ? item.description : '-' },
 				{
 					value:
 						Array.isArray(orderRef?.tags) && orderRef.tags.length ? orderRef.tags.join(', ') : '-'
@@ -591,7 +602,7 @@
 						? orderRef.projectId[0]
 						: orderRef.projectId
 					: null;
-				if (projRef && projRef.name) {
+				if (projRef?.name) {
 					if (data.description != null && data.description !== '') {
 						data.description += ` - Projet ${projRef.name}`;
 					} else {
@@ -618,7 +629,7 @@
 				}
 
 				const fileList = Array.isArray(dat) ? dat : [];
-				let files = [...fileList.map((file) => `invoices/${id}/${file.name}`)];
+				const files = [...fileList.map((file) => `invoices/${id}/${file.name}`)];
 
 				// compute author safely (can be array or object)
 				let authorName = 'Aucun';
@@ -681,7 +692,7 @@
 							]
 						},
 
-						files: files,
+						files,
 						actions: [
 							{
 								title: 'Modifier',

@@ -27,7 +27,7 @@
 
 	let saving = $state(false);
 	let message = $state('');
-	let canAccess = false;
+	const canAccess = false;
 	let selectedSlug = $state('');
 	let saveSteps = $state([]);
 
@@ -65,9 +65,13 @@
 
 	async function handleUpload(ev) {
 		const file = ev?.target?.files?.[0];
-		if (!file) return;
+		if (!file) {
+			return;
+		}
 		try {
-			if (!slug) slug = toSlug(title) || crypto.randomUUID().slice(0, 8);
+			if (!slug) {
+				slug = toSlug(title) || crypto.randomUUID().slice(0, 8);
+			}
 			await ensureFolder(slug);
 			const fileName = `${Date.now()}-${file.name}`.replace(/[^a-zA-Z0-9_.-]/g, '_');
 			const filePath = `tmp/${fileName}`;
@@ -83,7 +87,7 @@
 			const url = pub?.publicUrl;
 			if (url) {
 				// Append markdown reference at end
-				const isImage = /^image\//.test(file.type);
+				const isImage = file.type.startsWith('image/');
 				const snippet = isImage ? `\n\n![](${url})\n` : `\n\n[${file.name}](${url})\n`;
 				body = (body || '') + snippet;
 				message = 'Fichier téléversé';
@@ -98,9 +102,13 @@
 	}
 
 	async function transcodeHero() {
-		if (!meta.heroImage) return true;
+		if (!meta.heroImage) {
+			return true;
+		}
 		// Skip if already transcoded (heuristic: contains 'hero-large' and ends in .webp)
-		if (meta.heroImage.includes('hero-large') && meta.heroImage.endsWith('.webp')) return true;
+		if (meta.heroImage.includes('hero-large') && meta.heroImage.endsWith('.webp')) {
+			return true;
+		}
 
 		try {
 			const res = await fetch(`${supabaseUrl}functions/v1/transcode/blog-post-hero`, {
@@ -111,7 +119,7 @@
 				},
 				body: JSON.stringify({
 					image: meta.heroImage,
-					title: title,
+					title,
 					bucketName: 'articles',
 					folder: slug,
 					quality: 40
@@ -125,13 +133,14 @@
 
 				if (oldUrl.includes('/articles/tmp/')) {
 					const path = oldUrl.split('/articles/')[1];
-					if (path) await supabase.storage.from('articles').remove([path]);
+					if (path) {
+						await supabase.storage.from('articles').remove([path]);
+					}
 				}
 				return true;
-			} else {
-				console.warn('Transcode hero failed:', data);
-				return false;
 			}
+			console.warn('Transcode hero failed:', data);
+			return false;
 		} catch (e) {
 			console.error('Transcode hero error:', e);
 			return false;
@@ -139,7 +148,9 @@
 	}
 
 	async function transcodeOg() {
-		if (!meta.heroImage) return true;
+		if (!meta.heroImage) {
+			return true;
+		}
 
 		try {
 			const res = await fetch(`${supabaseUrl}functions/v1/transcode/blog-post-og`, {
@@ -150,7 +161,7 @@
 				},
 				body: JSON.stringify({
 					image: meta.heroImage,
-					title: title,
+					title,
 					bucketName: 'articles',
 					folder: slug
 				})
@@ -159,10 +170,9 @@
 			if (data.success && data.image) {
 				meta.heroImageSocial = data.image;
 				return true;
-			} else {
-				console.warn('Transcode OG failed:', data);
-				return false;
 			}
+			console.warn('Transcode OG failed:', data);
+			return false;
 		} catch (e) {
 			console.error('Transcode OG error:', e);
 			return false;
@@ -170,7 +180,9 @@
 	}
 
 	async function transcodeBodyImages() {
-		if (!body) return true;
+		if (!body) {
+			return true;
+		}
 
 		// Find all images: ![alt](url)
 		const regex = /!\[.*?\]\((.*?)\)/g;
@@ -187,7 +199,9 @@
 			}
 		}
 
-		if (imagesToTranscode.length === 0) return true;
+		if (imagesToTranscode.length === 0) {
+			return true;
+		}
 
 		// Remove duplicates
 		const uniqueImages = [...new Set(imagesToTranscode)];
@@ -225,7 +239,9 @@
 
 						if (originalUrl.includes('/articles/tmp/')) {
 							const path = originalUrl.split('/articles/')[1];
-							if (path) toDelete.push(path);
+							if (path) {
+								toDelete.push(path);
+							}
 						}
 					}
 				}
@@ -234,10 +250,9 @@
 					await supabase.storage.from('articles').remove(toDelete);
 				}
 				return true;
-			} else {
-				console.warn('Transcode body images failed:', data);
-				return false;
 			}
+			console.warn('Transcode body images failed:', data);
+			return false;
 		} catch (e) {
 			console.error('Transcode body images error:', e);
 			return false;
@@ -400,9 +415,13 @@
 
 	async function handleCoverUpload(ev) {
 		const file = ev?.target?.files?.[0];
-		if (!file) return;
+		if (!file) {
+			return;
+		}
 		try {
-			if (!slug) slug = toSlug(title) || crypto.randomUUID().slice(0, 8);
+			if (!slug) {
+				slug = toSlug(title) || crypto.randomUUID().slice(0, 8);
+			}
 			await ensureFolder(slug);
 			const fileName = `cover-${Date.now()}-${file.name}`.replace(/[^a-zA-Z0-9_.-]/g, '_');
 			const filePath = `tmp/${fileName}`;

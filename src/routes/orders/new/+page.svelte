@@ -8,7 +8,7 @@
 
 	let items = $state([{ nom: '', lien: '', price: '', quantity: '' }]);
 	let projectId = $state(-1);
-	let projectTitle = $state({});
+	const projectTitle = $state({});
 
 	let name = '';
 	let selectedTags = $state([]);

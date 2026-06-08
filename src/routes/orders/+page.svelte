@@ -11,7 +11,7 @@
 	import CrudForm from '$lib/components/modals/CrudForm.svelte';
 
 	/** @type {{data: any}} */
-	let { data } = $props();
+	const { data } = $props();
 
 	let user;
 	let pendingCount = $state(0);
@@ -25,7 +25,9 @@
 	let project = $state([]);
 
 	const syncUserContext = (profile) => {
-		if (!profile) return;
+		if (!profile) {
+			return;
+		}
 		user = profile;
 		const permissions = Array.isArray(profile.permissions) ? profile.permissions : [];
 		canViewAllOrders = hasAnyPermission(permissions, ['orders.read.all']);
@@ -45,7 +47,7 @@
 		}
 	});
 
-	let headers = [
+	const headers = [
 		'Objet',
 		'Date',
 		'Dernière MàJ',
@@ -56,13 +58,13 @@
 		'Status',
 		'Actions'
 	];
-	let dbInfo = {
+	const dbInfo = {
 		table: 'orders',
 		key: 'id, creationDate, projectId(id, name), status, lastUpdate, requestedBy(id, username), name, tags, price, shipping_cost',
 		ordering: 'lastUpdate:desc'
 	};
 
-	let statusFilters = [
+	const statusFilters = [
 		{ name: 'En revue CDP', value: 'pending_cdp' },
 		{ name: 'En revue Tréso', value: 'pending_treso' },
 		{ name: 'En attente livraison', value: 'pending_delivery' },
@@ -88,7 +90,7 @@
 		];
 	});
 
-	let actions = [
+	const actions = [
 		{
 			title: 'Voir',
 			type: 'view',
@@ -111,7 +113,7 @@
 				const price = data.price.toFixed(2);
 				const name = data.name;
 
-				let items = [];
+				const items = [];
 				data.items.forEach((item, i) => {
 					items.push({
 						name: item.name,
@@ -191,7 +193,9 @@
 				};
 
 				const deleteItemHandler = async (itemToRemove) => {
-					if (!confirm('Supprimer cet objet ?')) return;
+					if (!confirm('Supprimer cet objet ?')) {
+						return;
+					}
 					const { error } = await supabase.from('items').delete().eq('id', itemToRemove.id);
 					if (error) {
 						alert('Erreur: ' + error.message);
@@ -270,9 +274,9 @@
 										title: lifecycleTransitions,
 										type: 'selector',
 										handler: async (e) => {
-											let new_status = e.target.value;
-											let shippingCost = '0';
-											let finalPrice = price.toString();
+											const new_status = e.target.value;
+											const shippingCost = '0';
+											const finalPrice = price.toString();
 
 											if (new_status === 'pending_delivery') {
 												const { data: banks, error: bankErr } = await supabase
@@ -404,7 +408,7 @@
 										title: 'Valider',
 										type: 'validate',
 										handler: async (e) => {
-											let new_status = 'pending_treso';
+											const new_status = 'pending_treso';
 
 											const { error } = await supabase
 												.from('orders')
@@ -552,7 +556,7 @@
 		}
 	];
 	function parseItems(data) {
-		let items = [];
+		const items = [];
 		data.forEach((el) => {
 			const price = Math.round((el.price + el.shipping_cost || 0) * 100) / 100;
 			items.push([

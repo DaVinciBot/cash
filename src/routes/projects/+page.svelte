@@ -47,7 +47,9 @@
 	};
 
 	function fmt(n) {
-		if (n == null) return '0';
+		if (n == null) {
+			return '0';
+		}
 		try {
 			return Number(n).toLocaleString('fr-FR');
 		} catch {
@@ -55,7 +57,7 @@
 		}
 	}
 
-	let year = new Date().getFullYear();
+	const year = new Date().getFullYear();
 
 	userdata.subscribe(async (value) => {
 		if (value) {
@@ -82,7 +84,7 @@
 		}
 	});
 
-	let budgetChartData = $derived({
+	const budgetChartData = $derived({
 		labels: ['Budget restant', 'Dépenses'],
 		datasets: [
 			{
@@ -102,7 +104,7 @@
 		if (!selectedProjectId) {
 			return { name: 'Aucun projet sélectionné', budget: { budget: 0, year: 0 } };
 		}
-		let { data, error } = await supabase
+		const { data, error } = await supabase
 			.from('projects')
 			.select('id, name, debut, budget(budget, year, current)')
 			.eq('id', selectedProjectId)
@@ -130,7 +132,7 @@
 	async function loadPage() {
 		project = await fetchProject();
 		if (selectedProjectId == 0) {
-			project.budget = { budget: 0, year: year, cost: 0 };
+			project.budget = { budget: 0, year, cost: 0 };
 		}
 		const { data: costData, error: costErr } = await supabase.rpc('get_project_cost', {
 			projectid: selectedProjectId,
@@ -179,7 +181,9 @@
 	}
 
 	function handleWindowClick(e) {
-		if (!showDropdown) return;
+		if (!showDropdown) {
+			return;
+		}
 		if (dropdownEl && !dropdownEl.contains(e.target)) {
 			showDropdown = false;
 		}

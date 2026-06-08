@@ -11,14 +11,14 @@
 	import '../app.css';
 
 	/** @type {{data: any, children?: import('svelte').Snippet}} */
-	let { data, children } = $props();
+	const { data, children } = $props();
 
-	let userProfile = $derived(data.userProfile);
-	let canCreateOrder = $derived(data.canCreateOrder ?? false);
-	let __menu = $derived(data.menu ?? []);
+	const userProfile = $derived(data.userProfile);
+	const canCreateOrder = $derived(data.canCreateOrder ?? false);
+	const __menu = $derived(data.menu ?? []);
 
 	let open = $state(false);
-	let custom_uri = [...ADMIN_CUSTOM_URI];
+	const custom_uri = [...ADMIN_CUSTOM_URI];
 	let sessionSynced = $state(false);
 
 	onMount(() => {

@@ -13,11 +13,11 @@
 	import UserImportModal from '$lib/components/modals/UserImportModal.svelte';
 
 	/** @type {{data: any}} */
-	let { data } = $props();
+	const { data } = $props();
 
-	let headers = ['Nom', 'Projets', 'Statut', 'Actions'];
+	const headers = ['Nom', 'Projets', 'Statut', 'Actions'];
 
-	let dbInfo = {
+	const dbInfo = {
 		table: 'profiles',
 		key: 'id, username, avatar_url, status, member_of(project!inner(id, name))'
 	};
@@ -53,7 +53,7 @@
 	}
 
 	async function inviteAuthUser(email) {
-		const res = await fetch(`${resolve('/api/admin/users')}`, {
+		const res = await fetch(resolve('/api/admin/users'), {
 			method: 'POST',
 			headers: { 'Content-Type': 'application/json' },
 			body: JSON.stringify({ email })
@@ -113,9 +113,13 @@
 	}
 
 	function formatDate(value) {
-		if (!value) return 'Jamais';
+		if (!value) {
+			return 'Jamais';
+		}
 		const dt = new Date(value);
-		if (Number.isNaN(dt.getTime())) return value;
+		if (Number.isNaN(dt.getTime())) {
+			return value;
+		}
 		return dt.toLocaleString('fr-FR');
 	}
 
@@ -135,7 +139,9 @@
 			while (true) {
 				const fetched = await listAuthUsers(page, perPage);
 				users.push(...fetched);
-				if (fetched.length < perPage) break;
+				if (fetched.length < perPage) {
+					break;
+				}
 				page += 1;
 			}
 
@@ -195,7 +201,7 @@
 		{ name: 'CDR Nantes', value: '14' }
 	];
 
-	let filters = $state([
+	const filters = $state([
 		{
 			category: 'Projets',
 			value: 'member_of.project.id',
@@ -218,7 +224,7 @@
 	}
 
 	userdata.subscribe((user) => {
-		if (user && user.allProjects) {
+		if (user?.allProjects) {
 			allProjects = user.allProjects.map(normalizeProjectOption);
 			filters[0].options = allProjects;
 		}
@@ -241,7 +247,7 @@
 	});
 
 	function parseItems(data) {
-		let items = [];
+		const items = [];
 		data.forEach((el) => {
 			const project = el.member_of.map((el) => el.project?.name).join(', ');
 			const status = el.status === 'disabled' ? 'Désactivé' : 'Activé';
@@ -286,10 +292,14 @@
 						while (true) {
 							const fetched = await listAuthUsers(page, perPage);
 							for (const authUser of fetched) {
-								if (!authUser.email) continue;
+								if (!authUser.email) {
+									continue;
+								}
 								existingAuthUsers.set(authUser.email.toLowerCase(), authUser);
 							}
-							if (fetched.length < perPage) break;
+							if (fetched.length < perPage) {
+								break;
+							}
 							page += 1;
 						}
 					} catch (error) {
@@ -326,20 +336,25 @@
 							if (!existingAuth) {
 								const inviteData = await inviteAuthUser(email);
 								createdUserId = inviteData?.user?.id;
-								if (!createdUserId)
+								if (!createdUserId) {
 									throw new Error('Invitation échouée : ID utilisateur manquant.');
+								}
 								isNewlyCreated = true;
 								const { error: profileError } = await supabase.from('profiles').insert({
 									id: createdUserId,
 									username,
 									permissions: incomingPermissions
 								});
-								if (profileError) throw new Error(profileError.message);
+								if (profileError) {
+									throw new Error(profileError.message);
+								}
 								const { error: memberError } = await supabase.from('member_of').insert({
 									profile: createdUserId,
 									project: projectId
 								});
-								if (memberError) throw new Error(memberError.message);
+								if (memberError) {
+									throw new Error(memberError.message);
+								}
 								createdUsers.push(email);
 								existingAuthUsers.set(email, { id: createdUserId, email });
 							} else {
@@ -349,7 +364,9 @@
 									.select('id, username, permissions')
 									.eq('id', profileId)
 									.limit(1);
-								if (existingProfileError) throw new Error(existingProfileError.message);
+								if (existingProfileError) {
+									throw new Error(existingProfileError.message);
+								}
 								const existingProfile = existingProfileRows?.[0];
 								if (!existingProfile) {
 									const fallbackUsername = username || email.split('@')[0];
@@ -358,7 +375,9 @@
 										username: fallbackUsername,
 										permissions: incomingPermissions
 									});
-									if (profileInsertError) throw new Error(profileInsertError.message);
+									if (profileInsertError) {
+										throw new Error(profileInsertError.message);
+									}
 								} else if (incomingPermissions.length > 0) {
 									const currentPermissions = Array.isArray(existingProfile.permissions)
 										? existingProfile.permissions
@@ -371,7 +390,9 @@
 											.from('profiles')
 											.update({ permissions: mergedPermissions })
 											.eq('id', profileId);
-										if (permUpdateError) throw new Error(permUpdateError.message);
+										if (permUpdateError) {
+											throw new Error(permUpdateError.message);
+										}
 									}
 								}
 								const { count: memberCount, error: memberCheckError } = await supabase
@@ -379,13 +400,17 @@
 									.select('project', { count: 'exact', head: true })
 									.eq('profile', profileId)
 									.eq('project', projectId);
-								if (memberCheckError) throw new Error(memberCheckError.message);
+								if (memberCheckError) {
+									throw new Error(memberCheckError.message);
+								}
 								if ((memberCount ?? 0) === 0) {
 									const { error: attachError } = await supabase.from('member_of').insert({
 										profile: profileId,
 										project: projectId
 									});
-									if (attachError) throw new Error(attachError.message);
+									if (attachError) {
+										throw new Error(attachError.message);
+									}
 									updatedUsers.push(email);
 								} else {
 									alreadyLinked.push(email);
@@ -613,7 +638,10 @@
 			.select('id, username, permissions, status, member_of(role, project(id,name)), avatar_url')
 			.eq('id', id)
 			.single();
-		if (error) return console.error(error);
+		if (error) {
+			console.error(error);
+			return;
+		}
 
 		const projectsData = data.member_of
 			.map((m) => ({
@@ -630,13 +658,17 @@
 
 		const projectBadges = data.member_of
 			.map((m) => {
-				if (!m.project) return null;
+				if (!m.project) {
+					return null;
+				}
 				let roleColor = 'bg-gray-700 border border-gray-500';
-				if (m.role === 'admin' || m.role === 'bureau')
+				if (m.role === 'admin' || m.role === 'bureau') {
 					roleColor = 'bg-rose-900 border border-rose-500 text-rose-100';
-				else if (m.role === 'cdp')
+				} else if (m.role === 'cdp') {
 					roleColor = 'bg-amber-900 border border-amber-500 text-amber-100';
-				else roleColor = 'bg-blue-900 border border-blue-500 text-blue-100';
+				} else {
+					roleColor = 'bg-blue-900 border border-blue-500 text-blue-100';
+				}
 				return { text: `${m.project.name} (${m.role})`, color: roleColor };
 			})
 			.filter(Boolean);
@@ -744,7 +776,9 @@
 					);
 					const projectsToRemove = currentProjectIds.filter((pid) => !newProjectIds.includes(pid));
 					const projectsToUpdate = projectsRoles.filter((p) => {
-						if (!p.project_id) return false;
+						if (!p.project_id) {
+							return false;
+						}
 						const existing = memberData.find(
 							(m) => m.project.toString() === p.project_id.toString()
 						);
@@ -808,7 +842,7 @@
 						}
 					});
 				},
-				id: id,
+				id,
 				actions: canEditMembers
 					? [
 							data.status === 'disabled'
@@ -820,7 +854,7 @@
 		});
 	}
 
-	let actions = [
+	const actions = [
 		{
 			title: 'Voir',
 			type: 'view',
@@ -836,7 +870,9 @@
 			alert("Vous n'avez pas les permissions requises pour désactiver un utilisateur.");
 			return;
 		}
-		if (!confirm('Voulez-vous vraiment désactiver cet utilisateur ?')) return;
+		if (!confirm('Voulez-vous vraiment désactiver cet utilisateur ?')) {
+			return;
+		}
 		const drawer = document.querySelector('div[id^=drawer-]');
 		const id = drawer.id.split('drawer-')[1]; // Extract the id from the drawer id
 		try {
@@ -855,7 +891,9 @@
 			alert("Vous n'avez pas les permissions requises pour réactiver un utilisateur.");
 			return;
 		}
-		if (!confirm('Voulez-vous vraiment réactiver cet utilisateur ?')) return;
+		if (!confirm('Voulez-vous vraiment réactiver cet utilisateur ?')) {
+			return;
+		}
 		const drawer = document.querySelector('div[id^=drawer-]');
 		const id = drawer.id.split('drawer-')[1];
 		try {

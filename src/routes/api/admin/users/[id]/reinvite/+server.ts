@@ -20,7 +20,9 @@ const getPermissions = async (locals: any) => {
 	if (Array.isArray(locals?.permissions) && locals.permissions.length > 0) {
 		return locals.permissions;
 	}
-	if (!locals?.user?.id || !locals?.supabase) return [];
+	if (!locals?.user?.id || !locals?.supabase) {
+		return [];
+	}
 	const { data } = await locals.supabase
 		.from('profiles')
 		.select('permissions')
