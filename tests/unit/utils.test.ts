@@ -25,8 +25,17 @@ describe('utils helpers', () => {
 		loadUserdata(null);
 		expect(userdata.set).toHaveBeenCalledWith(null);
 
-		loadUserdata({ id: 'u-1' });
-		expect(userdata.set).toHaveBeenCalledWith({ id: 'u-1' });
+		const mockUser = {
+			id: 'u-1',
+			email: '',
+			name: '',
+			avatar: '',
+			projects: [],
+			permissions: [],
+			allProjects: null
+		};
+		loadUserdata(mockUser);
+		expect(userdata.set).toHaveBeenCalledWith(mockUser);
 	});
 
 	it('loadSettings and saveSettings persist JSON values', () => {

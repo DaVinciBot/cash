@@ -1,11 +1,11 @@
 import { describe, expect, it, vi } from 'vitest';
 
-import UserImportModal from '../../src/lib/components/modals/UserImportModal.svelte';
 import { mount } from 'svelte';
+import UserImportModal from '../../src/lib/components/modals/UserImportModal.svelte';
 
 describe('UserImportModal (components submodule)', () => {
 	it('submits a valid simple user payload', async () => {
-		const onSubmit = vi.fn(async () => {});
+		const onSubmit = vi.fn(() => Promise.resolve());
 		const onClose = vi.fn();
 		const target = document.createElement('div');
 		document.body.appendChild(target);
@@ -15,16 +15,20 @@ describe('UserImportModal (components submodule)', () => {
 			props: {
 				permissionCategories: {},
 				permissionPackages: [],
-				projectOptions: [{ value: 'project-1', text: 'Project 1' }],
+				projectOptions: [{ value: 'project-1', name: 'Project 1' }],
 				onSubmit,
 				onClose
 			}
 		});
 
-		const nameInput = target.querySelector('#simple-name');
-		const emailInput = target.querySelector('#simple-email');
-		const projectSelect = target.querySelector('#simple-project');
-		const form = target.querySelector('form');
+		const nameInput = target.querySelector<HTMLInputElement>('#simple-name');
+		const emailInput = target.querySelector<HTMLInputElement>('#simple-email');
+		const projectSelect = target.querySelector<HTMLSelectElement>('#simple-project');
+		const form = target.querySelector<HTMLFormElement>('form');
+
+		if (!nameInput || !emailInput || !projectSelect || !form) {
+			throw new Error('Expected simple import form controls to be mounted.');
+		}
 
 		nameInput.value = 'Alice';
 		nameInput.dispatchEvent(new Event('input', { bubbles: true }));

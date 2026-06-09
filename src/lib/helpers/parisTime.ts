@@ -192,7 +192,7 @@ export function getParisDateParts(value: DateInput): ParisDateParts | null {
 
 export function getParisMidnightUtcFromParts(parts: ParisDateParts) {
 	const iso = parseParisDatetimeLocal(
-		`${parts.year}-${pad2(parts.month)}-${pad2(parts.day)}T00:00`
+		`${String(parts.year)}-${pad2(parts.month)}-${pad2(parts.day)}T00:00`
 	);
 	return iso ? new Date(iso) : null;
 }

@@ -1,46 +1,52 @@
+import type { Permission } from '$lib/permissions';
 import { json } from '@sveltejs/kit';
+import type { RequestEvent } from './$types';
 
-const getPermissions = async (locals: any) => {
-	if (Array.isArray(locals?.permissions) && locals.permissions.length > 0) {
+const getPermissions = async (locals: App.Locals): Promise<Permission[]> => {
+	if (Array.isArray(locals.permissions) && locals.permissions.length > 0) {
 		return locals.permissions;
 	}
-	if (!locals?.user?.id || !locals?.supabase) {
+	if (!locals.user?.id) {
 		return [];
 	}
-	const { data } = await locals.supabase
+	const result = (await locals.supabase
 		.from('profiles')
 		.select('permissions')
 		.eq('id', locals.user.id)
-		.single();
-	return data?.permissions ?? [];
+		.single()) as { data: { permissions: Permission[] } | null; error: unknown };
+	return result.data?.permissions ?? [];
 };
 
-const requireEditMembers = async (locals: any) => {
+const requireEditMembers = async (locals: App.Locals): Promise<boolean> => {
 	const permissions = await getPermissions(locals);
 	return permissions.some((permission: string) =>
 		['members.profile.update.all', 'members.profile.status.update'].includes(permission)
 	);
 };
 
-const updateProfileStatus = async (locals: any, userId: string, status: 'active' | 'disabled') => {
-	return await locals.supabase
+const updateProfileStatus = async (
+	locals: App.Locals,
+	userId: string,
+	status: 'active' | 'disabled'
+) => {
+	return (await locals.supabase
 		.from('profiles')
 		.update({
 			status,
 			status_reason: status === 'disabled' ? 'disabled_by_admin' : null,
 			status_updated_at: new Date().toISOString(),
-			status_updated_by: locals?.user?.id ?? null
+			status_updated_by: locals.user?.id ?? null
 		})
-		.eq('id', userId);
+		.eq('id', userId)) as { data: unknown; error: { message: string } | null };
 };
 
-export const DELETE = async (event: any) => {
+export const DELETE = async (event: RequestEvent) => {
 	const { locals, params } = event;
 	if (!(await requireEditMembers(locals))) {
 		return json({ error: 'Not authorized' }, { status: 403 });
 	}
 
-	const userId = params?.id;
+	const userId = params.id;
 	if (!userId) {
 		return json({ error: 'Missing user id' }, { status: 400 });
 	}
@@ -57,25 +63,25 @@ export const DELETE = async (event: any) => {
 	}
 };
 
-export const PATCH = async (event: any) => {
+export const PATCH = async (event: RequestEvent) => {
 	const { locals, params, request } = event;
 	if (!(await requireEditMembers(locals))) {
 		return json({ error: 'Not authorized' }, { status: 403 });
 	}
 
-	const userId = params?.id;
+	const userId = params.id;
 	if (!userId) {
 		return json({ error: 'Missing user id' }, { status: 400 });
 	}
 
-	const payload = await request.json().catch(() => ({}));
-	const status = payload?.status;
-	if (!['active', 'disabled'].includes(status)) {
+	const payload = (await request.json().catch(() => ({}))) as { status?: string };
+	const status = payload.status;
+	if (!['active', 'disabled'].includes(status ?? '')) {
 		return json({ error: 'Invalid status' }, { status: 400 });
 	}
 
 	try {
-		const { error } = await updateProfileStatus(locals, userId, status);
+		const { error } = await updateProfileStatus(locals, userId, status as 'active' | 'disabled');
 		if (error) {
 			return json({ error: error.message }, { status: 500 });
 		}

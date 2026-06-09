@@ -1,3 +1,4 @@
+import type { UserProfile } from '$lib/types/profile';
 import { writable, type Writable } from 'svelte/store';
 
 export interface TableRefreshEvent {
@@ -6,7 +7,7 @@ export interface TableRefreshEvent {
 	payload: unknown;
 }
 
-export type UserData = Record<string, unknown> | null;
+export type UserData = UserProfile | null;
 
 export const userdata: Writable<UserData> = writable(null);
 

@@ -1,19 +1,16 @@
 <script lang="ts">
-	import { run } from 'svelte/legacy';
-
+	import type { UserData } from '$lib/store';
 	import { userdata } from '$lib/store';
-	import { supabase } from '$lib/supabaseClient';
+	import { getSupabaseBrowserClient } from '$lib/supabaseClient';
 	import { loadUserdata, mountClosable, statusText } from '$lib/utils';
 	import { onMount } from 'svelte';
+	import type { ItemRow, OrderRow } from '../database.types';
 
 	import Table from '$lib/components/admin/Table.svelte';
 	import ReadDrawer from '$lib/components/drawers/ReadDrawer.svelte';
 
-	/** @type {{data: any}} */
-	const { data } = $props();
-
 	let skip = false;
-	let user = $state();
+	let user: UserData = $state(null);
 
 	userdata.subscribe((value) => {
 		if (value) {
@@ -51,38 +48,60 @@
 		}
 	]);
 
-	run(() => {
+	$effect(() => {
 		filters[1].options[0].value = user?.id;
 	});
+
+	interface OrderDetail extends OrderRow {
+		items: ItemRow[];
+		comment: string | null;
+		status_reason: string | null;
+	}
+
+	interface UpdateRow {
+		id: number;
+		message: string | null;
+		date: string;
+		type: string | null;
+		author: { username: string | null } | null;
+	}
 
 	const actions = [
 		{
 			title: 'Voir',
 			type: 'view',
-			handler: async (e) => {
-				// get the info from the order
-				const id = e.target.closest('tr').querySelector('th').dataset.utils;
+			handler: async (e: MouseEvent) => {
+				const target = e.target as HTMLElement;
+				const id = target.closest('tr')?.querySelector('th')?.dataset.utils;
 
-				const { data, error } = await supabase
+				const supabase = getSupabaseBrowserClient();
+				const { data, error } = (await supabase
 					.from('orders')
 					.select(
 						'id, creationDate, projectId, status, status_reason, lastUpdate, items(*), comment, price, name'
 					)
-					.eq('id', id)
-					.single();
+					.eq('id', id ?? '')
+					.single()) as { data: OrderDetail | null; error: unknown };
 
-				if (error) {
+				if (error || !data) {
 					return;
 				}
-				const price = data.price.toFixed(2);
+				const price = data.price?.toFixed(2) ?? '0.00';
 				const name = data.name;
 
-				const items = [];
-				data.items.forEach((item, i) => {
+				const items: {
+					name: string;
+					quantity: number;
+					price: string;
+					id: number;
+					link: string | null;
+				}[] = [];
+				data.items.forEach((item) => {
+					const itemName = item.name ?? '';
 					items.push({
-						name: item.name.length > 30 ? item.name.slice(0, 30) + '...' : item.name,
+						name: itemName.length > 30 ? itemName.slice(0, 30) + '...' : itemName,
 						quantity: item.quantity,
-						price: `${item.price} €`,
+						price: `${String(item.price)} €`,
 						id: item.id,
 						link: item.link
 					});
@@ -129,19 +148,19 @@
 				}
 
 				// fetch the updates for the order
-				const updates = await supabase
+				const updates = (await supabase
 					.from('updates')
 					.select('id, message, date, author(username), type')
-					.eq('order_id', id)
-					.order('date', { ascending: false });
+					.eq('order_id', id ?? '')
+					.order('date', { ascending: false })) as { data: UpdateRow[] | null; error: unknown };
 
-				if (updates.error) {
+				if (updates.error || !updates.data) {
 					return;
 				}
-				const updatesList = updates.data;
-				updatesList.forEach((update) => {
-					update.date = new Date(update.date).toLocaleString();
-				});
+				const updatesList: (UpdateRow & { date: string })[] = updates.data.map((u) => ({
+					...u,
+					date: new Date(u.date).toLocaleString()
+				}));
 
 				mountClosable(ReadDrawer, {
 					target: document.body,
@@ -172,7 +191,7 @@
 											message: update.message,
 											date: update.date,
 											type: update.type,
-											user: update.author.username ?? 'Système'
+											user: update.author?.username ?? 'Système'
 										})),
 										type: 'updates'
 									}
@@ -183,18 +202,19 @@
 							{
 								title: 'Annuler',
 								type: 'delete',
-								handler: async (e) => {
+								handler: async (_e: MouseEvent) => {
 									const reason = prompt("Raison d'annulation (optionnelle)")?.trim() ?? null;
-									const { data, error } = await supabase
+									const supabaseClient = getSupabaseBrowserClient();
+									const { data: cancelData, error: cancelError } = (await supabaseClient
 										.from('orders')
 										.update({ status: 'canceled_user', status_reason: reason })
-										.eq('id', id)
+										.eq('id', id ?? '')
 										.select()
-										.single();
-									if (error) {
+										.single()) as { data: OrderRow | null; error: unknown };
+									if (cancelError) {
 										return;
 									}
-									if (data) {
+									if (cancelData) {
 										window.location.reload();
 									}
 								}
@@ -213,27 +233,37 @@
 		ordering: 'lastUpdate:desc'
 	};
 
-	function parseItems(data) {
-		const items = [];
+	interface OrderListRow {
+		id: number;
+		price: number | null;
+		shipping_cost: number | null;
+		name: string | null;
+		creationDate: string;
+		lastUpdate: string;
+		status: string;
+	}
+
+	function parseItems(data: OrderListRow[]) {
+		const items: { value: string | number; data?: number }[][] = [];
 		data.forEach((el) => {
-			const price = Math.round((el.price + el.shipping_cost ?? 0) * 100) / 100;
-			const name = el.name.length > 30 ? el.name.slice(0, 30) + '...' : el.name;
+			const price = Math.round(((el.price ?? 0) + (el.shipping_cost ?? 0)) * 100) / 100;
+			const elName = el.name ?? '';
+			const name = elName.length > 30 ? elName.slice(0, 30) + '...' : elName;
 			items.push([
 				{ value: name, data: el.id },
-				{ value: el.creationDate.toLocaleString().split('T')[0] },
-				{ value: el.lastUpdate.toLocaleString().split('T')[0] },
-				{ value: price + ' €' },
-				{ value: statusText[el.status] }
+				{ value: el.creationDate.split('T')[0] },
+				{ value: el.lastUpdate.split('T')[0] },
+				{ value: `${String(price)} €` },
+				{ value: statusText[el.status] ?? el.status }
 			]);
 		});
 		return items;
 	}
 
-	onMount(async () => {
-		if (skip) {
-			return;
+	onMount(() => {
+		if (!skip) {
+			loadUserdata();
 		}
-		await loadUserdata();
 	});
 </script>
 
@@ -249,15 +279,6 @@
 </div>
 <div class="w-full py-2 sm:px-8 lg:px-16">
 	<div class="rounded-lg bg-gray-800">
-		<Table
-			{headers}
-			{dbInfo}
-			{parseItems}
-			{actions}
-			{filters}
-			supabase={data.supabase}
-			type="commande"
-			type_accord="une"
-		/>
+		<Table {headers} {dbInfo} {parseItems} {actions} {filters} type="commande" type_accord="une" />
 	</div>
 </div>

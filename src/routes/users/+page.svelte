@@ -1,19 +1,63 @@
 <script lang="ts">
-	import { run } from 'svelte/legacy';
-
 	import { resolve } from '$app/paths';
 	import { hasAnyPermission } from '$lib/permissions';
 	import { userdata } from '$lib/store';
-	import { supabase } from '$lib/supabaseClient';
+	import { getSupabaseBrowserClient } from '$lib/supabaseClient';
 	import { mountClosable } from '$lib/utils';
+	import { SvelteMap } from 'svelte/reactivity';
 
 	import Table from '$lib/components/admin/Table.svelte';
 	import ReadDrawer from '$lib/components/drawers/ReadDrawer.svelte';
 	import SucessModal from '$lib/components/modals/InfoModal.svelte';
 	import UserImportModal from '$lib/components/modals/UserImportModal.svelte';
 
-	/** @type {{data: any}} */
-	const { data } = $props();
+	interface AuthUser {
+		id: string;
+		email: string | undefined;
+		email_confirmed_at: string | null;
+		invited_at: string | null;
+		last_sign_in_at: string | null;
+	}
+
+	interface ApiPayload {
+		error?: string;
+		users?: AuthUser[];
+		user?: { id: string };
+	}
+
+	interface ProjectOption {
+		name: string;
+		value: string;
+	}
+
+	interface ProfileRow {
+		id: string;
+		username: string;
+		avatar_url: string | null;
+		status: string;
+		member_of: MemberOfRow[];
+	}
+
+	interface MemberOfRow {
+		role: string;
+		project: { id: number; name: string } | null;
+	}
+
+	interface ProjectRoleEntry {
+		project_id: string | number | null | undefined;
+		role: string;
+	}
+
+	interface ImportUser {
+		email: string;
+		name: string;
+		project?: string;
+	}
+
+	interface FailureEntry {
+		email: string;
+		message: string;
+	}
 
 	const headers = ['Nom', 'Projets', 'Statut', 'Actions'];
 
@@ -22,93 +66,93 @@
 		key: 'id, username, avatar_url, status, member_of(project!inner(id, name))'
 	};
 
-	let canEditMembers = $state(false);
-	let pendingInvites = $state([]);
-	let pendingInvitesLoading = $state(false);
+	let canEditMembers = $state<boolean>(false);
+	let pendingInvites = $state<AuthUser[]>([]);
+	let pendingInvitesLoading = $state<boolean>(false);
 	let pendingInvitesError = $state('');
-	let reinvitingUserId = $state(null);
-	let pendingInvitesInitialized = $state(false);
+	let reinvitingUserId = $state<string | null>(null);
+	let pendingInvitesInitialized = $state<boolean>(false);
 
-	async function listAuthUsers(page, perPage) {
-		const res = await fetch(`${resolve('/api/admin/users')}?page=${page}&perPage=${perPage}`);
+	async function listAuthUsers(page: number, perPage: number): Promise<AuthUser[]> {
+		const res = await fetch(
+			`${resolve('/api/admin/users')}?page=${String(page)}&perPage=${String(perPage)}`
+		);
 		const body = await res.text();
-		let payload = {};
+		let payload: ApiPayload;
 		try {
-			payload = body ? JSON.parse(body) : {};
+			payload = body ? (JSON.parse(body) as ApiPayload) : {};
 		} catch {
 			payload = {};
 		}
 		if (!res.ok) {
-			const fallback = body?.trim()
+			const fallback = body.trim()
 				? body.trim()
-				: `Impossible de charger la liste des utilisateurs (status ${res.status}).`;
-			const message = payload?.error || fallback;
-			throw new Error(`${message} (status ${res.status})`);
+				: `Impossible de charger la liste des utilisateurs (status ${String(res.status)}).`;
+			const message = payload.error ?? fallback;
+			throw new Error(`${message} (status ${String(res.status)})`);
 		}
-		return payload?.users ?? [];
+		return payload.users ?? [];
 	}
 
-	async function inviteAuthUser(email) {
+	async function inviteAuthUser(email: string): Promise<ApiPayload> {
 		const res = await fetch(resolve('/api/admin/users'), {
 			method: 'POST',
 			headers: { 'Content-Type': 'application/json' },
 			body: JSON.stringify({ email })
 		});
 		if (!res.ok) {
-			const payload = await res.json().catch(() => ({}));
-			throw new Error(payload?.error || `Invitation impossible pour ${email}.`);
+			const payload = (await res.json().catch(() => ({}))) as ApiPayload;
+			throw new Error(payload.error ?? `Invitation impossible pour ${email}.`);
 		}
-		return await res.json();
+		return (await res.json()) as ApiPayload;
 	}
 
-	async function deleteAuthUser(id) {
+	async function deleteAuthUser(id: string): Promise<ApiPayload> {
 		const res = await fetch(`${resolve('/api/admin/users')}/${id}`, { method: 'DELETE' });
 		if (!res.ok) {
-			const payload = await res.json().catch(() => ({}));
-			throw new Error(payload?.error || 'Suppression impossible côté auth.');
+			const payload = (await res.json().catch(() => ({}))) as ApiPayload;
+			throw new Error(payload.error ?? 'Suppression impossible côté auth.');
 		}
-		return await res.json();
+		return (await res.json()) as ApiPayload;
 	}
 
-	async function updateAuthUserStatus(id, status) {
+	async function updateAuthUserStatus(id: string, status: string): Promise<ApiPayload> {
 		const res = await fetch(`${resolve('/api/admin/users')}/${id}`, {
 			method: 'PATCH',
 			headers: { 'Content-Type': 'application/json' },
 			body: JSON.stringify({ status })
 		});
 		if (!res.ok) {
-			const payload = await res.json().catch(() => ({}));
-			throw new Error(payload?.error || 'Mise à jour du statut impossible.');
+			const payload = (await res.json().catch(() => ({}))) as ApiPayload;
+			throw new Error(payload.error ?? 'Mise à jour du statut impossible.');
 		}
-		return await res.json();
+		return (await res.json()) as ApiPayload;
 	}
 
-	async function reinviteAuthUser(id) {
+	async function reinviteAuthUser(id: string): Promise<ApiPayload> {
 		const res = await fetch(`${resolve('/api/admin/users')}/${id}/reinvite`, { method: 'POST' });
 		const body = await res.text();
-		let payload = {};
+		let payload: ApiPayload;
 		try {
-			payload = body ? JSON.parse(body) : {};
+			payload = body ? (JSON.parse(body) as ApiPayload) : {};
 		} catch {
 			payload = {};
 		}
 		if (!res.ok) {
-			const fallback = body?.trim()
+			const fallback = body.trim()
 				? body.trim()
-				: `Réinvitation impossible pour cet utilisateur (status ${res.status}).`;
-			const message = payload?.error || fallback;
+				: `Réinvitation impossible pour cet utilisateur (status ${String(res.status)}).`;
+			const message = payload.error ?? fallback;
 			throw new Error(message);
 		}
 		return payload;
 	}
 
-	function isPendingInvitedUser(authUser) {
-		return (
-			Boolean(authUser?.email) && !authUser?.email_confirmed_at && Boolean(authUser?.invited_at)
-		);
+	function isPendingInvitedUser(authUser: AuthUser): boolean {
+		return Boolean(authUser.email) && !authUser.email_confirmed_at && Boolean(authUser.invited_at);
 	}
 
-	function formatDate(value) {
+	function formatDate(value: string | null | undefined): string {
 		if (!value) {
 			return 'Jamais';
 		}
@@ -129,10 +173,10 @@
 		pendingInvitesLoading = true;
 		pendingInvitesError = '';
 		try {
-			const users = [];
+			const users: AuthUser[] = [];
 			const perPage = 100;
 			let page = 1;
-			while (true) {
+			for (;;) {
 				const fetched = await listAuthUsers(page, perPage);
 				users.push(...fetched);
 				if (fetched.length < perPage) {
@@ -142,25 +186,26 @@
 			}
 
 			pendingInvites = users.filter(isPendingInvitedUser).sort((a, b) => {
-				const aDate = new Date(a?.invited_at || 0).getTime();
-				const bDate = new Date(b?.invited_at || 0).getTime();
+				const aDate = new Date(a.invited_at ?? 0).getTime();
+				const bDate = new Date(b.invited_at ?? 0).getTime();
 				return bDate - aDate;
 			});
 		} catch (error) {
 			pendingInvites = [];
 			pendingInvitesError =
-				error?.message || 'Impossible de charger les invitations en attente pour le moment.';
+				(error as Error | null)?.message ??
+				'Impossible de charger les invitations en attente pour le moment.';
 		} finally {
 			pendingInvitesLoading = false;
 		}
 	}
 
-	async function reinvitePendingUser(authUser) {
+	async function reinvitePendingUser(authUser: AuthUser) {
 		if (!canEditMembers) {
 			alert("Vous n'avez pas les permissions requises pour réinviter un utilisateur.");
 			return;
 		}
-		if (!authUser?.id || !authUser?.email) {
+		if (!authUser.id || !authUser.email) {
 			alert('Utilisateur invalide, impossible de renvoyer une invitation.');
 			return;
 		}
@@ -172,18 +217,20 @@
 				target: document.body,
 				props: {
 					message: `Invitation renvoyée à ${authUser.email}.`,
-					onClose: () => {}
+					onClose: () => {
+						/* no-op */
+					}
 				}
 			});
 			await loadPendingInvites();
 		} catch (error) {
-			alert(error?.message || 'Impossible de renvoyer cette invitation.');
+			alert((error as Error | null)?.message ?? 'Impossible de renvoyer cette invitation.');
 		} finally {
 			reinvitingUserId = null;
 		}
 	}
 
-	let allProjects = [
+	let allProjects: ProjectOption[] = $state([
 		{ name: 'CDR', value: '1' },
 		{ name: 'Travelers', value: '2' },
 		{ name: 'Exodus', value: '3' },
@@ -193,7 +240,7 @@
 		{ name: 'Mur Végétal', value: '12' },
 		{ name: 'E-Dog', value: '13' },
 		{ name: 'CDR Nantes', value: '14' }
-	];
+	]);
 
 	const filters = $state([
 		{
@@ -211,28 +258,35 @@
 		}
 	]);
 
-	function normalizeProjectOption(project) {
-		const value = project?.value ?? project?.id;
-		const name = project?.name ?? String(value ?? '');
+	function normalizeProjectOption(project: {
+		value?: string | number;
+		id?: number;
+		name?: string;
+	}): ProjectOption {
+		const value = String(project.value ?? project.id ?? '');
+		const name = project.name ?? value;
 		return { name, value };
 	}
 
 	userdata.subscribe((user) => {
 		if (user?.allProjects) {
 			allProjects = user.allProjects.map(normalizeProjectOption);
-			filters[0].options = allProjects;
+			const projectFilter = filters[0];
+			if (projectFilter) {
+				projectFilter.options = allProjects;
+			}
 		}
-		canEditMembers = hasAnyPermission(user?.permissions || [], ['members.profile.update.all']);
+		canEditMembers = hasAnyPermission(user?.permissions ?? [], ['members.profile.update.all']);
 	});
 
-	run(() => {
+	$effect(() => {
 		if (canEditMembers && !pendingInvitesInitialized) {
 			pendingInvitesInitialized = true;
-			loadPendingInvites();
+			void loadPendingInvites();
 		}
 	});
 
-	run(() => {
+	$effect(() => {
 		if (!canEditMembers) {
 			pendingInvitesInitialized = false;
 			pendingInvites = [];
@@ -240,21 +294,22 @@
 		}
 	});
 
-	function parseItems(data) {
-		const items = [];
-		data.forEach((el) => {
-			const project = el.member_of.map((el) => el.project?.name).join(', ');
+	function parseItems(data: unknown[]) {
+		const typedData = data as ProfileRow[];
+		const items: { value: string; data?: string; avatar?: string | null }[][] = [];
+		for (const el of typedData) {
+			const project = el.member_of.map((m) => m.project?.name ?? '').join(', ');
 			const status = el.status === 'disabled' ? 'Désactivé' : 'Activé';
 			items.push([
 				{ value: el.username, data: el.id, avatar: el.avatar_url },
 				{ value: project },
 				{ value: status }
 			]);
-		});
+		}
 		return items;
 	}
 
-	async function addNew() {
+	function addNew() {
 		mountClosable(UserImportModal, {
 			target: document.body,
 			props: {
@@ -262,28 +317,34 @@
 				permissionCategories,
 				permissionPackages,
 				title: 'Importer des utilisateurs',
-				onSubmit: async ({ project, users, permissions }) => {
+				onSubmit: async ({
+					project,
+					users,
+					permissions
+				}: {
+					project: string;
+					users: ImportUser[];
+					permissions: string[];
+				}) => {
 					if (!canEditMembers) {
 						throw new Error(
 							"Vous n'avez pas les permissions requises pour cette action (members.profile.update.all nécessaire)."
 						);
 					}
 
-					const createdUsers = [];
-					const updatedUsers = [];
-					const alreadyLinked = [];
-					const failures = [];
-					const defaultProject =
-						project !== undefined && project !== null && project !== '' && project !== 'NULL'
-							? project
-							: '';
-					const incomingPermissions = Array.isArray(permissions) ? permissions.filter(Boolean) : [];
+					const supabase = getSupabaseBrowserClient();
+					const createdUsers: string[] = [];
+					const updatedUsers: string[] = [];
+					const alreadyLinked: string[] = [];
+					const failures: FailureEntry[] = [];
+					const defaultProject = project !== '' && project !== 'NULL' ? project : '';
+					const incomingPermissions = permissions.filter(Boolean);
 
-					const existingAuthUsers = new Map();
+					const existingAuthUsers = new SvelteMap<string, AuthUser>();
 					try {
 						const perPage = 100;
 						let page = 1;
-						while (true) {
+						for (;;) {
 							const fetched = await listAuthUsers(page, perPage);
 							for (const authUser of fetched) {
 								if (!authUser.email) {
@@ -296,7 +357,7 @@
 							}
 							page += 1;
 						}
-					} catch (error) {
+					} catch {
 						throw new Error('Impossible de récupérer la liste des utilisateurs existants.');
 					}
 
@@ -305,7 +366,7 @@
 						const username = user.name.trim();
 						const projectRaw =
 							user.project && user.project !== 'NULL' ? user.project : defaultProject;
-						const resolvedProjectValue = (projectRaw ?? '').toString().trim();
+						const resolvedProjectValue = projectRaw.trim();
 						if (!resolvedProjectValue) {
 							failures.push({
 								email,
@@ -322,13 +383,13 @@
 							continue;
 						}
 						const existingAuth = existingAuthUsers.get(email);
-						let createdUserId = existingAuth?.id ?? null;
+						let createdUserId: string | null = existingAuth?.id ?? null;
 						let isNewlyCreated = false;
 
 						try {
 							if (!existingAuth) {
 								const inviteData = await inviteAuthUser(email);
-								createdUserId = inviteData?.user?.id;
+								createdUserId = inviteData.user?.id ?? null;
 								if (!createdUserId) {
 									throw new Error('Invitation échouée : ID utilisateur manquant.');
 								}
@@ -339,26 +400,35 @@
 									permissions: incomingPermissions
 								});
 								if (profileError) {
-									throw new Error(profileError.message);
+									throw new Error((profileError as { message: string }).message);
 								}
 								const { error: memberError } = await supabase.from('member_of').insert({
 									profile: createdUserId,
 									project: projectId
 								});
 								if (memberError) {
-									throw new Error(memberError.message);
+									throw new Error((memberError as { message: string }).message);
 								}
 								createdUsers.push(email);
-								existingAuthUsers.set(email, { id: createdUserId, email });
+								existingAuthUsers.set(email, {
+									id: createdUserId,
+									email,
+									email_confirmed_at: null,
+									invited_at: null,
+									last_sign_in_at: null
+								});
 							} else {
 								const profileId = createdUserId;
-								const { data: existingProfileRows, error: existingProfileError } = await supabase
+								const { data: existingProfileRows, error: existingProfileError } = (await supabase
 									.from('profiles')
 									.select('id, username, permissions')
 									.eq('id', profileId)
-									.limit(1);
+									.limit(1)) as {
+									data: { id: string; username: string; permissions: string[] }[] | null;
+									error: unknown;
+								};
 								if (existingProfileError) {
-									throw new Error(existingProfileError.message);
+									throw new Error((existingProfileError as { message: string }).message);
 								}
 								const existingProfile = existingProfileRows?.[0];
 								if (!existingProfile) {
@@ -369,7 +439,7 @@
 										permissions: incomingPermissions
 									});
 									if (profileInsertError) {
-										throw new Error(profileInsertError.message);
+										throw new Error((profileInsertError as { message: string }).message);
 									}
 								} else if (incomingPermissions.length > 0) {
 									const currentPermissions = Array.isArray(existingProfile.permissions)
@@ -384,7 +454,7 @@
 											.update({ permissions: mergedPermissions })
 											.eq('id', profileId);
 										if (permUpdateError) {
-											throw new Error(permUpdateError.message);
+											throw new Error((permUpdateError as { message: string }).message);
 										}
 									}
 								}
@@ -394,7 +464,7 @@
 									.eq('profile', profileId)
 									.eq('project', projectId);
 								if (memberCheckError) {
-									throw new Error(memberCheckError.message);
+									throw new Error((memberCheckError as { message: string }).message);
 								}
 								if ((memberCount ?? 0) === 0) {
 									const { error: attachError } = await supabase.from('member_of').insert({
@@ -402,7 +472,7 @@
 										project: projectId
 									});
 									if (attachError) {
-										throw new Error(attachError.message);
+										throw new Error((attachError as { message: string }).message);
 									}
 									updatedUsers.push(email);
 								} else {
@@ -410,20 +480,23 @@
 								}
 							}
 						} catch (error) {
-							failures.push({ email, message: error?.message || 'Erreur inconnue' });
+							failures.push({
+								email,
+								message: (error as Error | null)?.message ?? 'Erreur inconnue'
+							});
 							if (isNewlyCreated && createdUserId) {
-								const { error: cleanupProfileError } = await supabase
+								await supabase
 									.from('profiles')
 									.update({
 										status: 'disabled',
 										status_reason: 'rollback_import_failed'
 									})
 									.eq('id', createdUserId);
-								if (cleanupProfileError) {
-								}
 								try {
 									await deleteAuthUser(createdUserId);
-								} catch (cleanupError) {}
+								} catch {
+									// cleanup best-effort
+								}
 							}
 						}
 					}
@@ -441,19 +514,19 @@
 						);
 					}
 
-					const messageParts = [];
+					const messageParts: string[] = [];
 					if (createdUsers.length > 0) {
 						const createdLabel =
 							createdUsers.length === 1
-								? `Utilisateur invité : ${createdUsers[0]}`
-								: `${createdUsers.length} nouveaux utilisateurs invités.`;
+								? `Utilisateur invité : ${createdUsers[0] ?? ''}`
+								: `${String(createdUsers.length)} nouveaux utilisateurs invités.`;
 						messageParts.push(createdLabel);
 					}
 					if (updatedUsers.length > 0) {
 						const updatedLabel =
 							updatedUsers.length === 1
-								? `Projet ajouté pour ${updatedUsers[0]}.`
-								: `Projet ajouté pour ${updatedUsers.length} utilisateurs.`;
+								? `Projet ajouté pour ${updatedUsers[0] ?? ''}.`
+								: `Projet ajouté pour ${String(updatedUsers.length)} utilisateurs.`;
 						messageParts.push(updatedLabel);
 					}
 					if (alreadyLinked.length > 0) {
@@ -614,20 +687,31 @@
 	];
 
 	// Action handlers for rows
-	async function viewUser(e) {
+	async function viewUser(e: Event) {
 		e.preventDefault();
 		if (!canEditMembers) {
 			alert("Vous n'avez pas les permissions requises pour modifier un utilisateur.");
 			return;
 		}
-		const tr = e.currentTarget.closest('tr');
-		const id = tr.querySelector('[data-utils]').getAttribute('data-utils');
-		const { data, error } = await supabase
+		const supabase = getSupabaseBrowserClient();
+		const tr = (e.currentTarget as HTMLElement).closest('tr');
+		if (!tr) {
+			return;
+		}
+		const dataEl = tr.querySelector('[data-utils]');
+		const id = dataEl instanceof HTMLElement ? dataEl.getAttribute('data-utils') : null;
+		if (!id) {
+			return;
+		}
+		const { data, error } = (await supabase
 			.from('profiles')
 			.select('id, username, permissions, status, member_of(role, project(id,name)), avatar_url')
 			.eq('id', id)
-			.single();
-		if (error) {
+			.single()) as {
+			data: (ProfileRow & { permissions: string[]; status: string }) | null;
+			error: unknown;
+		};
+		if (error || !data) {
 			return;
 		}
 
@@ -636,11 +720,11 @@
 				project_id: m.project?.id,
 				role: m.role || 'membre'
 			}))
-			.filter((m) => m.project_id);
+			.filter((m) => m.project_id !== undefined);
 
 		const flatPerms = Object.values(permissionCategories).flat();
-		const permBadges = (data.permissions || []).map((p) => {
-			const label = flatPerms.find((fp) => fp.value === p)?.label || p;
+		const permBadges = data.permissions.map((p: string) => {
+			const label = flatPerms.find((fp) => fp.value === p)?.label ?? p;
 			return { text: label, color: 'bg-primary-900 border border-primary-500 text-primary-100' };
 		});
 
@@ -649,7 +733,7 @@
 				if (!m.project) {
 					return null;
 				}
-				let roleColor = 'bg-gray-700 border border-gray-500';
+				let roleColor: string;
 				if (m.role === 'admin' || m.role === 'bureau') {
 					roleColor = 'bg-rose-900 border border-rose-500 text-rose-100';
 				} else if (m.role === 'cdp') {
@@ -659,12 +743,12 @@
 				}
 				return { text: `${m.project.name} (${m.role})`, color: roleColor };
 			})
-			.filter(Boolean);
+			.filter((b): b is { text: string; color: string } => b !== null);
 
 		const values = {
 			header: {
 				title: 'Utilisateur',
-				sub: `${(data.permissions || []).length} permission(s)`
+				sub: `${String(data.permissions.length)} permission(s)`
 			},
 			body: [
 				{ label: 'Nom', value: data.username, avatar: data.avatar_url },
@@ -672,7 +756,7 @@
 					label: 'Permissions',
 					value: { type: 'badges', list: permBadges },
 					id: 'permissions',
-					data: data.permissions || []
+					data: data.permissions
 				},
 				{
 					label: 'Projets et rôles',
@@ -719,18 +803,33 @@
 			props: {
 				values,
 				fields,
-				onSubmit: async (e, forms, newFields) => {
+				onSubmit: async (
+					_e: Event,
+					forms: HTMLFormElement,
+					newFields: { name?: string; id?: string; value?: unknown }[]
+				) => {
 					const formData = new FormData(forms);
 
-					const nom = formData.get('Nom') || newFields.find((f) => f.name === 'Nom').value;
+					const nomVal = formData.get('Nom');
+					const nomField = newFields.find((f) => f.name === 'Nom');
+					const nom =
+						typeof nomVal === 'string'
+							? nomVal
+							: typeof nomField?.value === 'string'
+								? nomField.value
+								: '';
 
 					// permissions
 					const permsField = newFields.find((f) => f.id === 'permissions');
-					const extractedPermissions = permsField.value || [];
+					const extractedPermissions = Array.isArray(permsField?.value)
+						? (permsField.value as string[])
+						: [];
 
 					// projects
 					const projectsField = newFields.find((f) => f.id === 'projects');
-					const projectsRoles = projectsField.value || [];
+					const projectsRoles = Array.isArray(projectsField?.value)
+						? (projectsField.value as ProjectRoleEntry[])
+						: [];
 
 					// update the profile
 					const { error: profileError } = await supabase
@@ -741,22 +840,34 @@
 						})
 						.eq('id', id);
 					if (profileError) {
-						alert('Erreur lors de la mise à jour du profil : ' + profileError.message);
+						alert(
+							'Erreur lors de la mise à jour du profil : ' +
+								(profileError as { message: string }).message
+						);
 						return;
 					}
 
 					// Fetch existing project links
-					const { data: memberData, error: memberError } = await supabase
+					const { data: memberData, error: memberError } = (await supabase
 						.from('member_of')
 						.select('project, role')
-						.eq('profile', id);
+						.eq('profile', id)) as {
+						data: { project: string | number; role: string }[] | null;
+						error: unknown;
+					};
 					if (memberError) {
-						alert('Erreur lors de la récupération des projets existants : ' + memberError.message);
+						alert(
+							'Erreur lors de la récupération des projets existants : ' +
+								(memberError as { message: string }).message
+						);
 						return;
 					}
 
-					const currentProjectIds = memberData.map((m) => m.project.toString());
-					const newProjectIds = projectsRoles.map((p) => p.project_id?.toString()).filter(Boolean);
+					const memberRows = memberData ?? [];
+					const currentProjectIds = memberRows.map((m) => m.project.toString());
+					const newProjectIds = projectsRoles
+						.map((p) => p.project_id?.toString())
+						.filter((id): id is string => Boolean(id));
 					const projectsToAdd = projectsRoles.filter(
 						(p) => p.project_id && !currentProjectIds.includes(p.project_id.toString())
 					);
@@ -765,8 +876,8 @@
 						if (!p.project_id) {
 							return false;
 						}
-						const existing = memberData.find(
-							(m) => m.project.toString() === p.project_id.toString()
+						const existing = memberRows.find(
+							(m) => m.project.toString() === p.project_id?.toString()
 						);
 						return existing && existing.role !== p.role;
 					});
@@ -781,7 +892,9 @@
 							}))
 						);
 						if (addError) {
-							alert("Erreur lors de l'ajout aux projets : " + addError.message);
+							alert(
+								"Erreur lors de l'ajout aux projets : " + (addError as { message: string }).message
+							);
 							return;
 						}
 					}
@@ -795,7 +908,8 @@
 							.eq('project', p.project_id);
 						if (updateRoleError) {
 							alert(
-								'Erreur lors de la mise à jour du rôle pour le projet : ' + updateRoleError.message
+								'Erreur lors de la mise à jour du rôle pour le projet : ' +
+									(updateRoleError as { message: string }).message
 							);
 							return;
 						}
@@ -809,7 +923,10 @@
 							.eq('profile', id)
 							.in('project', projectsToRemove);
 						if (removeError) {
-							alert('Erreur lors de la suppression des projets : ' + removeError.message);
+							alert(
+								'Erreur lors de la suppression des projets : ' +
+									(removeError as { message: string }).message
+							);
 							return;
 						}
 					}
@@ -826,13 +943,11 @@
 					});
 				},
 				id,
-				actions: canEditMembers
-					? [
-							data.status === 'disabled'
-								? { title: 'Réactiver', type: 'validate', handler: reactivateUser }
-								: { title: 'Désactiver', type: 'delete', handler: deleteUser }
-						]
-					: []
+				actions: [
+					data.status === 'disabled'
+						? { title: 'Réactiver', type: 'validate', handler: reactivateUser }
+						: { title: 'Désactiver', type: 'delete', handler: deleteUser }
+				]
 			}
 		});
 	}
@@ -841,13 +956,13 @@
 		{
 			title: 'Voir',
 			type: 'view',
-			handler: async (e) => {
+			handler: async (e: Event) => {
 				await viewUser(e);
 			}
 		}
 	];
 
-	async function deleteUser(e) {
+	async function deleteUser(e: Event) {
 		e.preventDefault();
 		if (!canEditMembers) {
 			alert("Vous n'avez pas les permissions requises pour désactiver un utilisateur.");
@@ -857,17 +972,20 @@
 			return;
 		}
 		const drawer = document.querySelector('div[id^=drawer-]');
-		const id = drawer.id.split('drawer-')[1]; // Extract the id from the drawer id
+		const drawerId = drawer instanceof HTMLElement ? drawer.id.split('drawer-')[1] : '';
+		if (!drawerId) {
+			return;
+		}
 		try {
-			await deleteAuthUser(id);
+			await deleteAuthUser(drawerId);
 		} catch (error) {
-			alert(error?.message || 'Erreur lors de la désactivation du compte.');
+			alert((error as Error | null)?.message ?? 'Erreur lors de la désactivation du compte.');
 			return;
 		}
 		window.location.reload();
 	}
 
-	async function reactivateUser(e) {
+	async function reactivateUser(e: Event) {
 		e.preventDefault();
 		if (!canEditMembers) {
 			alert("Vous n'avez pas les permissions requises pour réactiver un utilisateur.");
@@ -877,11 +995,14 @@
 			return;
 		}
 		const drawer = document.querySelector('div[id^=drawer-]');
-		const id = drawer.id.split('drawer-')[1];
+		const drawerId = drawer instanceof HTMLElement ? drawer.id.split('drawer-')[1] : '';
+		if (!drawerId) {
+			return;
+		}
 		try {
-			await updateAuthUserStatus(id, 'active');
+			await updateAuthUserStatus(drawerId, 'active');
 		} catch (error) {
-			alert(error?.message || 'Erreur lors de la réactivation du compte.');
+			alert((error as Error | null)?.message ?? 'Erreur lors de la réactivation du compte.');
 			return;
 		}
 		window.location.reload();
@@ -897,14 +1018,14 @@
 			>
 				{pendingInvitesLoading
 					? 'Chargement...'
-					: `${pendingInvites.length} ${pendingInvites.length > 1 ? 'membres non validés' : 'membre non validé'}`}
+					: `${String(pendingInvites.length)} ${pendingInvites.length > 1 ? 'membres non validés' : 'membre non validé'}`}
 			</span>
 		{/if}
 	</div>
 </div>
 <div class="w-full py-2 sm:px-8 lg:px-16">
 	<div class="rounded-lg bg-gray-800">
-		<Table {headers} {parseItems} {filters} {dbInfo} {addNew} {actions} supabase={data.supabase} />
+		<Table {headers} {parseItems} {filters} {dbInfo} {addNew} {actions} />
 	</div>
 </div>
 
@@ -916,7 +1037,9 @@
 				<button
 					type="button"
 					class="rounded-lg border border-gray-600 px-3 py-2 text-sm font-medium text-gray-200 hover:bg-gray-700 disabled:cursor-not-allowed disabled:opacity-50"
-					onclick={loadPendingInvites}
+					onclick={() => {
+						void loadPendingInvites();
+					}}
 					disabled={pendingInvitesLoading || reinvitingUserId !== null}
 				>
 					Rafraîchir
@@ -947,7 +1070,7 @@
 							</tr>
 						</thead>
 						<tbody>
-							{#each pendingInvites as authUser}
+							{#each pendingInvites as authUser (authUser.id)}
 								<tr class="border-b border-gray-700">
 									<td class="px-3 py-2 text-white">{authUser.email}</td>
 									<td class="px-3 py-2">{formatDate(authUser.invited_at)}</td>
@@ -956,7 +1079,9 @@
 										<button
 											type="button"
 											class="bg-primary-700 hover:bg-primary-800 rounded-lg px-3 py-1.5 text-sm font-medium text-white disabled:cursor-not-allowed disabled:opacity-50"
-											onclick={() => reinvitePendingUser(authUser)}
+											onclick={() => {
+												void reinvitePendingUser(authUser);
+											}}
 											disabled={reinvitingUserId !== null}
 										>
 											{reinvitingUserId === authUser.id ? 'Envoi...' : 'Réinviter'}

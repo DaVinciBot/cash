@@ -1,19 +1,73 @@
 <script lang="ts">
 	import { hasAnyPermission } from '$lib/permissions';
+	import type { UserData } from '$lib/store';
 	import { userdata } from '$lib/store';
-	import { supabase } from '$lib/supabaseClient';
+	import { getSupabaseBrowserClient } from '$lib/supabaseClient';
 	import { loadUserdata, mountClosable, statusText } from '$lib/utils';
 	import { onMount } from 'svelte';
-	import { run } from 'svelte/legacy';
 
 	import Table from '$lib/components/admin/Table.svelte';
 	import ReadDrawer from '$lib/components/drawers/ReadDrawer.svelte';
 	import CrudForm from '$lib/components/modals/CrudForm.svelte';
 
-	/** @type {{data: any}} */
-	const { data } = $props();
+	interface OrderRow {
+		id: number;
+		creationDate: string;
+		projectId: { id: number; name: string | null } | null;
+		status: string;
+		lastUpdate: string;
+		requestedBy: { id: string; username: string | null } | null;
+		name: string | null;
+		tags: string[] | null;
+		price: number | null;
+		shipping_cost: number | null;
+	}
 
-	let user;
+	interface OrderDetail {
+		id: number;
+		creationDate: string;
+		projectId: number | null;
+		status: string;
+		status_reason: string | null;
+		lastUpdate: string;
+		items: ItemRow[];
+		comment: string | null;
+		tags: string[] | null;
+		requestedBy:
+			| { id: string; username: string | null }
+			| { id: string; username: string | null }[]
+			| null;
+		price: number | null;
+		name: string | null;
+	}
+
+	interface ItemRow {
+		id: number;
+		name: string | null;
+		quantity: number;
+		price: number | null;
+		link: string | null;
+	}
+
+	interface UpdateRow {
+		id: number;
+		message: string | null;
+		date: string;
+		type: string | null;
+		author: { username: string | null } | { username: string | null }[] | null;
+	}
+
+	interface BankRow {
+		id: number;
+		name: string | null;
+	}
+
+	interface ProjectOption {
+		name: string;
+		value: number;
+	}
+
+	let user: UserData = $state(null);
 	let pendingCount = $state(0);
 	let approvedCount = $state(0);
 	let deliveryCount = $state(0);
@@ -22,24 +76,19 @@
 	let canEditProjectOrders = false;
 	let canEditOrders = false;
 
-	let project = $state([]);
+	let project = $state<ProjectOption[]>([]);
 
-	const syncUserContext = (profile) => {
-		if (!profile) {
-			return;
-		}
+	const syncUserContext = (profile: NonNullable<UserData>) => {
 		user = profile;
 		const permissions = Array.isArray(profile.permissions) ? profile.permissions : [];
 		canViewAllOrders = hasAnyPermission(permissions, ['orders.read.all']);
-		canEditProjectOrders = (profile?.projects || []).some((p) => p?.role === 'cdp');
+		canEditProjectOrders = profile.projects.some((p) => p.role === 'cdp');
 		canEditOrders = hasAnyPermission(permissions, ['orders.lifecycle.update.all']);
-		project = profile?.projects.map((p) => ({ name: p.name, value: p.id })) || [];
+		project = profile.projects.map((p) => ({ name: p.name, value: p.id }));
 		if (canViewAllOrders) {
-			project = profile?.allProjects || [];
+			project = (profile.allProjects ?? []).map((p) => ({ name: p.name, value: p.value }));
 		}
 	};
-
-	syncUserContext(data?.userProfile);
 
 	userdata.subscribe((value) => {
 		if (value) {
@@ -73,58 +122,66 @@
 		{ name: 'Annulé', value: 'canceled_user","canceled_ops' }
 	];
 
-	let filters;
-	run(() => {
-		filters = [
-			{
-				category: 'Projet',
-				value: 'projectId',
-				wide: true,
-				options: project
-			},
-			{
-				category: 'Status',
-				value: 'status',
-				options: statusFilters
-			}
-		];
+	let filters = $state([
+		{
+			category: 'Projet',
+			value: 'projectId',
+			wide: true,
+			options: project
+		},
+		{
+			category: 'Status',
+			value: 'status',
+			options: statusFilters
+		}
+	]);
+
+	$effect(() => {
+		filters[0].options = project;
 	});
+
+	function getFormNumber(formData: FormData, key: string): number {
+		const val = formData.get(key);
+		return parseFloat(typeof val === 'string' ? val : '0');
+	}
+
+	function getFormInt(formData: FormData, key: string): number {
+		const val = formData.get(key);
+		return parseInt(typeof val === 'string' ? val : '0');
+	}
 
 	const actions = [
 		{
 			title: 'Voir',
 			type: 'view',
-			handler: async (e) => {
-				// get the info from the order
-				const id = e.target.closest('tr').querySelector('th').dataset.utils;
+			handler: async (e: MouseEvent) => {
+				const target = e.target as HTMLElement;
+				const id = target.closest('tr')?.querySelector('th')?.dataset.utils;
 
-				const { data, error } = await supabase
+				const supabase = getSupabaseBrowserClient();
+				const { data, error } = (await supabase
 					.from('orders')
 					.select(
 						'id, creationDate, projectId, status, status_reason, lastUpdate, items(*), comment, tags, requestedBy(id, username), price, name'
 					)
-					.eq('id', id)
-					.single();
+					.eq('id', id ?? '')
+					.single()) as { data: OrderDetail | null; error: unknown };
 
-				if (error) {
+				if (error || !data) {
 					return;
 				}
-				const price = data.price.toFixed(2);
+				const price = data.price?.toFixed(2) ?? '0.00';
 				const name = data.name;
 
-				const items = [];
-				data.items.forEach((item, i) => {
-					items.push({
-						name: item.name,
-						quantity: item.quantity,
-						price: `${item.price} €`,
-						rawPrice: item.price,
-						id: item.id,
-						link: item.link
-					});
-				});
-
-				const isRequester = data.requestedBy?.id === user?.id;
+				const isRequester = (() => {
+					if (!data.requestedBy) {
+						return false;
+					}
+					if (Array.isArray(data.requestedBy)) {
+						return data.requestedBy[0]?.id === user?.id;
+					}
+					return data.requestedBy.id === user?.id;
+				})();
 				let canEditThisOrderItems = false;
 				if (data.status === 'pending_cdp' && (canEditProjectOrders || isRequester)) {
 					canEditThisOrderItems = true;
@@ -132,7 +189,32 @@
 					canEditThisOrderItems = true;
 				}
 
-				const editItemHandler = (itemToEdit) => {
+				const items: {
+					name: string;
+					quantity: number;
+					price: string;
+					rawPrice: number | null;
+					id: number;
+					link: string | null;
+				}[] = [];
+				data.items.forEach((item) => {
+					items.push({
+						name: item.name ?? '',
+						quantity: item.quantity,
+						price: `${String(item.price)} €`,
+						rawPrice: item.price,
+						id: item.id,
+						link: item.link
+					});
+				});
+
+				const editItemHandler = (itemToEdit: {
+					name: string;
+					link: string | null;
+					quantity: number;
+					rawPrice: number | null;
+					id: number;
+				}) => {
 					mountClosable(CrudForm, {
 						target: document.body,
 						props: {
@@ -155,63 +237,68 @@
 									name: 'Prix unitaire (€)',
 									type: 'number',
 									id: 'price',
-									value: parseFloat(itemToEdit.rawPrice),
+									value: parseFloat(String(itemToEdit.rawPrice ?? 0)),
 									required: true,
 									step: 0.01
 								}
 							],
-							onSubmit: async (ev) => {
+							onSubmit: async (ev: SubmitEvent) => {
 								ev.preventDefault();
-								const form = ev.target.closest('form');
+								const form = (ev.target as HTMLElement).closest('form');
+								if (!form) {
+									return;
+								}
 								const fd = new FormData(form);
-								const name = fd.get('name');
-								const link = fd.get('link');
-								const quantity = parseInt(String(fd.get('quantity')));
-								const price = parseFloat(String(fd.get('price')));
+								const nameVal = fd.get('name');
+								const linkVal = fd.get('link');
+								const name = typeof nameVal === 'string' ? nameVal : '';
+								const link = typeof linkVal === 'string' ? linkVal : null;
+								const quantityVal = fd.get('quantity');
+								const priceVal = fd.get('price');
+								const quantity = parseInt(typeof quantityVal === 'string' ? quantityVal : '0');
+								const price = parseFloat(typeof priceVal === 'string' ? priceVal : '0');
 
 								if (Number.isNaN(quantity) || Number.isNaN(price) || !name) {
 									alert('Veuillez remplir correctement tous les champs.');
 									return;
 								}
 
-								const { error } = await supabase
+								const supabase2 = getSupabaseBrowserClient();
+								const { error: updateErr } = await supabase2
 									.from('items')
 									.update({ name, link, quantity, price })
 									.eq('id', itemToEdit.id);
 
-								if (error) {
+								if (updateErr) {
 									alert("Échec de la mise à jour de l'objet.");
 									return;
 								}
-								// Trigger a reload or update local state
 								window.location.reload();
 							}
 						}
 					});
 				};
 
-				const deleteItemHandler = async (itemToRemove) => {
+				const deleteItemHandler = async (itemToRemove: { id: number }) => {
 					if (!confirm('Supprimer cet objet ?')) {
 						return;
 					}
-					const { error } = await supabase.from('items').delete().eq('id', itemToRemove.id);
-					if (error) {
-						alert('Erreur: ' + error.message);
+					const supabase2 = getSupabaseBrowserClient();
+					const { error: deleteErr } = await supabase2
+						.from('items')
+						.delete()
+						.eq('id', itemToRemove.id);
+					if (deleteErr) {
+						alert(`Erreur: ${deleteErr.message}`);
 					} else {
-						window.location.reload(); // Quick refresh
+						window.location.reload();
 					}
 				};
 
 				// Stepper logic based on order status
 				const stepper = [
-					{
-						done: true,
-						icon: 'link'
-					},
-					{
-						done: data.status !== 'pending_cdp',
-						icon: 'checked-document'
-					},
+					{ done: true, icon: 'link' },
+					{ done: data.status !== 'pending_cdp', icon: 'checked-document' },
 					{
 						done: [
 							'pending_delivery',
@@ -222,14 +309,8 @@
 						].includes(data.status),
 						icon: 'processing'
 					},
-					{
-						done: data.status === 'completed',
-						icon: 'shipping'
-					},
-					{
-						done: data.status === 'completed',
-						icon: 'done'
-					}
+					{ done: data.status === 'completed', icon: 'shipping' },
+					{ done: data.status === 'completed', icon: 'done' }
 				];
 
 				if (data.status === 'refused_cdp') {
@@ -246,10 +327,10 @@
 					stepper[3].icon = 'cancel';
 				}
 
-				let custom_actions = [];
+				let custom_actions: unknown[] = [];
 
 				if (canEditOrders) {
-					const lifecycleTransitions = [];
+					const lifecycleTransitions: { value: string; name: string }[] = [];
 					if (data.status === 'pending_cdp') {
 						lifecycleTransitions.push({ value: 'pending_treso', name: 'Passer en revue Tréso' });
 					}
@@ -263,174 +344,178 @@
 						lifecycleTransitions.push({ value: 'completed', name: 'Terminer' });
 					}
 
-					custom_actions =
-						lifecycleTransitions.length > 0
-							? [
-									{
-										title: lifecycleTransitions,
-										type: 'selector',
-										handler: async (e) => {
-											const new_status = e.target.value;
-											const shippingCost = '0';
-											const finalPrice = price.toString();
+					if (lifecycleTransitions.length > 0) {
+						custom_actions = [
+							{
+								title: lifecycleTransitions,
+								type: 'selector',
+								handler: async (e: Event) => {
+									const new_status = (e.target as HTMLSelectElement).value;
+									const finalPrice = price;
 
-											if (new_status === 'pending_delivery') {
-												const { data: banks, error: bankErr } = await supabase
-													.from('bank')
-													.select('id, name')
-													.order('name');
-												if (bankErr) {
-													alert('Impossible de charger la liste des banques.');
-													return;
-												}
+									if (new_status === 'pending_delivery') {
+										const supabase2 = getSupabaseBrowserClient();
+										const { data: banks, error: bankErr } = (await supabase2
+											.from('bank')
+											.select('id, name')
+											.order('name')) as { data: BankRow[] | null; error: unknown };
+										if (bankErr || !banks) {
+											alert('Impossible de charger la liste des banques.');
+											return;
+										}
 
-												mountClosable(CrudForm, {
-													target: document.body,
-													props: {
-														type: 'commande',
-														type_accord: 'une',
-														action: 'Valider',
-														title: 'Informations de commande',
-														fields: [
-															{
-																name: 'Frais de port (€)',
-																type: 'number',
-																id: 'shipping_cost',
-																required: true,
-																value: '0',
-																step: 0.01,
-																min: 0
-															},
-															{
-																name: 'Prix final hors port (€)',
-																type: 'number',
-																id: 'final_price',
-																required: true,
-																value: price.toString(),
-																step: 0.01,
-																min: 0
-															},
-															{
-																name: 'Compte',
-																type: 'select',
-																id: 'bank_id',
-																required: true,
-																options: banks.map((b) => ({
-																	value: String(b.id),
-																	text: b.name || `Compte ${b.id}`
-																}))
-															}
-														],
-														onSubmit: async (ev) => {
-															ev.preventDefault();
-															const form = ev.target.closest('form');
-															const fd = new FormData(form);
-															const shipping = parseFloat(String(fd.get('shipping_cost') ?? ''));
-															const finalP = parseFloat(String(fd.get('final_price') ?? ''));
-															const bankId = parseInt(String(fd.get('bank_id') ?? ''));
-															if (
-																Number.isNaN(shipping) ||
-																Number.isNaN(finalP) ||
-																Number.isNaN(bankId)
-															) {
-																alert('Veuillez remplir correctement tous les champs.');
-																return;
-															}
-
-															const { error: updErr } = await supabase
-																.from('orders')
-																.update({
-																	status: new_status,
-																	shipping_cost: shipping,
-																	price: finalP,
-																	status_reason: null
-																})
-																.eq('id', id);
-															if (updErr) {
-																alert(`Échec de la mise à jour de la commande: ${updErr.message}`);
-																return;
-															}
-
-															const total = shipping + finalP;
-															const { error: spendErr } = await supabase.from('spending').insert([
-																{
-																	amount: total,
-																	is_positive: false,
-																	order_id: id,
-																	bank_id: bankId
-																}
-															]);
-															if (spendErr) {
-																alert(
-																	'URGENT : CONTACTER ADMIN \n Commande mise à jour mais écriture trésorerie échouée'
-																);
-															}
-
-															window.location.reload();
-														}
+										mountClosable(CrudForm, {
+											target: document.body,
+											props: {
+												type: 'commande',
+												type_accord: 'une',
+												action: 'Valider',
+												title: 'Informations de commande',
+												fields: [
+													{
+														name: 'Frais de port (€)',
+														type: 'number',
+														id: 'shipping_cost',
+														required: true,
+														value: '0',
+														step: 0.01,
+														min: 0
+													},
+													{
+														name: 'Prix final hors port (€)',
+														type: 'number',
+														id: 'final_price',
+														required: true,
+														value: finalPrice,
+														step: 0.01,
+														min: 0
+													},
+													{
+														name: 'Compte',
+														type: 'select',
+														id: 'bank_id',
+														required: true,
+														options: banks.map((b) => ({
+															value: String(b.id),
+															text: b.name ?? `Compte ${String(b.id)}`
+														}))
 													}
-												});
-												return;
-											}
+												],
+												onSubmit: async (ev: SubmitEvent) => {
+													ev.preventDefault();
+													const form = (ev.target as HTMLElement).closest('form');
+													if (!form) {
+														return;
+													}
+													const fd = new FormData(form);
+													const shipping = getFormNumber(fd, 'shipping_cost');
+													const finalP = getFormNumber(fd, 'final_price');
+													const bankId = getFormInt(fd, 'bank_id');
+													if (
+														Number.isNaN(shipping) ||
+														Number.isNaN(finalP) ||
+														Number.isNaN(bankId)
+													) {
+														alert('Veuillez remplir correctement tous les champs.');
+														return;
+													}
 
-											const { error } = await supabase
-												.from('orders')
-												.update({
-													status: new_status,
-													shipping_cost: parseFloat(shippingCost),
-													price: parseFloat(finalPrice),
-													status_reason: null
-												})
-												.eq('id', id);
+													const supabase3 = getSupabaseBrowserClient();
+													const { error: updErr } = await supabase3
+														.from('orders')
+														.update({
+															status: new_status,
+															shipping_cost: shipping,
+															price: finalP,
+															status_reason: null
+														})
+														.eq('id', id ?? '');
+													if (updErr) {
+														alert(`Échec de la mise à jour de la commande: ${updErr.message}`);
+														return;
+													}
 
-											if (error) {
-												alert(`Échec de la mise à jour de la commande: ${error.message}`);
-												return;
+													const total = shipping + finalP;
+													const supabase4 = getSupabaseBrowserClient();
+													const { error: spendErr } = await supabase4.from('spending').insert([
+														{
+															amount: total,
+															is_positive: false,
+															order_id: id,
+															bank_id: bankId
+														}
+													]);
+													if (spendErr) {
+														alert(
+															'URGENT : CONTACTER ADMIN \n Commande mise à jour mais écriture trésorerie échouée'
+														);
+													}
+
+													window.location.reload();
+												}
 											}
-											window.location.reload();
-										}
+										});
+										return;
 									}
-								]
-							: [];
-				} else {
-					custom_actions =
-						canEditProjectOrders && data.status === 'pending_cdp'
-							? [
-									{
-										title: 'Valider',
-										type: 'validate',
-										handler: async (e) => {
-											const new_status = 'pending_treso';
 
-											const { error } = await supabase
-												.from('orders')
-												.update({ status: new_status, status_reason: null })
-												.eq('id', id);
+									const supabase2 = getSupabaseBrowserClient();
+									const { error: updErr2 } = await supabase2
+										.from('orders')
+										.update({
+											status: new_status,
+											shipping_cost: 0,
+											price: parseFloat(finalPrice),
+											status_reason: null
+										})
+										.eq('id', id ?? '');
 
-											if (error) {
-												alert(`Échec de la mise à jour de la commande: ${error.message}`);
-												return;
-											}
-											window.location.reload();
-										}
+									if (updErr2) {
+										alert(`Échec de la mise à jour de la commande: ${updErr2.message}`);
+										return;
 									}
-								]
-							: [];
+									window.location.reload();
+								}
+							}
+						];
+					}
+				} else if (canEditProjectOrders && data.status === 'pending_cdp') {
+					custom_actions = [
+						{
+							title: 'Valider',
+							type: 'validate',
+							handler: async (_e: MouseEvent) => {
+								const new_status = 'pending_treso';
+
+								const supabase2 = getSupabaseBrowserClient();
+								const { error: updErr } = await supabase2
+									.from('orders')
+									.update({ status: new_status, status_reason: null })
+									.eq('id', id ?? '');
+
+								if (updErr) {
+									alert(`Échec de la mise à jour de la commande: ${updErr.message}`);
+									return;
+								}
+								window.location.reload();
+							}
+						}
+					];
 				}
 
-				const updates = await supabase
+				const supabase2 = getSupabaseBrowserClient();
+				const updates = (await supabase2
 					.from('updates')
 					.select('id, message, date, author(username), type')
-					.eq('order_id', id)
-					.order('date', { ascending: false });
+					.eq('order_id', id ?? '')
+					.order('date', { ascending: false })) as { data: UpdateRow[] | null; error: unknown };
 
-				if (updates.error) {
+				if (updates.error || !updates.data) {
 					return;
 				}
-				const updatesList = updates.data;
-				updatesList.forEach((update) => {
-					update.date = new Date(update.date).toLocaleString();
-				});
+				const updatesList: (UpdateRow & { date: string })[] = updates.data.map((u) => ({
+					...u,
+					date: new Date(u.date).toLocaleString()
+				}));
 
 				const canRefuseOrder =
 					(canEditProjectOrders && data.status === 'pending_cdp') ||
@@ -443,7 +528,7 @@
 						values: {
 							header: {
 								title: name,
-								sub: price + ' €',
+								sub: `${price} €`,
 								stepper
 							},
 							body: [
@@ -463,7 +548,7 @@
 								},
 								{
 									label: 'Raison statut',
-									value: data.status_reason?.trim() || 'Aucune'
+									value: data.status_reason?.trim() ?? 'Aucune'
 								},
 								{
 									label: 'Tags',
@@ -480,8 +565,8 @@
 											date: update.date,
 											type: update.type,
 											user: Array.isArray(update.author)
-												? update.author[0]?.username || 'Système'
-												: update.author?.username || 'Système'
+												? (update.author[0]?.username ?? 'Système')
+												: (update.author?.username ?? 'Système')
 										})),
 										type: 'updates'
 									}
@@ -495,8 +580,8 @@
 										{
 											title: 'Refuser',
 											type: 'delete',
-											handler: async (e) => {
-												let new_status = null;
+											handler: async (_e: MouseEvent) => {
+												let new_status: string | null = null;
 												if (data.status === 'pending_cdp') {
 													new_status = 'refused_cdp';
 												} else if (data.status === 'pending_treso') {
@@ -513,7 +598,7 @@
 													new_status === 'canceled_ops'
 														? "Raison d'annulation (obligatoire)"
 														: 'Raison du refus (obligatoire)';
-												const reason = prompt(reasonPrompt)?.trim() || '';
+												const reason = prompt(reasonPrompt)?.trim() ?? '';
 												if (!reason) {
 													alert(
 														new_status === 'canceled_ops'
@@ -523,13 +608,14 @@
 													return;
 												}
 
-												const { error } = await supabase
+												const supabase3 = getSupabaseBrowserClient();
+												const { error: refuseErr } = await supabase3
 													.from('orders')
 													.update({ status: new_status, status_reason: reason })
-													.eq('id', id);
+													.eq('id', id ?? '');
 
-												if (error) {
-													alert(`Échec du changement de statut: ${error.message}`);
+												if (refuseErr) {
+													alert(`Échec du changement de statut: ${refuseErr.message}`);
 													return;
 												}
 												window.location.reload();
@@ -544,29 +630,33 @@
 			}
 		}
 	];
-	function parseItems(data) {
-		const items = [];
+
+	function parseItems(data: OrderRow[]) {
+		const items: { value: string | number; data?: string | number }[][] = [];
 		data.forEach((el) => {
-			const price = Math.round((el.price + el.shipping_cost || 0) * 100) / 100;
+			const price = Math.round(((el.price ?? 0) + (el.shipping_cost ?? 0)) * 100) / 100;
+			const elName = el.name ?? '';
+			const name = elName.length > 30 ? elName.substring(0, 30) + '...' : elName || '-';
 			items.push([
-				{
-					value: el.name?.length > 30 ? el.name.substring(0, 30) + '...' : el.name || '-',
-					data: el.id
-				},
-				{ value: el.creationDate?.toLocaleString().split('T')[0] || '-' },
-				{ value: el.lastUpdate?.toLocaleString().split('T')[0] || '-' },
-				{ value: price + ' €' },
-				{ value: el.projectId?.name || '-', data: el.projectId?.id || '' },
-				{ value: el.requestedBy?.username || '-', data: el.requestedBy?.id || '' },
-				{ value: Array.isArray(el.tags) && el.tags.length ? el.tags.join(', ') : '-' },
-				{ value: statusText[el.status] || el.status || '-' }
+				{ value: name, data: el.id },
+				{ value: el.creationDate.split('T')[0] },
+				{ value: el.lastUpdate.split('T')[0] },
+				{ value: `${String(price)} €` },
+				{ value: el.projectId?.name ?? '-', data: el.projectId?.id ?? '' },
+				{ value: el.requestedBy?.username ?? '-', data: el.requestedBy?.id ?? '' },
+				{ value: Array.isArray(el.tags) && el.tags.length > 0 ? el.tags.join(', ') : '-' },
+				{ value: statusText[el.status] ?? el.status ?? '-' }
 			]);
 		});
 		return items;
 	}
 
 	async function updateCounts() {
-		const { data, error } = await supabase.from('orders').select('status');
+		const supabase = getSupabaseBrowserClient();
+		const { data, error } = (await supabase.from('orders').select('status')) as {
+			data: { status: string }[] | null;
+			error: unknown;
+		};
 
 		if (!error && data) {
 			pendingCount = data.filter((o) => o.status === 'pending_cdp').length;
@@ -576,22 +666,24 @@
 		}
 	}
 
-	onMount(async () => {
+	onMount(() => {
 		if (!user) {
-			await loadUserdata(data?.userProfile ?? null);
+			loadUserdata();
 		}
 		if (!canViewAllOrders) {
-			filters = filters.splice(1, 1);
-			filters = [
-				...filters,
-				{
-					category: 'hidden',
-					value: 'projectId',
-					options: [{ name: 'CDP project', value: user?.projects[0].id, active: true }]
-				}
-			];
+			filters.splice(0, 1);
+			if (user) {
+				filters = [
+					...filters,
+					{
+						category: 'hidden',
+						value: 'projectId',
+						options: [{ name: 'CDP project', value: user.projects[0]?.id ?? 0, active: true }]
+					}
+				];
+			}
 		}
-		await updateCounts();
+		void updateCounts();
 	});
 </script>
 
@@ -626,7 +718,6 @@
 			{dbInfo}
 			{filters}
 			{parseItems}
-			supabase={data.supabase}
 			type="commande"
 			type_accord="une"
 			searchable="name"

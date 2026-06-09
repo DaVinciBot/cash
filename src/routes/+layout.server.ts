@@ -2,49 +2,68 @@ import {
 	ADMIN_MENU,
 	canAccessAdminPath,
 	filterMenuByPermissions,
-	hasAnyPermission
+	hasAnyPermission,
+	type Permission
 } from '$lib/permissions';
+import type { UserProfile, UserProject } from '$lib/types/profile';
 import { redirect } from '@sveltejs/kit';
+import type { ProjectRow } from '../database.types';
 import type { LayoutServerLoad } from './$types';
 
+interface ProfileRow {
+	username: string | null;
+	avatar_url: string | null;
+	permissions: Permission[] | null;
+	member_of: {
+		role: string;
+		project: {
+			id: number;
+			name: string;
+			debut: string | null;
+		} | null;
+	}[];
+}
+
 export const load: LayoutServerLoad = async ({ locals, cookies, url }) => {
-	const { safeGetSession, supabase } = locals as any;
+	const { safeGetSession, supabase } = locals;
 	const { session, user } = await safeGetSession();
 
-	if (!session && !import.meta.env?.DEV) {
+	if (!session && !import.meta.env.DEV) {
 		redirect(303, 'https://davincibot.fr');
 	}
 
-	let userProfile = null;
-	let permissions: string[] = [];
+	let userProfile: UserProfile | null = null;
+	let permissions: Permission[] = [];
 	let canCreateOrder = false;
 	let menu = filterMenuByPermissions(ADMIN_MENU, []);
 
 	if (user?.id) {
-		const { data, error } = await supabase
+		const { data, error } = (await supabase
 			.from('profiles')
 			.select('username,avatar_url,permissions, member_of(role, project(id, name, debut))')
 			.eq('id', user.id)
-			.single();
+			.single()) as { data: ProfileRow | null; error: unknown };
 
 		if (!error && data) {
-			permissions = (data.permissions as string[]) ?? [];
+			permissions = (data.permissions ?? []).filter(Boolean);
 			canCreateOrder =
 				permissions.includes('orders.create.all') || permissions.includes('orders.cru.self');
 
+			const projects: UserProject[] = data.member_of.map((m) => ({
+				id: m.project?.id ?? 0,
+				name: m.project?.name ?? '',
+				debut: m.project?.debut ?? '0000-00-00',
+				role: m.role
+			}));
+
 			userProfile = {
 				email: user.email ?? '',
-				name: data.username ?? (user.email ? user.email.split('@')[0] : ''),
+				name: data.username ?? (user.email ? (user.email.split('@').at(0) ?? '') : ''),
 				avatar: data.avatar_url ?? 'https://avatar.iran.liara.run/public/boy',
 				id: user.id,
-				projects: ((data.member_of as any[]) || []).map((m: any) => ({
-					id: m?.project?.id,
-					name: m?.project?.name,
-					debut: m?.project?.debut ?? '0000-00-00',
-					role: m?.role ?? 'membre'
-				})),
+				projects,
 				permissions,
-				allProjects: null as any[] | null
+				allProjects: null
 			};
 
 			if (
@@ -64,14 +83,14 @@ export const load: LayoutServerLoad = async ({ locals, cookies, url }) => {
 					role: 'association'
 				}); //TODO: review
 
-				const { data: projects, error: projectsError } = await supabase
+				const { data: projects, error: projectsError } = (await supabase
 					.from('projects')
-					.select('id, name, debut');
+					.select('id, name, debut')) as { data: ProjectRow[] | null; error: unknown };
 				if (!projectsError) {
-					userProfile.allProjects = (projects || []).map((p: any) => ({
+					userProfile.allProjects = (projects ?? []).map((p) => ({
 						value: p.id,
-						name: p.name,
-						debut: p.debut
+						name: p.name ?? '',
+						debut: p.debut ?? ''
 					}));
 				}
 			}
@@ -89,7 +108,7 @@ export const load: LayoutServerLoad = async ({ locals, cookies, url }) => {
 		menu = filterMenuByPermissions(ADMIN_MENU, permissions);
 	}
 
-	(locals as any).permissions = permissions;
+	locals.permissions = permissions;
 
 	return {
 		session,

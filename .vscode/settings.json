@@ -18,5 +18,12 @@
 	"editor.formatOnSave": true,
 	"files.associations": {
 		"*.css": "tailwindcss"
-	}
+	},
+	"files.exclude": {
+		"**/.svelte-kit": true,
+		"**/dist": true,
+		"**/build": true
+	},
+	"eslint.run": "onSave",
+	"eslint.workingDirectories": [{ "mode": "auto" }]
 }

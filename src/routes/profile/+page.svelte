@@ -1,23 +1,14 @@
 <script lang="ts">
-	import { preventDefault } from 'svelte/legacy';
-
+	import type { UserData } from '$lib/store';
 	import { userdata } from '$lib/store';
-	import { supabase } from '$lib/supabaseClient';
+	import { getSupabaseBrowserClient } from '$lib/supabaseClient';
 	import { onMount } from 'svelte';
-
-	/** @type {{user?: any}} */
-	let {
-		user = $bindable({
-			name: 'Urbain',
-			email: 'davincibot@devinci.fr',
-			avatar: 'https://flowbite.s3.amazonaws.com/blocks/marketing-ui/avatars/michael-gough.png'
-		})
-	} = $props();
+	let user = $state<UserData>(null);
 
 	userdata.subscribe((value) => {
 		if (value) {
 			user = value;
-			loadPage().catch(() => undefined);
+			loadPage();
 		}
 	});
 
@@ -26,10 +17,10 @@
 		window.location.href = `${window.location.origin}/auth/login`;
 	}
 
-	async function clearUserdataCache() {
+	function clearUserdataCache() {
 		try {
 			// collect keys to remove: userdata cache + all table settings (settings_*)
-			const keysToRemove = [];
+			const keysToRemove: string[] = [];
 			for (let i = 0; i < localStorage.length; i++) {
 				const key = localStorage.key(i);
 				if (!key) {
@@ -48,12 +39,20 @@
 			alert('Impossible de vider le cache utilisateur');
 		}
 	}
-	async function handleImage(e) {
-		const avatarFile = e.target.files[0];
+
+	async function handleImage(e: Event) {
+		const input = e.target as HTMLInputElement;
+		const avatarFile = input.files?.[0];
+		if (!avatarFile || !user) {
+			return;
+		}
 		const extension = avatarFile.name.split('.').pop();
-		const { data, error } = await supabase.storage
+		const supabase = getSupabaseBrowserClient();
+		const userId = user.id;
+		const ext = extension ?? 'jpg';
+		const { error } = await supabase.storage
 			.from('avatars')
-			.upload(`${user.id}/avatar.${extension}`, avatarFile, {
+			.upload(`${userId}/avatar.${ext}`, avatarFile, {
 				cacheControl: '3600',
 				upsert: true
 			});
@@ -65,18 +64,18 @@
 				alert('Une erreur est survenue lors de la modification de votre avatar');
 			}
 		} else {
-			const { data } = supabase.storage
+			const { data: urlData } = supabase.storage
 				.from('avatars')
-				.getPublicUrl(`${user.id}/avatar.${extension}`);
-			user.avatar = data.publicUrl;
+				.getPublicUrl(`${userId}/avatar.${ext}`);
+			user.avatar = urlData.publicUrl;
 			userdata.set(user);
 
-			const { data: data2, error: error2 } = await supabase
+			const { error: updateError } = await supabase
 				.from('profiles')
-				.update({ avatar_url: data.publicUrl })
+				.update({ avatar_url: urlData.publicUrl })
 				.eq('id', user.id);
 
-			if (error2) {
+			if (updateError) {
 				alert('Une erreur est survenue lors de la modification de votre avatar');
 			}
 
@@ -90,7 +89,7 @@
 	let new_password_confirmation = $state('');
 	let new_username = $state('');
 
-	let loading = $state(false);
+	let loading = $state<boolean>(false);
 
 	async function handlePassword() {
 		loading = true;
@@ -116,10 +115,17 @@
 		new_password_confirmation = '';
 	}
 
-	async function handleSubmit() {
+	async function handleSubmit(e: SubmitEvent) {
+		e.preventDefault();
 		loading = true;
 
-		const { data, error } = await supabase
+		if (!user) {
+			loading = false;
+			return;
+		}
+
+		const supabase = getSupabaseBrowserClient();
+		const { error } = await supabase
 			.from('profiles')
 			.update({ username: new_username })
 			.eq('id', user.id);
@@ -134,12 +140,12 @@
 		loading = false;
 	}
 
-	async function loadPage() {
-		new_username = user.name ?? '';
+	function loadPage() {
+		new_username = user?.name ?? '';
 	}
 
-	onMount(async () => {
-		await loadPage();
+	onMount(() => {
+		loadPage();
 	});
 </script>
 
@@ -170,14 +176,14 @@
 
 		<div>
 			<h3 class="text-lg font-semibold text-white">
-				{user?.projects?.map((el) => el.name).join(', ')}
+				{user ? user.projects.map((el) => el.name).join(', ') : ''}
 			</h3>
 		</div>
 	</div>
 	<div
 		class="flex h-full w-full flex-col items-center justify-center rounded-lg bg-gray-800 p-8 text-white shadow-md sm:mx-auto"
 	>
-		<form class="w-full space-y-4 md:space-y-6" onsubmit={preventDefault(handleSubmit)}>
+		<form class="w-full space-y-4 md:space-y-6" onsubmit={handleSubmit}>
 			<div>
 				<label for="username" class="mb-2 block text-sm font-medium text-white">Votre nom</label>
 				<input
@@ -218,7 +224,10 @@
 	>
 		<form
 			class="w-full space-y-4 border-gray-700 md:space-y-6"
-			onsubmit={preventDefault(handlePassword)}
+			onsubmit={async (e: SubmitEvent) => {
+				e.preventDefault();
+				await handlePassword();
+			}}
 		>
 			<div>
 				<label for="password" class="mb-2 block text-sm font-medium text-white"

@@ -1,27 +1,26 @@
 <script lang="ts">
 	import { browser } from '$app/environment';
-	import { ADMIN_CUSTOM_URI } from '$lib/permissions';
+	import { resolve } from '$app/paths';
 	import { userdata } from '$lib/store';
 	import { getSupabaseBrowserClient } from '$lib/supabaseClient';
-	import { onMount } from 'svelte';
-	import { run } from 'svelte/legacy';
+	import type { Session } from '@supabase/supabase-js';
+	import type { Snippet } from 'svelte';
+	import type { PageData } from './$types';
 
 	import SideBar from '$lib/components/admin/SideBar.svelte';
 	import UserBadge from '$lib/components/share/UserBadge.svelte';
 	import '../app.css';
 
-	/** @type {{data: any, children?: import('svelte').Snippet}} */
-	const { data, children } = $props();
+	const { data, children }: { data: PageData; children?: Snippet } = $props();
 
 	const userProfile = $derived(data.userProfile);
-	const canCreateOrder = $derived(data.canCreateOrder ?? false);
-	const __menu = $derived(data.menu ?? []);
+	const canCreateOrder = $derived(data.canCreateOrder);
+	const __menu = $derived(data.menu);
 
 	let open = $state(false);
-	const custom_uri = [...ADMIN_CUSTOM_URI];
 	let sessionSynced = $state(false);
 
-	onMount(() => {
+	$effect(() => {
 		if (userProfile) {
 			userdata.set(userProfile);
 		} else {
@@ -29,21 +28,14 @@
 		}
 	});
 
-	run(() => {
-		if (userProfile) {
-			userdata.set(userProfile);
-		} else {
-			userdata.set(null);
-		}
-	});
-
-	run(() => {
-		if (browser && !sessionSynced && data?.session?.access_token && data?.session?.refresh_token) {
+	$effect(() => {
+		const session = data.session as Session | null;
+		if (browser && !sessionSynced && session?.access_token && session.refresh_token) {
 			sessionSynced = true;
 			const supabase = getSupabaseBrowserClient();
-			supabase.auth.setSession({
-				access_token: data.session.access_token,
-				refresh_token: data.session.refresh_token
+			void supabase.auth.setSession({
+				access_token: session.access_token,
+				refresh_token: session.refresh_token
 			});
 		}
 	});
@@ -79,8 +71,8 @@
 						data-drawer-target="drawer-navigation"
 						data-drawer-toggle="drawer-navigation"
 						aria-controls="drawer-navigation"
-						class="mr-2 cursor-pointer rounded-lg p-2 text-gray-400 hover:bg-gray-700 hover:text-white focus:bg-gray-700 focus:ring-2 focus:ring-gray-100 focus:ring-gray-700 md:hidden"
-						onclick={(e) => {
+						class="mr-2 cursor-pointer rounded-lg p-2 text-gray-400 hover:bg-gray-700 hover:text-white focus:bg-gray-700 focus:ring-2 focus:ring-gray-100 md:hidden"
+						onclick={() => {
 							open = !open;
 						}}
 					>
@@ -112,7 +104,7 @@
 						</svg>
 						<span class="sr-only">Toggle sidebar</span>
 					</button>
-					<a href="/admin" class="mr-4 flex items-center justify-between">
+					<a href={resolve('/')} class="mr-4 flex items-center justify-between">
 						<img src="/admin/white_logo_notext.webp" class="mr-3 h-8" alt="Davincibot Logo" />
 						<span
 							class="hidden self-center text-2xl font-semibold whitespace-nowrap text-white sm:block"
@@ -126,12 +118,12 @@
 						<a
 							type="button"
 							class="bg-primary-600 hover:bg-primary-800 focus:ring-primary-800 mr-2 flex items-center justify-center rounded-lg p-2 py-2 text-sm font-medium text-white focus:ring-4 focus:outline-none sm:px-4"
-							href="/admin/orders/new"
+							href={resolve('/orders/new' as '/')}
 						>
 							<svg
 								class="h-3.5 w-3.5 sm:mr-2"
 								fill="currentColor"
-								viewbox="0 0 20 20"
+								viewBox="0 0 20 20"
 								xmlns="http://www.w3.org/2000/svg"
 								aria-hidden="true"
 							>

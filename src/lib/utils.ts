@@ -1,9 +1,8 @@
-import { userdata } from '$lib/store';
+import { userdata, type UserData } from '$lib/store';
 import { mount, unmount, type Component } from 'svelte';
 
-type UserData = Record<string, unknown> | null;
-type CloseEvent = Event | Element | null;
-type CloseHandler = (event: CloseEvent) => void;
+export type CloseEvent = Event | Element | null;
+export type CloseHandler = (event: CloseEvent) => void;
 type ClosableProps = Record<string, unknown> & {
 	onClose?: CloseHandler;
 };

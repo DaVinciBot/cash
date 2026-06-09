@@ -10,7 +10,8 @@
 		"noImplicitOverride": true,
 		"noUncheckedIndexedAccess": true,
 		"skipLibCheck": true,
-		"strict": true
+		"strict": true,
+		"strictNullChecks": true
 	},
 	"include": [
 		".svelte-kit/ambient.d.ts",

@@ -1,7 +1,8 @@
 <script lang="ts">
-	import { supabase } from '$lib/supabaseClient';
+	import { getSupabaseBrowserClient } from '$lib/supabaseClient';
 	import { onMount } from 'svelte';
 
+	import type { UserData } from '$lib/store';
 	import { userdata } from '$lib/store';
 	import { loadUserdata } from '$lib/utils';
 
@@ -20,15 +21,41 @@
 
 	ChartJS.register(Title, Tooltip, Legend, ArcElement, CategoryScale, LinearScale, BarElement);
 
-	let selectedProjectId = $state();
-	let project = $state({});
-	let stats = $state({ websites: [], users: [], tags: [], banks: [] });
+	interface BudgetData {
+		budget: number | null;
+		year: string | null;
+		current: boolean | null;
+		cost?: number;
+	}
+
+	interface ProjectData {
+		id: number;
+		name: string | null;
+		debut: string | null;
+		budget: BudgetData | null;
+	}
+
+	interface StatEntry {
+		label: string;
+		value: number | string;
+	}
+
+	interface StatsData {
+		websites: StatEntry[];
+		users: StatEntry[];
+		tags: StatEntry[];
+		banks: StatEntry[];
+	}
+
+	let selectedProjectId = $state<number | undefined>(undefined);
+	let project = $state<Partial<ProjectData>>({});
+	let stats = $state<StatsData>({ websites: [], users: [], tags: [], banks: [] });
 	let skip = false;
-	let user = $state();
-	let showDropdown = $state(false);
-	let dropdownEl = $state();
-	let selectedYear = $state();
-	let budgets = $state([]);
+	let user = $state<UserData>(null);
+	let showDropdown = $state<boolean>(false);
+	let dropdownEl = $state<HTMLElement | undefined>(undefined);
+	let selectedYear = $state<string | undefined>(undefined);
+	let budgets = $state<BudgetData[]>([]);
 
 	const barOptions = {
 		responsive: true,
@@ -46,12 +73,12 @@
 		}
 	};
 
-	function fmt(n) {
-		if (n == null) {
+	function fmt(n: number | null | undefined): string {
+		if (n === null || n === undefined) {
 			return '0';
 		}
 		try {
-			return Number(n).toLocaleString('fr-FR');
+			return n.toLocaleString('fr-FR');
 		} catch {
 			return String(n);
 		}
@@ -59,26 +86,29 @@
 
 	const year = new Date().getFullYear();
 
-	userdata.subscribe(async (value) => {
+	userdata.subscribe((value) => {
 		if (value) {
 			user = value;
-			selectedProjectId = user.projects.length > 0 ? user.projects[0].id : undefined;
+			const userProfile = value;
+			selectedProjectId =
+				userProfile.projects.length > 0 ? userProfile.projects.at(0)?.id : undefined;
 
-			if (user.allProjects) {
-				user.allProjects.forEach((p) => {
-					if (!user.projects.some((proj) => proj.id === p.value)) {
+			if (userProfile.allProjects) {
+				userProfile.allProjects.forEach((p) => {
+					if (!userProfile.projects.some((proj) => proj.id === p.value)) {
 						// Only add projects that are not already in the user's projects
-						user.projects.push({
+						userProfile.projects.push({
 							id: p.value,
 							name: p.name,
-							debut: p.debut
+							debut: p.debut,
+							role: 'membre'
 						});
 					}
 				});
 			}
 
 			if (selectedProjectId) {
-				await loadPage();
+				void loadPage();
 			}
 			skip = true;
 		}
@@ -89,10 +119,10 @@
 		datasets: [
 			{
 				data: [
-					Number(project.budget?.budget ?? 0) - Number(project.budget?.cost ?? 0) < 0
+					(project.budget?.budget ?? 0) - (project.budget?.cost ?? 0) < 0
 						? 0
-						: Number(project.budget?.budget ?? 0) - Number(project.budget?.cost ?? 0),
-					Number(project.budget?.cost ?? 0)
+						: (project.budget?.budget ?? 0) - (project.budget?.cost ?? 0),
+					project.budget?.cost ?? 0
 				],
 				backgroundColor: ['#36A2EB', '#FF6384'],
 				hoverBackgroundColor: ['#36A2EB', '#FF6384']
@@ -100,84 +130,88 @@
 		]
 	});
 
-	async function fetchProject() {
+	async function fetchProject(): Promise<Partial<ProjectData>> {
 		if (!selectedProjectId) {
-			return { name: 'Aucun projet sélectionné', budget: { budget: 0, year: 0 } };
+			return { name: 'Aucun projet sélectionné', budget: { budget: 0, year: '0', current: null } };
 		}
-		const { data, error } = await supabase
+		const supabase = getSupabaseBrowserClient();
+		const { data, error } = (await supabase
 			.from('projects')
 			.select('id, name, debut, budget(budget, year, current)')
 			.eq('id', selectedProjectId)
-			.single();
+			.single()) as { data: ProjectData | null; error: unknown };
 
-		if (error) {
-			return;
+		if (error || !data) {
+			return {};
 		}
-		budgets = (data.budget || []).sort((a, b) => String(b.year).localeCompare(String(a.year)));
+		const rawBudgets = (
+			Array.isArray(data.budget) ? data.budget : data.budget ? [data.budget] : []
+		) as BudgetData[];
+		budgets = rawBudgets.sort((a, b) => String(b.year).localeCompare(String(a.year)));
 		const current = budgets.find((b) => b.current);
 		selectedYear = selectedYear ?? current?.year ?? budgets[0]?.year ?? String(year);
-		data.budget = budgets.find((b) => b.year === selectedYear) ||
-			budgets[0] || { budget: 0, year: selectedYear };
-		return data;
+		const fallbackYear = selectedYear;
+		const matchedBudget = budgets.find((b) => b.year === fallbackYear) ??
+			budgets[0] ?? { budget: 0, year: fallbackYear, current: null };
+		return { ...data, budget: matchedBudget };
 	}
 
-	onMount(async () => {
-		await loadPage();
+	onMount(() => {
+		void loadPage();
 		if (!skip) {
-			await loadUserdata();
+			loadUserdata();
 		}
 	});
 
 	async function loadPage() {
 		project = await fetchProject();
-		if (selectedProjectId == 0) {
-			project.budget = { budget: 0, year, cost: 0 };
+		if (selectedProjectId === 0) {
+			project.budget = { budget: 0, year: String(year), current: null, cost: 0 };
 		}
-		const { data: costData, error: costErr } = await supabase.rpc('get_project_cost', {
+		if (!project.budget) {
+			return;
+		}
+		const supabase = getSupabaseBrowserClient();
+		const { data: costData, error: costErr } = (await supabase.rpc('get_project_cost', {
 			projectid: selectedProjectId,
-			year: selectedYear ?? project?.budget?.year
-		});
+			year: selectedYear ?? project.budget.year
+		})) as { data: number | null; error: unknown };
 		if (costErr) {
 			return;
 		}
-		project.budget.cost = costData;
+		project.budget.cost = costData ?? 0;
 
 		// Fetch aggregated stats in one call (try with year, fallback without)
-		let statsData, statsErr;
-		({ data: statsData, error: statsErr } = await supabase.rpc('get_project_stats', {
+		let statsResult = (await supabase.rpc('get_project_stats', {
 			projectid: selectedProjectId,
-			year: selectedYear || project?.budget?.year
-		}));
-		if (statsErr) {
-			({ data: statsData, error: statsErr } = await supabase.rpc('get_project_stats', {
+			year: selectedYear ?? project.budget.year
+		})) as { data: StatsData | null; error: unknown };
+		if (statsResult.error) {
+			statsResult = (await supabase.rpc('get_project_stats', {
 				projectid: selectedProjectId
-			}));
+			})) as { data: StatsData | null; error: unknown };
 		}
-		if (statsErr) {
-		} else {
-			stats = statsData ?? { websites: [], users: [], tags: [], banks: [] };
+		if (!statsResult.error) {
+			stats = statsResult.data ?? { websites: [], users: [], tags: [], banks: [] };
 		}
-	}
-	async function handleSelect(event) {
-		selectedProjectId = event.target.value;
-		selectedYear = undefined; // reset to current/default for new project
-		await loadPage();
 	}
 
-	async function handleYearChange(e) {
-		selectedYear = e.target.value;
+	async function handleYearChange(e: Event) {
+		const target = e.target as HTMLSelectElement;
+		selectedYear = target.value;
 		// update displayed budget object to match selected year
-		if (budgets?.length) {
-			project.budget = budgets.find((b) => b.year === selectedYear) || project.budget;
+		if (budgets.length) {
+			project.budget = budgets.find((b) => b.year === selectedYear) ?? project.budget;
 		}
 		await loadPage();
 	}
 
-	function handleWindowClick(e) {
+	function handleWindowClick(e: MouseEvent) {
 		if (!showDropdown) {
 			return;
 		}
-		if (dropdownEl && !dropdownEl.contains(e.target)) {
+		const target = e.target as Node;
+		if (dropdownEl && !dropdownEl.contains(target)) {
 			showDropdown = false;
 		}
 	}
@@ -188,14 +222,14 @@
 <div class="mx-auto flex w-full max-w-7xl flex-col items-start justify-center gap-6 px-4 py-8">
 	<div class="flex h-14 w-full items-center justify-between">
 		<h2 class="h-full w-full self-center align-middle text-3xl font-bold tracking-tight text-white">
-			{#if user?.projects?.length > 1}
+			{#if (user?.projects.length ?? 0) > 1}
 				<div class="relative inline-block h-full min-w-64 md:min-w-72" bind:this={dropdownEl}>
 					<button
 						class="flex h-full w-full items-center justify-between rounded-md border border-gray-800 bg-gray-900 px-6 py-2 text-2xl font-bold text-white hover:bg-gray-800"
 						onclick={() => (showDropdown = !showDropdown)}
 						type="button"
 					>
-						{user.projects.find((p) => p.id === selectedProjectId)?.name ||
+						{user?.projects.find((p) => p.id === selectedProjectId)?.name ??
 							'Sélectionner un projet'}
 						<svg class="ml-2 h-6 w-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
 							<path
@@ -210,14 +244,14 @@
 						<ul
 							class="absolute z-20 mt-1 w-full overflow-hidden rounded-xl border border-gray-700 bg-gray-800 shadow-xl"
 						>
-							{#each user.projects as p (p.id)}
+							{#each user?.projects ?? [] as p (p.id)}
 								<li>
 									<button
 										class="w-full px-4 py-2 text-left text-white hover:bg-gray-700"
 										onclick={() => {
 											selectedProjectId = p.id;
 											showDropdown = false;
-											handleSelect({ target: { value: p.id } });
+											void loadPage();
 										}}
 									>
 										{p.name}
@@ -240,8 +274,8 @@
 				bind:value={selectedYear}
 				aria-label="Sélection de l'année du budget"
 			>
-				{#if budgets?.length}
-					{#each budgets.sort((a, b) => b.year - a.year) as b (b.year)}
+				{#if budgets.length}
+					{#each budgets.sort((a, b) => parseInt(b.year ?? '0', 10) - parseInt(a.year ?? '0', 10)) as b (b.year)}
 						<option value={b.year}>{b.year}</option>
 					{/each}
 				{:else}
@@ -278,7 +312,7 @@
 							>{fmt(Math.max((project.budget?.budget ?? 0) - (project.budget?.cost ?? 0), 0))} €</span
 						>
 					</div>
-					{#if project.budget?.budget - project.budget?.cost < 0}
+					{#if (project.budget?.budget ?? 0) - (project.budget?.cost ?? 0) < 0}
 						<p class="text-sm font-semibold text-red-400">Dépassement de budget !</p>
 					{/if}
 				</div>

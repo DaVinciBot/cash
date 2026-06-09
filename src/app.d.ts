@@ -1,21 +1,7 @@
 import type { Permission } from '$lib/permissions';
+import type { UserProfile } from '$lib/types/profile';
 import type { Session, SupabaseClient, User } from '@supabase/supabase-js';
-
-interface UserProject {
-	id: number;
-	name: string;
-	debut: string;
-}
-
-interface UserProfile {
-	email: string;
-	name: string;
-	avatar: string;
-	id: string;
-	projects: UserProject[];
-	permissions: Permission[];
-	allProjects: { value: number; name: string; debut: string }[] | null;
-}
+import type { Cookies } from '@sveltejs/kit';
 
 interface ServerSession {
 	id: string;
@@ -38,20 +24,21 @@ declare global {
 		interface PageData {
 			session: Session | null;
 			user: User | null;
-			cookies: cookies.getAll();
+			cookies: ReturnType<Cookies['getAll']>;
 			userProfile: UserProfile | null;
 			permissions: Permission[];
 			canCreateOrder: boolean;
+			supabase?: SupabaseClient;
 			menu: {
 				title: string;
 				uri: string;
 				icon: string;
 				requiredPermissions: Permission[];
-			}[]
+			}[];
 		}
 		// interface PageState {}
 		// interface Platform {}
 	}
 }
 
-export { };
+export {};

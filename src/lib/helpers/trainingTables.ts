@@ -1,7 +1,12 @@
 import Badge from '$lib/components/utils/Badge.svelte';
 import { formatParisDateTimeShort } from '$lib/helpers/parisTime';
 import { categoryOptions, statusOptions } from '$lib/helpers/trainingOptions';
-import type { TrainingListItem, TrainingSlotListItem } from '$lib/services/training';
+import type {
+	SlotStatus,
+	TrainingCategory,
+	TrainingListItem,
+	TrainingSlotListItem
+} from '$lib/services/training';
 
 export function formatSlotDate(dateString: string) {
 	return formatParisDateTimeShort(dateString);
@@ -19,8 +24,42 @@ function getStatusOption(status: string) {
 	return statusOptions.find((opt) => opt.value === status);
 }
 
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
-export function createTrainingTableItems(data: any[]) {
+interface TrainingRawItem {
+	id: number;
+	name: string;
+	description: string | null;
+	prerequisites: string | null;
+	category: string;
+}
+
+interface SlotRawItem {
+	id: number;
+	training_id: number;
+	custom_name: string | null;
+	custom_description: string | null;
+	custom_prerequisites: string | null;
+	start: string;
+	duration_hours: number;
+	on_site_seats: number | null;
+	remote_seats: number | null;
+	location: string | null;
+	video_conference_link: string | null;
+	excusable: boolean;
+	status: string;
+	trainer_id: string;
+	training: {
+		name: string | null;
+		description: string | null;
+		prerequisites: string | null;
+		category: string | null;
+	} | null;
+	profiles: {
+		username: string | null;
+		avatar_url: string | null;
+	} | null;
+}
+
+export function createTrainingTableItems(data: TrainingRawItem[]) {
 	const index = new Map<number, TrainingListItem>(
 		data.map((training) => [
 			training.id,
@@ -29,7 +68,7 @@ export function createTrainingTableItems(data: any[]) {
 				name: training.name,
 				description: training.description,
 				prerequisites: training.prerequisites,
-				category: training.category
+				category: training.category as TrainingCategory
 			}
 		])
 	);
@@ -49,21 +88,20 @@ export function createTrainingTableItems(data: any[]) {
 	return { index, rows };
 }
 
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
-export function createSlotTableItems(data: any[]) {
+export function createSlotTableItems(data: SlotRawItem[]) {
 	const index = new Map<number, TrainingSlotListItem>(
 		data.map((slot) => {
-			const training = slot.training ?? {};
-			const trainer = slot.profiles ?? {};
+			const training = slot.training;
+			const trainer = slot.profiles;
 			return [
 				slot.id,
 				{
 					slot_id: slot.id,
 					training_id: slot.training_id,
-					name: slot.custom_name ?? training.name,
-					description: slot.custom_description ?? training.description ?? null,
-					prerequisites: slot.custom_prerequisites ?? training.prerequisites ?? null,
-					category: training.category,
+					name: slot.custom_name ?? training?.name ?? '',
+					description: slot.custom_description ?? training?.description ?? null,
+					prerequisites: slot.custom_prerequisites ?? training?.prerequisites ?? null,
+					category: (training?.category ?? 'other') as TrainingCategory,
 					start: slot.start,
 					duration_hours: slot.duration_hours,
 					on_site_seats: slot.on_site_seats,
@@ -77,24 +115,24 @@ export function createSlotTableItems(data: any[]) {
 					location: slot.location,
 					video_conference_link: slot.video_conference_link,
 					excusable: slot.excusable,
-					status: slot.status,
+					status: slot.status as SlotStatus,
 					trainer_id: slot.trainer_id,
-					trainer_username: trainer.username ?? null,
-					trainer_avatar_url: trainer.avatar_url ?? null
+					trainer_username: trainer?.username ?? null,
+					trainer_avatar_url: trainer?.avatar_url ?? null
 				}
 			];
 		})
 	);
 
 	const rows = data.map((slot) => {
-		const training = slot.training ?? {};
-		const trainer = slot.profiles ?? {};
-		const name = slot.custom_name ?? training.name;
+		const training = slot.training;
+		const trainer = slot.profiles;
+		const name = slot.custom_name ?? training?.name ?? '';
 		const statusOption = getStatusOption(slot.status);
 		return [
 			{ value: formatSlotDate(slot.start), data: slot.id },
 			{ value: name },
-			{ value: trainer.username ?? 'À définir', avatar: trainer.avatar_url },
+			{ value: trainer?.username ?? 'À définir', avatar: trainer?.avatar_url },
 			{
 				component: Badge,
 				props: {

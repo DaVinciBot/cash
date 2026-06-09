@@ -1,35 +1,95 @@
 <script lang="ts">
-	import { preventDefault } from 'svelte/legacy';
-
 	import Stepper from '$lib/components/admin/Stepper.svelte';
+	import { getSupabaseBrowserClient, supabaseKey, supabaseUrl } from '$lib/supabaseClient';
 	import { Carta, CartaEditor } from 'carta-md';
 	import 'carta-md/default.css';
 	import { onMount } from 'svelte';
 
-	import { supabase, supabaseKey, supabaseUrl } from '$lib/supabaseClient';
+	interface TranscodeImageResult {
+		success: boolean;
+		index: number;
+		url: string;
+	}
+
+	interface TranscodeHeroResult {
+		success: boolean;
+		images?: { large: string; small: string };
+	}
+
+	interface TranscodeOgResult {
+		success: boolean;
+		image?: string;
+	}
+
+	interface TranscodeBodyResult {
+		success: boolean;
+		images?: TranscodeImageResult[];
+	}
+
+	interface MetaData {
+		excerpt: string;
+		heroImage: string;
+		heroAlt: string;
+		heroImageSmall?: string;
+		heroImageSocial?: string;
+		author: { name: string; role: string };
+		tag: string;
+	}
+
+	interface ArticleRow {
+		title: string | null;
+		slug: string | null;
+		last_update: string | null;
+		publish_date: string | null;
+		data: MetaData | null;
+		state: string | null;
+	}
+
+	interface ArticleDetail {
+		title: string | null;
+		slug: string | null;
+		body: string | null;
+		state: string | null;
+		data: MetaData | null;
+	}
+
+	interface StepItem {
+		done: boolean;
+		icon: string;
+	}
 
 	// Listing state
-	let articles = $state([]);
+	let articles = $state<
+		{
+			title: string | null;
+			slug: string | null;
+			date: string | null;
+			state: string;
+			cover: string | null;
+		}[]
+	>([]);
 	let search = $state('');
 	let loadingList = $state(false);
 
 	let title = $state('');
 	let slug = $state('');
 	let body = $state('');
-	let state = $state('draft');
-	let meta = $state({
+	let articleState: string = $state('draft');
+	let meta = $state<MetaData>({
 		excerpt: '',
 		heroImage: '',
 		heroAlt: '',
 		author: { name: '', role: '' },
-		tag: '' // space/comma/hashtag separated string
+		tag: ''
 	});
 
 	let saving = $state<boolean>(false);
 	let message = $state('');
-	const canAccess = false;
 	let selectedSlug = $state('');
-	let saveSteps = $state([]);
+	let saveSteps = $state<StepItem[]>([]);
+
+	// Get the Supabase client
+	const supabase = getSupabaseBrowserClient();
 
 	function toSlug(t = '') {
 		return t
@@ -41,28 +101,29 @@
 			.slice(0, 120);
 	}
 
-	async function ensureFolder(slug) {
+	async function ensureFolder(folderSlug: string): Promise<boolean> {
 		// For public bucket 'articles', create a zero-byte .keep if empty
 		try {
-			const path = `${slug}/.keep`;
-			const { data, error } = await supabase.storage.from('articles').upload(path, new Blob([]), {
+			const path = `${folderSlug}/.keep`;
+			const { error } = await supabase.storage.from('articles').upload(path, new Blob([]), {
 				upsert: false,
 				contentType: 'application/octet-stream'
 			});
-			if (error && !String(error.message ?? '').includes('The resource already exists')) {
+			if (error && !error.message.includes('The resource already exists')) {
 				// ignore if already exists
 				return false;
 			}
 			return true;
-		} catch (e) {
+		} catch {
 			return false;
 		}
 	}
 
-	const carta = new Carta({});
+	const carta = new Carta({ sanitizer: false });
 
-	async function handleUpload(ev) {
-		const file = ev?.target?.files?.[0];
+	async function handleUpload(ev: Event) {
+		const input = ev.target as HTMLInputElement;
+		const file = input.files?.[0];
 		if (!file) {
 			return;
 		}
@@ -71,17 +132,17 @@
 				slug = toSlug(title);
 			}
 			await ensureFolder(slug);
-			const fileName = `${Date.now()}-${file.name}`.replace(/[^a-zA-Z0-9_.-]/g, '_');
+			const fileName = `${String(Date.now())}-${file.name}`.replace(/[^a-zA-Z0-9_.-]/g, '_');
 			const filePath = `tmp/${fileName}`;
 			const { error } = await supabase.storage
 				.from('articles')
 				.upload(filePath, file, { upsert: false });
-			if (error && !String(error.message ?? '').includes('The resource already exists')) {
-				message = 'Erreur upload: ' + error.message;
+			if (error && !error.message.includes('The resource already exists')) {
+				message = `Erreur upload: ${error.message}`;
 				return;
 			}
 			const { data: pub } = supabase.storage.from('articles').getPublicUrl(filePath);
-			const url = pub?.publicUrl;
+			const url = pub.publicUrl;
 			if (url) {
 				// Append markdown reference at end
 				const isImage = file.type.startsWith('image/');
@@ -93,11 +154,11 @@
 			message = 'Erreur upload';
 		} finally {
 			// reset input value to allow re-uploading same file name
-			ev.target.value = '';
+			input.value = '';
 		}
 	}
 
-	async function transcodeHero() {
+	async function transcodeHero(): Promise<boolean> {
 		if (!meta.heroImage) {
 			return true;
 		}
@@ -121,7 +182,7 @@
 					quality: 40
 				})
 			});
-			const data = await res.json();
+			const data = (await res.json()) as TranscodeHeroResult;
 			if (data.success && data.images) {
 				const oldUrl = meta.heroImage;
 				meta.heroImage = data.images.large;
@@ -136,12 +197,12 @@
 				return true;
 			}
 			return false;
-		} catch (e) {
+		} catch {
 			return false;
 		}
 	}
 
-	async function transcodeOg() {
+	async function transcodeOg(): Promise<boolean> {
 		if (!meta.heroImage) {
 			return true;
 		}
@@ -160,18 +221,18 @@
 					folder: slug
 				})
 			});
-			const data = await res.json();
+			const data = (await res.json()) as TranscodeOgResult;
 			if (data.success && data.image) {
 				meta.heroImageSocial = data.image;
 				return true;
 			}
 			return false;
-		} catch (e) {
+		} catch {
 			return false;
 		}
 	}
 
-	async function transcodeBodyImages() {
+	async function transcodeBodyImages(): Promise<boolean> {
 		if (!body) {
 			return true;
 		}
@@ -179,10 +240,10 @@
 		// Find all images: ![alt](url)
 		const regex = /!\[.*?\]\((.*?)\)/g;
 		let match;
-		const imagesToTranscode = [];
+		const imagesToTranscode: string[] = [];
 
 		while ((match = regex.exec(body)) !== null) {
-			const url = match[1];
+			const url = match[1] ?? '';
 			// Check if it's a supabase storage URL and not already transcoded
 			// Heuristic for already transcoded: ends with .webp and contains 'image-' and digits
 			const isTranscoded = /\/image-\d+-\d+\.webp$/.test(url);
@@ -213,7 +274,7 @@
 					quality: 60
 				})
 			});
-			const data = await res.json();
+			const data = (await res.json()) as TranscodeBodyResult;
 
 			if (data.success && data.images) {
 				// Replace URLs in body
@@ -221,10 +282,13 @@
 				// data.images is array of { index, success, url }
 				// The index corresponds to the input array `uniqueImages`
 
-				const toDelete = [];
+				const toDelete: string[] = [];
 				for (const result of data.images) {
 					if (result.success) {
 						const originalUrl = uniqueImages[result.index];
+						if (!originalUrl) {
+							continue;
+						}
 						const newUrl = result.url;
 						// Global replace of this URL
 						newBody = newBody.split(originalUrl).join(newUrl);
@@ -261,69 +325,70 @@
 			return;
 		}
 		saving = true;
-		saveSteps = [
+		const steps: [StepItem, StepItem, StepItem, StepItem, StepItem] = [
 			{ done: false, icon: 'processing' },
 			{ done: false, icon: 'link' },
 			{ done: false, icon: 'shipping' },
 			{ done: false, icon: 'shipping' },
 			{ done: false, icon: 'checked-document' }
 		];
+		saveSteps = [...steps];
 
 		try {
 			// 1. Ensure folder
 			if (await ensureFolder(slug)) {
-				saveSteps[0].done = true;
+				steps[0].done = true;
 			} else {
-				saveSteps[0].icon = 'cancel';
+				steps[0].icon = 'cancel';
 			}
-			saveSteps = [...saveSteps];
+			saveSteps = [...steps];
 
 			// 2. Transcode OG
 			message = 'Génération OG...';
 			if (await transcodeOg()) {
-				saveSteps[1].done = true;
+				steps[1].done = true;
 			} else {
-				saveSteps[1].icon = 'cancel';
+				steps[1].icon = 'cancel';
 			}
-			saveSteps = [...saveSteps];
+			saveSteps = [...steps];
 
 			// 3. Transcode Hero
 			message = 'Optimisation couverture...';
 			if (await transcodeHero()) {
-				saveSteps[2].done = true;
+				steps[2].done = true;
 			} else {
-				saveSteps[2].icon = 'cancel';
+				steps[2].icon = 'cancel';
 			}
-			saveSteps = [...saveSteps];
+			saveSteps = [...steps];
 
 			// 4. Transcode Body
 			message = 'Optimisation contenu...';
 			if (await transcodeBodyImages()) {
-				saveSteps[3].done = true;
+				steps[3].done = true;
 			} else {
-				saveSteps[3].icon = 'cancel';
+				steps[3].icon = 'cancel';
 			}
-			saveSteps = [...saveSteps];
+			saveSteps = [...steps];
 
 			const row = {
 				title,
 				slug,
 				body,
-				state,
+				state: articleState,
 				data: meta
 			};
 			// upsert by primary key (slug)
 			const { error } = await supabase.from('blog').upsert(row).select('slug').single();
 			if (error) {
-				message = 'Erreur enregistrement: ' + error.message;
-				saveSteps[4].icon = 'cancel';
+				message = `Erreur enregistrement: ${error.message}`;
+				steps[4].icon = 'cancel';
 			} else {
 				message = 'Article enregistré';
-				saveSteps[4].done = true;
+				steps[4].done = true;
 				selectedSlug = slug;
 				await loadArticles();
 			}
-			saveSteps = [...saveSteps];
+			saveSteps = [...steps];
 		} catch {
 			message = 'Erreur système';
 		} finally {
@@ -338,15 +403,18 @@
 	async function loadArticles() {
 		try {
 			loadingList = true;
-			const { data, error } = await supabase
+			const { data, error } = (await supabase
 				.from('blog')
 				.select('title,slug,last_update,publish_date,data,state')
-				.order('publish_date', { ascending: false, nullsFirst: false });
+				.order('publish_date', { ascending: false, nullsFirst: false })) as {
+				data: ArticleRow[] | null;
+				error: unknown;
+			};
 			if (error) {
 				return;
 			}
 			// normalize and sort fallback by last_update
-			const list = (data || []).map((row) => {
+			const list = (data ?? []).map((row) => {
 				const date = row.publish_date ?? row.last_update ?? null;
 				return {
 					title: row.title,
@@ -356,24 +424,30 @@
 					cover: row.data?.heroImage ?? null
 				};
 			});
-			list.sort((a, b) => new Date(b.date ?? 0) - new Date(a.date ?? 0));
+			list.sort((a, b) => new Date(b.date ?? 0).getTime() - new Date(a.date ?? 0).getTime());
 			articles = list;
 		} finally {
 			loadingList = false;
 		}
 	}
 
-	async function loadArticle(s) {
+	async function loadArticle(s: string) {
 		try {
-			const { data, error } = await supabase.from('blog').select('*').eq('slug', s).single();
+			const { data, error } = (await supabase.from('blog').select('*').eq('slug', s).single()) as {
+				data: ArticleDetail | null;
+				error: unknown;
+			};
 			if (error) {
-				message = 'Erreur chargement: ' + error.message;
+				message = `Erreur chargement: ${(error as { message?: string }).message ?? ''}`;
+				return;
+			}
+			if (!data) {
 				return;
 			}
 			title = data.title ?? '';
 			slug = data.slug ?? '';
 			body = data.body ?? '';
-			state = data.state ?? 'draft';
+			articleState = data.state ?? 'draft';
 			meta = data.data ?? {
 				excerpt: '',
 				heroImage: '',
@@ -392,14 +466,15 @@
 		title = '';
 		slug = '';
 		body = '';
-		state = 'draft';
+		articleState = 'draft';
 		meta = { excerpt: '', heroImage: '', heroAlt: '', author: { name: '', role: '' }, tag: '' };
 		selectedSlug = '';
 		message = '';
 	}
 
-	async function handleCoverUpload(ev) {
-		const file = ev?.target?.files?.[0];
+	async function handleCoverUpload(ev: Event) {
+		const input = ev.target as HTMLInputElement;
+		const file = input.files?.[0];
 		if (!file) {
 			return;
 		}
@@ -408,17 +483,17 @@
 				slug = toSlug(title);
 			}
 			await ensureFolder(slug);
-			const fileName = `cover-${Date.now()}-${file.name}`.replace(/[^a-zA-Z0-9_.-]/g, '_');
+			const fileName = `cover-${String(Date.now())}-${file.name}`.replace(/[^a-zA-Z0-9_.-]/g, '_');
 			const filePath = `tmp/${fileName}`;
 			const { error } = await supabase.storage
 				.from('articles')
 				.upload(filePath, file, { upsert: false });
-			if (error && !String(error.message).includes('The resource already exists')) {
-				message = 'Erreur upload cover: ' + error.message;
+			if (error && !error.message.includes('The resource already exists')) {
+				message = `Erreur upload cover: ${error.message}`;
 				return;
 			}
 			const { data: pub } = supabase.storage.from('articles').getPublicUrl(filePath);
-			const url = pub?.publicUrl;
+			const url = pub.publicUrl;
 			if (url) {
 				meta = { ...meta, heroImage: url };
 				message = 'Image de couverture téléversée';
@@ -426,8 +501,12 @@
 		} catch {
 			message = 'Erreur upload cover';
 		} finally {
-			ev.target.value = '';
+			input.value = '';
 		}
+	}
+
+	async function handleSave() {
+		await save();
 	}
 </script>
 
@@ -477,14 +556,18 @@
 					<div class="p-3 text-sm text-gray-400">Aucun article</div>
 				{:else}
 					<ul class="divide-y divide-gray-700">
-						{#each articles.filter((a) => a.title
-								?.toLowerCase()
-								.includes(search.toLowerCase())) as a}
+						{#each articles.filter((a) => (a.title ?? '')
+								.toLowerCase()
+								.includes(search.toLowerCase())) as a (a.slug)}
 							<li>
 								<button
 									type="button"
 									class={`w-full cursor-pointer rounded p-2 text-left hover:bg-gray-700/40 ${a.slug === selectedSlug ? 'bg-gray-700/30' : ''}`}
-									onclick={() => loadArticle(a.slug)}
+									onclick={() => {
+										if (a.slug) {
+											void loadArticle(a.slug);
+										}
+									}}
 								>
 									<div class="text-sm font-medium">{a.title}</div>
 									<div class="flex items-center justify-between gap-2">
@@ -536,7 +619,7 @@
 				<select
 					id="state"
 					class="w-full rounded border border-gray-700 bg-gray-900 px-3 py-2"
-					bind:value={state}
+					bind:value={articleState}
 				>
 					<option value="draft">Brouillon</option>
 					<option value="published">Publié</option>
@@ -614,7 +697,7 @@
 
 			<button
 				class="bg-primary-600 hover:bg-primary-700 rounded px-4 py-2 text-white disabled:opacity-50"
-				onclick={preventDefault(save)}
+				onclick={handleSave}
 				disabled={saving}
 			>
 				{saving ? 'Enregistrement…' : 'Enregistrer'}

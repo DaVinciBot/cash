@@ -26,14 +26,22 @@ export const createUserClient = (accessToken: string) => {
 	});
 };
 
-export const decodeJwt = (token: string) => {
+interface JwtPayload {
+	sub: string;
+	email?: string | null;
+	app_metadata?: Record<string, unknown>;
+	user_metadata?: Record<string, unknown>;
+	[key: string]: unknown;
+}
+
+export const decodeJwt = (token: string): JwtPayload | null => {
 	try {
 		const payload = token.split('.')[1];
 		if (!payload) {
 			return null;
 		}
 		const decoded = Buffer.from(payload, 'base64').toString('utf8');
-		return JSON.parse(decoded);
+		return JSON.parse(decoded) as JwtPayload;
 	} catch {
 		return null;
 	}

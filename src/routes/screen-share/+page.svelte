@@ -1,26 +1,26 @@
 <script lang="ts">
-	import { hasAnyPermission } from '$lib/permissions';
+	import { hasAnyPermission, type Permission } from '$lib/permissions';
 	import { userdata } from '$lib/store';
 	import { hideOnClickOutside, loadUserdata } from '$lib/utils';
 	import { onDestroy, onMount } from 'svelte';
 
 	interface ScreenShareUser {
-		permissions?: string[];
+		permissions?: Permission[];
 	}
 
 	let user: ScreenShareUser | null = null;
 	let ws: WebSocket | null = null;
 	let pc: RTCPeerConnection | null = null;
 	let stream: MediaStream | null = null;
-	let is_busy = $state(true);
-	let connected = $state(false);
-	let sharing = $state(false);
-	let canCastSmartShare = $state(false);
-	let canManageTraining = $state(false);
+	let is_busy = $state<boolean>(true);
+	let connected = $state<boolean>(false);
+	let sharing = $state<boolean>(false);
+	let canCastSmartShare = $state<boolean>(false);
+	let canManageTraining = $state<boolean>(false);
 	const wsUrl = 'wss://cast.davincibot.fr'; // Change if needed
-	let showToolbox = $state(false); // Add this variable
+	let showToolbox = $state<boolean>(false);
 
-	userdata.subscribe((value: ScreenShareUser | null) => {
+	userdata.subscribe((value) => {
 		if (value) {
 			user = value;
 			const permissions = Array.isArray(value.permissions) ? value.permissions : [];
@@ -29,17 +29,20 @@
 		}
 	});
 
-	onMount(async () => {
+	onMount(() => {
 		if (!user) {
-			await loadUserdata();
+			loadUserdata();
 		}
-		hideOnClickOutside(
-			document.querySelector('#infoToolbox'),
-			() => {
-				showToolbox = false;
-			},
-			true
-		);
+		const infoToolbox = document.querySelector<HTMLElement>('#infoToolbox');
+		if (infoToolbox) {
+			hideOnClickOutside(
+				infoToolbox,
+				() => {
+					showToolbox = false;
+				},
+				true
+			);
+		}
 		setupWebSocket();
 	});
 
@@ -61,17 +64,24 @@
 		ws = new WebSocket(wsUrl);
 		ws.onopen = () => {
 			connected = true;
-			ws!.send(JSON.stringify({ type: 'is_busy' }));
+			ws?.send(JSON.stringify({ type: 'is_busy' }));
 		};
 		ws.onmessage = async (event) => {
-			const messageText = event.data instanceof Blob ? await event.data.text() : event.data;
-			const data = JSON.parse(messageText);
+			const messageText =
+				event.data instanceof Blob ? await event.data.text() : (event.data as string);
+			const data = JSON.parse(messageText) as {
+				type?: string;
+				candidate?: unknown;
+				message?: boolean;
+			};
 			if (data.type === 'answer') {
-				await pc?.setRemoteDescription(new RTCSessionDescription(data));
+				await pc?.setRemoteDescription(
+					new RTCSessionDescription(data as RTCSessionDescriptionInit)
+				);
 			} else if (data.candidate) {
-				await pc?.addIceCandidate(new RTCIceCandidate(data));
+				await pc?.addIceCandidate(new RTCIceCandidate(data as RTCIceCandidateInit));
 			} else if (data.type === 'busy_update') {
-				is_busy = data.message;
+				is_busy = data.message ?? false;
 			}
 		};
 	}
@@ -101,8 +111,9 @@
 			}
 		};
 		stream = await navigator.mediaDevices.getDisplayMedia({ video: true });
+		const localStream = stream;
 		stream.getTracks().forEach((track) => {
-			pc?.addTrack(track, stream!);
+			pc?.addTrack(track, localStream);
 
 			track.onended = () => {
 				ws?.send(JSON.stringify({ type: 'disconnect' }));
@@ -114,7 +125,7 @@
 		});
 		const offer = await pc.createOffer();
 		await pc.setLocalDescription(offer);
-		ws!.send(JSON.stringify(offer));
+		ws?.send(JSON.stringify(offer));
 		sharing = true;
 	}
 
@@ -132,7 +143,7 @@
 <!-- Info Button (top right, outside layout) -->
 <button
 	class="fixed top-20 right-4 z-20 rounded-full p-2 hover:bg-gray-600 focus:outline-none"
-	onclick={(e) => {
+	onclick={(e: MouseEvent) => {
 		e.stopPropagation();
 		showToolbox = !showToolbox;
 	}}

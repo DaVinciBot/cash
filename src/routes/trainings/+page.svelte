@@ -28,36 +28,44 @@
 		updateTraining,
 		updateTrainingSlot,
 		type SlotStatus,
+		type TrainingCategory,
 		type TrainingListItem,
-		type TrainingSlotListItem
+		type TrainingSlotListItem,
+		type UpdateTrainingSlotPayload
 	} from '$lib/services/training';
 	import { triggerTableRefresh } from '$lib/store';
-	import { supabase } from '$lib/supabaseClient';
+	import { getSupabaseBrowserClient } from '$lib/supabaseClient';
+	import type { CrudField } from '$lib/types/crud';
 	import type { SupabaseClient } from '@supabase/supabase-js';
 	import { onMount } from 'svelte';
 
-	let trainings: TrainingListItem[] = [];
-	let slots: TrainingSlotListItem[] = [];
-	let profiles: ProfileOption[] = [];
-	let loading = false;
-	let error: string | null = null;
-	let formError: string | null = null;
+	function getFormString(formData: FormData, key: string): string {
+		const val = formData.get(key);
+		return typeof val === 'string' ? val : '';
+	}
 
-	let showTrainingModal = false;
-	let showSlotModal = false;
-	let editingTraining: TrainingListItem | null = null;
-	let editingSlot: TrainingSlotListItem | null = null;
-	let trainingFields: any[] = [];
-	let slotFields: any[] = [];
-	let selectedTrainerId: string | null = null;
-	let selectedTrainingId: number | null = null;
+	let trainings: TrainingListItem[] = $state([]);
+	let slots: TrainingSlotListItem[] = $state([]);
+	let profiles: ProfileOption[] = [];
+	let loading = $state<boolean>(false);
+	let error: string | null = $state(null);
+	let formError: string | null = $state(null);
+
+	let showTrainingModal = $state<boolean>(false);
+	let showSlotModal = $state<boolean>(false);
+	let editingTraining = $state<TrainingListItem | null>(null);
+	let editingSlot = $state<TrainingSlotListItem | null>(null);
+	let trainingFields = $state<CrudField[]>([]);
+	let slotFields = $state<CrudField[]>([]);
+	let selectedTrainerId: string | null = $state(null);
+	let selectedTrainingId: number | null = $state(null);
 	let summaryFrom = '';
 	let summaryTo = '';
 	let summaryText = '';
-	let summarySending = false;
-	let summaryError: string | null = null;
-	let showSummaryModal = false;
-	let summaryFields: any[] = [];
+	let summarySending = $state<boolean>(false);
+	let summaryError: string | null = $state(null);
+	let showSummaryModal = $state<boolean>(false);
+	let summaryFields = $state<CrudField[]>([]);
 
 	const defaultSummaryText = `# Formations de la semaine {emoji_dvb}
 :wave: Hello {member_tag} :blue_heart: !
@@ -70,7 +78,7 @@ Voici une synthèse des formations prévues du {from} au {to} : {nb} formation{s
 
 DVBisous ! :robot:`;
 
-	const supabaseClient = supabase as SupabaseClient;
+	const supabaseClient: SupabaseClient = getSupabaseBrowserClient();
 
 	const slotRangeDays = 120;
 	const trainingTableTopic = 'admin-trainings';
@@ -194,10 +202,11 @@ DVBisous ! :robot:`;
 			const nextFields = buildSlotFields(nextConfig);
 
 			const previousById = new Map(
-				previousFields.filter((field) => field?.id).map((field) => [field.id, field])
+				previousFields.filter((field) => field.id).map((field) => [field.id, field])
 			);
 
-			slotFields = nextFields.map((field) => {
+			slotFields = nextFields.map((nextField): CrudField => {
+				const field: CrudField = nextField as unknown as CrudField;
 				const previous = field.id ? previousById.get(field.id) : null;
 				if (!previous || field.id === 'training_id') {
 					return field;
@@ -269,15 +278,15 @@ DVBisous ! :robot:`;
 
 	async function handleTrainingSubmit(event: Event) {
 		event.preventDefault();
-		const form = document.querySelector('#TrainingModal form');
+		const form = document.querySelector<HTMLFormElement>('#TrainingModal form');
 		if (!form) {
 			return;
 		}
 		const formData = new FormData(form);
-		const name = (formData.get('name') || '').toString().trim();
-		const category = (formData.get('category') || '').toString();
-		const description = (formData.get('description') || '').toString().trim() || null;
-		const prerequisites = (formData.get('prerequisites') || '').toString().trim() || null;
+		const name = getFormString(formData, 'name').trim();
+		const category = getFormString(formData, 'category');
+		const description = getFormString(formData, 'description').trim() || null;
+		const prerequisites = getFormString(formData, 'prerequisites').trim() || null;
 
 		if (!name || !category) {
 			formError = 'Nom et catégorie obligatoires.';
@@ -288,14 +297,14 @@ DVBisous ! :robot:`;
 			if (editingTraining) {
 				await updateTraining(supabaseClient, editingTraining.training_id, {
 					name,
-					category: category as any,
+					category: category as TrainingCategory,
 					description,
 					prerequisites
 				});
 			} else {
 				await createTraining(supabaseClient, {
 					name,
-					category: category as any,
+					category: category as TrainingCategory,
 					description,
 					prerequisites
 				});
@@ -310,7 +319,7 @@ DVBisous ! :robot:`;
 
 	async function handleSlotSubmit(event: Event) {
 		event.preventDefault();
-		const form = document.querySelector('#SlotModal form');
+		const form = document.querySelector<HTMLFormElement>('#SlotModal form');
 		if (!form) {
 			return;
 		}
@@ -324,22 +333,22 @@ DVBisous ! :robot:`;
 				? Number(trainingFromField)
 				: trainingFromForm);
 		const trainingId = Number.isNaN(trainingCandidate) ? 0 : trainingCandidate;
-		const startInput = (formData.get('start') || '').toString();
+		const startInput = getFormString(formData, 'start');
 		const duration = Number(formData.get('duration_hours'));
-		const status = (formData.get('status') || 'draft') as SlotStatus;
-		const onSiteSeatsRaw = (formData.get('on_site_seats') || '').toString();
-		const remoteSeatsRaw = (formData.get('remote_seats') || '').toString();
-		const location = (formData.get('location') || '').toString().trim() || null;
-		const videoLink = (formData.get('video_conference_link') || '').toString().trim() || null;
+		const statusStr = getFormString(formData, 'status') || 'draft';
+		const status = statusStr as SlotStatus;
+		const onSiteSeatsRaw = getFormString(formData, 'on_site_seats');
+		const remoteSeatsRaw = getFormString(formData, 'remote_seats');
+		const location = getFormString(formData, 'location').trim() || null;
+		const videoLink = getFormString(formData, 'video_conference_link').trim() || null;
 		const excusable = formData.has('excusable');
 		const startIso = startInput ? parseParisDatetimeLocal(startInput) : '';
 		const onSiteSeats = onSiteSeatsRaw === '' ? null : Number(onSiteSeatsRaw);
 		const remoteSeats = remoteSeatsRaw === '' ? null : Number(remoteSeatsRaw);
 		const trainerId = selectedTrainerId ?? '';
-		const customName = (formData.get('custom_name') || '').toString().trim() || null;
-		const customDescription = (formData.get('custom_description') || '').toString().trim() || null;
-		const customPrerequisites =
-			(formData.get('custom_prerequisites') || '').toString().trim() || null;
+		const customName = getFormString(formData, 'custom_name').trim() || null;
+		const customDescription = getFormString(formData, 'custom_description').trim() || null;
+		const customPrerequisites = getFormString(formData, 'custom_prerequisites').trim() || null;
 		const baseTraining = trainings.find((training) => training.training_id === trainingId) ?? null;
 		const baseName = baseTraining?.name ?? null;
 		const baseDescription = baseTraining?.description ?? null;
@@ -352,7 +361,11 @@ DVBisous ! :robot:`;
 
 		try {
 			if (editingSlot) {
-				const updates: any = {
+				const updates: UpdateTrainingSlotPayload & {
+					custom_name?: string | null;
+					custom_description?: string | null;
+					custom_prerequisites?: string | null;
+				} = {
 					training_id: trainingId,
 					trainer_id: trainerId,
 					start: startIso,
@@ -406,14 +419,18 @@ DVBisous ! :robot:`;
 		}
 	}
 
-	function parseTrainingItems(data: any[]) {
-		const { index, rows } = createTrainingTableItems(data);
+	function parseTrainingItems(data: unknown[]) {
+		const { index, rows } = createTrainingTableItems(
+			data as Parameters<typeof createTrainingTableItems>[0]
+		);
 		trainingIndex = index;
 		return rows;
 	}
 
-	function parseSlotItems(data: any[]) {
-		const { index, rows } = createSlotTableItems(data);
+	function parseSlotItems(data: unknown[]) {
+		const { index, rows } = createSlotTableItems(
+			data as Parameters<typeof createSlotTableItems>[0]
+		);
 		slotIndex = index;
 		return rows;
 	}
@@ -440,17 +457,14 @@ DVBisous ! :robot:`;
 		summarySending = true;
 		try {
 			const cleanText = text.trim();
-			const { data, error: invokeError } = await supabaseClient.functions.invoke(
-				'discord-summary',
-				{
-					body: {
-						from,
-						to,
-						mode,
-						...(cleanText ? { text: cleanText } : {})
-					}
+			const { error: invokeError } = await supabaseClient.functions.invoke('discord-summary', {
+				body: {
+					from,
+					to,
+					mode,
+					...(cleanText ? { text: cleanText } : {})
 				}
-			);
+			});
 			if (invokeError) {
 				summaryError =
 					"Impossible de déclencher le webhook. Assurez-vous qu'il y a des formations prévues dans la période sélectionnée et réessayez.";
@@ -473,14 +487,14 @@ DVBisous ! :robot:`;
 		if (summarySending) {
 			return;
 		}
-		const form = document.querySelector('#SummaryModal form');
+		const form = document.querySelector<HTMLFormElement>('#SummaryModal form');
 		if (!form) {
 			return;
 		}
 		const formData = new FormData(form);
-		const from = (formData.get('summary_from') || '').toString();
-		const to = (formData.get('summary_to') || '').toString();
-		const text = (formData.get('summary_text') || '').toString().trim();
+		const from = getFormString(formData, 'summary_from');
+		const to = getFormString(formData, 'summary_to');
+		const text = getFormString(formData, 'summary_text').trim();
 		summaryFrom = from;
 		summaryTo = to;
 		summaryText = text;
@@ -558,8 +572,8 @@ DVBisous ! :robot:`;
 		}
 	];
 
-	$: upcomingSlots = slots.filter((slot) => new Date(slot.start) >= new Date());
-	$: draftSlots = slots.filter((slot) => slot.status === 'draft');
+	const upcomingSlots = $derived(slots.filter((slot) => new Date(slot.start) >= new Date()));
+	const draftSlots = $derived(slots.filter((slot) => slot.status === 'draft'));
 
 	onMount(() => {
 		if (!summaryFrom) {

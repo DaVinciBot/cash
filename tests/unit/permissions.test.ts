@@ -59,7 +59,7 @@ describe('permissions helpers', () => {
 		const uris = menu.map((item) => item.uri);
 
 		expect(uris).toContain('/admin');
-		expect(uris).toContain('/admin/training');
+		expect(uris).toContain('/admin/trainings');
 		expect(uris).not.toContain('/admin/users');
 	});
 });

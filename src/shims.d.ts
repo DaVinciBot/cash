@@ -1,5 +1,7 @@
 declare module '@supabase/phoenix/priv/static/types/timer' {
-	export default class Timer {}
+	export default class Timer {
+		reset(): void;
+	}
 }
 
 declare module '@supabase/phoenix/priv/static/types/types' {

@@ -29,7 +29,7 @@ describe('training form helpers', () => {
 			'description',
 			'prerequisites'
 		]);
-		expect(fields[0].value).toBe('');
+		expect(fields.at(0)?.value).toBe('');
 	});
 
 	it('buildSlotFields wires autocomplete and trainer callbacks', async () => {
@@ -48,7 +48,7 @@ describe('training form helpers', () => {
 		const slot = {
 			slot_id: 10,
 			training_id: 1,
-			name: null,
+			name: 'Svelte',
 			description: null,
 			prerequisites: null,
 			category: 'software' as const,
@@ -71,8 +71,12 @@ describe('training form helpers', () => {
 			trainer_avatar_url: '/alice.png'
 		};
 
-		const searchTrainings = vi.fn(async (search: string) => [{ value: 1, text: search }]);
-		const searchProfiles = vi.fn(async (search: string) => [{ value: 'trainer-2', text: search }]);
+		const searchTrainings = vi.fn((search: string) =>
+			Promise.resolve([{ value: 1, text: search }])
+		);
+		const searchProfiles = vi.fn((search: string) =>
+			Promise.resolve([{ value: 'trainer-2', text: search }])
+		);
 		const onTrainingChange = vi.fn();
 		const onTrainerChange = vi.fn();
 
@@ -92,7 +96,7 @@ describe('training form helpers', () => {
 
 		const trainingResults = await trainingField?.onChange?.({
 			target: { value: ' TS ' }
-		});
+		} as unknown as Event);
 		expect(searchTrainings).toHaveBeenCalledWith('ts');
 		expect(trainingResults).toEqual([{ value: 1, text: 'ts' }]);
 
@@ -103,7 +107,7 @@ describe('training form helpers', () => {
 
 		const profileResults = await trainerField?.onChange?.({
 			target: { value: ' Bob ' }
-		});
+		} as unknown as Event);
 		expect(onTrainerChange).toHaveBeenCalledWith(null);
 		expect(searchProfiles).toHaveBeenCalledWith('bob');
 		expect(profileResults).toEqual([{ value: 'trainer-2', text: 'bob' }]);

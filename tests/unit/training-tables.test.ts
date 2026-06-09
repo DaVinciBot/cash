@@ -10,6 +10,7 @@ import {
 	findTrainingName,
 	formatSlotDate
 } from '../../src/lib/helpers/trainingTables';
+import type { TrainingListItem } from '../../src/lib/services/training';
 
 describe('training table helpers', () => {
 	it('formatSlotDate uses paris short datetime formatter', () => {
@@ -17,8 +18,18 @@ describe('training table helpers', () => {
 	});
 
 	it('findTrainingName resolves known and unknown ids', () => {
-		expect(findTrainingName(2, [{ training_id: 2, name: 'TS' }] as any)).toBe('TS');
-		expect(findTrainingName(9, [{ training_id: 2, name: 'TS' }] as any)).toBe('Formation');
+		const trainings: TrainingListItem[] = [
+			{
+				training_id: 2,
+				name: 'TS',
+				description: null,
+				prerequisites: null,
+				category: 'software'
+			}
+		];
+
+		expect(findTrainingName(2, trainings)).toBe('TS');
+		expect(findTrainingName(9, trainings)).toBe('Formation');
 	});
 
 	it('createTrainingTableItems returns index and display rows', () => {
@@ -27,8 +38,8 @@ describe('training table helpers', () => {
 		]);
 
 		expect(index.get(1)).toMatchObject({ training_id: 1, name: 'Svelte' });
-		expect(rows[0][0]).toEqual({ value: 'Svelte', data: 1 });
-		expect(rows[0][2]).toEqual({ value: 'Aucune description' });
+		expect(rows.at(0)?.at(0)).toEqual({ value: 'Svelte', data: 1 });
+		expect(rows.at(0)?.at(2)).toEqual({ value: 'Aucune description' });
 	});
 
 	it('createSlotTableItems maps nested slot/trainer data', () => {
@@ -54,7 +65,7 @@ describe('training table helpers', () => {
 					prerequisites: 'JS',
 					category: 'software'
 				},
-				profiles: {}
+				profiles: { username: null, avatar_url: null }
 			}
 		]);
 
@@ -63,7 +74,7 @@ describe('training table helpers', () => {
 			name: 'Svelte',
 			trainer_username: null
 		});
-		expect(rows[0][0].value).toBe('short:2025-01-10T10:00:00.000Z');
-		expect(rows[0][2].value).toBe('À définir');
+		expect(rows.at(0)?.at(0)?.value).toBe('short:2025-01-10T10:00:00.000Z');
+		expect(rows.at(0)?.at(2)?.value).toBe('À définir');
 	});
 });
