@@ -104,7 +104,8 @@
 						</svg>
 						<span class="sr-only">Toggle sidebar</span>
 					</button>
-					<a href={resolve('/')} class="mr-4 flex items-center justify-between">
+					<!-- eslint-disable-next-line svelte/no-navigation-without-resolve -->
+					<a href="/" class="mr-4 flex items-center justify-between">
 						<img src="/admin/white_logo_notext.webp" class="mr-3 h-8" alt="Davincibot Logo" />
 						<span
 							class="hidden self-center text-2xl font-semibold whitespace-nowrap text-white sm:block"
