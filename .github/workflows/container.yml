@@ -27,7 +27,7 @@ permissions:
 jobs:
   build-and-publish:
     name: Build and Publish
-    uses: DaVinciBot/shared-workflows/.github/workflows/container.yml@v1.2.0
+    uses: DaVinciBot/shared-workflows/.github/workflows/container.yml@v1.2.1
     with:
       push: ${{ github.event_name == 'push' || (github.event_name == 'workflow_dispatch' && inputs.publish) }}
 
@@ -35,7 +35,7 @@ jobs:
     name: Deploy Dev
     if: github.event_name == 'push' && github.ref == 'refs/heads/develop'
     needs: build-and-publish
-    uses: DaVinciBot/shared-workflows/.github/workflows/deploy.yml@v1.2.0
+    uses: DaVinciBot/shared-workflows/.github/workflows/deploy.yml@v1.2.1
     with:
       environment: dev
       image_ref: ${{ needs.build-and-publish.outputs.image }}@${{ needs.build-and-publish.outputs.digest }}
