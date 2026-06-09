@@ -10,7 +10,7 @@
 	import ReadDrawer from '$lib/components/drawers/ReadDrawer.svelte';
 
 	let skip = false;
-	let user: UserData = $state(null);
+	let user = $state<UserData>(null);
 
 	userdata.subscribe((value) => {
 		if (value) {
@@ -28,7 +28,14 @@
 		'Actions'
 	];
 
-	const filters = $state([
+	interface TableFilter {
+		category: string;
+		value: string;
+		wide?: boolean;
+		options: { name: string; value: string; active?: boolean }[];
+	}
+
+	const filters = $derived<TableFilter[]>([
 		{
 			category: 'Status',
 			value: 'status',
@@ -44,12 +51,16 @@
 		{
 			category: 'hidden',
 			value: 'requestedBy',
-			options: [{ name: 'current_user', value: user?.id, active: true }]
+			options: [{ name: 'current_user', value: user?.id ?? '', active: true }]
 		}
 	]);
 
 	$effect(() => {
-		filters[1].options[0].value = user?.id;
+		const hiddenFilter = filters[1];
+		const hiddenOption = hiddenFilter?.options[0];
+		if (hiddenOption) {
+			hiddenOption.value = user?.id ?? '';
+		}
 	});
 
 	interface OrderDetail extends OrderRow {
@@ -70,7 +81,7 @@
 		{
 			title: 'Voir',
 			type: 'view',
-			handler: async (e: MouseEvent) => {
+			handler: async (e: Event) => {
 				const target = e.target as HTMLElement;
 				const id = target.closest('tr')?.querySelector('th')?.dataset.utils;
 
@@ -119,7 +130,7 @@
 					},
 					{
 						done: ['completed', 'refused_treso', 'canceled_user', 'canceled_ops'].includes(
-							data.status
+							data.status ?? ''
 						),
 						icon: 'processing'
 					},
@@ -135,16 +146,25 @@
 
 				if (data.status === 'refused_cdp') {
 					stepper.splice(2);
-					stepper[1].done = true;
-					stepper[1].icon = 'cancel';
+					const s1 = stepper[1];
+					if (s1) {
+						s1.done = true;
+						s1.icon = 'cancel';
+					}
 				} else if (data.status === 'refused_treso') {
 					stepper.splice(3);
-					stepper[2].done = true;
-					stepper[2].icon = 'cancel';
+					const s2 = stepper[2];
+					if (s2) {
+						s2.done = true;
+						s2.icon = 'cancel';
+					}
 				} else if (data.status === 'canceled_user' || data.status === 'canceled_ops') {
 					stepper.splice(4);
-					stepper[3].done = true;
-					stepper[3].icon = 'cancel';
+					const s3 = stepper[3];
+					if (s3) {
+						s3.done = true;
+						s3.icon = 'cancel';
+					}
 				}
 
 				// fetch the updates for the order
@@ -202,7 +222,7 @@
 							{
 								title: 'Annuler',
 								type: 'delete',
-								handler: async (_e: MouseEvent) => {
+								handler: async (_e: Event) => {
 									const reason = prompt("Raison d'annulation (optionnelle)")?.trim() ?? null;
 									const supabaseClient = getSupabaseBrowserClient();
 									const { data: cancelData, error: cancelError } = (await supabaseClient
@@ -243,18 +263,19 @@
 		status: string;
 	}
 
-	function parseItems(data: OrderListRow[]) {
+	function parseItems(data: unknown[]) {
+		const rows = data as OrderListRow[];
 		const items: { value: string | number; data?: number }[][] = [];
-		data.forEach((el) => {
+		rows.forEach((el) => {
 			const price = Math.round(((el.price ?? 0) + (el.shipping_cost ?? 0)) * 100) / 100;
 			const elName = el.name ?? '';
 			const name = elName.length > 30 ? elName.slice(0, 30) + '...' : elName;
 			items.push([
 				{ value: name, data: el.id },
-				{ value: el.creationDate.split('T')[0] },
-				{ value: el.lastUpdate.split('T')[0] },
+				{ value: el.creationDate.substring(0, 10) },
+				{ value: el.lastUpdate.substring(0, 10) },
 				{ value: `${String(price)} €` },
-				{ value: statusText[el.status] ?? el.status }
+				{ value: (statusText as Record<string, string>)[el.status] ?? el.status }
 			]);
 		});
 		return items;

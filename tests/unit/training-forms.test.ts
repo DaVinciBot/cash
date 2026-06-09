@@ -72,7 +72,7 @@ describe('training form helpers', () => {
 		};
 
 		const searchTrainings = vi.fn((search: string) =>
-			Promise.resolve([{ value: 1, text: search }])
+			Promise.resolve([{ value: '1', text: search }])
 		);
 		const searchProfiles = vi.fn((search: string) =>
 			Promise.resolve([{ value: 'trainer-2', text: search }])
@@ -98,7 +98,7 @@ describe('training form helpers', () => {
 			target: { value: ' TS ' }
 		} as unknown as Event);
 		expect(searchTrainings).toHaveBeenCalledWith('ts');
-		expect(trainingResults).toEqual([{ value: 1, text: 'ts' }]);
+		expect(trainingResults).toEqual([{ value: '1', text: 'ts' }]);
 
 		trainingField?.onSelect?.('42');
 		trainingField?.onSelect?.('abc');

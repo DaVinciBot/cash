@@ -64,10 +64,10 @@
 
 	interface ProjectOption {
 		name: string;
-		value: number;
+		value: string;
 	}
 
-	let user: UserData = $state(null);
+	let user = $state<UserData>(null);
 	let pendingCount = $state(0);
 	let approvedCount = $state(0);
 	let deliveryCount = $state(0);
@@ -84,9 +84,9 @@
 		canViewAllOrders = hasAnyPermission(permissions, ['orders.read.all']);
 		canEditProjectOrders = profile.projects.some((p) => p.role === 'cdp');
 		canEditOrders = hasAnyPermission(permissions, ['orders.lifecycle.update.all']);
-		project = profile.projects.map((p) => ({ name: p.name, value: p.id }));
+		project = profile.projects.map((p) => ({ name: p.name, value: String(p.id) }));
 		if (canViewAllOrders) {
-			project = (profile.allProjects ?? []).map((p) => ({ name: p.name, value: p.value }));
+			project = (profile.allProjects ?? []).map((p) => ({ name: p.name, value: String(p.value) }));
 		}
 	};
 
@@ -122,7 +122,14 @@
 		{ name: 'Annulé', value: 'canceled_user","canceled_ops' }
 	];
 
-	let filters = $state([
+	interface TableFilter {
+		category: string;
+		value: string;
+		wide?: boolean;
+		options: { name: string; value: string; active?: boolean }[];
+	}
+
+	let filters = $derived<TableFilter[]>([
 		{
 			category: 'Projet',
 			value: 'projectId',
@@ -137,7 +144,10 @@
 	]);
 
 	$effect(() => {
-		filters[0].options = project;
+		const projectFilter = filters[0];
+		if (projectFilter) {
+			projectFilter.options = project;
+		}
 	});
 
 	function getFormNumber(formData: FormData, key: string): number {
@@ -154,7 +164,7 @@
 		{
 			title: 'Voir',
 			type: 'view',
-			handler: async (e: MouseEvent) => {
+			handler: async (e: Event) => {
 				const target = e.target as HTMLElement;
 				const id = target.closest('tr')?.querySelector('th')?.dataset.utils;
 
@@ -315,16 +325,25 @@
 
 				if (data.status === 'refused_cdp') {
 					stepper.splice(2);
-					stepper[1].done = true;
-					stepper[1].icon = 'cancel';
+					const s1 = stepper[1];
+					if (s1) {
+						s1.done = true;
+						s1.icon = 'cancel';
+					}
 				} else if (data.status === 'refused_treso') {
 					stepper.splice(3);
-					stepper[2].done = true;
-					stepper[2].icon = 'cancel';
+					const s2 = stepper[2];
+					if (s2) {
+						s2.done = true;
+						s2.icon = 'cancel';
+					}
 				} else if (data.status === 'canceled_user' || data.status === 'canceled_ops') {
 					stepper.splice(4);
-					stepper[3].done = true;
-					stepper[3].icon = 'cancel';
+					const s3 = stepper[3];
+					if (s3) {
+						s3.done = true;
+						s3.icon = 'cancel';
+					}
 				}
 
 				let custom_actions: unknown[] = [];
@@ -631,21 +650,22 @@
 		}
 	];
 
-	function parseItems(data: OrderRow[]) {
+	function parseItems(data: unknown[]) {
+		const rows = data as OrderRow[];
 		const items: { value: string | number; data?: string | number }[][] = [];
-		data.forEach((el) => {
+		rows.forEach((el) => {
 			const price = Math.round(((el.price ?? 0) + (el.shipping_cost ?? 0)) * 100) / 100;
 			const elName = el.name ?? '';
 			const name = elName.length > 30 ? elName.substring(0, 30) + '...' : elName || '-';
 			items.push([
 				{ value: name, data: el.id },
-				{ value: el.creationDate.split('T')[0] },
-				{ value: el.lastUpdate.split('T')[0] },
+				{ value: el.creationDate.substring(0, 10) },
+				{ value: el.lastUpdate.substring(0, 10) },
 				{ value: `${String(price)} €` },
 				{ value: el.projectId?.name ?? '-', data: el.projectId?.id ?? '' },
 				{ value: el.requestedBy?.username ?? '-', data: el.requestedBy?.id ?? '' },
 				{ value: Array.isArray(el.tags) && el.tags.length > 0 ? el.tags.join(', ') : '-' },
-				{ value: statusText[el.status] ?? el.status ?? '-' }
+				{ value: (statusText as Record<string, string>)[el.status] ?? el.status }
 			]);
 		});
 		return items;
@@ -678,7 +698,9 @@
 					{
 						category: 'hidden',
 						value: 'projectId',
-						options: [{ name: 'CDP project', value: user.projects[0]?.id ?? 0, active: true }]
+						options: [
+							{ name: 'CDP project', value: String(user.projects.at(0)?.id ?? ''), active: true }
+						]
 					}
 				];
 			}

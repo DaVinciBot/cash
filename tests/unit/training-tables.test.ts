@@ -34,7 +34,7 @@ describe('training table helpers', () => {
 
 	it('createTrainingTableItems returns index and display rows', () => {
 		const { index, rows } = createTrainingTableItems([
-			{ id: 1, name: 'Svelte', description: '', prerequisites: '', category: 'software' }
+			{ id: 1, name: 'Svelte', description: null, prerequisites: null, category: 'software' }
 		]);
 
 		expect(index.get(1)).toMatchObject({ training_id: 1, name: 'Svelte' });

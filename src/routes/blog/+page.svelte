@@ -119,7 +119,7 @@
 		}
 	}
 
-	const carta = new Carta({ sanitizer: false });
+	const carta = new Carta({ sanitizer: (html) => html });
 
 	async function handleUpload(ev: Event) {
 		const input = ev.target as HTMLInputElement;

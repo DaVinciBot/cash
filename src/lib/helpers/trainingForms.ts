@@ -81,7 +81,7 @@ export interface SlotFieldsConfig {
 	trainings: TrainingListItem[];
 	profiles: ProfileOption[];
 	selectedTrainingId?: number | null;
-	searchTrainings: (search: string) => Promise<{ value: number; text: string }[]>;
+	searchTrainings: (search: string) => Promise<{ value: string; text: string }[]>;
 	searchProfiles: (search: string) => Promise<{ value: string; text: string; image?: string }[]>;
 	onTrainerChange?: (nextId: string | null) => void;
 	onTrainingChange?: (nextId: number | null) => void;

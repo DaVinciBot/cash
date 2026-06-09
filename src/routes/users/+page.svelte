@@ -1,15 +1,14 @@
 <script lang="ts">
 	import { resolve } from '$app/paths';
+	import Table from '$lib/components/admin/Table.svelte';
+	import ReadDrawer from '$lib/components/drawers/ReadDrawer.svelte';
+	import SucessModal from '$lib/components/modals/InfoModal.svelte';
+	import UserImportModal from '$lib/components/modals/UserImportModal.svelte';
 	import { hasAnyPermission } from '$lib/permissions';
 	import { userdata } from '$lib/store';
 	import { getSupabaseBrowserClient } from '$lib/supabaseClient';
 	import { mountClosable } from '$lib/utils';
 	import { SvelteMap } from 'svelte/reactivity';
-
-	import Table from '$lib/components/admin/Table.svelte';
-	import ReadDrawer from '$lib/components/drawers/ReadDrawer.svelte';
-	import SucessModal from '$lib/components/modals/InfoModal.svelte';
-	import UserImportModal from '$lib/components/modals/UserImportModal.svelte';
 
 	interface AuthUser {
 		id: string;
@@ -242,7 +241,14 @@
 		{ name: 'CDR Nantes', value: '14' }
 	]);
 
-	const filters = $state([
+	interface TableFilter {
+		category: string;
+		value: string;
+		wide?: boolean;
+		options: { name: string; value: string; active?: boolean }[];
+	}
+
+	const filters = $derived<TableFilter[]>([
 		{
 			category: 'Projets',
 			value: 'member_of.project.id',

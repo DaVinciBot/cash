@@ -102,7 +102,7 @@
 				name: i.nom,
 				link: i.lien,
 				price: parseFloat(i.price),
-				order_id: ordersTyped[0].id,
+				order_id: ordersTyped.at(0)?.id ?? 0,
 				quantity: parseInt(i.quantity)
 			};
 		});
@@ -146,7 +146,7 @@
 							-
 						</button>
 					</div>
-					<form class="objects grid w-full grid-flow-row gap-5 md:grid-flow-col">
+					<div class="objects grid w-full grid-flow-row gap-5 md:grid-flow-col">
 						<div>
 							<label for={`name-${String(i)}`}>Nom</label>
 							<input
@@ -206,7 +206,7 @@
 								min="1"
 							/>
 						</div>
-					</form>
+					</div>
 				</div>
 			{/each}
 

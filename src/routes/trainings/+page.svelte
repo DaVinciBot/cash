@@ -131,7 +131,7 @@ DVBisous ! :robot:`;
 
 		return data.map((training: { id: number; name: string }) => ({
 			id: training.id,
-			value: training.id,
+			value: String(training.id),
 			text: training.name
 		}));
 	}
@@ -206,7 +206,7 @@ DVBisous ! :robot:`;
 			);
 
 			slotFields = nextFields.map((nextField): CrudField => {
-				const field: CrudField = nextField as unknown as CrudField;
+				const field: CrudField = nextField;
 				const previous = field.id ? previousById.get(field.id) : null;
 				if (!previous || field.id === 'training_id') {
 					return field;

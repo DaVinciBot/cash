@@ -38,7 +38,7 @@ describe('UserImportModal (components submodule)', () => {
 		projectSelect.dispatchEvent(new Event('change', { bubbles: true }));
 
 		form.dispatchEvent(new Event('submit', { bubbles: true, cancelable: true }));
-		await Promise.resolve();
+		await new Promise<void>((resolve) => setTimeout(resolve, 0));
 
 		expect(onSubmit).toHaveBeenCalledWith({
 			permissions: [],
