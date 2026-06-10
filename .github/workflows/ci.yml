@@ -2,9 +2,9 @@ name: CI
 
 on:
   push:
-    branches: [develop, staging, main, master, 'release/**', 'hotfix/**']
+    branches: [dev, staging, main, master, 'release/**', 'hotfix/**']
   pull_request:
-    branches: [develop, staging, main, master, 'release/**', 'hotfix/**']
+    branches: [dev, staging, main, master, 'release/**', 'hotfix/**']
 
 concurrency:
   group: ${{ github.workflow }}-${{ github.ref }}
@@ -16,7 +16,7 @@ permissions:
 jobs:
   quality:
     name: Quality
-    uses: DaVinciBot/shared-workflows/.github/workflows/ci.yml@v1.2.1
+    uses: DaVinciBot/shared-workflows/.github/workflows/ci.yml@v2.0.0
     secrets: inherit
     with:
       pnpm_version: 11.5.2
