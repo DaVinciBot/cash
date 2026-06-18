@@ -10,3 +10,6 @@ dist
 coverage
 playwright-report
 test-results
+
+# Miscellaneous
+/static/

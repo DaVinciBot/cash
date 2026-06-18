@@ -18,6 +18,9 @@
 		"ci": "pnpm check && pnpm lint && pnpm test:unit && pnpm build"
 	},
 	"devDependencies": {
+		"@davincibot/eslint-config": "^1.0.0",
+		"@davincibot/prettier-config": "^1.0.0",
+		"@davincibot/tsconfig": "^1.0.0",
 		"@eslint/js": "^10.0.1",
 		"@playwright/test": "^1.60.0",
 		"@sveltejs/adapter-auto": "^7.0.1",

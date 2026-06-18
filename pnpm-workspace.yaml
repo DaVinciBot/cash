@@ -1,3 +1,7 @@
 allowBuilds:
   esbuild: true
   svelte-preprocess: true
+minimumReleaseAgeExclude:
+  - '@davincibot/eslint-config@1.0.0'
+  - '@davincibot/prettier-config@1.0.0'
+  - '@davincibot/tsconfig@1.0.0'
