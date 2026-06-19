@@ -1,0 +1,12 @@
+# Trivy ignore file
+#
+# Exceptions aux scans de vulnérabilités (FS + image). Chaque entrée DOIT être
+# datée et justifiée. Une exception sans date d'expiration n'a rien à faire ici.
+#
+# Format : un identifiant par ligne (CVE-xxxx-yyyy, AVD-xxx, secret/misconfig ID).
+# Exemple :
+#   # CVE-2024-XXXXX — faux positif, code vulnérable non atteignable.
+#   # Ajouté le 2026-06-19 par eliott. À revoir avant le 2026-09-19.
+#   CVE-2024-XXXXX
+#
+# Aucune exception active pour le moment.
