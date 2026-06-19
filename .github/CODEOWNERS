@@ -1,0 +1,14 @@
+# CODEOWNERS — cash
+
+# Une review d'un owner est requise sur les chemins ci-dessous (branch protection)
+
+# Par défaut : mainteneurs du site
+
+*                       @aust-1 @UrbsKali @SkaosDev
+
+# CI/CD, gouvernance, supply-chain : mainteneur lead uniquement
+
+/.github/               @aust-1
+/Dockerfile             @aust-1
+.prettierrc             @aust-1
+.prettierignore         @aust-1
