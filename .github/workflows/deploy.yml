@@ -12,8 +12,8 @@ on:
           - staging
           - prod
       image_ref:
-        description: GHCR image reference to deploy, preferably image@sha256:digest.
-        required: true
+        description: GHCR image reference to deploy, preferably image@sha256:digest. Leave empty to default to ghcr.io/<repo>:<environment>.
+        required: false
         type: string
 
 concurrency:
@@ -27,7 +27,7 @@ jobs:
   deploy-dev:
     name: Deploy Dev
     if: inputs.environment == 'dev'
-    uses: DaVinciBot/shared-workflows/.github/workflows/deploy.yml@v2.1.1
+    uses: DaVinciBot/shared-workflows/.github/workflows/deploy.yml@v2.2.0
     with:
       environment: dev
       image_ref: ${{ inputs.image_ref }}
@@ -37,7 +37,7 @@ jobs:
   deploy-staging:
     name: Deploy Staging
     if: inputs.environment == 'staging'
-    uses: DaVinciBot/shared-workflows/.github/workflows/deploy.yml@v2.1.1
+    uses: DaVinciBot/shared-workflows/.github/workflows/deploy.yml@v2.2.0
     with:
       environment: staging
       image_ref: ${{ inputs.image_ref }}
@@ -47,7 +47,7 @@ jobs:
   deploy-prod:
     name: Deploy Prod
     if: inputs.environment == 'prod'
-    uses: DaVinciBot/shared-workflows/.github/workflows/deploy.yml@v2.1.1
+    uses: DaVinciBot/shared-workflows/.github/workflows/deploy.yml@v2.2.0
     with:
       environment: prod
       image_ref: ${{ inputs.image_ref }}
