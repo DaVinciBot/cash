@@ -24,6 +24,12 @@ FROM base AS runner
 
 ENV NODE_ENV=production
 
+# Patch system packages to pick up security fixes (e.g. libgnutls30
+# CVE-2026-33845 / CVE-2026-42010) not yet in the base image.
+RUN apt-get update \
+    && apt-get upgrade -y --no-install-recommends \
+    && rm -rf /var/lib/apt/lists/*
+
 WORKDIR /app
 
 COPY package.json ./
