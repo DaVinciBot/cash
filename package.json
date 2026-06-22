@@ -25,7 +25,7 @@
 		"@playwright/test": "^1.61.0",
 		"@sveltejs/adapter-auto": "^7.0.1",
 		"@sveltejs/adapter-node": "^5.5.4",
-		"@sveltejs/kit": "^2.65.0",
+		"@sveltejs/kit": "^2.66.0",
 		"@sveltejs/vite-plugin-svelte": "^7.1.2",
 		"@tsconfig/svelte": "^5.0.8",
 		"@types/eslint": "^9.6.1",
@@ -50,7 +50,7 @@
 	},
 	"_note": "don't update prettier-plugin-svelte to 4.x until a compatible version of Prettier is released",
 	"dependencies": {
-		"@lucide/svelte": "^1.17.0",
+		"@lucide/svelte": "^1.21.0",
 		"@popperjs/core": "^2.11.8",
 		"@supabase/phoenix": "^0.4.4",
 		"@supabase/ssr": "^0.12.0",
