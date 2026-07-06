@@ -4,7 +4,14 @@
 	import ReadDrawer from '$lib/components/drawers/ReadDrawer.svelte';
 	import SucessModal from '$lib/components/modals/InfoModal.svelte';
 	import UserImportModal from '$lib/components/modals/UserImportModal.svelte';
-	import { hasAnyPermission } from '$lib/permissions';
+	import {
+		GLOBAL_ROLE_LABELS_FR,
+		hasAnyPermission,
+		PROJECT_ROLE_LABELS_FR,
+		type GlobalPermission,
+		type GlobalRole,
+		type ProjectRole
+	} from '$lib/permissions';
 	import { userdata } from '$lib/store';
 	import { getSupabaseBrowserClient } from '$lib/supabaseClient';
 	import { mountClosable } from '$lib/utils';
@@ -320,18 +327,8 @@
 			target: document.body,
 			props: {
 				projectOptions: allProjects,
-				permissionCategories,
-				permissionPackages,
 				title: 'Importer des utilisateurs',
-				onSubmit: async ({
-					project,
-					users,
-					permissions
-				}: {
-					project: string;
-					users: ImportUser[];
-					permissions: string[];
-				}) => {
+				onSubmit: async ({ project, users }: { project: string; users: ImportUser[] }) => {
 					if (!canEditMembers) {
 						throw new Error(
 							"Vous n'avez pas les permissions requises pour cette action (members.profile.update.all nécessaire)."
@@ -344,7 +341,6 @@
 					const alreadyLinked: string[] = [];
 					const failures: FailureEntry[] = [];
 					const defaultProject = project !== '' && project !== 'NULL' ? project : '';
-					const incomingPermissions = permissions.filter(Boolean);
 
 					const existingAuthUsers = new SvelteMap<string, AuthUser>();
 					try {
@@ -402,18 +398,28 @@
 								isNewlyCreated = true;
 								const { error: profileError } = await supabase.from('profiles').insert({
 									id: createdUserId,
-									username,
-									permissions: incomingPermissions
+									username
 								});
 								if (profileError) {
 									throw new Error((profileError as { message: string }).message);
 								}
 								const { error: memberError } = await supabase.from('member_of').insert({
 									profile: createdUserId,
-									project: projectId
+									project: projectId,
+									role: 'project_member' satisfies ProjectRole
 								});
 								if (memberError) {
 									throw new Error((memberError as { message: string }).message);
+								}
+								// Rôle global par défaut. Le trigger handle_new_user pose déjà
+								// `member` à la création auth ; on le (re)confirme via la RPC
+								// (idempotente) au cas où le trigger n'aurait pas tourné.
+								const { error: roleError } = await supabase.rpc('assign_global_role', {
+									p_profile: createdUserId,
+									p_role: DEFAULT_IMPORT_ROLE
+								});
+								if (roleError) {
+									throw new Error(roleError.message);
 								}
 								createdUsers.push(email);
 								existingAuthUsers.set(email, {
@@ -427,10 +433,10 @@
 								const profileId = createdUserId;
 								const { data: existingProfileRows, error: existingProfileError } = (await supabase
 									.from('profiles')
-									.select('id, username, permissions')
+									.select('id, username')
 									.eq('id', profileId)
 									.limit(1)) as {
-									data: { id: string; username: string; permissions: string[] }[] | null;
+									data: { id: string; username: string }[] | null;
 									error: unknown;
 								};
 								if (existingProfileError) {
@@ -441,27 +447,18 @@
 									const fallbackUsername = username || email.split('@')[0];
 									const { error: profileInsertError } = await supabase.from('profiles').insert({
 										id: profileId,
-										username: fallbackUsername,
-										permissions: incomingPermissions
+										username: fallbackUsername
 									});
 									if (profileInsertError) {
 										throw new Error((profileInsertError as { message: string }).message);
 									}
-								} else if (incomingPermissions.length > 0) {
-									const currentPermissions = Array.isArray(existingProfile.permissions)
-										? existingProfile.permissions
-										: [];
-									const mergedPermissions = Array.from(
-										new Set([...currentPermissions, ...incomingPermissions])
-									);
-									if (mergedPermissions.length !== currentPermissions.length) {
-										const { error: permUpdateError } = await supabase
-											.from('profiles')
-											.update({ permissions: mergedPermissions })
-											.eq('id', profileId);
-										if (permUpdateError) {
-											throw new Error((permUpdateError as { message: string }).message);
-										}
+									// Profil créé à la volée : lui garantir le rôle par défaut.
+									const { error: roleError } = await supabase.rpc('assign_global_role', {
+										p_profile: profileId,
+										p_role: DEFAULT_IMPORT_ROLE
+									});
+									if (roleError) {
+										throw new Error(roleError.message);
 									}
 								}
 								const { count: memberCount, error: memberCheckError } = await supabase
@@ -475,7 +472,8 @@
 								if ((memberCount ?? 0) === 0) {
 									const { error: attachError } = await supabase.from('member_of').insert({
 										profile: profileId,
-										project: projectId
+										project: projectId,
+										role: 'project_member' satisfies ProjectRole
 									});
 									if (attachError) {
 										throw new Error((attachError as { message: string }).message);
@@ -561,136 +559,87 @@
 		});
 	}
 
-	const permissionCategories = {
-		Membres: [
-			{ label: 'Voir membres', value: 'members.profile.read.all' },
-			{ label: 'Éditer membres', value: 'members.profile.update.all' },
-			{ label: 'Voir projets membres', value: 'members.projects.read.all' },
-			{ label: 'Éditer projets membres', value: 'members.projects.update.all' },
-			{ label: 'Inviter un membre', value: 'members.invite.send' },
-			{ label: 'Activer/Désactiver profil', value: 'members.profile.status.update' }
-		],
-		IAM: [
-			{ label: 'Voir permissions attribuées', value: 'iam.permissions.read.all' },
-			{ label: 'Attribuer (all)', value: 'iam.permissions.assign.all' },
-			{ label: 'Attribuer (owned)', value: 'iam.permissions.assign.owned' },
-			{ label: 'Retirer (all)', value: 'iam.permissions.revoke.all' },
-			{ label: 'Retirer (owned)', value: 'iam.permissions.revoke.owned' }
-		],
-		Formation: [
-			{ label: 'Voir catalogue formation', value: 'training.catalog.read' },
-			{ label: 'Voir sessions formation', value: 'training.slot.read' },
-			{ label: 'Créer/éditer session formation', value: 'training.slot.cu' },
-			{ label: 'Inscriptions self (CRU)', value: 'training.registration.cru.self' },
-			{ label: 'Voir toutes inscriptions', value: 'training.registration.read.all' },
-			{ label: 'Gérer inscriptions all (CU)', value: 'training.registration.cu.all' },
-			{ label: 'Éditer présence', value: 'training.presence.update' },
-			{ label: 'Recevoir récap formation', value: 'training.summary_email.receive' }
-		],
-		Commandes: [
-			{ label: 'Commandes self (CRU)', value: 'orders.cru.self' },
-			{ label: 'Voir toutes commandes', value: 'orders.read.all' },
-			{ label: 'Créer commande globale', value: 'orders.create.all' },
-			{ label: 'Gérer le workflow commandes global', value: 'orders.lifecycle.update.all' }
-		],
-		Projets: [{ label: 'Voir stats globales', value: 'projects.stats.read.all' }],
-		Finance: [
-			{ label: 'Voir la trésorerie', value: 'finance.read' },
-			{ label: 'Éditer la trésorerie', value: 'finance.write' }
-		],
-		Blog: [
-			{ label: 'Éditer brouillons blog', value: 'blog.draft.write' },
-			{ label: 'Publier blog', value: 'blog.publish' }
-		],
-		Intégrations: [
-			{ label: 'Caster SmartShare', value: 'integration.smartshare.cast' },
-			{
-				label: 'Déclencher le Webhook résumé Discord',
-				value: 'integration.discord.summary_webhook.send'
-			}
-		],
-		Audit: [
-			{ label: 'Voir logs', value: 'audit.logs.read' },
-			{ label: 'Voir logs sécurité', value: 'audit.logs.read.security' },
-			{ label: 'Exporter logs', value: 'audit.events.export' }
-		]
+	const roleCategories: Record<string, { value: GlobalRole; label: string }[]> = {
+		'Rôles globaux': (Object.keys(GLOBAL_ROLE_LABELS_FR) as GlobalRole[]).map((role) => ({
+			value: role,
+			label: GLOBAL_ROLE_LABELS_FR[role]
+		}))
 	};
 
-	const permissionPackages = [
+	const overridePermissionCategories: Record<string, { value: GlobalPermission; label: string }[]> =
 		{
-			label: 'Admin Complet',
-			perms: [
-				'members.profile.read.all',
-				'members.profile.update.all',
-				'members.projects.read.all',
-				'members.projects.update.all',
-				'members.invite.send',
-				'members.profile.status.update',
-				'iam.permissions.read.all',
-				'iam.permissions.assign.all',
-				'iam.permissions.revoke.all',
-				'training.catalog.read',
-				'training.slot.read',
-				'training.slot.cu',
-				'training.registration.cru.self',
-				'training.registration.read.all',
-				'training.registration.cu.all',
-				'training.presence.update',
-				'training.summary_email.receive',
-				'orders.cru.self',
-				'orders.read.all',
-				'orders.create.all',
-				'orders.lifecycle.update.all',
-				'projects.stats.read.all',
-				'finance.read',
-				'finance.write',
-				'blog.draft.write',
-				'blog.publish',
-				'integration.smartshare.cast',
-				'integration.discord.summary_webhook.send',
-				'audit.logs.read',
-				'audit.logs.read.security',
-				'audit.events.export'
+			'Override (exception)': [
+				{ label: 'Voir membres', value: 'members.profile.read.all' },
+				{ label: 'Éditer membres', value: 'members.profile.update.all' },
+				{ label: 'Éditer projets membres', value: 'members.projects.update.all' },
+				{ label: 'Inviter un membre', value: 'members.invite.send' },
+				{ label: 'Activer/Désactiver profil', value: 'members.profile.status.update' },
+				{ label: 'Gérer les rôles (IAM)', value: 'iam.roles.manage' },
+				{ label: 'Gérer les overrides (IAM)', value: 'iam.overrides.manage' },
+				{ label: 'Voir catalogue formation', value: 'training.catalog.read' },
+				{ label: 'Voir sessions formation', value: 'training.slot.read' },
+				{ label: 'Créer/éditer session formation', value: 'training.slot.manage' },
+				{ label: 'Gérer sa propre inscription', value: 'training.registration.manage.self' },
+				{ label: 'Voir toutes inscriptions', value: 'training.registration.read.all' },
+				{ label: 'Gérer toutes inscriptions', value: 'training.registration.manage.all' },
+				{ label: 'Éditer présence', value: 'training.presence.update' },
+				{ label: 'Recevoir récap formation (email)', value: 'training.summary_email.receive' },
+				{ label: 'Envoyer récap formation (Discord)', value: 'training.summary.discord.send' },
+				{ label: 'Envoyer story formation (Discord)', value: 'training.story.discord.send' },
+				{ label: 'Gérer sa propre commande', value: 'orders.manage.self' },
+				{ label: 'Voir toutes commandes', value: 'orders.read.all' },
+				{ label: 'Créer commande globale', value: 'orders.create.all' },
+				{ label: 'Gérer le workflow commandes', value: 'orders.lifecycle.update.all' },
+				{ label: 'Voir stats globales', value: 'stats.read.all' },
+				{ label: 'Voir la trésorerie', value: 'finance.read' },
+				{ label: 'Éditer la trésorerie', value: 'finance.write' },
+				{ label: 'Éditer brouillons blog', value: 'blog.draft.write' },
+				{ label: 'Publier blog', value: 'blog.publish' },
+				{ label: 'Caster SmartShare', value: 'integration.smartshare.cast' },
+				{ label: 'Voir logs', value: 'audit.logs.read' },
+				{ label: 'Voir logs sécurité', value: 'audit.logs.read.security' },
+				{ label: 'Exporter logs', value: 'audit.events.export' },
+				{ label: 'Accès environnements (infra)', value: 'infra.environments.access' }
 			]
-		},
-		{
-			label: 'Responsable Formation',
-			perms: [
-				'training.catalog.read',
-				'training.slot.read',
-				'training.slot.cu',
-				'training.registration.cru.self',
-				'training.registration.read.all',
-				'training.registration.cu.all',
-				'training.presence.update',
-				'training.summary_email.receive',
-				'integration.smartshare.cast',
-				'integration.discord.summary_webhook.send'
-			]
-		},
-		{
-			label: 'Gestion Membres',
-			perms: [
-				'members.profile.read.all',
-				'members.profile.update.all',
-				'members.projects.read.all',
-				'members.projects.update.all',
-				'members.invite.send',
-				'members.profile.status.update',
-				'iam.permissions.read.all',
-				'iam.permissions.assign.owned',
-				'iam.permissions.revoke.owned'
-			]
-		},
-		{
-			label: 'Membre Projet',
-			perms: ['orders.cru.self']
-		},
-		{
-			label: 'Membre Standard',
-			perms: ['training.slot.read', 'training.registration.cru.self']
+		};
+
+	const DEFAULT_IMPORT_ROLE: GlobalRole = 'guest';
+
+	/**
+	 * Applique un diff de rôles globaux via les RPC assign/revoke (immuabilité de
+	 * profile_global_roles respectée côté DB). `current` = rôles actifs, `next` =
+	 * sélection cible.
+	 */
+	async function applyGlobalRoleDiff(
+		supabase: ReturnType<typeof getSupabaseBrowserClient>,
+		profileId: string,
+		current: GlobalRole[],
+		next: GlobalRole[]
+	): Promise<void> {
+		const currentSet = new Set(current);
+		const nextSet = new Set(next);
+		const toAssign = next.filter((r) => !currentSet.has(r));
+		const toRevoke = current.filter((r) => !nextSet.has(r));
+
+		for (const role of toAssign) {
+			const { error } = await supabase.rpc('assign_global_role', {
+				p_profile: profileId,
+				p_role: role
+			});
+			if (error) {
+				throw new Error(`Attribution du rôle ${role} impossible : ${error.message}`);
+			}
 		}
-	];
+		for (const role of toRevoke) {
+			const { error } = await supabase.rpc('revoke_global_role', {
+				p_profile: profileId,
+				p_role: role
+			});
+			if (error) {
+				throw new Error(`Révocation du rôle ${role} impossible : ${error.message}`);
+			}
+		}
+	}
 
 	// Action handlers for rows
 	async function viewUser(e: Event) {
@@ -711,27 +660,47 @@
 		}
 		const { data, error } = (await supabase
 			.from('profiles')
-			.select('id, username, permissions, status, member_of(role, project(id,name)), avatar_url')
+			.select(
+				'id, username, permissions, status, profile_global_roles(role, revoked_at), member_of(role, project(id,name)), avatar_url'
+			)
 			.eq('id', id)
 			.single()) as {
-			data: (ProfileRow & { permissions: string[]; status: string }) | null;
+			data:
+				| (ProfileRow & {
+						permissions: string[];
+						status: string;
+						profile_global_roles: { role: string; revoked_at: string | null }[];
+				  })
+				| null;
 			error: unknown;
 		};
 		if (error || !data) {
 			return;
 		}
 
+		// Rôles globaux actifs (non révoqués) — servent d'état de départ au diff.
+		const activeGlobalRoles = (data.profile_global_roles ?? [])
+			.filter((r) => !r.revoked_at)
+			.map((r) => r.role as GlobalRole);
+
+		const overridePermissions = (data.permissions ?? []).filter(Boolean);
+
 		const projectsData = data.member_of
 			.map((m) => ({
 				project_id: m.project?.id,
-				role: m.role || 'membre'
+				role: (m.role || 'project_member') as ProjectRole
 			}))
 			.filter((m) => m.project_id !== undefined);
 
-		const flatPerms = Object.values(permissionCategories).flat();
-		const permBadges = data.permissions.map((p: string) => {
-			const label = flatPerms.find((fp) => fp.value === p)?.label ?? p;
-			return { text: label, color: 'bg-primary-900 border border-primary-500 text-primary-100' };
+		const roleBadges = activeGlobalRoles.map((role) => ({
+			text: GLOBAL_ROLE_LABELS_FR[role] ?? role,
+			color: 'bg-primary-900 border border-primary-500 text-primary-100'
+		}));
+
+		const flatOverride = Object.values(overridePermissionCategories).flat();
+		const permBadges = overridePermissions.map((p: string) => {
+			const label = flatOverride.find((fp) => fp.value === p)?.label ?? p;
+			return { text: label, color: 'bg-fuchsia-900 border border-fuchsia-500 text-fuchsia-100' };
 		});
 
 		const projectBadges = data.member_of
@@ -739,30 +708,33 @@
 				if (!m.project) {
 					return null;
 				}
-				let roleColor: string;
-				if (m.role === 'admin' || m.role === 'bureau') {
-					roleColor = 'bg-rose-900 border border-rose-500 text-rose-100';
-				} else if (m.role === 'cdp') {
-					roleColor = 'bg-amber-900 border border-amber-500 text-amber-100';
-				} else {
-					roleColor = 'bg-blue-900 border border-blue-500 text-blue-100';
-				}
-				return { text: `${m.project.name} (${m.role})`, color: roleColor };
+				const roleColor =
+					m.role === 'cdp'
+						? 'bg-amber-900 border border-amber-500 text-amber-100'
+						: 'bg-blue-900 border border-blue-500 text-blue-100';
+				const roleLabel = PROJECT_ROLE_LABELS_FR[(m.role || 'project_member') as ProjectRole] ?? m.role;
+				return { text: `${m.project.name} (${roleLabel})`, color: roleColor };
 			})
 			.filter((b): b is { text: string; color: string } => b !== null);
 
 		const values = {
 			header: {
 				title: 'Utilisateur',
-				sub: `${String(data.permissions.length)} permission(s)`
+				sub: `${String(activeGlobalRoles.length)} rôle(s) · ${String(overridePermissions.length)} override(s)`
 			},
 			body: [
 				{ label: 'Nom', value: data.username, avatar: data.avatar_url },
 				{
-					label: 'Permissions',
+					label: 'Rôles globaux',
+					value: { type: 'badges', list: roleBadges },
+					id: 'roles',
+					data: activeGlobalRoles
+				},
+				{
+					label: 'Permissions (override exception)',
 					value: { type: 'badges', list: permBadges },
 					id: 'permissions',
-					data: data.permissions
+					data: overridePermissions
 				},
 				{
 					label: 'Projets et rôles',
@@ -782,11 +754,19 @@
 				wide: true
 			},
 			{
-				name: 'Permissions granulaires',
+				name: 'Rôles globaux',
+				id: 'roles',
+				type: 'permissions_grouped',
+				categories: roleCategories,
+				packages: [],
+				wide: true
+			},
+			{
+				name: 'Permissions (override exception)',
 				id: 'permissions',
 				type: 'permissions_grouped',
-				categories: permissionCategories,
-				packages: permissionPackages,
+				categories: overridePermissionCategories,
+				packages: [],
 				wide: true
 			},
 			{
@@ -795,11 +775,8 @@
 				type: 'project_roles',
 				projects: allProjects,
 				roles: [
-					{ value: 'admin', text: 'Admin' },
-					{ value: 'bureau', text: 'Bureau' },
-					{ value: 'cdp', text: 'Chef de proj' },
-					{ value: 'membre', text: 'Membre' },
-					{ value: 'guest', text: 'Invité' }
+					{ value: 'cdp', text: PROJECT_ROLE_LABELS_FR.cdp },
+					{ value: 'project_member', text: PROJECT_ROLE_LABELS_FR.project_member }
 				],
 				wide: true
 			}
@@ -825,10 +802,16 @@
 								? nomField.value
 								: '';
 
-					// permissions
+					// rôles globaux (sélection cible)
+					const rolesField = newFields.find((f) => f.id === 'roles');
+					const nextGlobalRoles = Array.isArray(rolesField?.value)
+						? (rolesField.value as GlobalRole[])
+						: [];
+
+					// override de permissions d'exception (profiles.permissions[])
 					const permsField = newFields.find((f) => f.id === 'permissions');
 					const extractedPermissions = Array.isArray(permsField?.value)
-						? (permsField.value as string[])
+						? (permsField.value as GlobalPermission[])
 						: [];
 
 					// projects
@@ -837,7 +820,7 @@
 						? (projectsField.value as ProjectRoleEntry[])
 						: [];
 
-					// update the profile
+					// update the profile (nom + override permissions)
 					const { error: profileError } = await supabase
 						.from('profiles')
 						.update({
@@ -853,11 +836,25 @@
 						return;
 					}
 
-					// Fetch existing project links
+					// rôles globaux : diff via les RPC assign/revoke (immuabilité DB).
+					try {
+						await applyGlobalRoleDiff(supabase, id, activeGlobalRoles, nextGlobalRoles);
+					} catch (roleError) {
+						alert(
+							'Erreur lors de la mise à jour des rôles : ' +
+								((roleError as Error | null)?.message ?? 'Erreur inconnue')
+						);
+						return;
+					}
+
+					// Fetch existing ACTIVE project links (member_of est immuable :
+					// une révocation pose revoked_at, jamais de DELETE ; un changement
+					// de rôle = révoquer l'ancienne ligne + insérer la nouvelle).
 					const { data: memberData, error: memberError } = (await supabase
 						.from('member_of')
 						.select('project, role')
-						.eq('profile', id)) as {
+						.eq('profile', id)
+						.is('revoked_at', null)) as {
 						data: { project: string | number; role: string }[] | null;
 						error: unknown;
 					};
@@ -888,50 +885,47 @@
 						return existing && existing.role !== p.role;
 					});
 
-					// add new projects
-					if (projectsToAdd.length > 0) {
-						const { error: addError } = await supabase.from('member_of').insert(
-							projectsToAdd.map((p) => ({
-								profile: id,
-								project: p.project_id,
-								role: p.role
-							}))
-						);
+					// Révocation (retraits + changements de rôle) : UPDATE revoked_at.
+					const projectIdsToRevoke = [
+						...projectsToRemove,
+						...projectsToUpdate
+							.map((p) => p.project_id?.toString())
+							.filter((pid): pid is string => Boolean(pid))
+					];
+					if (projectIdsToRevoke.length > 0) {
+						const { error: revokeError } = await supabase
+							.from('member_of')
+							.update({ revoked_at: new Date().toISOString() })
+							.eq('profile', id)
+							.is('revoked_at', null)
+							.in('project', projectIdsToRevoke);
+						if (revokeError) {
+							alert(
+								'Erreur lors de la révocation des projets : ' +
+									(revokeError as { message: string }).message
+							);
+							return;
+						}
+					}
+
+					// Ajouts + ré-attribution (nouveau rôle) : INSERT de lignes actives.
+					const rowsToInsert = [
+						...projectsToAdd.map((p) => ({
+							profile: id,
+							project: p.project_id,
+							role: (p.role || 'project_member') as ProjectRole
+						})),
+						...projectsToUpdate.map((p) => ({
+							profile: id,
+							project: p.project_id,
+							role: (p.role || 'project_member') as ProjectRole
+						}))
+					];
+					if (rowsToInsert.length > 0) {
+						const { error: addError } = await supabase.from('member_of').insert(rowsToInsert);
 						if (addError) {
 							alert(
 								"Erreur lors de l'ajout aux projets : " + (addError as { message: string }).message
-							);
-							return;
-						}
-					}
-
-					// update existing projects where role changed
-					for (const p of projectsToUpdate) {
-						const { error: updateRoleError } = await supabase
-							.from('member_of')
-							.update({ role: p.role })
-							.eq('profile', id)
-							.eq('project', p.project_id);
-						if (updateRoleError) {
-							alert(
-								'Erreur lors de la mise à jour du rôle pour le projet : ' +
-									(updateRoleError as { message: string }).message
-							);
-							return;
-						}
-					}
-
-					// remove old projects
-					if (projectsToRemove.length > 0) {
-						const { error: removeError } = await supabase
-							.from('member_of')
-							.delete()
-							.eq('profile', id)
-							.in('project', projectsToRemove);
-						if (removeError) {
-							alert(
-								'Erreur lors de la suppression des projets : ' +
-									(removeError as { message: string }).message
 							);
 							return;
 						}

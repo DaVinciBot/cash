@@ -1,4 +1,4 @@
-import type { Permission } from '$lib/permissions';
+import type { EffectivePermission, GlobalPermission } from '$lib/permissions';
 import type { UserProfile } from '$lib/types/profile';
 import type { Session, SupabaseClient, User } from '@supabase/supabase-js';
 import type { Cookies } from '@sveltejs/kit';
@@ -18,7 +18,7 @@ declare global {
 			supabase: SupabaseClient;
 			session: ServerSession | null;
 			user: User | null;
-			permissions: Permission[];
+			permissions: EffectivePermission[];
 			safeGetSession: () => Promise<{ session: ServerSession | null; user: User | null }>;
 		}
 		interface PageData {
@@ -26,14 +26,14 @@ declare global {
 			user: User | null;
 			cookies: ReturnType<Cookies['getAll']>;
 			userProfile: UserProfile | null;
-			permissions: Permission[];
+			permissions: EffectivePermission[];
 			canCreateOrder: boolean;
 			supabase?: SupabaseClient;
 			menu: {
 				title: string;
 				uri: string;
 				icon: string;
-				requiredPermissions: Permission[];
+				requiredPermissions: GlobalPermission[];
 			}[];
 		}
 		// interface PageState {}

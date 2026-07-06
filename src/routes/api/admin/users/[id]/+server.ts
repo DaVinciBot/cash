@@ -1,8 +1,8 @@
-import type { Permission } from '$lib/permissions';
+import type { EffectivePermission } from '$lib/permissions';
 import { json } from '@sveltejs/kit';
 import type { RequestEvent } from './$types';
 
-const getPermissions = async (locals: App.Locals): Promise<Permission[]> => {
+const getPermissions = async (locals: App.Locals): Promise<EffectivePermission[]> => {
 	if (Array.isArray(locals.permissions) && locals.permissions.length > 0) {
 		return locals.permissions;
 	}
@@ -13,7 +13,7 @@ const getPermissions = async (locals: App.Locals): Promise<Permission[]> => {
 		.from('profiles')
 		.select('permissions')
 		.eq('id', locals.user.id)
-		.single()) as { data: { permissions: Permission[] } | null; error: unknown };
+		.single()) as { data: { permissions: EffectivePermission[] } | null; error: unknown };
 	return result.data?.permissions ?? [];
 };
 

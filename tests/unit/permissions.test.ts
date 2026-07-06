@@ -36,12 +36,12 @@ describe('permissions helpers', () => {
 
 	it('canAccessAdminPath requires at least one admin permission for admin routes', () => {
 		expect(canAccessAdminPath('/admin', [])).toBe(false);
-		expect(canAccessAdminPath('/admin', ['orders.cru.self'])).toBe(true);
+		expect(canAccessAdminPath('/admin', ['orders.manage.self'])).toBe(true);
 	});
 
 	it('canAccessAdminPath applies the most specific route rule', () => {
 		expect(canAccessAdminPath('/admin/orders/new', ['orders.read.all'])).toBe(false);
-		expect(canAccessAdminPath('/admin/orders/new', ['orders.cru.self'])).toBe(true);
+		expect(canAccessAdminPath('/admin/orders/new', ['orders.manage.self'])).toBe(true);
 	});
 
 	it('canAccessAdminPath handles nested paths using route prefix matching', () => {
@@ -50,12 +50,12 @@ describe('permissions helpers', () => {
 	});
 
 	it('canAccessAdminPath requires smartshare cast permission for SmartShare', () => {
-		expect(canAccessAdminPath('/admin/screen-share', ['training.slot.cu'])).toBe(false);
+		expect(canAccessAdminPath('/admin/screen-share', ['training.slot.manage'])).toBe(false);
 		expect(canAccessAdminPath('/admin/screen-share', ['integration.smartshare.cast'])).toBe(true);
 	});
 
 	it('filterMenuByPermissions keeps only authorized entries', () => {
-		const menu = filterMenuByPermissions(ADMIN_MENU, ['orders.cru.self', 'training.slot.cu']);
+		const menu = filterMenuByPermissions(ADMIN_MENU, ['orders.manage.self', 'training.slot.manage']);
 		const uris = menu.map((item) => item.uri);
 
 		expect(uris).toContain('/admin');
