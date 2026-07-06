@@ -55,7 +55,10 @@ describe('permissions helpers', () => {
 	});
 
 	it('filterMenuByPermissions keeps only authorized entries', () => {
-		const menu = filterMenuByPermissions(ADMIN_MENU, ['orders.manage.self', 'training.slot.manage']);
+		const menu = filterMenuByPermissions(ADMIN_MENU, [
+			'orders.manage.self',
+			'training.slot.manage'
+		]);
 		const uris = menu.map((item) => item.uri);
 
 		expect(uris).toContain('/admin');

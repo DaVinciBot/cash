@@ -712,7 +712,8 @@
 					m.role === 'cdp'
 						? 'bg-amber-900 border border-amber-500 text-amber-100'
 						: 'bg-blue-900 border border-blue-500 text-blue-100';
-				const roleLabel = PROJECT_ROLE_LABELS_FR[(m.role || 'project_member') as ProjectRole] ?? m.role;
+				const roleLabel =
+					PROJECT_ROLE_LABELS_FR[(m.role || 'project_member') as ProjectRole] ?? m.role;
 				return { text: `${m.project.name} (${roleLabel})`, color: roleColor };
 			})
 			.filter((b): b is { text: string; color: string } => b !== null);
