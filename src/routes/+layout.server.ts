@@ -33,18 +33,14 @@ interface ProfileRow {
 function resolveEffectivePermissions(data: ProfileRow): EffectivePermission[] {
 	const set = new Set<EffectivePermission>();
 	for (const p of data.permissions ?? []) {
-		if (p) {
-			set.add(p);
-		}
+		set.add(p);
 	}
-	for (const assignment of data.profile_global_roles ?? []) {
+	for (const assignment of data.profile_global_roles) {
 		if (assignment.revoked_at) {
 			continue;
 		}
 		for (const p of assignment.global_roles?.permissions ?? []) {
-			if (p) {
-				set.add(p);
-			}
+			set.add(p);
 		}
 	}
 	return [...set];

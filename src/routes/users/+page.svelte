@@ -679,11 +679,11 @@
 		}
 
 		// Rôles globaux actifs (non révoqués) — servent d'état de départ au diff.
-		const activeGlobalRoles = (data.profile_global_roles ?? [])
+		const activeGlobalRoles = data.profile_global_roles
 			.filter((r) => !r.revoked_at)
 			.map((r) => r.role as GlobalRole);
 
-		const overridePermissions = (data.permissions ?? []).filter(Boolean);
+		const overridePermissions = data.permissions.filter(Boolean);
 
 		const projectsData = data.member_of
 			.map((m) => ({
@@ -693,7 +693,7 @@
 			.filter((m) => m.project_id !== undefined);
 
 		const roleBadges = activeGlobalRoles.map((role) => ({
-			text: GLOBAL_ROLE_LABELS_FR[role] ?? role,
+			text: GLOBAL_ROLE_LABELS_FR[role],
 			color: 'bg-primary-900 border border-primary-500 text-primary-100'
 		}));
 
@@ -712,8 +712,7 @@
 					m.role === 'cdp'
 						? 'bg-amber-900 border border-amber-500 text-amber-100'
 						: 'bg-blue-900 border border-blue-500 text-blue-100';
-				const roleLabel =
-					PROJECT_ROLE_LABELS_FR[(m.role || 'project_member') as ProjectRole] ?? m.role;
+				const roleLabel = PROJECT_ROLE_LABELS_FR[(m.role || 'project_member') as ProjectRole];
 				return { text: `${m.project.name} (${roleLabel})`, color: roleColor };
 			})
 			.filter((b): b is { text: string; color: string } => b !== null);
