@@ -1,6 +1,6 @@
 import { createAnonClient, createUserClient, decodeJwt } from '$lib/server/sso';
 import type { User } from '@supabase/supabase-js';
-import type { Handle, RequestEvent } from '@sveltejs/kit';
+import { error, redirect, type Handle, type RequestEvent } from '@sveltejs/kit';
 
 interface CachedSession {
 	session: App.Locals['session'];
@@ -63,6 +63,37 @@ const getCachedSession = (cacheKey: string) => {
 const clearSessionCookie = (event: RequestEvent) => {
 	event.cookies.delete('sid', { path: '/' });
 };
+
+/**
+ * Garde d'accès aux environnements dev.* : exige d'être authentifié ET de
+ * détenir infra.environments.access (résolu côté DB via has_permission, qui
+ * unit rôles globaux actifs + override). Un utilisateur non connecté est
+ * redirigé vers le SSO ; connecté sans la permission -> 403.
+ */
+async function guardDevEnvironment(
+	event: RequestEvent,
+	session: App.Locals['session'],
+	user: App.Locals['user']
+): Promise<void> {
+	// Endpoints d'authentification locaux (ex. /auth/logout) : laissés
+	// accessibles pour ne pas bloquer la déconnexion sur dev.*.
+	if (event.url.pathname.startsWith('/auth/')) {
+		return;
+	}
+
+	if (!session || !user) {
+		const returnTo = encodeURIComponent(event.url.href);
+		redirect(302, `https://davincibot.fr/auth/login?redirect=${returnTo}`);
+	}
+
+	const result = (await event.locals.supabase.rpc('has_permission', {
+		p_permission: 'infra.environments.access'
+	})) as { data: boolean | null; error: unknown };
+
+	if (result.error || !result.data) {
+		error(403, "Accès réservé à l'environnement de développement (infra.environments.access requis).");
+	}
+}
 
 export const handle: Handle = async ({ event, resolve }) => {
 	const rawSid = event.cookies.get('sid');
@@ -172,6 +203,14 @@ export const handle: Handle = async ({ event, resolve }) => {
 	event.locals.permissions = [];
 
 	event.locals.safeGetSession = () => Promise.resolve({ session, user });
+
+	// Environnements de pré-production (dev.*) : accès réservé aux utilisateurs
+	// authentifiés détenant infra.environments.access. Enforcement applicatif en
+	// complément du reverse proxy. Le hostname dev.* couvre dev.davincibot.fr et
+	// les sous-domaines dev.* des autres apps.
+	if (event.url.hostname.startsWith('dev.')) {
+		await guardDevEnvironment(event, session, user);
+	}
 
 	return resolve(event, {
 		filterSerializedResponseHeaders(name: string) {
