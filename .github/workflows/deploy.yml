@@ -8,11 +8,10 @@ on:
         required: true
         type: choice
         options:
-          - dev
           - staging
           - prod
-      image_ref:
-        description: GHCR image reference to deploy, preferably image@sha256:digest. Leave empty to default to ghcr.io/<repo>:<environment>.
+      image_tag:
+        description: Explicit tag to deploy (e.g. sha-<commit> for a rollback). Leave empty for the default (staging -> staging, prod -> main).
         required: false
         type: string
 
@@ -24,32 +23,22 @@ permissions:
   contents: read
 
 jobs:
-  deploy-dev:
-    name: Deploy Dev
-    if: inputs.environment == 'dev'
-    uses: DaVinciBot/shared-workflows/.github/workflows/deploy.yml@v4.0.0
-    with:
-      environment: dev
-      image_ref: ${{ inputs.image_ref }}
-      health_url: https://dev.davincibot.fr/admin/health
-    secrets: inherit
-
   deploy-staging:
     name: Deploy Staging
     if: inputs.environment == 'staging'
-    uses: DaVinciBot/shared-workflows/.github/workflows/deploy.yml@v4.0.0
+    uses: DaVinciBot/shared-workflows/.github/workflows/deploy.yml@v4.1.0
     with:
       environment: staging
-      image_ref: ${{ inputs.image_ref }}
+      image_tag: ${{ inputs.image_tag }}
       health_url: https://staging.davincibot.fr/admin/health
     secrets: inherit
 
   deploy-prod:
     name: Deploy Prod
     if: inputs.environment == 'prod'
-    uses: DaVinciBot/shared-workflows/.github/workflows/deploy.yml@v4.0.0
+    uses: DaVinciBot/shared-workflows/.github/workflows/deploy.yml@v4.1.0
     with:
       environment: prod
-      image_ref: ${{ inputs.image_ref }}
+      image_tag: ${{ inputs.image_tag }}
       health_url: https://davincibot.fr/admin/health
     secrets: inherit
