@@ -91,7 +91,10 @@ async function guardDevEnvironment(
 	})) as { data: boolean | null; error: unknown };
 
 	if (result.error || !result.data) {
-		error(403, "Accès réservé à l'environnement de développement (infra.environments.access requis).");
+		error(
+			403,
+			"Accès réservé à l'environnement de développement (infra.environments.access requis)."
+		);
 	}
 }
 
