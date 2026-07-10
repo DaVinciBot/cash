@@ -6,13 +6,6 @@ on:
     tags: ['v*.*.*']
   pull_request:
     branches: [dev, staging, main, master, 'release/**', 'hotfix/**']
-  workflow_dispatch:
-    inputs:
-      publish:
-        description: Push the image to GHCR.
-        required: true
-        type: boolean
-        default: true
 
 concurrency:
   group: ${{ github.workflow }}-${{ github.ref }}
@@ -27,18 +20,16 @@ permissions:
 jobs:
   build-and-publish:
     name: Build and Publish
-    uses: DaVinciBot/shared-workflows/.github/workflows/container.yml@v3.1.0
+    uses: DaVinciBot/shared-workflows/.github/workflows/container.yml@v4.1.0
     with:
-      push: ${{ github.event_name == 'push' || (github.event_name == 'workflow_dispatch' && inputs.publish) }}
+      push: ${{ github.event_name == 'push' }}
 
   deploy-dev:
     name: Deploy Dev
     if: github.event_name == 'push' && github.ref == 'refs/heads/dev'
     needs: build-and-publish
-    uses: DaVinciBot/shared-workflows/.github/workflows/deploy.yml@v3.1.0
+    uses: DaVinciBot/shared-workflows/.github/workflows/deploy.yml@v4.1.0
     with:
       environment: dev
-      image_ref: ${{ needs.build-and-publish.outputs.image }}@${{ needs.build-and-publish.outputs.digest }}
       health_url: https://dev.davincibot.fr/admin/health
-      allow_missing_config: true
     secrets: inherit
