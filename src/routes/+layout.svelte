@@ -3,7 +3,7 @@
 	import { resolve } from '$app/paths';
 	import { userdata } from '$lib/store';
 	import { getSupabaseBrowserClient } from '$lib/supabaseClient';
-	import type { Snippet } from 'svelte';
+	import { untrack, type Snippet } from 'svelte';
 	import type { PageData } from './$types';
 
 	import SideBar from '$lib/components/admin/SideBar.svelte';
@@ -20,11 +20,13 @@
 	let sessionSynced = $state(false);
 
 	$effect(() => {
-		if (userProfile) {
-			userdata.set(userProfile);
-		} else {
-			userdata.set(null);
-		}
+		const profile = userProfile;
+		// untrack : les abonnés de userdata lisent/écrivent leur propre state pendant
+		// set() ; sans untrack ces lectures deviennent des dépendances de cet effet
+		// (boucle infinie effect_update_depth_exceeded qui casse la navigation).
+		untrack(() => {
+			userdata.set(profile ?? null);
+		});
 	});
 
 	$effect(() => {

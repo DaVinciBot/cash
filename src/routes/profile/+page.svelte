@@ -7,6 +7,12 @@
 	import { onMount } from 'svelte';
 	let user = $state<UserData>(null);
 
+	let new_password = $state('');
+	let new_password_confirmation = $state('');
+	let new_username = $state('');
+
+	let loading = $state<boolean>(false);
+
 	userdata.subscribe((value) => {
 		if (value) {
 			user = value;
@@ -85,12 +91,6 @@
 			);
 		}
 	}
-
-	let new_password = $state('');
-	let new_password_confirmation = $state('');
-	let new_username = $state('');
-
-	let loading = $state<boolean>(false);
 
 	async function handlePassword() {
 		if (!new_password) {
