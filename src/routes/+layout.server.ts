@@ -7,6 +7,7 @@ import {
 	type GlobalPermission
 } from '$lib/permissions';
 import type { UserProfile, UserProject } from '$lib/types/profile';
+import { buildLoginUrl } from '$lib/config/auth';
 import { redirect } from '@sveltejs/kit';
 import type { ProjectRow } from '../database.types';
 import type { LayoutServerLoad } from './$types';
@@ -50,8 +51,8 @@ export const load: LayoutServerLoad = async ({ locals, cookies, url }) => {
 	const { safeGetSession, supabase } = locals;
 	const { session, user } = await safeGetSession();
 
-	if (!session && !import.meta.env.DEV) {
-		redirect(303, 'https://davincibot.fr');
+	if (!session) {
+		redirect(303, buildLoginUrl(url.href));
 	}
 
 	let userProfile: UserProfile | null = null;
@@ -63,7 +64,7 @@ export const load: LayoutServerLoad = async ({ locals, cookies, url }) => {
 		const { data, error } = (await supabase
 			.from('profiles')
 			.select(
-				'username,avatar_url,permissions, profile_global_roles(role, revoked_at, global_roles(permissions)), member_of(role, project(id, name, debut))'
+				'username,avatar_url,permissions, profile_global_roles!profile_global_roles_profile_fkey(role, revoked_at, global_roles(permissions)), member_of!membre_projet_profile_fkey(role, project(id, name, debut))'
 			)
 			.eq('id', user.id)
 			.single()) as { data: ProfileRow | null; error: unknown };

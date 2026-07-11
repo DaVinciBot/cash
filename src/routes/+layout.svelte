@@ -3,7 +3,6 @@
 	import { resolve } from '$app/paths';
 	import { userdata } from '$lib/store';
 	import { getSupabaseBrowserClient } from '$lib/supabaseClient';
-	import type { Session } from '@supabase/supabase-js';
 	import type { Snippet } from 'svelte';
 	import type { PageData } from './$types';
 
@@ -29,8 +28,8 @@
 	});
 
 	$effect(() => {
-		const session = data.session as Session | null;
-		if (browser && !sessionSynced && session?.access_token && session.refresh_token) {
+		const session = data.session;
+		if (browser && !sessionSynced && session.access_token && session.refresh_token) {
 			sessionSynced = true;
 			const supabase = getSupabaseBrowserClient();
 			void supabase.auth.setSession({

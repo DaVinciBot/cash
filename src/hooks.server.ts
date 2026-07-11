@@ -1,11 +1,14 @@
+import { buildLoginUrl } from '$lib/config/auth';
 import { createAnonClient, createUserClient, decodeJwt } from '$lib/server/sso';
 import type { User } from '@supabase/supabase-js';
 import { error, redirect, type Handle, type RequestEvent } from '@sveltejs/kit';
+import { createHash, timingSafeEqual } from 'node:crypto';
 
 interface CachedSession {
 	session: App.Locals['session'];
 	user: App.Locals['user'];
 	timestamp: number;
+	secretHash: string;
 }
 
 interface ServerSessionRow {
@@ -48,13 +51,26 @@ const SESSION_CACHE_TTL_MS = 5 * 60 * 1000;
 const SESSION_REFRESH_GRACE_MS = 2 * 60 * 1000;
 const sessionCache = new Map<string, CachedSession>();
 
-const getCachedSession = (cacheKey: string) => {
+const hashSecret = (secret: string): string => createHash('sha256').update(secret).digest('hex');
+
+const secretMatches = (a: string, b: string): boolean => {
+	const bufA = Buffer.from(a);
+	const bufB = Buffer.from(b);
+	return bufA.length === bufB.length && timingSafeEqual(bufA, bufB);
+};
+
+// Le cache est lié au secret : un même sessionId présenté avec un secret différent
+// ne réutilise jamais l'entrée (sinon le secret ne serait plus vérifié).
+const getCachedSession = (cacheKey: string, secret: string) => {
 	const cached = sessionCache.get(cacheKey);
 	if (!cached) {
 		return null;
 	}
 	if (Date.now() - cached.timestamp > SESSION_CACHE_TTL_MS) {
 		sessionCache.delete(cacheKey);
+		return null;
+	}
+	if (!secretMatches(cached.secretHash, hashSecret(secret))) {
 		return null;
 	}
 	return cached;
@@ -82,8 +98,7 @@ async function guardDevEnvironment(
 	}
 
 	if (!session || !user) {
-		const returnTo = encodeURIComponent(event.url.href);
-		redirect(302, `https://davincibot.fr/auth/login?redirect=${returnTo}`);
+		redirect(302, buildLoginUrl(event.url.href));
 	}
 
 	const result = (await event.locals.supabase.rpc('has_permission', {
@@ -105,7 +120,7 @@ export const handle: Handle = async ({ event, resolve }) => {
 	let user: App.Locals['user'] = null;
 
 	if (sessionId && sessionSecret) {
-		const cached = getCachedSession(sessionId);
+		const cached = getCachedSession(sessionId, sessionSecret);
 		if (cached) {
 			session = cached.session;
 			user = cached.user;
@@ -169,7 +184,12 @@ export const handle: Handle = async ({ event, resolve }) => {
 								})
 							: createSessionUser({ id: sessionRow.user_id, email: null });
 						if (sessionId) {
-							sessionCache.set(sessionId, { session, user, timestamp: Date.now() });
+							sessionCache.set(sessionId, {
+								session,
+								user,
+								timestamp: Date.now(),
+								secretHash: hashSecret(sessionSecret)
+							});
 						}
 					}
 				} else {
@@ -189,7 +209,12 @@ export const handle: Handle = async ({ event, resolve }) => {
 								userMetadata: jwt.user_metadata ?? {}
 							})
 						: createSessionUser({ id: sessionRow.user_id, email: null });
-					sessionCache.set(sessionId, { session, user, timestamp: Date.now() });
+					sessionCache.set(sessionId, {
+						session,
+						user,
+						timestamp: Date.now(),
+						secretHash: hashSecret(sessionSecret)
+					});
 				}
 			}
 		}
