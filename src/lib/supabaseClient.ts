@@ -1,4 +1,5 @@
 import { browser } from '$app/environment';
+import { resolve } from '$app/paths';
 import { env } from '$env/dynamic/public';
 import { createClient } from '@supabase/supabase-js';
 import type { SupabaseClient } from '@supabase/supabase-js';
@@ -21,7 +22,7 @@ async function fetchAccessToken(): Promise<string | null> {
 	if (cachedToken && cachedToken.expiresAtMs - TOKEN_REFRESH_MARGIN_MS > Date.now()) {
 		return cachedToken.value;
 	}
-	pendingToken ??= fetch('/api/session/token')
+	pendingToken ??= fetch(resolve('/api/session/token'))
 		.then(async (response) => {
 			if (!response.ok) {
 				cachedToken = null;
