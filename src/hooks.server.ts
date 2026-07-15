@@ -1,7 +1,7 @@
 import { resolve as resolveRoute } from '$app/paths';
 import { buildLoginUrl } from '$lib/config/auth';
 import { resolveSessionViaAuth } from '$lib/server/authService';
-import { SessionCache } from '$lib/server/sessionCache';
+import { sessionCache } from '$lib/server/sessionCacheInstance';
 import { createAnonClient, createUserClient } from '$lib/server/sso';
 import type { User } from '@supabase/supabase-js';
 import { error, redirect, type Handle, type RequestEvent } from '@sveltejs/kit';
@@ -28,13 +28,6 @@ function createSessionUser({
 		updated_at: ''
 	};
 }
-
-const SESSION_CACHE_TTL_MS = 5 * 60 * 1000;
-const SESSION_STALE_MAX_AGE_MS = 15 * 60 * 1000;
-const sessionCache = new SessionCache<NonNullable<App.Locals['session']>, User>(
-	SESSION_CACHE_TTL_MS,
-	SESSION_STALE_MAX_AGE_MS
-);
 
 const clearSessionCookie = (event: RequestEvent) => {
 	event.cookies.delete('sid', { path: '/' });

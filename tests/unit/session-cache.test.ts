@@ -64,4 +64,31 @@ describe('SessionCache', () => {
 		vi.advanceTimersByTime(TTL + 1000);
 		expect(cache.getStale('sid', 'mauvais')).toBeNull();
 	});
+
+	it('delete ne purge que la clé visée', () => {
+		const cache = new SessionCache<TestSession, string>(TTL, STALE_MAX);
+		cache.set('sid-a', futureSession(), 'user-a', 'secret-a');
+		cache.set('sid-b', futureSession(), 'user-b', 'secret-b');
+		cache.delete('sid-a');
+		expect(cache.getFresh('sid-a', 'secret-a')).toBeNull();
+		expect(cache.getFresh('sid-b', 'secret-b')?.user).toBe('user-b');
+	});
+
+	it('clear purge toutes les entrées', () => {
+		const cache = new SessionCache<TestSession, string>(TTL, STALE_MAX);
+		cache.set('sid-a', futureSession(), 'user-a', 'secret-a');
+		cache.set('sid-b', futureSession(), 'user-b', 'secret-b');
+		cache.clear();
+		expect(cache.getFresh('sid-a', 'secret-a')).toBeNull();
+		expect(cache.getFresh('sid-b', 'secret-b')).toBeNull();
+	});
+
+	it('vérifie toujours le secret après une réinsertion post-delete', () => {
+		const cache = new SessionCache<TestSession, string>(TTL, STALE_MAX);
+		cache.set('sid', futureSession(), 'user', 'secret');
+		cache.delete('sid');
+		cache.set('sid', futureSession(), 'user', 'nouveau-secret');
+		expect(cache.getFresh('sid', 'secret')).toBeNull();
+		expect(cache.getFresh('sid', 'nouveau-secret')?.user).toBe('user');
+	});
 });

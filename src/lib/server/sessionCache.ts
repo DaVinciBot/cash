@@ -44,6 +44,16 @@ export class SessionCache<TSession extends { expires_at: number }, TUser> {
 		return this.read(key, secret, this.ttlMs);
 	}
 
+	// Invalidation lors d'une révocation : une session révoquée ne doit pas
+	// rester servie depuis le cache jusqu'à la fin de son TTL.
+	delete(key: string): void {
+		this.entries.delete(key);
+	}
+
+	clear(): void {
+		this.entries.clear();
+	}
+
 	getStale(key: string, secret: string): SessionCacheEntry<TSession, TUser> | null {
 		const entry = this.read(key, secret, this.staleMaxAgeMs);
 		return entry && entry.session.expires_at * 1000 > Date.now() ? entry : null;
