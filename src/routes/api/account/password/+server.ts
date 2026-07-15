@@ -6,7 +6,8 @@ import type { RequestHandler } from './$types';
 // changement de mot de passe passe par la session sid, sans exposer de CORS.
 export const POST: RequestHandler = async ({ request, cookies }) => {
 	const body = await request.text();
-	const authBase = (env.PUBLIC_AUTH_BASE_URL || 'https://auth.davincibot.fr').replace(/\/$/, '');
+	const rawAuthBase = env.PUBLIC_AUTH_BASE_URL;
+	const authBase = rawAuthBase ? rawAuthBase.replace(/\/$/, '') : 'https://auth.davincibot.fr';
 	const sid = cookies.get('sid');
 	const response = await fetch(`${authBase}/password`, {
 		method: 'POST',

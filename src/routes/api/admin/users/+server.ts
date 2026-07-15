@@ -82,7 +82,8 @@ export const POST = async (event: RequestEvent) => {
 
 	// Délégué au service auth : il re-vérifie la session (cookie sid forwardé) et
 	// la permission members.invite.send, puis envoie l'invitation.
-	const authBase = (env.PUBLIC_AUTH_BASE_URL || 'https://auth.davincibot.fr').replace(/\/$/, '');
+	const rawAuthBase = env.PUBLIC_AUTH_BASE_URL;
+	const authBase = rawAuthBase ? rawAuthBase.replace(/\/$/, '') : 'https://auth.davincibot.fr';
 	const sid = cookies.get('sid');
 	const response = await fetch(`${authBase}/api/invitations`, {
 		method: 'POST',
