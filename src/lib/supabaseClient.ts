@@ -17,8 +17,6 @@ const TOKEN_REFRESH_MARGIN_MS = 30 * 1000;
 let cachedToken: { value: string; expiresAtMs: number } | null = null;
 let pendingToken: Promise<string | null> | null = null;
 
-// L'access token vient du serveur du site (qui le tient du service auth) :
-// le navigateur ne détient jamais le refresh token et ne rafraîchit rien lui-même.
 async function fetchAccessToken(): Promise<string | null> {
 	if (cachedToken && cachedToken.expiresAtMs - TOKEN_REFRESH_MARGIN_MS > Date.now()) {
 		return cachedToken.value;
