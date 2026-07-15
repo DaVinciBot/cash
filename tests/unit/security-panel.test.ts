@@ -19,17 +19,8 @@ vi.mock('$lib/settings/sessions', () => mocks);
 
 import SecurityPanel from '../../src/lib/components/settings/SecurityPanel.svelte';
 
+// La session courante est volontairement en dernier : le composant doit la remonter en tête.
 const sessions = [
-	{
-		id: 'sess-current',
-		created_at: '2026-07-16T08:00:00Z',
-		last_seen_at: '2026-07-16T09:00:00Z',
-		absolute_expires_at: null,
-		trusted_device: true,
-		device_label:
-			'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/126.0.0.0 Safari/537.36',
-		is_current: true
-	},
 	{
 		id: 'sess-other',
 		created_at: '2026-07-15T10:00:00Z',
@@ -39,6 +30,16 @@ const sessions = [
 		device_label:
 			'Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:127.0) Gecko/20100101 Firefox/127.0',
 		is_current: false
+	},
+	{
+		id: 'sess-current',
+		created_at: '2026-07-16T08:00:00Z',
+		last_seen_at: '2026-07-16T09:00:00Z',
+		absolute_expires_at: null,
+		trusted_device: true,
+		device_label:
+			'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/126.0.0.0 Safari/537.36',
+		is_current: true
 	}
 ];
 
@@ -96,6 +97,7 @@ describe('SecurityPanel — appareils connectés', () => {
 		await waitForSelector(target, '#session-sess-current');
 
 		expect(target.querySelector('#session-sess-current')?.textContent).toContain('Cet appareil');
+		expect(target.querySelector('#sessions-section li')?.id).toBe('session-sess-current');
 		expect(target.querySelector('#session-sess-current')?.textContent).not.toContain(
 			'Chrome · macOS'
 		);
