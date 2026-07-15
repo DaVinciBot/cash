@@ -1,8 +1,6 @@
 <script lang="ts">
-	import { browser } from '$app/environment';
 	import { resolve } from '$app/paths';
 	import { userdata } from '$lib/store';
-	import { getSupabaseBrowserClient } from '$lib/supabaseClient';
 	import { untrack, type Snippet } from 'svelte';
 	import type { PageData } from './$types';
 
@@ -17,7 +15,6 @@
 	const __menu = $derived(data.menu);
 
 	let open = $state(false);
-	let sessionSynced = $state(false);
 
 	$effect(() => {
 		const profile = userProfile;
@@ -27,18 +24,6 @@
 		untrack(() => {
 			userdata.set(profile ?? null);
 		});
-	});
-
-	$effect(() => {
-		const session = data.session;
-		if (browser && !sessionSynced && session.access_token && session.refresh_token) {
-			sessionSynced = true;
-			const supabase = getSupabaseBrowserClient();
-			void supabase.auth.setSession({
-				access_token: session.access_token,
-				refresh_token: session.refresh_token
-			});
-		}
 	});
 </script>
 

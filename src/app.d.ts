@@ -1,12 +1,13 @@
 import type { EffectivePermission, GlobalPermission } from '$lib/permissions';
 import type { UserProfile } from '$lib/types/profile';
-import type { Session, SupabaseClient, User } from '@supabase/supabase-js';
+import type { SupabaseClient, User } from '@supabase/supabase-js';
 import type { Cookies } from '@sveltejs/kit';
 
+// Le refresh token ne quitte jamais le service auth : les sites ne voient
+// passer que l'access token.
 interface ServerSession {
 	id: string;
 	access_token: string;
-	refresh_token: string;
 	expires_at: number;
 	user_id: string;
 }
@@ -22,7 +23,7 @@ declare global {
 			safeGetSession: () => Promise<{ session: ServerSession | null; user: User | null }>;
 		}
 		interface PageData {
-			session: Session | null;
+			session: Pick<ServerSession, 'id' | 'expires_at' | 'user_id'> | null;
 			user: User | null;
 			cookies: ReturnType<Cookies['getAll']>;
 			userProfile: UserProfile | null;
