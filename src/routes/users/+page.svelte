@@ -46,6 +46,7 @@
 
 	interface MemberOfRow {
 		role: string;
+		revoked_at: string | null;
 		project: { id: number; name: string } | null;
 	}
 
@@ -69,7 +70,7 @@
 
 	const dbInfo = {
 		table: 'profiles',
-		key: 'id, username, avatar_url, status, member_of(project!inner(id, name))'
+		key: 'id, username, avatar_url, status, member_of(project!inner(id, name), revoked_at)'
 	};
 
 	let canEditMembers = $state<boolean>(false);
@@ -311,7 +312,10 @@
 		const typedData = data as ProfileRow[];
 		const items: { value: string; data?: string; avatar?: string | null }[][] = [];
 		for (const el of typedData) {
-			const project = el.member_of.map((m) => m.project?.name ?? '').join(', ');
+			const project = el.member_of
+				.filter((m) => !m.revoked_at)
+				.map((m) => m.project?.name ?? '')
+				.join(', ');
 			const status = el.status === 'disabled' ? 'Désactivé' : 'Activé';
 			items.push([
 				{ value: el.username, data: el.id, avatar: el.avatar_url },
@@ -465,7 +469,8 @@
 									.from('member_of')
 									.select('project', { count: 'exact', head: true })
 									.eq('profile', profileId)
-									.eq('project', projectId);
+									.eq('project', projectId)
+									.is('revoked_at', null);
 								if (memberCheckError) {
 									throw new Error((memberCheckError as { message: string }).message);
 								}
@@ -661,7 +666,7 @@
 		const { data, error } = (await supabase
 			.from('profiles')
 			.select(
-				'id, username, permissions, status, profile_global_roles(role, revoked_at), member_of(role, project(id,name)), avatar_url'
+				'id, username, permissions, status, profile_global_roles(role, revoked_at), member_of(role, revoked_at, project(id,name)), avatar_url'
 			)
 			.eq('id', id)
 			.single()) as {
@@ -686,6 +691,7 @@
 		const overridePermissions = data.permissions.filter(Boolean);
 
 		const projectsData = data.member_of
+			.filter((m) => !m.revoked_at)
 			.map((m) => ({
 				project_id: m.project?.id,
 				role: (m.role || 'project_member') as ProjectRole
@@ -704,6 +710,7 @@
 		});
 
 		const projectBadges = data.member_of
+			.filter((m) => !m.revoked_at)
 			.map((m) => {
 				if (!m.project) {
 					return null;

@@ -1,3 +1,4 @@
+import { resolve as resolveRoute } from '$app/paths';
 import { buildLoginUrl } from '$lib/config/auth';
 import { resolveSessionViaAuth } from '$lib/server/authService';
 import { SessionCache } from '$lib/server/sessionCache';
@@ -53,6 +54,11 @@ async function guardDevEnvironment(
 	// Endpoints d'authentification locaux (ex. /auth/logout) : laissés
 	// accessibles pour ne pas bloquer la déconnexion sur dev.*.
 	if (event.url.pathname.startsWith('/auth/')) {
+		return;
+	}
+
+	// Health check du déploiement : public, ne divulgue rien.
+	if (event.url.pathname === resolveRoute('/health')) {
 		return;
 	}
 

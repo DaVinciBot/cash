@@ -14,8 +14,10 @@ export type ResolveResult =
 	| { status: 'invalid' }
 	| { status: 'unavailable' };
 
-const authBase = (): string =>
-	(env.PUBLIC_AUTH_BASE_URL || 'https://auth.davincibot.fr').replace(/\/$/, '');
+const authBase = (): string => {
+	const raw = env.PUBLIC_AUTH_BASE_URL;
+	return raw ? raw.replace(/\/$/, '') : 'https://auth.davincibot.fr';
+};
 
 const isRecord = (value: unknown): value is Record<string, unknown> =>
 	typeof value === 'object' && value !== null;
