@@ -701,7 +701,7 @@ export interface Database {
 				Args: Record<string, never>;
 				Returns: TrainingListItemRow[];
 			};
-			training_manager_ids: {
+			training_director_ids: {
 				Args: Record<string, never>;
 				Returns: { id: string }[];
 			};

@@ -1,11 +1,11 @@
 <script lang="ts">
-	import { hasAnyPermission, type Permission } from '$lib/permissions';
+	import { hasAnyPermission, type EffectivePermission } from '$lib/permissions';
 	import { userdata } from '$lib/store';
 	import { hideOnClickOutside, loadUserdata } from '$lib/utils';
 	import { onDestroy, onMount } from 'svelte';
 
 	interface ScreenShareUser {
-		permissions?: Permission[];
+		permissions?: EffectivePermission[];
 	}
 
 	let user: ScreenShareUser | null = null;
@@ -25,7 +25,7 @@
 			user = value;
 			const permissions = Array.isArray(value.permissions) ? value.permissions : [];
 			canCastSmartShare = hasAnyPermission(permissions, ['integration.smartshare.cast']);
-			canManageTraining = hasAnyPermission(permissions, ['training.slot.cu']);
+			canManageTraining = hasAnyPermission(permissions, ['training.slot.manage']);
 		}
 	});
 

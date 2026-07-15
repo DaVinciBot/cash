@@ -1,5 +1,5 @@
 import { env } from '$env/dynamic/public';
-import type { Permission } from '$lib/permissions';
+import type { EffectivePermission } from '$lib/permissions';
 import { createClient, type SupabaseClient } from '@supabase/supabase-js';
 import { json } from '@sveltejs/kit';
 import type { RequestEvent } from './$types';
@@ -21,7 +21,7 @@ const getAdminClient = async (locals: App.Locals): Promise<SupabaseClient> => {
 	});
 };
 
-const getPermissions = async (locals: App.Locals): Promise<Permission[]> => {
+const getPermissions = async (locals: App.Locals): Promise<EffectivePermission[]> => {
 	if (Array.isArray(locals.permissions) && locals.permissions.length > 0) {
 		return locals.permissions;
 	}
@@ -32,7 +32,7 @@ const getPermissions = async (locals: App.Locals): Promise<Permission[]> => {
 		.from('profiles')
 		.select('permissions')
 		.eq('id', locals.user.id)
-		.single()) as { data: { permissions: Permission[] } | null; error: unknown };
+		.single()) as { data: { permissions: EffectivePermission[] } | null; error: unknown };
 	return result.data?.permissions ?? [];
 };
 
@@ -66,10 +66,7 @@ export const GET = async (event: RequestEvent) => {
 };
 
 export const POST = async (event: RequestEvent) => {
-	const { locals, request } = event;
-	if (!(await requireEditMembers(locals))) {
-		return json({ error: 'Not authorized' }, { status: 403 });
-	}
+	const { request, cookies } = event;
 
 	let email: string | undefined;
 	try {
@@ -83,15 +80,18 @@ export const POST = async (event: RequestEvent) => {
 		return json({ error: 'Missing email' }, { status: 400 });
 	}
 
-	try {
-		const admin = await getAdminClient(locals);
-		const { data, error } = await admin.auth.admin.inviteUserByEmail(email);
-		if (error) {
-			return json({ error: error.message }, { status: 500 });
-		}
-		return json({ user: data.user });
-	} catch (error) {
-		const message = error instanceof Error ? error.message : 'Failed to invite user';
-		return json({ error: message }, { status: 500 });
-	}
+	// Délégué au service auth : il re-vérifie la session (cookie sid forwardé) et
+	// la permission members.invite.send, puis envoie l'invitation.
+	const authBase = (env.PUBLIC_AUTH_BASE_URL || 'https://auth.davincibot.fr').replace(/\/$/, '');
+	const sid = cookies.get('sid');
+	const response = await fetch(`${authBase}/api/invitations`, {
+		method: 'POST',
+		headers: {
+			'Content-Type': 'application/json',
+			...(sid ? { cookie: `sid=${sid}` } : {})
+		},
+		body: JSON.stringify({ email })
+	});
+	const result = (await response.json().catch(() => ({}))) as Record<string, unknown>;
+	return json(result, { status: response.status });
 };

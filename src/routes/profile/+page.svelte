@@ -1,9 +1,17 @@
 <script lang="ts">
+	import { resolve } from '$app/paths';
+	import { buildLogoutUrl } from '$lib/config/auth';
 	import type { UserData } from '$lib/store';
 	import { userdata } from '$lib/store';
 	import { getSupabaseBrowserClient } from '$lib/supabaseClient';
 	import { onMount } from 'svelte';
 	let user = $state<UserData>(null);
+
+	let new_password = $state('');
+	let new_password_confirmation = $state('');
+	let new_username = $state('');
+
+	let loading = $state<boolean>(false);
 
 	userdata.subscribe((value) => {
 		if (value) {
@@ -12,9 +20,8 @@
 		}
 	});
 
-	async function LogOut() {
-		await fetch('/auth/logout', { method: 'POST' });
-		window.location.href = `${window.location.origin}/auth/login`;
+	function LogOut() {
+		window.location.href = buildLogoutUrl(window.location.origin);
 	}
 
 	function clearUserdataCache() {
@@ -85,32 +92,32 @@
 		}
 	}
 
-	let new_password = $state('');
-	let new_password_confirmation = $state('');
-	let new_username = $state('');
-
-	let loading = $state<boolean>(false);
-
 	async function handlePassword() {
-		loading = true;
-
-		if (new_password !== new_password_confirmation) {
-			alert('Les mots de passe ne correspondent pas');
-			loading = false;
+		if (!new_password) {
+			alert('Le mot de passe ne peut pas être vide');
 			return;
 		}
+		if (new_password !== new_password_confirmation) {
+			alert('Les mots de passe ne correspondent pas');
+			return;
+		}
+		loading = true;
 
-		const response = await fetch('/auth/password', {
+		const response = await fetch(resolve('/api/account/password'), {
 			method: 'POST',
 			headers: { 'Content-Type': 'application/json' },
 			body: JSON.stringify({ password: new_password })
 		});
-		if (!response.ok) {
-			alert('Une erreur est survenue lors de la modification de votre mot de passe');
+		if (response.ok) {
+			alert('Mot de passe modifié.');
+		} else {
+			const result = (await response.json().catch(() => ({}))) as { error?: string };
+			alert(
+				result.error ?? 'Une erreur est survenue lors de la modification de votre mot de passe'
+			);
 		}
 
 		loading = false;
-
 		new_password = '';
 		new_password_confirmation = '';
 	}
@@ -235,8 +242,9 @@
 				>
 				<input
 					type="password"
-					name="password"
+					name="new-password"
 					id="password"
+					autocomplete="new-password"
 					class=" block w-full rounded-lg border border-gray-600 bg-gray-700 p-2.5 text-white placeholder-gray-400 focus:border-blue-500 focus:ring-blue-500 disabled:opacity-50"
 					placeholder="********"
 					bind:value={new_password}
@@ -244,13 +252,14 @@
 			</div>
 
 			<div>
-				<label for="password" class="mb-2 block text-sm font-medium text-white"
+				<label for="password-confirm" class="mb-2 block text-sm font-medium text-white"
 					>Confirmer le mot de passe</label
 				>
 				<input
 					type="password"
-					name="password"
-					id="password"
+					name="confirm-password"
+					id="password-confirm"
+					autocomplete="new-password"
 					class="block w-full rounded-lg border border-gray-600 bg-gray-700 p-2.5 text-white placeholder-gray-400 focus:border-blue-500 focus:ring-blue-500 disabled:opacity-50"
 					placeholder="********"
 					bind:value={new_password_confirmation}

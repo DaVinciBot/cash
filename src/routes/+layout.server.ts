@@ -3,9 +3,11 @@ import {
 	canAccessAdminPath,
 	filterMenuByPermissions,
 	hasAnyPermission,
-	type Permission
+	type EffectivePermission,
+	type GlobalPermission
 } from '$lib/permissions';
 import type { UserProfile, UserProject } from '$lib/types/profile';
+import { buildLoginUrl } from '$lib/config/auth';
 import { redirect } from '@sveltejs/kit';
 import type { ProjectRow } from '../database.types';
 import type { LayoutServerLoad } from './$types';
@@ -13,7 +15,12 @@ import type { LayoutServerLoad } from './$types';
 interface ProfileRow {
 	username: string | null;
 	avatar_url: string | null;
-	permissions: Permission[] | null;
+	permissions: GlobalPermission[] | null;
+	profile_global_roles: {
+		role: string;
+		revoked_at: string | null;
+		global_roles: { permissions: GlobalPermission[] | null } | null;
+	}[];
 	member_of: {
 		role: string;
 		project: {
@@ -24,30 +31,48 @@ interface ProfileRow {
 	}[];
 }
 
+function resolveEffectivePermissions(data: ProfileRow): EffectivePermission[] {
+	const set = new Set<EffectivePermission>();
+	for (const p of data.permissions ?? []) {
+		set.add(p);
+	}
+	for (const assignment of data.profile_global_roles) {
+		if (assignment.revoked_at) {
+			continue;
+		}
+		for (const p of assignment.global_roles?.permissions ?? []) {
+			set.add(p);
+		}
+	}
+	return [...set];
+}
+
 export const load: LayoutServerLoad = async ({ locals, cookies, url }) => {
 	const { safeGetSession, supabase } = locals;
 	const { session, user } = await safeGetSession();
 
-	if (!session && !import.meta.env.DEV) {
-		redirect(303, 'https://davincibot.fr');
+	if (!session) {
+		redirect(303, buildLoginUrl(url.href));
 	}
 
 	let userProfile: UserProfile | null = null;
-	let permissions: Permission[] = [];
+	let permissions: EffectivePermission[] = [];
 	let canCreateOrder = false;
 	let menu = filterMenuByPermissions(ADMIN_MENU, []);
 
 	if (user?.id) {
 		const { data, error } = (await supabase
 			.from('profiles')
-			.select('username,avatar_url,permissions, member_of(role, project(id, name, debut))')
+			.select(
+				'username,avatar_url,permissions, profile_global_roles!profile_global_roles_profile_fkey(role, revoked_at, global_roles(permissions)), member_of!membre_projet_profile_fkey(role, project(id, name, debut))'
+			)
 			.eq('id', user.id)
 			.single()) as { data: ProfileRow | null; error: unknown };
 
 		if (!error && data) {
-			permissions = (data.permissions ?? []).filter(Boolean);
+			permissions = resolveEffectivePermissions(data);
 			canCreateOrder =
-				permissions.includes('orders.create.all') || permissions.includes('orders.cru.self');
+				permissions.includes('orders.create.all') || permissions.includes('orders.manage.self');
 
 			const projects: UserProject[] = data.member_of.map((m) => ({
 				id: m.project?.id ?? 0,
@@ -73,7 +98,7 @@ export const load: LayoutServerLoad = async ({ locals, cookies, url }) => {
 					'members.profile.read.all',
 					'finance.write',
 					'members.profile.update.all',
-					'projects.stats.read.all'
+					'stats.read.all'
 				])
 			) {
 				userProfile.projects.push({
@@ -111,7 +136,8 @@ export const load: LayoutServerLoad = async ({ locals, cookies, url }) => {
 	locals.permissions = permissions;
 
 	return {
-		session,
+		// Jamais de token dans les données de page : le navigateur passe par /api/session/token.
+		session: { id: session.id, expires_at: session.expires_at, user_id: session.user_id },
 		user,
 		cookies: cookies.getAll(),
 		userProfile,

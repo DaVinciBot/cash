@@ -1,10 +1,7 @@
 <script lang="ts">
-	import { browser } from '$app/environment';
 	import { resolve } from '$app/paths';
 	import { userdata } from '$lib/store';
-	import { getSupabaseBrowserClient } from '$lib/supabaseClient';
-	import type { Session } from '@supabase/supabase-js';
-	import type { Snippet } from 'svelte';
+	import { untrack, type Snippet } from 'svelte';
 	import type { PageData } from './$types';
 
 	import SideBar from '$lib/components/admin/SideBar.svelte';
@@ -18,26 +15,15 @@
 	const __menu = $derived(data.menu);
 
 	let open = $state(false);
-	let sessionSynced = $state(false);
 
 	$effect(() => {
-		if (userProfile) {
-			userdata.set(userProfile);
-		} else {
-			userdata.set(null);
-		}
-	});
-
-	$effect(() => {
-		const session = data.session as Session | null;
-		if (browser && !sessionSynced && session?.access_token && session.refresh_token) {
-			sessionSynced = true;
-			const supabase = getSupabaseBrowserClient();
-			void supabase.auth.setSession({
-				access_token: session.access_token,
-				refresh_token: session.refresh_token
-			});
-		}
+		const profile = userProfile;
+		// untrack : les abonnés de userdata lisent/écrivent leur propre state pendant
+		// set() ; sans untrack ces lectures deviennent des dépendances de cet effet
+		// (boucle infinie effect_update_depth_exceeded qui casse la navigation).
+		untrack(() => {
+			userdata.set(profile ?? null);
+		});
 	});
 </script>
 

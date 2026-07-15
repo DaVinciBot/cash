@@ -1,25 +1,9 @@
-import { createAnonClient, createUserClient, decodeJwt } from '$lib/server/sso';
+import { buildLoginUrl } from '$lib/config/auth';
+import { resolveSessionViaAuth } from '$lib/server/authService';
+import { SessionCache } from '$lib/server/sessionCache';
+import { createAnonClient, createUserClient } from '$lib/server/sso';
 import type { User } from '@supabase/supabase-js';
-import type { Handle, RequestEvent } from '@sveltejs/kit';
-
-interface CachedSession {
-	session: App.Locals['session'];
-	user: App.Locals['user'];
-	timestamp: number;
-}
-
-interface ServerSessionRow {
-	access_token: string;
-	refresh_token: string;
-	expires_at: string;
-	user_id: string;
-	revoked_at: string | null;
-}
-
-interface SupabaseQueryResult<T> {
-	data: T;
-	error: unknown;
-}
+import { error, redirect, type Handle, type RequestEvent } from '@sveltejs/kit';
 
 function createSessionUser({
 	id,
@@ -45,24 +29,48 @@ function createSessionUser({
 }
 
 const SESSION_CACHE_TTL_MS = 5 * 60 * 1000;
-const SESSION_REFRESH_GRACE_MS = 2 * 60 * 1000;
-const sessionCache = new Map<string, CachedSession>();
-
-const getCachedSession = (cacheKey: string) => {
-	const cached = sessionCache.get(cacheKey);
-	if (!cached) {
-		return null;
-	}
-	if (Date.now() - cached.timestamp > SESSION_CACHE_TTL_MS) {
-		sessionCache.delete(cacheKey);
-		return null;
-	}
-	return cached;
-};
+const SESSION_STALE_MAX_AGE_MS = 15 * 60 * 1000;
+const sessionCache = new SessionCache<NonNullable<App.Locals['session']>, User>(
+	SESSION_CACHE_TTL_MS,
+	SESSION_STALE_MAX_AGE_MS
+);
 
 const clearSessionCookie = (event: RequestEvent) => {
 	event.cookies.delete('sid', { path: '/' });
 };
+
+/**
+ * Garde d'accès aux environnements dev.* : exige d'être authentifié ET de
+ * détenir infra.environments.access (résolu côté DB via has_permission, qui
+ * unit rôles globaux actifs + override). Un utilisateur non connecté est
+ * redirigé vers le SSO ; connecté sans la permission -> 403.
+ */
+async function guardDevEnvironment(
+	event: RequestEvent,
+	session: App.Locals['session'],
+	user: App.Locals['user']
+): Promise<void> {
+	// Endpoints d'authentification locaux (ex. /auth/logout) : laissés
+	// accessibles pour ne pas bloquer la déconnexion sur dev.*.
+	if (event.url.pathname.startsWith('/auth/')) {
+		return;
+	}
+
+	if (!session || !user) {
+		redirect(302, buildLoginUrl(event.url.href));
+	}
+
+	const result = (await event.locals.supabase.rpc('has_permission', {
+		p_permission: 'infra.environments.access'
+	})) as { data: boolean | null; error: unknown };
+
+	if (result.error || !result.data) {
+		error(
+			403,
+			"Accès réservé à l'environnement de développement (infra.environments.access requis)."
+		);
+	}
+}
 
 export const handle: Handle = async ({ event, resolve }) => {
 	const rawSid = event.cookies.get('sid');
@@ -70,92 +78,31 @@ export const handle: Handle = async ({ event, resolve }) => {
 	let session: App.Locals['session'] = null;
 	let user: App.Locals['user'] = null;
 
-	if (sessionId && sessionSecret) {
-		const cached = getCachedSession(sessionId);
+	if (rawSid && sessionId && sessionSecret) {
+		const cached = sessionCache.getFresh(sessionId, sessionSecret);
 		if (cached) {
 			session = cached.session;
 			user = cached.user;
 		} else {
-			const anon = createAnonClient();
-			const sessionResult = (await anon.schema('sso').rpc('get_server_session', {
-				p_session_id: sessionId,
-				p_session_secret: sessionSecret
-			})) as SupabaseQueryResult<ServerSessionRow[] | ServerSessionRow | null>;
-			const sessionRow = Array.isArray(sessionResult.data)
-				? (sessionResult.data[0] ?? null)
-				: sessionResult.data;
-			if (sessionResult.error || !sessionRow || sessionRow.revoked_at) {
+			const result = await resolveSessionViaAuth(event.fetch, rawSid);
+			if (result.status === 'ok') {
+				session = result.session;
+				user = createSessionUser({
+					id: result.user.id,
+					email: result.user.email,
+					appMetadata: result.user.app_metadata,
+					userMetadata: result.user.user_metadata
+				});
+				sessionCache.set(sessionId, session, user, sessionSecret);
+			} else if (result.status === 'invalid') {
 				clearSessionCookie(event);
 			} else {
-				const expiresAtMs = new Date(sessionRow.expires_at).getTime();
-				let accessToken = sessionRow.access_token;
-				let refreshToken = sessionRow.refresh_token;
-				let expiresAt = sessionRow.expires_at;
-
-				if (expiresAtMs - Date.now() < SESSION_REFRESH_GRACE_MS) {
-					const refreshResult = (await anon.auth.refreshSession({
-						refresh_token: refreshToken
-					})) as SupabaseQueryResult<{ session: NonNullable<App.Locals['session']> | null }>;
-					if (refreshResult.error || !refreshResult.data.session) {
-						await anon.schema('sso').rpc('revoke_server_session', {
-							p_session_id: sessionId,
-							p_session_secret: sessionSecret
-						});
-						clearSessionCookie(event);
-					} else {
-						const refreshedSession = refreshResult.data.session;
-						const refreshedExpiresAt =
-							typeof refreshedSession.expires_at === 'number'
-								? refreshedSession.expires_at
-								: Math.floor(new Date(expiresAt).getTime() / 1000);
-						accessToken = refreshedSession.access_token;
-						refreshToken = refreshedSession.refresh_token;
-						expiresAt = new Date(refreshedExpiresAt * 1000).toISOString();
-						await anon.schema('sso').rpc('update_server_session_tokens', {
-							p_session_id: sessionId,
-							p_session_secret: sessionSecret,
-							p_access_token: accessToken,
-							p_refresh_token: refreshToken,
-							p_expires_at: expiresAt
-						});
-						const jwt = decodeJwt(accessToken);
-						session = {
-							id: sessionId,
-							access_token: accessToken,
-							refresh_token: refreshToken,
-							expires_at: refreshedExpiresAt,
-							user_id: jwt?.sub ?? sessionRow.user_id
-						};
-						user = jwt
-							? createSessionUser({
-									id: jwt.sub,
-									email: jwt.email ?? null,
-									appMetadata: jwt.app_metadata ?? {},
-									userMetadata: jwt.user_metadata ?? {}
-								})
-							: createSessionUser({ id: sessionRow.user_id, email: null });
-						if (sessionId) {
-							sessionCache.set(sessionId, { session, user, timestamp: Date.now() });
-						}
-					}
-				} else {
-					const jwt = decodeJwt(accessToken);
-					session = {
-						id: sessionId,
-						access_token: accessToken,
-						refresh_token: refreshToken,
-						expires_at: Math.floor(new Date(expiresAt).getTime() / 1000),
-						user_id: jwt?.sub ?? sessionRow.user_id
-					};
-					user = jwt
-						? createSessionUser({
-								id: jwt.sub,
-								email: jwt.email ?? null,
-								appMetadata: jwt.app_metadata ?? {},
-								userMetadata: jwt.user_metadata ?? {}
-							})
-						: createSessionUser({ id: sessionRow.user_id, email: null });
-					sessionCache.set(sessionId, { session, user, timestamp: Date.now() });
+				// Service auth injoignable : on ressert l'entrée périmée du cache
+				// tant que l'access token est encore valable, sans purger le cookie.
+				const stale = sessionCache.getStale(sessionId, sessionSecret);
+				if (stale) {
+					session = stale.session;
+					user = stale.user;
 				}
 			}
 		}
@@ -172,6 +119,14 @@ export const handle: Handle = async ({ event, resolve }) => {
 	event.locals.permissions = [];
 
 	event.locals.safeGetSession = () => Promise.resolve({ session, user });
+
+	// Environnements de pré-production (dev.*) : accès réservé aux utilisateurs
+	// authentifiés détenant infra.environments.access. Enforcement applicatif en
+	// complément du reverse proxy. Le hostname dev.* couvre dev.davincibot.fr et
+	// les sous-domaines dev.* des autres apps.
+	if (event.url.hostname.startsWith('dev.')) {
+		await guardDevEnvironment(event, session, user);
+	}
 
 	return resolve(event, {
 		filterSerializedResponseHeaders(name: string) {

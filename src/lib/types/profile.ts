@@ -1,4 +1,4 @@
-import type { Permission } from '$lib/permissions';
+import type { EffectivePermission } from '$lib/permissions';
 
 export interface UserProject {
 	id: number;
@@ -13,6 +13,6 @@ export interface UserProfile {
 	avatar: string;
 	id: string;
 	projects: UserProject[];
-	permissions: Permission[];
+	permissions: EffectivePermission[];
 	allProjects: { value: number; name: string; debut: string }[] | null;
 }
