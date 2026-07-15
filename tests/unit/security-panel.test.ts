@@ -96,8 +96,15 @@ describe('SecurityPanel — appareils connectés', () => {
 		await waitForSelector(target, '#session-sess-current');
 
 		expect(target.querySelector('#session-sess-current')?.textContent).toContain('Cet appareil');
-		expect(target.querySelector('#session-sess-current')?.textContent).toContain('Chrome · macOS');
-		expect(target.querySelector('#session-sess-current')?.textContent).toContain('Confiance');
+		expect(target.querySelector('#session-sess-current')?.textContent).not.toContain(
+			'Chrome · macOS'
+		);
+		expect(
+			target.querySelector('#session-sess-current [aria-label="Appareil de confiance"]')
+		).not.toBeNull();
+		expect(target.querySelector('#session-sess-current')?.textContent).not.toContain(
+			'Dernière activité'
+		);
 		expect(target.querySelector('#session-sess-other')?.textContent).toContain('Firefox · Windows');
 		expect(target.querySelector('#session-revoke-sess-current')).toBeNull();
 		expect(target.querySelector('#session-revoke-sess-other')).not.toBeNull();
