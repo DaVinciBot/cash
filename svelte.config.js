@@ -16,8 +16,7 @@ const config = {
 				'/admin/treso',
 				'/admin/orders/new',
 				'/admin/users/',
-				'/admin/wip',
-				'/admin/profile'
+				'/admin/wip'
 			]
 		},
 		paths: {
