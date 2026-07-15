@@ -1,6 +1,6 @@
 import { browser } from '$app/environment';
 import { env } from '$env/dynamic/public';
-import { createBrowserClient } from '@supabase/ssr';
+import { createClient } from '@supabase/supabase-js';
 import type { SupabaseClient } from '@supabase/supabase-js';
 
 const publicSupabaseUrl = env.PUBLIC_SUPABASE_URL;
@@ -13,20 +13,35 @@ type BrowserSupabaseClient = SupabaseClient;
 
 let browserClient: BrowserSupabaseClient | null = null;
 
-function getCookieOptions() {
-	if (!browser) {
-		return undefined;
+const TOKEN_REFRESH_MARGIN_MS = 30 * 1000;
+let cachedToken: { value: string; expiresAtMs: number } | null = null;
+let pendingToken: Promise<string | null> | null = null;
+
+// L'access token vient du serveur du site (qui le tient du service auth) :
+// le navigateur ne détient jamais le refresh token et ne rafraîchit rien lui-même.
+async function fetchAccessToken(): Promise<string | null> {
+	if (cachedToken && cachedToken.expiresAtMs - TOKEN_REFRESH_MARGIN_MS > Date.now()) {
+		return cachedToken.value;
 	}
-
-	const isLocalhost =
-		window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1';
-
-	return {
-		domain: isLocalhost ? undefined : '.davincibot.fr',
-		path: '/',
-		sameSite: 'lax' as const,
-		secure: window.location.protocol === 'https:'
-	};
+	pendingToken ??= fetch('/api/session/token')
+		.then(async (response) => {
+			if (!response.ok) {
+				cachedToken = null;
+				return null;
+			}
+			const payload = (await response.json()) as { access_token?: unknown; expires_at?: unknown };
+			if (typeof payload.access_token !== 'string' || typeof payload.expires_at !== 'number') {
+				cachedToken = null;
+				return null;
+			}
+			cachedToken = { value: payload.access_token, expiresAtMs: payload.expires_at * 1000 };
+			return payload.access_token;
+		})
+		.catch(() => cachedToken?.value ?? null)
+		.finally(() => {
+			pendingToken = null;
+		});
+	return pendingToken;
 }
 
 export function getSupabaseBrowserClient(): BrowserSupabaseClient {
@@ -38,11 +53,8 @@ export function getSupabaseBrowserClient(): BrowserSupabaseClient {
 		throw new Error('Missing PUBLIC_SUPABASE_URL or PUBLIC_SUPABASE_PUBLISHABLE_KEY');
 	}
 
-	browserClient ??= createBrowserClient(publicSupabaseUrl, publicSupabaseKey, {
-		auth: {
-			flowType: 'pkce'
-		},
-		cookieOptions: getCookieOptions()
+	browserClient ??= createClient(publicSupabaseUrl, publicSupabaseKey, {
+		accessToken: fetchAccessToken
 	});
 
 	return browserClient;
