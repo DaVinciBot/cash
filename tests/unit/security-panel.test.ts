@@ -17,6 +17,20 @@ const mocks = vi.hoisted(() => ({
 
 vi.mock('$lib/settings/sessions', () => mocks);
 
+const mfaMocks = vi.hoisted(() => ({
+	fetchMfaState: vi.fn(),
+	startEmailEnrollment: vi.fn(),
+	verifyEmailEnrollment: vi.fn(),
+	startTotpEnrollment: vi.fn(),
+	verifyTotpEnrollment: vi.fn(),
+	disableMfaMethod: vi.fn(),
+	regenerateRecoveryCodes: vi.fn(),
+	stepUpChallenge: vi.fn(),
+	stepUpVerify: vi.fn()
+}));
+
+vi.mock('$lib/settings/mfa', () => mfaMocks);
+
 import SecurityPanel from '../../src/lib/components/settings/SecurityPanel.svelte';
 
 // La session courante est volontairement en dernier : le composant doit la remonter en tête.
@@ -81,6 +95,12 @@ beforeEach(() => {
 	mocks.revokeSession.mockResolvedValue(undefined);
 	mocks.revokeAllSessions.mockResolvedValue(undefined);
 	mocks.revokeConnection.mockResolvedValue(undefined);
+	mfaMocks.fetchMfaState.mockResolvedValue({
+		methods: [],
+		recovery_codes_remaining: 0,
+		has_mfa: false,
+		elevated: false
+	});
 	vi.spyOn(window, 'confirm').mockReturnValue(true);
 	vi.spyOn(window, 'alert').mockImplementation(() => undefined);
 });
@@ -203,5 +223,15 @@ describe('SecurityPanel — applications connectées', () => {
 				'Aucune application connectée'
 			);
 		});
+	});
+});
+
+describe('SecurityPanel — vérification en deux étapes', () => {
+	it('rend la section MFA entre le mot de passe et les appareils', async () => {
+		const target = mountPanel();
+		await waitForSelector(target, '#mfa-section');
+
+		const ids = Array.from(target.querySelectorAll('section')).map((section) => section.id);
+		expect(ids.indexOf('mfa-section')).toBeLessThan(ids.indexOf('sessions-section'));
 	});
 });
