@@ -70,7 +70,7 @@
 
 	const dbInfo = {
 		table: 'profiles',
-		key: 'id, username, avatar_url, status, member_of(project!inner(id, name), revoked_at)'
+		key: 'id, username, avatar_url, status, member_of!membre_projet_profile_fkey(project!inner(id, name), revoked_at)'
 	};
 
 	let canEditMembers = $state<boolean>(false);
@@ -666,7 +666,7 @@
 		const { data, error } = (await supabase
 			.from('profiles')
 			.select(
-				'id, username, permissions, status, profile_global_roles(role, revoked_at), member_of(role, revoked_at, project(id,name)), avatar_url'
+				'id, username, permissions, status, profile_global_roles(role, revoked_at), member_of!membre_projet_profile_fkey(role, revoked_at, project(id,name)), avatar_url'
 			)
 			.eq('id', id)
 			.single()) as {
