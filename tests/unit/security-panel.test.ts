@@ -190,14 +190,15 @@ describe('SecurityPanel — appareils connectés', () => {
 });
 
 describe('SecurityPanel — applications connectées', () => {
-	it('liste les applications avec leur état', async () => {
+	it('liste les applications avec leur nom et la date, sans badge ni scopes', async () => {
 		const target = mountPanel();
 		await waitForSelector(target, '#connection-rallly');
 
 		const row = target.querySelector('#connection-rallly');
 		expect(row?.textContent).toContain('Rallly');
-		expect(row?.textContent).toContain('Active');
-		expect(row?.textContent).toContain('openid profile email');
+		expect(row?.textContent).toContain('juil');
+		expect(row?.textContent).not.toContain('Active');
+		expect(row?.textContent).not.toContain('openid profile email');
 	});
 
 	it('révoque une application après confirmation', async () => {
