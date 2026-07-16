@@ -9,6 +9,15 @@ export class ElevationRequiredError extends Error {
 	}
 }
 
+// L'utilisateur a fermé le dialogue de confirmation : abandon silencieux,
+// à ne pas afficher comme une erreur.
+export class StepUpCancelledError extends Error {
+	constructor() {
+		super('Action annulée.');
+		this.name = 'StepUpCancelledError';
+	}
+}
+
 export const isElevationRequired = (status: number, result: { error?: string }): boolean =>
 	status === 403 && result.error === 'elevation_required';
 
@@ -30,6 +39,15 @@ export function requestStepUp(): Promise<boolean> {
 	});
 }
 
+// Pour les catch des actions sensibles : une annulation du dialogue se tait,
+// tout le reste s'affiche.
+export function alertUnlessCancelled(error: unknown): void {
+	if (error instanceof StepUpCancelledError) {
+		return;
+	}
+	alert(error instanceof Error ? error.message : 'Une erreur est survenue');
+}
+
 export async function withStepUp<T>(action: () => Promise<T>): Promise<T> {
 	try {
 		return await action();
@@ -39,7 +57,7 @@ export async function withStepUp<T>(action: () => Promise<T>): Promise<T> {
 		}
 		const confirmed = await requestStepUp();
 		if (!confirmed) {
-			throw new Error('Action annulée.', { cause: error });
+			throw new StepUpCancelledError();
 		}
 		return await action();
 	}

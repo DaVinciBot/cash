@@ -3,6 +3,7 @@ import { describe, expect, it, vi } from 'vitest';
 
 import {
 	ElevationRequiredError,
+	StepUpCancelledError,
 	requestStepUp,
 	stepUpRequest,
 	withStepUp
@@ -39,7 +40,7 @@ describe('withStepUp', () => {
 		expect(get(stepUpRequest)).toBe(null);
 	});
 
-	it("échoue proprement quand l'utilisateur annule le dialogue", async () => {
+	it("l'annulation du dialogue lève une StepUpCancelledError silencieuse", async () => {
 		const action = vi.fn().mockRejectedValue(new ElevationRequiredError());
 
 		const pending = withStepUp(action);
@@ -48,7 +49,7 @@ describe('withStepUp', () => {
 		});
 		get(stepUpRequest)?.resolve(false);
 
-		await expect(pending).rejects.toThrow('Action annulée.');
+		await expect(pending).rejects.toThrow(StepUpCancelledError);
 		expect(action).toHaveBeenCalledTimes(1);
 		expect(get(stepUpRequest)).toBe(null);
 	});
