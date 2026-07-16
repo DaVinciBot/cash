@@ -2,6 +2,7 @@ import type { EffectivePermission, GlobalPermission } from '$lib/permissions';
 import type { UserProfile } from '$lib/types/profile';
 import type { SupabaseClient, User } from '@supabase/supabase-js';
 import type { Cookies } from '@sveltejs/kit';
+import type { Database } from './database.types.ts';
 
 // Le refresh token ne quitte jamais le service auth : les sites ne voient
 // passer que l'access token.
@@ -16,7 +17,7 @@ declare global {
 	namespace App {
 		// interface Error {}
 		interface Locals {
-			supabase: SupabaseClient;
+			supabase: SupabaseClient<Database>;
 			session: ServerSession | null;
 			user: User | null;
 			permissions: EffectivePermission[];
@@ -29,7 +30,7 @@ declare global {
 			userProfile: UserProfile | null;
 			permissions: EffectivePermission[];
 			canCreateOrder: boolean;
-			supabase?: SupabaseClient;
+			supabase?: SupabaseClient<Database>;
 			menu: {
 				title: string;
 				uri: string;

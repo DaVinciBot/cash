@@ -1,13 +1,12 @@
+import { buildLoginUrl } from '$lib/config/auth';
 import {
 	ADMIN_MENU,
 	canAccessAdminPath,
 	filterMenuByPermissions,
-	hasAnyPermission,
 	type EffectivePermission,
 	type GlobalPermission
 } from '$lib/permissions';
 import type { UserProfile, UserProject } from '$lib/types/profile';
-import { buildLoginUrl } from '$lib/config/auth';
 import { redirect } from '@sveltejs/kit';
 import type { ProjectRow } from '../database.types';
 import type { LayoutServerLoad } from './$types';
@@ -61,18 +60,39 @@ export const load: LayoutServerLoad = async ({ locals, cookies, url }) => {
 	let menu = filterMenuByPermissions(ADMIN_MENU, []);
 
 	if (user?.id) {
-		const { data, error } = (await supabase
-			.from('profiles')
-			.select(
-				'username,avatar_url,permissions, profile_global_roles!profile_global_roles_profile_fkey(role, revoked_at, global_roles(permissions)), member_of!membre_projet_profile_fkey(role, project(id, name, debut))'
-			)
-			.eq('id', user.id)
-			.single()) as { data: ProfileRow | null; error: unknown };
+		const [
+			profileResult,
+			{ data: canCreate },
+			{ data: canManage },
+			{ data: canReadOrders },
+			{ data: canReadFinance },
+			{ data: canReadProfiles },
+			{ data: canWriteFinance },
+			{ data: canUpdateProfiles },
+			{ data: canReadStats }
+		] = await Promise.all([
+			supabase
+				.from('profiles')
+				.select(
+					'username,avatar_url,permissions, profile_global_roles!profile_global_roles_profile_fkey(role, revoked_at, global_roles(permissions)), member_of!membre_projet_profile_fkey(role, project(id, name, debut))'
+				)
+				.eq('id', user.id)
+				.single() as unknown as Promise<{ data: ProfileRow | null; error: unknown }>,
+			supabase.rpc('has_permission', { p_permission: 'orders.create.all' }),
+			supabase.rpc('has_permission', { p_permission: 'orders.manage.self' }),
+			supabase.rpc('has_permission', { p_permission: 'orders.read.all' }),
+			supabase.rpc('has_permission', { p_permission: 'finance.read' }),
+			supabase.rpc('has_permission', { p_permission: 'members.profile.read.all' }),
+			supabase.rpc('has_permission', { p_permission: 'finance.write' }),
+			supabase.rpc('has_permission', { p_permission: 'members.profile.update.all' }),
+			supabase.rpc('has_permission', { p_permission: 'stats.read.all' })
+		]);
 
+		canCreateOrder = canCreate === true || canManage === true;
+
+		const { data, error } = profileResult;
 		if (!error && data) {
 			permissions = resolveEffectivePermissions(data);
-			canCreateOrder =
-				permissions.includes('orders.create.all') || permissions.includes('orders.manage.self');
 
 			const projects: UserProject[] = data.member_of.map((m) => ({
 				id: m.project?.id ?? 0,
@@ -92,14 +112,12 @@ export const load: LayoutServerLoad = async ({ locals, cookies, url }) => {
 			};
 
 			if (
-				hasAnyPermission(permissions, [
-					'orders.read.all',
-					'finance.read',
-					'members.profile.read.all',
-					'finance.write',
-					'members.profile.update.all',
-					'stats.read.all'
-				])
+				canReadOrders ||
+				canReadFinance ||
+				canReadProfiles ||
+				canWriteFinance ||
+				canUpdateProfiles ||
+				canReadStats
 			) {
 				userProfile.projects.push({
 					id: 0,

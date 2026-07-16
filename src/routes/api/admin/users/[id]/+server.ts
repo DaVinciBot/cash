@@ -1,27 +1,12 @@
-import type { EffectivePermission } from '$lib/permissions';
 import { json } from '@sveltejs/kit';
 import type { RequestEvent } from './$types';
 
-const getPermissions = async (locals: App.Locals): Promise<EffectivePermission[]> => {
-	if (Array.isArray(locals.permissions) && locals.permissions.length > 0) {
-		return locals.permissions;
-	}
-	if (!locals.user?.id) {
-		return [];
-	}
-	const result = (await locals.supabase
-		.from('profiles')
-		.select('permissions')
-		.eq('id', locals.user.id)
-		.single()) as { data: { permissions: EffectivePermission[] } | null; error: unknown };
-	return result.data?.permissions ?? [];
-};
-
 const requireEditMembers = async (locals: App.Locals): Promise<boolean> => {
-	const permissions = await getPermissions(locals);
-	return permissions.some((permission: string) =>
-		['members.profile.update.all', 'members.profile.status.update'].includes(permission)
-	);
+	const [{ data: canUpdate }, { data: canStatusUpdate }] = await Promise.all([
+		locals.supabase.rpc('has_permission', { p_permission: 'members.profile.update.all' }),
+		locals.supabase.rpc('has_permission', { p_permission: 'members.profile.status.update' })
+	]);
+	return canUpdate === true || canStatusUpdate === true;
 };
 
 const updateProfileStatus = async (
