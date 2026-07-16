@@ -46,7 +46,7 @@ export async function revokeSession(sessionId: string): Promise<void> {
 	if (!response.ok) {
 		return throwResponseError(
 			response,
-			'Une erreur est survenue lors de la déconnexion de l’appareil'
+			"Une erreur est survenue lors de la déconnexion de l'appareil"
 		);
 	}
 }
@@ -82,7 +82,7 @@ export async function revokeConnection(clientId: string): Promise<void> {
 	if (!response.ok) {
 		return throwResponseError(
 			response,
-			'Une erreur est survenue lors de la révocation de l’application'
+			"Une erreur est survenue lors de la révocation de l'application"
 		);
 	}
 }

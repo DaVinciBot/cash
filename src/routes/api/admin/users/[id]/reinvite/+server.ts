@@ -35,7 +35,7 @@ interface AdminUser {
 	invited_at?: string | null;
 }
 
-const reinvitePendingUserByEmail = async (admin: SupabaseClient, email: string) => {
+const reinvitePendingUserByEmail = async (admin: SupabaseClient<Database>, email: string) => {
 	const { error: inviteError } = await admin.auth.admin.inviteUserByEmail(email);
 	if (!inviteError) {
 		return { method: 'invite' };

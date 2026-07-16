@@ -11,7 +11,7 @@ const publicSupabaseKey = env.PUBLIC_SUPABASE_PUBLISHABLE_KEY;
 export const supabaseUrl = publicSupabaseUrl.replace(/\/$/, '');
 export const supabaseKey = publicSupabaseKey;
 
-type BrowserSupabaseClient = SupabaseClient;
+type BrowserSupabaseClient = SupabaseClient<Database>;
 
 let browserClient: BrowserSupabaseClient | null = null;
 
@@ -59,14 +59,3 @@ export function getSupabaseBrowserClient(): BrowserSupabaseClient {
 
 	return browserClient;
 }
-
-/**
- * @deprecated Prefer getSupabaseBrowserClient() in browser code and event.locals.supabase on
- * the server. Kept temporarily for existing browser-only imports.
- */
-export const supabase = new Proxy({} as BrowserSupabaseClient, {
-	get(_, property: string | symbol): unknown {
-		const client = getSupabaseBrowserClient() as unknown as Record<string | symbol, unknown>;
-		return client[property];
-	}
-});
