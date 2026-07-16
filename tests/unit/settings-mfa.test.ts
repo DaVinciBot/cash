@@ -64,11 +64,13 @@ describe('erreur elevation_required', () => {
 });
 
 describe('enrôlement email', () => {
-	it('startEmailEnrollment poste sur le proxy', async () => {
-		const fetchMock = vi.fn().mockResolvedValue(jsonResponse(200, { ok: true }));
+	it("startEmailEnrollment poste sur le proxy et renvoie l'adresse destinataire", async () => {
+		const fetchMock = vi
+			.fn()
+			.mockResolvedValue(jsonResponse(200, { ok: true, email: 'clement@davincibot.fr' }));
 		vi.stubGlobal('fetch', fetchMock);
 
-		await expect(startEmailEnrollment()).resolves.toBeUndefined();
+		await expect(startEmailEnrollment()).resolves.toBe('clement@davincibot.fr');
 		const [url, init] = fetchMock.mock.calls[0] as [string, RequestInit];
 		expect(url).toContain('/api/account/mfa/email/start');
 		expect(init.method).toBe('POST');
@@ -112,12 +114,27 @@ describe('désactivation et codes', () => {
 });
 
 describe('step-up', () => {
-	it('stepUpChallenge renvoie la méthode attendue', async () => {
+	it("stepUpChallenge renvoie la méthode et l'adresse destinataire", async () => {
 		vi.stubGlobal(
 			'fetch',
-			vi.fn().mockResolvedValue(jsonResponse(200, { ok: true, method: 'email' }))
+			vi
+				.fn()
+				.mockResolvedValue(
+					jsonResponse(200, { ok: true, method: 'email', email: 'clement@davincibot.fr' })
+				)
 		);
-		await expect(stepUpChallenge()).resolves.toBe('email');
+		await expect(stepUpChallenge()).resolves.toEqual({
+			method: 'email',
+			email: 'clement@davincibot.fr'
+		});
+	});
+
+	it('stepUpChallenge sans MFA renvoie password sans email', async () => {
+		vi.stubGlobal(
+			'fetch',
+			vi.fn().mockResolvedValue(jsonResponse(200, { ok: true, method: 'password' }))
+		);
+		await expect(stepUpChallenge()).resolves.toEqual({ method: 'password', email: null });
 	});
 
 	it('stepUpVerify poste la preuve fournie', async () => {

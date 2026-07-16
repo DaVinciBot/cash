@@ -96,15 +96,17 @@ describe('MfaSection — sans méthode', () => {
 		);
 	});
 
-	it("l'activation envoie le code puis affiche la saisie", async () => {
+	it("l'activation envoie le code puis affiche la saisie avec l'adresse destinataire", async () => {
+		mocks.startEmailEnrollment.mockResolvedValue('clement@davincibot.fr');
 		const target = mountSection();
 		await waitForSelector(target, '#mfa-enable-email');
 
 		target.querySelector<HTMLButtonElement>('#mfa-enable-email')?.click();
 		flushSync();
 
-		await waitForSelector(target, '#mfa-enroll-code');
+		await waitForSelector(target, '#mfa-enroll-code-0');
 		expect(mocks.startEmailEnrollment).toHaveBeenCalledTimes(1);
+		expect(target.querySelector('#mfa-section')?.textContent).toContain('clement@davincibot.fr');
 	});
 
 	it('la validation du code affiche les codes de récupération à la première méthode', async () => {
@@ -112,12 +114,12 @@ describe('MfaSection — sans méthode', () => {
 		const target = mountSection();
 		await waitForSelector(target, '#mfa-enable-email');
 		target.querySelector<HTMLButtonElement>('#mfa-enable-email')?.click();
-		await waitForSelector(target, '#mfa-enroll-code');
+		await waitForSelector(target, '#mfa-enroll-code-0');
 
 		mocks.fetchMfaState.mockResolvedValue(stateWithEmail);
-		setInputValue(target, '#mfa-enroll-code', '123456');
+		setInputValue(target, '#mfa-enroll-code-0', '123456');
 		target
-			.querySelector('#mfa-enroll-code')
+			.querySelector('#mfa-enroll-code-0')
 			?.closest('form')
 			?.dispatchEvent(new Event('submit', { bubbles: true, cancelable: true }));
 		flushSync();

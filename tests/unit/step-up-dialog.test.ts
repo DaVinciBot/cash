@@ -61,7 +61,7 @@ const submitForm = (target: HTMLElement, selector: string) => {
 
 beforeEach(() => {
 	vi.clearAllMocks();
-	mocks.stepUpChallenge.mockResolvedValue('email');
+	mocks.stepUpChallenge.mockResolvedValue({ method: 'email', email: 'clement@davincibot.fr' });
 	mocks.stepUpVerify.mockResolvedValue(undefined);
 });
 
@@ -81,11 +81,12 @@ describe('StepUpDialog', () => {
 	it('ouvre le dialogue, lance le challenge et valide un code email', async () => {
 		const target = mountDialog();
 		const pending = requestStepUp();
-		await waitForSelector(target, '#step-up-code');
+		await waitForSelector(target, '#step-up-code-0');
 		expect(mocks.stepUpChallenge).toHaveBeenCalledTimes(1);
+		expect(target.querySelector('#step-up-dialog')?.textContent).toContain('clement@davincibot.fr');
 
-		setInputValue(target, '#step-up-code', '123456');
-		submitForm(target, '#step-up-code');
+		setInputValue(target, '#step-up-code-0', '123456');
+		submitForm(target, '#step-up-code-0');
 
 		await expect(pending).resolves.toBe(true);
 		expect(mocks.stepUpVerify).toHaveBeenCalledWith({ code: '123456' });
@@ -98,7 +99,7 @@ describe('StepUpDialog', () => {
 	it('bascule vers un code de récupération', async () => {
 		const target = mountDialog();
 		const pending = requestStepUp();
-		await waitForSelector(target, '#step-up-code');
+		await waitForSelector(target, '#step-up-code-0');
 
 		const toggle = Array.from(
 			target.querySelectorAll<HTMLButtonElement>('#step-up-dialog button')
@@ -115,7 +116,7 @@ describe('StepUpDialog', () => {
 	});
 
 	it('demande le mot de passe quand le compte est sans MFA', async () => {
-		mocks.stepUpChallenge.mockResolvedValue('password');
+		mocks.stepUpChallenge.mockResolvedValue({ method: 'password', email: null });
 		const target = mountDialog();
 		const pending = requestStepUp();
 		await waitForSelector(target, '#step-up-password');
@@ -131,10 +132,10 @@ describe('StepUpDialog', () => {
 		mocks.stepUpVerify.mockRejectedValue(new Error('Vérification échouée.'));
 		const target = mountDialog();
 		void requestStepUp();
-		await waitForSelector(target, '#step-up-code');
+		await waitForSelector(target, '#step-up-code-0');
 
-		setInputValue(target, '#step-up-code', '000000');
-		submitForm(target, '#step-up-code');
+		setInputValue(target, '#step-up-code-0', '000000');
+		submitForm(target, '#step-up-code-0');
 
 		await vi.waitFor(() => {
 			flushSync();
@@ -148,7 +149,7 @@ describe('StepUpDialog', () => {
 	it("l'annulation résout false et ferme le dialogue", async () => {
 		const target = mountDialog();
 		const pending = requestStepUp();
-		await waitForSelector(target, '#step-up-code');
+		await waitForSelector(target, '#step-up-code-0');
 
 		const cancel = Array.from(
 			target.querySelectorAll<HTMLButtonElement>('#step-up-dialog button')

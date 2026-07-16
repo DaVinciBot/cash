@@ -50,11 +50,14 @@ export async function fetchMfaState(): Promise<MfaState> {
 	return (await response.json()) as MfaState;
 }
 
-export async function startEmailEnrollment(): Promise<void> {
+// Renvoie l'adresse à laquelle le code a été envoyé.
+export async function startEmailEnrollment(): Promise<string | null> {
 	const response = await fetch(resolve('/api/account/mfa/email/start'), { method: 'POST' });
 	if (!response.ok) {
 		return throwResponseError(response, "Une erreur est survenue lors de l'envoi du code");
 	}
+	const result = (await response.json()) as { email?: string };
+	return result.email ?? null;
 }
 
 // Renvoie les codes de récupération quand c'est la première méthode activée
@@ -93,13 +96,21 @@ export async function regenerateRecoveryCodes(): Promise<string[]> {
 	return result.recovery_codes ?? [];
 }
 
-export async function stepUpChallenge(): Promise<StepUpMethod> {
+export interface StepUpChallengeInfo {
+	method: StepUpMethod;
+	email: string | null;
+}
+
+export async function stepUpChallenge(): Promise<StepUpChallengeInfo> {
 	const response = await fetch(resolve('/api/account/step-up/challenge'), { method: 'POST' });
 	if (!response.ok) {
 		return throwResponseError(response, "Une erreur est survenue lors de l'envoi du code");
 	}
-	const result = (await response.json()) as { method?: StepUpMethod };
-	return result.method === 'password' ? 'password' : 'email';
+	const result = (await response.json()) as { method?: StepUpMethod; email?: string };
+	return {
+		method: result.method === 'password' ? 'password' : 'email',
+		email: result.email ?? null
+	};
 }
 
 // 401 = preuve refusée (code ou mot de passe faux) : pas de redirection.
