@@ -1,10 +1,10 @@
 import { env } from '$env/dynamic/public';
-import type { EffectivePermission } from '$lib/permissions';
 import { createClient, type SupabaseClient } from '@supabase/supabase-js';
 import { json } from '@sveltejs/kit';
+import type { Database } from '../../../../../../database.types.ts';
 import type { RequestEvent } from './$types';
 
-const getAdminClient = async (locals: App.Locals): Promise<SupabaseClient> => {
+const getAdminClient = async (locals: App.Locals): Promise<SupabaseClient<Database>> => {
 	const supabaseUrl = env.PUBLIC_SUPABASE_URL;
 	if (!supabaseUrl) {
 		throw new Error('Missing PUBLIC_SUPABASE_URL.');
@@ -21,27 +21,13 @@ const getAdminClient = async (locals: App.Locals): Promise<SupabaseClient> => {
 	});
 };
 
-const getPermissions = async (locals: App.Locals): Promise<EffectivePermission[]> => {
-	if (Array.isArray(locals.permissions) && locals.permissions.length > 0) {
-		return locals.permissions;
-	}
-	if (!locals.user?.id) {
-		return [];
-	}
-	const result = (await locals.supabase
-		.from('profiles')
-		.select('permissions')
-		.eq('id', locals.user.id)
-		.single()) as { data: { permissions: EffectivePermission[] } | null; error: unknown };
-	return result.data?.permissions ?? [];
-};
-
 const requireEditMembers = async (locals: App.Locals): Promise<boolean> => {
-	const permissions = await getPermissions(locals);
-	return permissions.some((permission: string) =>
-		['members.profile.update.all', 'members.profile.status.update'].includes(permission)
-	);
-}; //TODO: accès si on peut lire mais pas edit ?
+	const [{ data: canUpdate }, { data: canStatusUpdate }] = await Promise.all([
+		locals.supabase.rpc('has_permission', { p_permission: 'members.profile.update.all' }),
+		locals.supabase.rpc('has_permission', { p_permission: 'members.profile.status.update' })
+	]);
+	return canUpdate === true || canStatusUpdate === true;
+};
 
 interface AdminUser {
 	email?: string;

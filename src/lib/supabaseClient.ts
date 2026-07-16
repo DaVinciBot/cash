@@ -1,8 +1,9 @@
 import { browser } from '$app/environment';
 import { resolve } from '$app/paths';
 import { env } from '$env/dynamic/public';
-import { createClient } from '@supabase/supabase-js';
 import type { SupabaseClient } from '@supabase/supabase-js';
+import { createClient } from '@supabase/supabase-js';
+import type { Database } from '../database.types';
 
 const publicSupabaseUrl = env.PUBLIC_SUPABASE_URL;
 const publicSupabaseKey = env.PUBLIC_SUPABASE_PUBLISHABLE_KEY;
@@ -52,7 +53,7 @@ export function getSupabaseBrowserClient(): BrowserSupabaseClient {
 		throw new Error('Missing PUBLIC_SUPABASE_URL or PUBLIC_SUPABASE_PUBLISHABLE_KEY');
 	}
 
-	browserClient ??= createClient(publicSupabaseUrl, publicSupabaseKey, {
+	browserClient ??= createClient<Database>(publicSupabaseUrl, publicSupabaseKey, {
 		accessToken: fetchAccessToken
 	});
 

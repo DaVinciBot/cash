@@ -1,5 +1,6 @@
 import { env } from '$env/dynamic/public';
 import { createClient } from '@supabase/supabase-js';
+import type { Database } from '../../database.types';
 
 const assertEnv = () => {
 	if (!env.PUBLIC_SUPABASE_URL || !env.PUBLIC_SUPABASE_PUBLISHABLE_KEY) {
@@ -9,14 +10,14 @@ const assertEnv = () => {
 
 export const createAnonClient = () => {
 	assertEnv();
-	return createClient(env.PUBLIC_SUPABASE_URL, env.PUBLIC_SUPABASE_PUBLISHABLE_KEY, {
+	return createClient<Database>(env.PUBLIC_SUPABASE_URL, env.PUBLIC_SUPABASE_PUBLISHABLE_KEY, {
 		auth: { persistSession: false, autoRefreshToken: false }
 	});
 };
 
 export const createUserClient = (accessToken: string) => {
 	assertEnv();
-	return createClient(env.PUBLIC_SUPABASE_URL, env.PUBLIC_SUPABASE_PUBLISHABLE_KEY, {
+	return createClient<Database>(env.PUBLIC_SUPABASE_URL, env.PUBLIC_SUPABASE_PUBLISHABLE_KEY, {
 		global: {
 			headers: {
 				Authorization: `Bearer ${accessToken}`
