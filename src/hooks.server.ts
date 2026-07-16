@@ -56,6 +56,11 @@ async function guardDevEnvironment(
 	}
 
 	if (!session || !user) {
+		// Un fetch vers l'API ne peut pas suivre la redirection vers la page de
+		// login (il la suivrait en GET) : 401 explicite, traité côté client.
+		if (event.url.pathname.startsWith(resolveRoute('/api'))) {
+			error(401, 'Non authentifié');
+		}
 		redirect(302, buildLoginUrl(event.url.href));
 	}
 

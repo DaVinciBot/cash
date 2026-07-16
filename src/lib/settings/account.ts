@@ -1,5 +1,6 @@
 import { resolve } from '$app/paths';
 import { buildLogoutUrl } from '$lib/config/auth';
+import { redirectToLoginIfUnauthorized } from '$lib/settings/authGuard';
 import { userdata } from '$lib/store';
 import { getSupabaseBrowserClient } from '$lib/supabaseClient';
 
@@ -61,6 +62,7 @@ export async function changePassword(password: string): Promise<void> {
 		body: JSON.stringify({ password })
 	});
 	if (!response.ok) {
+		redirectToLoginIfUnauthorized(response);
 		const result = (await response.json().catch(() => ({}))) as { error?: string };
 		throw new Error(
 			result.error ?? 'Une erreur est survenue lors de la modification de votre mot de passe'

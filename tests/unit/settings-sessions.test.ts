@@ -1,6 +1,8 @@
 import { afterEach, describe, expect, it, vi } from 'vitest';
 
 vi.mock('$env/dynamic/public', () => ({ env: {} }));
+// URL relative : jsdom ne sait pas naviguer vers un autre domaine.
+vi.mock('$lib/config/auth', () => ({ buildLoginUrl: () => '#login' }));
 
 import {
 	fetchConnections,
@@ -34,9 +36,19 @@ describe('fetchSessions', () => {
 	});
 
 	it('remonte le message d’erreur du serveur', async () => {
+		vi.stubGlobal(
+			'fetch',
+			vi.fn().mockResolvedValue(jsonResponse(500, { error: 'Service indisponible' }))
+		);
+
+		await expect(fetchSessions()).rejects.toThrow('Service indisponible');
+	});
+
+	it('renvoie vers la connexion sur un 401 (session expirée)', async () => {
 		vi.stubGlobal('fetch', vi.fn().mockResolvedValue(jsonResponse(401, { error: 'Non connecté' })));
 
-		await expect(fetchSessions()).rejects.toThrow('Non connecté');
+		await expect(fetchSessions()).rejects.toThrow('Session expirée');
+		expect(window.location.hash).toBe('#login');
 	});
 });
 

@@ -1,4 +1,5 @@
 import { resolve } from '$app/paths';
+import { redirectToLoginIfUnauthorized } from '$lib/settings/authGuard';
 
 export interface SessionInfo {
 	id: string;
@@ -19,6 +20,7 @@ export interface ConnectionInfo {
 }
 
 async function throwResponseError(response: Response, fallback: string): Promise<never> {
+	redirectToLoginIfUnauthorized(response);
 	const result = (await response.json().catch(() => ({}))) as { error?: string };
 	throw new Error(result.error ?? fallback);
 }
