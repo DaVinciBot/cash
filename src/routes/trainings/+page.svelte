@@ -36,7 +36,6 @@
 	import { triggerTableRefresh } from '$lib/store';
 	import { getSupabaseBrowserClient } from '$lib/supabaseClient';
 	import type { CrudField } from '$lib/types/crud';
-	import type { SupabaseClient } from '@supabase/supabase-js';
 	import { onMount } from 'svelte';
 
 	function getFormString(formData: FormData, key: string): string {
@@ -78,8 +77,6 @@ Voici une synthèse des formations prévues du {from} au {to} : {nb} formation{s
 
 DVBisous ! :robot:`;
 
-	const supabaseClient: SupabaseClient = getSupabaseBrowserClient();
-
 	const slotRangeDays = 120;
 	const trainingTableTopic = 'admin-trainings';
 	const slotTableTopic = 'admin-slots';
@@ -97,6 +94,7 @@ DVBisous ! :robot:`;
 	let slotIndex = new Map<number, TrainingSlotListItem>();
 
 	async function searchProfiles(search: string) {
+		const supabaseClient = getSupabaseBrowserClient();
 		const { data, error } = await supabaseClient
 			.from('profiles')
 			.select('id, username, avatar_url')
@@ -118,6 +116,7 @@ DVBisous ! :robot:`;
 	}
 
 	async function searchTrainings(search: string) {
+		const supabaseClient = getSupabaseBrowserClient();
 		const { data, error } = await supabaseClient
 			.from(trainingDbInfo.table)
 			.select('id, name')
@@ -137,6 +136,7 @@ DVBisous ! :robot:`;
 	}
 
 	async function loadProfiles() {
+		const supabaseClient = getSupabaseBrowserClient();
 		const { data, error: profilesError } = await supabaseClient
 			.from('profiles')
 			.select('id, username, avatar_url')
@@ -153,6 +153,7 @@ DVBisous ! :robot:`;
 	}
 
 	async function loadData() {
+		const supabaseClient = getSupabaseBrowserClient();
 		loading = true;
 		error = null;
 		try {
@@ -277,6 +278,7 @@ DVBisous ! :robot:`;
 	}
 
 	async function handleTrainingSubmit(event: Event) {
+		const supabaseClient = getSupabaseBrowserClient();
 		event.preventDefault();
 		const form = document.querySelector<HTMLFormElement>('#TrainingModal form');
 		if (!form) {
@@ -318,6 +320,7 @@ DVBisous ! :robot:`;
 	}
 
 	async function handleSlotSubmit(event: Event) {
+		const supabaseClient = getSupabaseBrowserClient();
 		event.preventDefault();
 		const form = document.querySelector<HTMLFormElement>('#SlotModal form');
 		if (!form) {
@@ -456,6 +459,7 @@ DVBisous ! :robot:`;
 		}
 		summarySending = true;
 		try {
+			const supabaseClient = getSupabaseBrowserClient();
 			const cleanText = text.trim();
 			const { error: invokeError } = await supabaseClient.functions.invoke('discord-summary', {
 				body: {

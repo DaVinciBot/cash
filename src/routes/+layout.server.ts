@@ -77,7 +77,7 @@ export const load: LayoutServerLoad = async ({ locals, cookies, url }) => {
 					'username,avatar_url,permissions, profile_global_roles!profile_global_roles_profile_fkey(role, revoked_at, global_roles(permissions)), member_of!membre_projet_profile_fkey(role, project(id, name, debut))'
 				)
 				.eq('id', user.id)
-				.single() as unknown as Promise<{ data: ProfileRow | null; error: unknown }>,
+				.single(),
 			supabase.rpc('has_permission', { p_permission: 'orders.create.all' }),
 			supabase.rpc('has_permission', { p_permission: 'orders.manage.self' }),
 			supabase.rpc('has_permission', { p_permission: 'orders.read.all' }),
@@ -91,13 +91,13 @@ export const load: LayoutServerLoad = async ({ locals, cookies, url }) => {
 		canCreateOrder = canCreate === true || canManage === true;
 
 		const { data, error } = profileResult;
-		if (!error && data) {
+		if (!error) {
 			permissions = resolveEffectivePermissions(data);
 
 			const projects: UserProject[] = data.member_of.map((m) => ({
-				id: m.project?.id ?? 0,
-				name: m.project?.name ?? '',
-				debut: m.project?.debut ?? '0000-00-00',
+				id: m.project.id,
+				name: m.project.name ?? '',
+				debut: m.project.debut ?? '0000-00-00',
 				role: m.role
 			}));
 

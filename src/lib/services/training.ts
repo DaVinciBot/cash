@@ -1,4 +1,5 @@
 import type { SupabaseClient } from '@supabase/supabase-js';
+import type { Database } from '../../database.types';
 
 export type TrainingCategory = 'code' | 'electronics' | 'robotic' | 'other' | 'software';
 
@@ -97,7 +98,7 @@ export interface UpdateRegistrationPayload {
 	feedback?: string | null;
 }
 
-export type TrainingSupabaseClient = SupabaseClient;
+export type TrainingSupabaseClient = SupabaseClient<Database>;
 
 interface RpcResult<T> {
 	data: T | null;

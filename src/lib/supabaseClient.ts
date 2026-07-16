@@ -1,4 +1,5 @@
 import { browser } from '$app/environment';
+import { resolve } from '$app/paths';
 import { env } from '$env/dynamic/public';
 import type { SupabaseClient } from '@supabase/supabase-js';
 import { createClient } from '@supabase/supabase-js';
@@ -10,7 +11,7 @@ const publicSupabaseKey = env.PUBLIC_SUPABASE_PUBLISHABLE_KEY;
 export const supabaseUrl = publicSupabaseUrl.replace(/\/$/, '');
 export const supabaseKey = publicSupabaseKey;
 
-type BrowserSupabaseClient = SupabaseClient;
+type BrowserSupabaseClient = SupabaseClient<Database>;
 
 let browserClient: BrowserSupabaseClient | null = null;
 
@@ -22,7 +23,7 @@ async function fetchAccessToken(): Promise<string | null> {
 	if (cachedToken && cachedToken.expiresAtMs - TOKEN_REFRESH_MARGIN_MS > Date.now()) {
 		return cachedToken.value;
 	}
-	pendingToken ??= fetch('/api/session/token')
+	pendingToken ??= fetch(resolve('/api/session/token'))
 		.then(async (response) => {
 			if (!response.ok) {
 				cachedToken = null;
@@ -58,14 +59,3 @@ export function getSupabaseBrowserClient(): BrowserSupabaseClient {
 
 	return browserClient;
 }
-
-/**
- * @deprecated Prefer getSupabaseBrowserClient() in browser code and event.locals.supabase on
- * the server. Kept temporarily for existing browser-only imports.
- */
-export const supabase = new Proxy({} as BrowserSupabaseClient, {
-	get(_, property: string | symbol): unknown {
-		const client = getSupabaseBrowserClient() as unknown as Record<string | symbol, unknown>;
-		return client[property];
-	}
-});

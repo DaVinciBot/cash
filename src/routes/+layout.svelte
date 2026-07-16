@@ -1,10 +1,20 @@
 <script lang="ts">
+	import { afterNavigate, replaceState } from '$app/navigation';
 	import { resolve } from '$app/paths';
-	import { userdata } from '$lib/store';
-	import { untrack, type Snippet } from 'svelte';
+	import { page } from '$app/state';
+	import { parseSettingsCategory } from '$lib/settings/categories';
+	import {
+		closeSettings,
+		openSettings,
+		settingsModal,
+		userdata,
+		type SettingsModalState
+	} from '$lib/store';
+	import { onDestroy, untrack, type Snippet } from 'svelte';
 	import type { PageData } from './$types';
 
 	import SideBar from '$lib/components/admin/SideBar.svelte';
+	import SettingsModal from '$lib/components/settings/SettingsModal.svelte';
 	import UserBadge from '$lib/components/share/UserBadge.svelte';
 	import '../app.css';
 
@@ -16,6 +26,12 @@
 
 	let open = $state(false);
 
+	let settingsState = $state<SettingsModalState | null>(null);
+	const unsubscribeSettings = settingsModal.subscribe((value) => {
+		settingsState = value;
+	});
+	onDestroy(unsubscribeSettings);
+
 	$effect(() => {
 		const profile = userProfile;
 		// untrack : les abonnés de userdata lisent/écrivent leur propre state pendant
@@ -24,6 +40,21 @@
 		untrack(() => {
 			userdata.set(profile ?? null);
 		});
+	});
+
+	// Deep-link ?settings=<cat> : ouvre le modal Paramètres puis nettoie l'URL.
+	// afterNavigate (et pas un $effect) : replaceState exige un router initialisé,
+	// et un effet sur page.url se redéclencherait après le replaceState.
+	afterNavigate(() => {
+		const raw = page.url.searchParams.get('settings');
+		if (raw === null) {
+			return;
+		}
+		openSettings(parseSettingsCategory(raw));
+		const url = new URL(window.location.href);
+		url.searchParams.delete('settings');
+		// eslint-disable-next-line svelte/no-navigation-without-resolve -- URL courante, déjà résolue
+		replaceState(url, {});
 	});
 </script>
 
@@ -134,5 +165,9 @@
 		<main class="min-h-screen p-4 pt-20 md:ml-64">
 			{@render children?.()}
 		</main>
+
+		{#if settingsState}
+			<SettingsModal initialCategory={settingsState.category} onClose={closeSettings} />
+		{/if}
 	</div>
 </div>

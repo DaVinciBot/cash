@@ -88,9 +88,6 @@
 	let selectedSlug = $state('');
 	let saveSteps = $state<StepItem[]>([]);
 
-	// Get the Supabase client
-	const supabase = getSupabaseBrowserClient();
-
 	function toSlug(t = '') {
 		return t
 			.toLowerCase()
@@ -102,6 +99,7 @@
 	}
 
 	async function ensureFolder(folderSlug: string): Promise<boolean> {
+		const supabase = getSupabaseBrowserClient();
 		// For public bucket 'articles', create a zero-byte .keep if empty
 		try {
 			const path = `${folderSlug}/.keep`;
@@ -122,6 +120,7 @@
 	const carta = new Carta({ sanitizer: (html) => html });
 
 	async function handleUpload(ev: Event) {
+		const supabase = getSupabaseBrowserClient();
 		const input = ev.target as HTMLInputElement;
 		const file = input.files?.[0];
 		if (!file) {
@@ -159,6 +158,7 @@
 	}
 
 	async function transcodeHero(): Promise<boolean> {
+		const supabase = getSupabaseBrowserClient();
 		if (!meta.heroImage) {
 			return true;
 		}
@@ -233,6 +233,7 @@
 	}
 
 	async function transcodeBodyImages(): Promise<boolean> {
+		const supabase = getSupabaseBrowserClient();
 		if (!body) {
 			return true;
 		}
@@ -314,6 +315,7 @@
 	}
 
 	async function save() {
+		const supabase = getSupabaseBrowserClient();
 		message = '';
 		if (!title.trim()) {
 			message = 'Le titre est requis';
@@ -401,6 +403,7 @@
 	});
 
 	async function loadArticles() {
+		const supabase = getSupabaseBrowserClient();
 		try {
 			loadingList = true;
 			const { data, error } = (await supabase
@@ -432,6 +435,7 @@
 	}
 
 	async function loadArticle(s: string) {
+		const supabase = getSupabaseBrowserClient();
 		try {
 			const { data, error } = (await supabase.from('blog').select('*').eq('slug', s).single()) as {
 				data: ArticleDetail | null;
@@ -473,6 +477,7 @@
 	}
 
 	async function handleCoverUpload(ev: Event) {
+		const supabase = getSupabaseBrowserClient();
 		const input = ev.target as HTMLInputElement;
 		const file = input.files?.[0];
 		if (!file) {

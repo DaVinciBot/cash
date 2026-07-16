@@ -7,11 +7,15 @@ vi.mock('$lib/supabaseClient', () => ({
 	getSupabaseBrowserClient: () => ({})
 }));
 vi.mock('$app/state', () => ({
-	page: { route: { id: '/profile' }, url: new URL('http://localhost/admin/profile/') }
+	page: { route: { id: '/' }, url: new URL('http://localhost/admin/') }
+}));
+vi.mock('$app/navigation', () => ({
+	afterNavigate: vi.fn(),
+	replaceState: vi.fn()
 }));
 
 import Layout from '../../src/routes/+layout.svelte';
-import ProfilePage from '../../src/routes/profile/+page.svelte';
+import SettingsModal from '../../src/lib/components/settings/SettingsModal.svelte';
 import { userdata } from '../../src/lib/store';
 import type { UserProfile } from '../../src/lib/types/profile';
 
@@ -39,13 +43,16 @@ describe('+layout.svelte / synchronisation du store userdata', () => {
 	it('ne boucle pas quand un abonné de userdata écrit du state pendant le $effect du layout', () => {
 		userdata.set(null);
 
-		const pageTarget = document.createElement('div');
+		const modalTarget = document.createElement('div');
 		const layoutTarget = document.createElement('div');
-		document.body.appendChild(pageTarget);
+		document.body.appendChild(modalTarget);
 		document.body.appendChild(layoutTarget);
 
-		// La page profil s'abonne à userdata et écrit son propre $state dans le callback.
-		const pageInstance = mount(ProfilePage, { target: pageTarget });
+		// Le modal Paramètres lit userdata et écrit son propre $state quand il change.
+		const modalInstance = mount(SettingsModal, {
+			target: modalTarget,
+			props: { initialCategory: null, onClose: () => undefined }
+		});
 
 		let layoutInstance: Record<string, unknown> | undefined;
 		expect(() => {
@@ -57,11 +64,11 @@ describe('+layout.svelte / synchronisation du store userdata', () => {
 			flushSync();
 		}).not.toThrow();
 
-		void unmount(pageInstance);
+		void unmount(modalInstance);
 		if (layoutInstance) {
 			void unmount(layoutInstance);
 		}
-		pageTarget.remove();
+		modalTarget.remove();
 		layoutTarget.remove();
 	});
 });
