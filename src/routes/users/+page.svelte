@@ -666,7 +666,7 @@
 		const { data, error } = (await supabase
 			.from('profiles')
 			.select(
-				'id, username, permissions, status, profile_global_roles(role, revoked_at), member_of!membre_projet_profile_fkey(role, revoked_at, project(id,name)), avatar_url'
+				'id, username, permissions, status, profile_global_roles!profile_global_roles_profile_fkey(role, revoked_at), member_of!membre_projet_profile_fkey(role, revoked_at, project(id,name)), avatar_url'
 			)
 			.eq('id', id)
 			.single()) as {
