@@ -1,3 +1,4 @@
+import { sidCookieName } from '$lib/server/authProxy';
 import { env } from '$env/dynamic/public';
 import { createClient, type SupabaseClient } from '@supabase/supabase-js';
 import { json } from '@sveltejs/kit';
@@ -70,12 +71,12 @@ export const POST = async (event: RequestEvent) => {
 	// la permission members.invite.send, puis envoie l'invitation.
 	const rawAuthBase = env.PUBLIC_AUTH_BASE_URL;
 	const authBase = rawAuthBase ? rawAuthBase.replace(/\/$/, '') : 'https://auth.davincibot.fr';
-	const sid = cookies.get('sid');
+	const sid = cookies.get(sidCookieName());
 	const response = await fetch(`${authBase}/api/invitations`, {
 		method: 'POST',
 		headers: {
 			'Content-Type': 'application/json',
-			...(sid ? { cookie: `sid=${sid}` } : {})
+			...(sid ? { cookie: `${sidCookieName()}=${sid}` } : {})
 		},
 		body: JSON.stringify({ email })
 	});
