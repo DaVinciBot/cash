@@ -259,7 +259,7 @@
 	const filters = $derived<TableFilter[]>([
 		{
 			category: 'Projets',
-			value: 'member_of.project.id',
+			value: 'member_of.project',
 			options: allProjects
 		},
 		{
