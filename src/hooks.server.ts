@@ -1,3 +1,4 @@
+import { sidCookieName } from '$lib/server/authProxy';
 import { resolve as resolveRoute } from '$app/paths';
 import { buildLoginUrl } from '$lib/config/auth';
 import { resolveSessionViaAuth } from '$lib/server/authService';
@@ -30,7 +31,7 @@ function createSessionUser({
 }
 
 const clearSessionCookie = (event: RequestEvent) => {
-	event.cookies.delete('sid', { path: '/' });
+	event.cookies.delete(sidCookieName(), { path: '/' });
 };
 
 /**
@@ -77,7 +78,7 @@ async function guardDevEnvironment(
 }
 
 export const handle: Handle = async ({ event, resolve }) => {
-	const rawSid = event.cookies.get('sid');
+	const rawSid = event.cookies.get(sidCookieName());
 	const [sessionId, sessionSecret] = rawSid ? rawSid.split('.') : [null, null];
 	let session: App.Locals['session'] = null;
 	let user: App.Locals['user'] = null;

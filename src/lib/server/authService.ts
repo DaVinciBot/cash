@@ -1,3 +1,4 @@
+import { sidCookieName } from './authProxy';
 import { env } from '$env/dynamic/public';
 
 type SessionInfo = NonNullable<App.Locals['session']>;
@@ -67,7 +68,7 @@ export const resolveSessionViaAuth = async (
 	try {
 		const response = await fetchFn(`${authBase()}/session/resolve`, {
 			method: 'POST',
-			headers: { cookie: `sid=${rawSid}` }
+			headers: { cookie: `${sidCookieName()}=${rawSid}` }
 		});
 		if (response.status === 401) {
 			return { status: 'invalid' };
