@@ -21,6 +21,8 @@ const mfaMocks = vi.hoisted(() => ({
 	fetchMfaState: vi.fn(),
 	startEmailEnrollment: vi.fn(),
 	verifyEmailEnrollment: vi.fn(),
+	startTotpEnrollment: vi.fn(),
+	verifyTotpEnrollment: vi.fn(),
 	disableMfaMethod: vi.fn(),
 	regenerateRecoveryCodes: vi.fn(),
 	stepUpChallenge: vi.fn(),

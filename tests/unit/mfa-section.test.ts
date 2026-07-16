@@ -8,6 +8,8 @@ const mocks = vi.hoisted(() => ({
 	fetchMfaState: vi.fn(),
 	startEmailEnrollment: vi.fn(),
 	verifyEmailEnrollment: vi.fn(),
+	startTotpEnrollment: vi.fn(),
+	verifyTotpEnrollment: vi.fn(),
 	disableMfaMethod: vi.fn(),
 	regenerateRecoveryCodes: vi.fn(),
 	stepUpChallenge: vi.fn(),
@@ -107,6 +109,34 @@ describe('MfaSection — sans méthode', () => {
 		await waitForSelector(target, '#mfa-enroll-code-0');
 		expect(mocks.startEmailEnrollment).toHaveBeenCalledTimes(1);
 		expect(target.querySelector('#mfa-section')?.textContent).toContain('clement@davincibot.fr');
+	});
+
+	it("l'activation TOTP ouvre le modal avec la clé et valide le code", async () => {
+		mocks.startTotpEnrollment.mockResolvedValue({
+			secret: 'ABCD2345ABCD2345',
+			otpauth_url: 'otpauth://totp/DaVinciBot:x?secret=ABCD2345ABCD2345'
+		});
+		mocks.verifyTotpEnrollment.mockResolvedValue(['DDDDD-DDDDD']);
+		const target = mountSection();
+		await waitForSelector(target, '#mfa-enable-totp');
+
+		target.querySelector<HTMLButtonElement>('#mfa-enable-totp')?.click();
+		flushSync();
+
+		await waitForSelector(target, '#totp-enroll-modal');
+		expect(target.querySelector('#totp-enroll-modal')?.textContent).toContain('ABCD2345ABCD2345');
+
+		mocks.fetchMfaState.mockResolvedValue(stateWithEmail);
+		setInputValue(target, '#totp-enroll-code-0', '123456');
+		target
+			.querySelector('#totp-enroll-code-0')
+			?.closest('form')
+			?.dispatchEvent(new Event('submit', { bubbles: true, cancelable: true }));
+		flushSync();
+
+		await waitForSelector(target, '#recovery-codes-modal');
+		expect(mocks.verifyTotpEnrollment).toHaveBeenCalledWith('123456');
+		expect(target.querySelector('#recovery-codes-modal')?.textContent).toContain('DDDDD-DDDDD');
 	});
 
 	it('la validation du code affiche les codes de récupération à la première méthode', async () => {

@@ -9,9 +9,11 @@ import {
 	fetchMfaState,
 	regenerateRecoveryCodes,
 	startEmailEnrollment,
+	startTotpEnrollment,
 	stepUpChallenge,
 	stepUpVerify,
-	verifyEmailEnrollment
+	verifyEmailEnrollment,
+	verifyTotpEnrollment
 } from '$lib/settings/mfa';
 import { ElevationRequiredError } from '$lib/settings/stepUp';
 
@@ -113,28 +115,80 @@ describe('désactivation et codes', () => {
 	});
 });
 
-describe('step-up', () => {
-	it("stepUpChallenge renvoie la méthode et l'adresse destinataire", async () => {
-		vi.stubGlobal(
-			'fetch',
-			vi
-				.fn()
-				.mockResolvedValue(
-					jsonResponse(200, { ok: true, method: 'email', email: 'clement@davincibot.fr' })
-				)
+describe('enrôlement TOTP', () => {
+	it('startTotpEnrollment renvoie le secret et l’URL otpauth', async () => {
+		const fetchMock = vi.fn().mockResolvedValue(
+			jsonResponse(200, {
+				ok: true,
+				secret: 'ABCD2345',
+				otpauth_url: 'otpauth://totp/DaVinciBot:x?secret=ABCD2345'
+			})
 		);
+		vi.stubGlobal('fetch', fetchMock);
+
+		await expect(startTotpEnrollment()).resolves.toEqual({
+			secret: 'ABCD2345',
+			otpauth_url: 'otpauth://totp/DaVinciBot:x?secret=ABCD2345'
+		});
+		expect(String(fetchMock.mock.calls[0]?.[0])).toContain('/api/account/mfa/totp/start');
+	});
+
+	it('verifyTotpEnrollment renvoie les codes de récupération à la première méthode', async () => {
+		const fetchMock = vi
+			.fn()
+			.mockResolvedValue(jsonResponse(200, { ok: true, recovery_codes: ['AAAAA-AAAAA'] }));
+		vi.stubGlobal('fetch', fetchMock);
+
+		await expect(verifyTotpEnrollment('123456')).resolves.toEqual(['AAAAA-AAAAA']);
+		const [url, init] = fetchMock.mock.calls[0] as [string, RequestInit];
+		expect(url).toContain('/api/account/mfa/totp/verify');
+		expect(init.body).toBe(JSON.stringify({ code: '123456' }));
+	});
+});
+
+describe('step-up', () => {
+	it('stepUpChallenge renvoie méthode, méthodes disponibles et adresse', async () => {
+		const fetchMock = vi.fn().mockResolvedValue(
+			jsonResponse(200, {
+				ok: true,
+				method: 'email',
+				methods: ['email'],
+				email: 'clement@davincibot.fr'
+			})
+		);
+		vi.stubGlobal('fetch', fetchMock);
 		await expect(stepUpChallenge()).resolves.toEqual({
 			method: 'email',
+			methods: ['email'],
 			email: 'clement@davincibot.fr'
 		});
+	});
+
+	it('stepUpChallenge peut demander explicitement la méthode e-mail', async () => {
+		const fetchMock = vi.fn().mockResolvedValue(
+			jsonResponse(200, {
+				ok: true,
+				method: 'email',
+				methods: ['email', 'totp'],
+				email: 'clement@davincibot.fr'
+			})
+		);
+		vi.stubGlobal('fetch', fetchMock);
+		await stepUpChallenge('email');
+		const [, init] = fetchMock.mock.calls[0] as [string, RequestInit];
+		expect(init.body).toBe(JSON.stringify({ method: 'email' }));
 	});
 
 	it('stepUpChallenge sans MFA renvoie password sans email', async () => {
 		vi.stubGlobal(
 			'fetch',
-			vi.fn().mockResolvedValue(jsonResponse(200, { ok: true, method: 'password' }))
+			vi.fn().mockResolvedValue(jsonResponse(200, { ok: true, method: 'password', methods: [] }))
 		);
-		await expect(stepUpChallenge()).resolves.toEqual({ method: 'password', email: null });
+		await expect(stepUpChallenge()).resolves.toEqual({
+			method: 'password',
+			methods: [],
+			email: null
+		});
 	});
 
 	it('stepUpVerify poste la preuve fournie', async () => {

@@ -9,6 +9,8 @@ const mocks = vi.hoisted(() => ({
 	fetchMfaState: vi.fn(),
 	startEmailEnrollment: vi.fn(),
 	verifyEmailEnrollment: vi.fn(),
+	startTotpEnrollment: vi.fn(),
+	verifyTotpEnrollment: vi.fn(),
 	disableMfaMethod: vi.fn(),
 	regenerateRecoveryCodes: vi.fn(),
 	stepUpChallenge: vi.fn(),
@@ -61,7 +63,11 @@ const submitForm = (target: HTMLElement, selector: string) => {
 
 beforeEach(() => {
 	vi.clearAllMocks();
-	mocks.stepUpChallenge.mockResolvedValue({ method: 'email', email: 'clement@davincibot.fr' });
+	mocks.stepUpChallenge.mockResolvedValue({
+		method: 'email',
+		methods: ['email'],
+		email: 'clement@davincibot.fr'
+	});
 	mocks.stepUpVerify.mockResolvedValue(undefined);
 });
 
@@ -89,22 +95,28 @@ describe('StepUpDialog', () => {
 		submitForm(target, '#step-up-code-0');
 
 		await expect(pending).resolves.toBe(true);
-		expect(mocks.stepUpVerify).toHaveBeenCalledWith({ code: '123456' });
+		expect(mocks.stepUpVerify).toHaveBeenCalledWith({ code: '123456', method: 'email' });
 		await vi.waitFor(() => {
 			flushSync();
 			expect(target.querySelector('#step-up-dialog')).toBeNull();
 		});
 	});
 
-	it('bascule vers un code de récupération', async () => {
+	it('bascule vers un code de récupération via « Utiliser une autre méthode »', async () => {
 		const target = mountDialog();
 		const pending = requestStepUp();
 		await waitForSelector(target, '#step-up-code-0');
 
-		const toggle = Array.from(
+		const other = Array.from(
 			target.querySelectorAll<HTMLButtonElement>('#step-up-dialog button')
-		).find((button) => button.textContent.includes('code de récupération'));
-		toggle?.click();
+		).find((button) => button.textContent.includes('Utiliser une autre méthode'));
+		other?.click();
+		flushSync();
+
+		const recoveryOption = Array.from(
+			target.querySelectorAll<HTMLButtonElement>('#step-up-dialog button')
+		).find((button) => button.textContent.includes('Code de récupération'));
+		recoveryOption?.click();
 		flushSync();
 
 		await waitForSelector(target, '#step-up-recovery');
@@ -115,8 +127,68 @@ describe('StepUpDialog', () => {
 		expect(mocks.stepUpVerify).toHaveBeenCalledWith({ recovery_code: 'AAAAA-BBBBB' });
 	});
 
+	it('démarre sur le TOTP sans envoi et bascule vers l’e-mail via le menu', async () => {
+		mocks.stepUpChallenge
+			.mockResolvedValueOnce({ method: 'totp', methods: ['email', 'totp'], email: null })
+			.mockResolvedValueOnce({
+				method: 'email',
+				methods: ['email', 'totp'],
+				email: 'clement@davincibot.fr'
+			});
+		const target = mountDialog();
+		const pending = requestStepUp();
+		await waitForSelector(target, '#step-up-code-0');
+		expect(target.querySelector('#step-up-dialog')?.textContent).toContain(
+			"application d'authentification"
+		);
+		expect(mocks.stepUpChallenge).toHaveBeenCalledTimes(1);
+		expect(mocks.stepUpChallenge).toHaveBeenCalledWith();
+
+		const other = Array.from(
+			target.querySelectorAll<HTMLButtonElement>('#step-up-dialog button')
+		).find((button) => button.textContent.includes('Utiliser une autre méthode'));
+		other?.click();
+		flushSync();
+		const emailOption = Array.from(
+			target.querySelectorAll<HTMLButtonElement>('#step-up-dialog button')
+		).find((button) => button.textContent.includes('Code reçu par e-mail'));
+		emailOption?.click();
+		flushSync();
+
+		await vi.waitFor(() => {
+			flushSync();
+			expect(target.querySelector('#step-up-dialog')?.textContent).toContain(
+				'clement@davincibot.fr'
+			);
+		});
+		expect(mocks.stepUpChallenge).toHaveBeenCalledTimes(2);
+		expect(mocks.stepUpChallenge).toHaveBeenLastCalledWith('email');
+
+		setInputValue(target, '#step-up-code-0', '654321');
+		submitForm(target, '#step-up-code-0');
+		await expect(pending).resolves.toBe(true);
+		expect(mocks.stepUpVerify).toHaveBeenCalledWith({ code: '654321', method: 'email' });
+	});
+
+	it('valide un code TOTP avec la bonne méthode', async () => {
+		mocks.stepUpChallenge.mockResolvedValue({
+			method: 'totp',
+			methods: ['email', 'totp'],
+			email: null
+		});
+		const target = mountDialog();
+		const pending = requestStepUp();
+		await waitForSelector(target, '#step-up-code-0');
+
+		setInputValue(target, '#step-up-code-0', '123456');
+		submitForm(target, '#step-up-code-0');
+
+		await expect(pending).resolves.toBe(true);
+		expect(mocks.stepUpVerify).toHaveBeenCalledWith({ code: '123456', method: 'totp' });
+	});
+
 	it('demande le mot de passe quand le compte est sans MFA', async () => {
-		mocks.stepUpChallenge.mockResolvedValue({ method: 'password', email: null });
+		mocks.stepUpChallenge.mockResolvedValue({ method: 'password', methods: [], email: null });
 		const target = mountDialog();
 		const pending = requestStepUp();
 		await waitForSelector(target, '#step-up-password');

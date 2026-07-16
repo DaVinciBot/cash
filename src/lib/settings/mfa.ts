@@ -16,10 +16,11 @@ export interface MfaState {
 	elevated: boolean;
 }
 
-export type StepUpMethod = 'email' | 'password';
+export type StepUpMethod = 'email' | 'totp' | 'password';
 
 export interface StepUpProof {
 	code?: string;
+	method?: 'email' | 'totp';
 	recovery_code?: string;
 	password?: string;
 }
@@ -76,6 +77,35 @@ export async function verifyEmailEnrollment(code: string): Promise<string[] | nu
 	return result.recovery_codes ?? null;
 }
 
+export interface TotpEnrollmentInfo {
+	secret: string;
+	otpauth_url: string;
+}
+
+export async function startTotpEnrollment(): Promise<TotpEnrollmentInfo> {
+	const response = await fetch(resolve('/api/account/mfa/totp/start'), { method: 'POST' });
+	if (!response.ok) {
+		return throwResponseError(response, "Une erreur est survenue lors de l'activation");
+	}
+	const result = (await response.json()) as { secret?: string; otpauth_url?: string };
+	return { secret: result.secret ?? '', otpauth_url: result.otpauth_url ?? '' };
+}
+
+// Renvoie les codes de récupération quand c'est la première méthode activée,
+// null sinon. Un 401 signifie « code faux », pas « session expirée ».
+export async function verifyTotpEnrollment(code: string): Promise<string[] | null> {
+	const response = await fetch(resolve('/api/account/mfa/totp/verify'), {
+		method: 'POST',
+		headers: { 'Content-Type': 'application/json' },
+		body: JSON.stringify({ code })
+	});
+	if (!response.ok) {
+		return throwResponseError(response, 'Code invalide', { redirectOn401: false });
+	}
+	const result = (await response.json()) as { recovery_codes?: string[] };
+	return result.recovery_codes ?? null;
+}
+
 export async function disableMfaMethod(methodId: string): Promise<void> {
 	const response = await fetch(resolve('/api/account/mfa/disable'), {
 		method: 'POST',
@@ -98,17 +128,27 @@ export async function regenerateRecoveryCodes(): Promise<string[]> {
 
 export interface StepUpChallengeInfo {
 	method: StepUpMethod;
+	methods: string[];
 	email: string | null;
 }
 
-export async function stepUpChallenge(): Promise<StepUpChallengeInfo> {
-	const response = await fetch(resolve('/api/account/step-up/challenge'), { method: 'POST' });
+export async function stepUpChallenge(method?: 'email' | 'totp'): Promise<StepUpChallengeInfo> {
+	const response = await fetch(resolve('/api/account/step-up/challenge'), {
+		method: 'POST',
+		headers: { 'Content-Type': 'application/json' },
+		body: JSON.stringify(method ? { method } : {})
+	});
 	if (!response.ok) {
 		return throwResponseError(response, "Une erreur est survenue lors de l'envoi du code");
 	}
-	const result = (await response.json()) as { method?: StepUpMethod; email?: string };
+	const result = (await response.json()) as {
+		method?: StepUpMethod;
+		methods?: string[];
+		email?: string;
+	};
 	return {
-		method: result.method === 'password' ? 'password' : 'email',
+		method: result.method === 'password' ? 'password' : result.method === 'totp' ? 'totp' : 'email',
+		methods: result.methods ?? [],
 		email: result.email ?? null
 	};
 }
