@@ -1,5 +1,6 @@
 import { resolve } from '$app/paths';
 import { redirectToLoginIfUnauthorized } from '$lib/settings/authGuard';
+import { ElevationRequiredError, isElevationRequired } from '$lib/settings/stepUp';
 
 export interface SessionInfo {
 	id: string;
@@ -22,6 +23,9 @@ export interface ConnectionInfo {
 async function throwResponseError(response: Response, fallback: string): Promise<never> {
 	redirectToLoginIfUnauthorized(response);
 	const result = (await response.json().catch(() => ({}))) as { error?: string };
+	if (isElevationRequired(response.status, result)) {
+		throw new ElevationRequiredError();
+	}
 	throw new Error(result.error ?? fallback);
 }
 
