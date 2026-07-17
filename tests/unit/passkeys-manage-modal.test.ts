@@ -89,14 +89,14 @@ afterEach(() => {
 });
 
 describe('PasskeysManageModal', () => {
-	it('liste les passkeys avec badge synchronisée', async () => {
+	it("liste les passkeys avec leur date d'ajout", async () => {
 		const target = mountModal();
 		await waitForSelector(target, '#passkey-row-pk-1');
 		const text = target.querySelector('#passkeys-manage-modal')?.textContent;
 		expect(text).toContain('MacBook du bureau');
 		expect(text).toContain('Clé USB');
-		expect(target.querySelector('#passkey-row-pk-1')?.textContent).toContain('Synchronisée');
-		expect(target.querySelector('#passkey-row-pk-2')?.textContent).not.toContain('Synchronisée');
+		expect(target.querySelector('#passkey-row-pk-1')?.textContent).not.toContain('Synchronisée');
+		expect(target.querySelector('#passkey-row-pk-1')?.textContent).not.toContain('Ajoutée le');
 	});
 
 	it('affiche un état vide sans passkey', async () => {

@@ -273,7 +273,7 @@ describe('MfaSection — erreurs', () => {
 	});
 });
 
-describe('MfaSection — passkeys', () => {
+describe('MfaSection - passkeys', () => {
 	it('propose Activer sans passkey puis enrôle via la modale de nommage', async () => {
 		passkeyMocks.registerPasskey.mockResolvedValue({
 			id: 'pk-1',
