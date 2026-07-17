@@ -75,6 +75,20 @@ describe('SettingsModal', () => {
 		cleanup();
 	});
 
+	it('bascule sur le panneau Signaler un problème au clic dans la sidebar', () => {
+		const { target, cleanup } = mountModal();
+
+		findCategoryButton(target, 'Signaler un problème').click();
+		flushSync();
+
+		expect(target.querySelector('#report-type')).not.toBeNull();
+		expect(target.querySelector('#report-title')).not.toBeNull();
+		expect(target.querySelector('#report-description')).not.toBeNull();
+		expect(target.querySelector('#username')).toBeNull();
+
+		cleanup();
+	});
+
 	it('appelle onClose sur Escape', () => {
 		const { onClose, cleanup } = mountModal();
 

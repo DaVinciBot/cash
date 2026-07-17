@@ -1,4 +1,4 @@
-export type SettingsCategory = 'profil' | 'securite';
+export type SettingsCategory = 'profil' | 'securite' | 'signalement';
 
 export interface SettingsCategoryEntry {
 	id: SettingsCategory;
@@ -9,6 +9,12 @@ export const SETTINGS_CATEGORIES: readonly SettingsCategoryEntry[] = [
 	{ id: 'profil', label: 'Profil' },
 	{ id: 'securite', label: 'Sécurité' }
 ];
+
+// hors SETTINGS_CATEGORIES : affiché à part dans la nav, pas deep-linkable
+export const REPORT_CATEGORY: SettingsCategoryEntry = {
+	id: 'signalement',
+	label: 'Signaler un problème'
+};
 
 const COMBINING_DIACRITICS = new RegExp('[\\u0300-\\u036f]', 'g');
 

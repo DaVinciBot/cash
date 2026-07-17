@@ -1015,6 +1015,15 @@ export interface Database {
 				Returns: number;
 			};
 			send_training_reminders: { Args: never; Returns: undefined };
+			submit_report: {
+				Args: {
+					p_description: string;
+					p_image_urls?: string[];
+					p_title: string;
+					p_type: string;
+				};
+				Returns: number;
+			};
 			sync_training_slot_statuses: { Args: never; Returns: undefined };
 			trainer_update_presence: {
 				Args: { p_member_id: string; p_present?: boolean; p_slot_id: number };
