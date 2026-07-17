@@ -20,15 +20,16 @@ permissions:
 jobs:
   build-and-publish:
     name: Build and Publish
-    uses: DaVinciBot/shared-workflows/.github/workflows/container.yml@v4.1.0
+    uses: DaVinciBot/shared-workflows/.github/workflows/container.yml@v5.0.0
     with:
       push: ${{ github.event_name == 'push' }}
+    secrets: inherit
 
   deploy-dev:
     name: Deploy Dev
     if: github.event_name == 'push' && github.ref == 'refs/heads/dev'
     needs: build-and-publish
-    uses: DaVinciBot/shared-workflows/.github/workflows/deploy.yml@v4.1.0
+    uses: DaVinciBot/shared-workflows/.github/workflows/deploy.yml@v5.0.0
     with:
       environment: dev
       health_url: https://dev.davincibot.fr/admin/health

@@ -1,4 +1,4 @@
-import { createConfig } from '@davincibot/eslint-config';
+import { createConfig } from '@davincibot/config/eslint';
 import { fileURLToPath } from 'node:url';
 import svelteConfig from './svelte.config.js';
 
