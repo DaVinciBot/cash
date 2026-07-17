@@ -29,6 +29,7 @@ export interface ReportInput {
 	title: string;
 	description: string;
 	images: File[];
+	anonymous?: boolean;
 }
 
 export function validateReportImage(file: File): string | null {
@@ -78,7 +79,8 @@ export async function submitReport(userId: string, input: ReportInput): Promise<
 			p_type: input.type,
 			p_title: input.title,
 			p_description: input.description,
-			p_image_urls: imageUrls
+			p_image_urls: imageUrls,
+			p_anonymous: input.anonymous ?? false
 		});
 		if (error) {
 			throw new Error("Une erreur est survenue lors de l'envoi du signalement");

@@ -1017,6 +1017,7 @@ export interface Database {
 			send_training_reminders: { Args: never; Returns: undefined };
 			submit_report: {
 				Args: {
+					p_anonymous?: boolean;
 					p_description: string;
 					p_image_urls?: string[];
 					p_title: string;
