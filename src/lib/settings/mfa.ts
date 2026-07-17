@@ -1,6 +1,7 @@
 import { resolve } from '$app/paths';
 import { redirectToLoginIfUnauthorized } from '$lib/settings/authGuard';
 import { ElevationRequiredError, isElevationRequired } from '$lib/settings/stepUp';
+import type { PublicKeyCredentialRequestOptionsJSON } from '@simplewebauthn/browser';
 
 export interface MfaMethodInfo {
 	id: string;
@@ -16,7 +17,7 @@ export interface MfaState {
 	elevated: boolean;
 }
 
-export type StepUpMethod = 'email' | 'totp' | 'password';
+export type StepUpMethod = 'email' | 'totp' | 'password' | 'webauthn';
 
 export interface StepUpProof {
 	code?: string;
@@ -25,7 +26,7 @@ export interface StepUpProof {
 	password?: string;
 }
 
-async function throwResponseError(
+export async function throwResponseError(
 	response: Response,
 	fallback: string,
 	{ redirectOn401 = true } = {}
@@ -147,7 +148,10 @@ export async function stepUpChallenge(method?: 'email' | 'totp'): Promise<StepUp
 		email?: string;
 	};
 	return {
-		method: result.method === 'password' ? 'password' : result.method === 'totp' ? 'totp' : 'email',
+		method:
+			result.method === 'password' || result.method === 'totp' || result.method === 'webauthn'
+				? result.method
+				: 'email',
 		methods: result.methods ?? [],
 		email: result.email ?? null
 	};
@@ -162,5 +166,38 @@ export async function stepUpVerify(proof: StepUpProof): Promise<void> {
 	});
 	if (!response.ok) {
 		return throwResponseError(response, 'Vérification échouée.', { redirectOn401: false });
+	}
+}
+
+// Step-up complet par passkey : challenge webauthn → navigator.credentials.get()
+// → vérification de l'assertion. La cérémonie vit ici (app hôte), pas dans le
+// composant partagé.
+export async function stepUpVerifyWebauthn(): Promise<void> {
+	const challengeResponse = await fetch(resolve('/api/account/step-up/challenge'), {
+		method: 'POST',
+		headers: { 'Content-Type': 'application/json' },
+		body: JSON.stringify({ method: 'webauthn' })
+	});
+	if (!challengeResponse.ok) {
+		return throwResponseError(challengeResponse, 'La vérification a échoué.');
+	}
+	const challenge = (await challengeResponse.json()) as {
+		method?: string;
+		options?: PublicKeyCredentialRequestOptionsJSON;
+	};
+	if (challenge.method !== 'webauthn' || !challenge.options) {
+		throw new Error('La vérification par passkey est indisponible.');
+	}
+
+	const { startAuthentication } = await import('@simplewebauthn/browser');
+	const credential = await startAuthentication({ optionsJSON: challenge.options });
+
+	const verifyResponse = await fetch(resolve('/api/account/step-up/verify'), {
+		method: 'POST',
+		headers: { 'Content-Type': 'application/json' },
+		body: JSON.stringify({ method: 'webauthn', webauthn_response: credential })
+	});
+	if (!verifyResponse.ok) {
+		return throwResponseError(verifyResponse, 'Vérification échouée.', { redirectOn401: false });
 	}
 }

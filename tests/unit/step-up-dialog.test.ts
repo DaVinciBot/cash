@@ -14,7 +14,8 @@ const mocks = vi.hoisted(() => ({
 	disableMfaMethod: vi.fn(),
 	regenerateRecoveryCodes: vi.fn(),
 	stepUpChallenge: vi.fn(),
-	stepUpVerify: vi.fn()
+	stepUpVerify: vi.fn(),
+	stepUpVerifyWebauthn: vi.fn()
 }));
 
 vi.mock('$lib/settings/mfa', () => mocks);
@@ -216,6 +217,50 @@ describe('StepUpDialog', () => {
 			);
 		});
 		expect(get(stepUpRequest)).not.toBe(null);
+	});
+
+	it('démarre sur la passkey avec tentative automatique et résout la demande', async () => {
+		mocks.stepUpChallenge.mockResolvedValue({
+			method: 'webauthn',
+			methods: ['email', 'webauthn'],
+			email: null
+		});
+		mocks.stepUpVerifyWebauthn.mockResolvedValue(undefined);
+		const target = mountDialog();
+		const pending = requestStepUp();
+
+		await expect(pending).resolves.toBe(true);
+		expect(mocks.stepUpVerifyWebauthn).toHaveBeenCalledTimes(1);
+		expect(mocks.stepUpVerify).not.toHaveBeenCalled();
+		flushSync();
+		expect(target.querySelector('#step-up-dialog')).toBeNull();
+	});
+
+	it('passkey annulée : silencieux, bouton de relance et bascule possibles', async () => {
+		mocks.stepUpChallenge.mockResolvedValue({
+			method: 'webauthn',
+			methods: ['email', 'webauthn'],
+			email: null
+		});
+		const cancelError = new Error('cancelled');
+		cancelError.name = 'NotAllowedError';
+		mocks.stepUpVerifyWebauthn.mockRejectedValueOnce(cancelError).mockResolvedValueOnce(undefined);
+
+		const target = mountDialog();
+		const pending = requestStepUp();
+		await waitForSelector(target, '#step-up-passkey');
+		// l'annulation du prompt ne s'affiche pas comme une erreur
+		expect(target.querySelector('#step-up-dialog')?.textContent).not.toContain('erreur');
+		// la bascule vers une autre méthode reste proposée
+		expect(target.querySelector('#step-up-dialog')?.textContent).toContain(
+			'Utiliser une autre méthode'
+		);
+
+		target.querySelector<HTMLButtonElement>('#step-up-passkey')?.click();
+		flushSync();
+
+		await expect(pending).resolves.toBe(true);
+		expect(mocks.stepUpVerifyWebauthn).toHaveBeenCalledTimes(2);
 	});
 
 	it("l'annulation résout false et ferme le dialogue", async () => {

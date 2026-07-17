@@ -53,6 +53,7 @@
 	"dependencies": {
 		"@lucide/svelte": "^1.17.0",
 		"@popperjs/core": "^2.11.8",
+		"@simplewebauthn/browser": "^13.3.0",
 		"@supabase/phoenix": "^0.4.4",
 		"@supabase/ssr": "^0.12.0",
 		"@supabase/supabase-js": "^2.108.2",
