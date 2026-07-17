@@ -1,6 +1,6 @@
 <script lang="ts">
-	import Stepper from '$lib/components/admin/Stepper.svelte';
-	import { getSupabaseBrowserClient, supabaseKey, supabaseUrl } from '$lib/supabaseClient';
+	import { Stepper } from '@davincibot/components';
+	import { getSupabaseBrowserClient, supabaseKey, supabaseUrl } from '@davincibot/lib/supabase';
 	import { Carta, CartaEditor } from 'carta-md';
 	import 'carta-md/default.css';
 	import { onMount } from 'svelte';

@@ -1,10 +1,10 @@
 <script lang="ts">
-	import { getSupabaseBrowserClient } from '$lib/supabaseClient';
+	import { getSupabaseBrowserClient } from '@davincibot/lib/supabase';
 	import { onMount } from 'svelte';
 
-	import type { UserData } from '$lib/store';
-	import { userdata } from '$lib/store';
-	import { loadUserdata } from '$lib/utils';
+	import type { UserData } from '@davincibot/lib';
+	import { userdata } from '@davincibot/lib';
+	import { loadUserdata } from '@davincibot/lib';
 
 	import { Bar, Pie } from 'svelte5-chartjs';
 

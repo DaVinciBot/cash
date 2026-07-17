@@ -1,6 +1,6 @@
 import { env } from '$env/dynamic/public';
 import { createClient } from '@supabase/supabase-js';
-import type { Database } from '../../database.types';
+import type { Database } from '@davincibot/database-types';
 
 const assertEnv = () => {
 	if (!env.PUBLIC_SUPABASE_URL || !env.PUBLIC_SUPABASE_PUBLISHABLE_KEY) {

@@ -1,4 +1,4 @@
-import { SessionCache } from '$lib/server/sessionCache';
+import { SessionCache } from '@davincibot/lib/server';
 import type { User } from '@supabase/supabase-js';
 
 const SESSION_CACHE_TTL_MS = 5 * 60 * 1000;

@@ -1,12 +1,12 @@
 <script lang="ts">
-	import Table from '$lib/components/admin/Table.svelte';
-	import CrudForm from '$lib/components/modals/CrudForm.svelte';
-	import SucessModal from '$lib/components/modals/InfoModal.svelte';
-	import ReadModal from '$lib/components/modals/ReadModal.svelte';
+	import { Table } from '@davincibot/components';
+	import { CrudForm } from '@davincibot/components';
+	import { InfoModal as SucessModal } from '@davincibot/components';
+	import { ReadModal } from '@davincibot/components';
 
-	import { triggerTableRefresh } from '$lib/store';
-	import { getSupabaseBrowserClient } from '$lib/supabaseClient';
-	import { mountClosable } from '$lib/utils';
+	import { triggerTableRefresh } from '@davincibot/lib';
+	import { getSupabaseBrowserClient } from '@davincibot/lib/supabase';
+	import { mountClosable } from '@davincibot/lib';
 	import { onMount, unmount } from 'svelte';
 	import { SvelteDate, SvelteMap } from 'svelte/reactivity';
 	import { Bar } from 'svelte5-chartjs';

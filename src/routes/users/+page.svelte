@@ -1,9 +1,9 @@
 <script lang="ts">
 	import { resolve } from '$app/paths';
-	import Table from '$lib/components/admin/Table.svelte';
-	import ReadDrawer from '$lib/components/drawers/ReadDrawer.svelte';
-	import SucessModal from '$lib/components/modals/InfoModal.svelte';
-	import UserImportModal from '$lib/components/modals/UserImportModal.svelte';
+	import { Table } from '@davincibot/components';
+	import { ReadDrawer } from '@davincibot/components';
+	import { InfoModal as SucessModal } from '@davincibot/components';
+	import { UserImportModal } from '@davincibot/components';
 	import {
 		GLOBAL_ROLE_LABELS_FR,
 		hasAnyPermission,
@@ -11,10 +11,10 @@
 		type GlobalPermission,
 		type GlobalRole,
 		type ProjectRole
-	} from '$lib/permissions';
-	import { userdata } from '$lib/store';
-	import { getSupabaseBrowserClient } from '$lib/supabaseClient';
-	import { mountClosable } from '$lib/utils';
+	} from '@davincibot/lib';
+	import { userdata } from '@davincibot/lib';
+	import { getSupabaseBrowserClient } from '@davincibot/lib/supabase';
+	import { mountClosable } from '@davincibot/lib';
 	import { SvelteMap } from 'svelte/reactivity';
 
 	interface AuthUser {

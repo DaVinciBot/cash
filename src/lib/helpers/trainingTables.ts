@@ -1,12 +1,12 @@
-import Badge from '$lib/components/utils/Badge.svelte';
-import { formatParisDateTimeShort } from '$lib/helpers/parisTime';
+import { Badge } from '@davincibot/components';
+import { formatParisDateTimeShort } from '@davincibot/lib';
 import { categoryOptions, statusOptions } from '$lib/helpers/trainingOptions';
 import type {
 	SlotStatus,
 	TrainingCategory,
 	TrainingListItem,
 	TrainingSlotListItem
-} from '$lib/services/training';
+} from '@davincibot/lib';
 
 export function formatSlotDate(dateString: string) {
 	return formatParisDateTimeShort(dateString);

@@ -1,4 +1,4 @@
-import type { SlotStatus } from '$lib/services/training';
+import type { SlotStatus } from '@davincibot/lib';
 
 export const categoryOptions = [
 	{ value: 'code', text: 'Code' },

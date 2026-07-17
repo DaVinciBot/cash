@@ -1,6 +1,6 @@
 import { sidCookieName } from '$lib/server/authProxy';
 import { resolve as resolveRoute } from '$app/paths';
-import { buildLoginUrl } from '$lib/config/auth';
+import { buildLoginUrl } from '@davincibot/lib';
 import { resolveSessionViaAuth } from '$lib/server/authService';
 import { sessionCache } from '$lib/server/sessionCacheInstance';
 import { createAnonClient, createUserClient } from '$lib/server/sso';

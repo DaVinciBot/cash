@@ -1,6 +1,6 @@
-import { formatParisDatetimeLocal } from '$lib/helpers/parisTime';
+import { formatParisDatetimeLocal } from '@davincibot/lib';
 import { categoryOptions, statusOptions } from '$lib/helpers/trainingOptions';
-import type { TrainingListItem, TrainingSlotListItem } from '$lib/services/training';
+import type { TrainingListItem, TrainingSlotListItem } from '@davincibot/lib';
 
 export interface SummaryFieldsConfig {
 	from: string;

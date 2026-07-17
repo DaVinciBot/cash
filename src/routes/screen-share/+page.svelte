@@ -1,7 +1,7 @@
 <script lang="ts">
-	import { hasAnyPermission, type EffectivePermission } from '$lib/permissions';
-	import { userdata } from '$lib/store';
-	import { hideOnClickOutside, loadUserdata } from '$lib/utils';
+	import { hasAnyPermission, type EffectivePermission } from '@davincibot/lib';
+	import { userdata } from '@davincibot/lib';
+	import { hideOnClickOutside, loadUserdata } from '@davincibot/lib';
 	import { onDestroy, onMount } from 'svelte';
 
 	interface ScreenShareUser {
