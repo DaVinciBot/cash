@@ -18,6 +18,15 @@ const mocks = vi.hoisted(() => ({
 
 vi.mock('$lib/settings/mfa', () => mocks);
 
+const passkeyMocks = vi.hoisted(() => ({
+	fetchPasskeys: vi.fn(),
+	registerPasskey: vi.fn(),
+	renamePasskey: vi.fn(),
+	deletePasskey: vi.fn()
+}));
+
+vi.mock('$lib/settings/passkeys', () => passkeyMocks);
+
 import MfaSection from '../../src/lib/components/settings/MfaSection.svelte';
 
 const stateWithoutMfa = {
@@ -37,6 +46,20 @@ const stateWithEmail = {
 		}
 	],
 	recovery_codes_remaining: 7,
+	has_mfa: true,
+	elevated: true
+};
+
+const stateWithPasskey = {
+	methods: [
+		{
+			id: 'method-webauthn',
+			method_type: 'webauthn',
+			created_at: '2026-07-17T08:00:00Z',
+			last_used_at: null
+		}
+	],
+	recovery_codes_remaining: 8,
 	has_mfa: true,
 	elevated: true
 };
@@ -79,6 +102,9 @@ beforeEach(() => {
 	mocks.verifyEmailEnrollment.mockResolvedValue(null);
 	mocks.disableMfaMethod.mockResolvedValue(undefined);
 	mocks.regenerateRecoveryCodes.mockResolvedValue(['AAAAA-AAAAA']);
+	passkeyMocks.fetchPasskeys.mockResolvedValue([]);
+	// jsdom n'expose pas WebAuthn : simule un navigateur compatible.
+	vi.stubGlobal('PublicKeyCredential', {});
 	vi.spyOn(window, 'confirm').mockReturnValue(true);
 	vi.spyOn(window, 'alert').mockImplementation(() => undefined);
 });
@@ -86,6 +112,7 @@ beforeEach(() => {
 afterEach(() => {
 	cleanup?.();
 	cleanup = null;
+	vi.unstubAllGlobals();
 	vi.restoreAllMocks();
 });
 
@@ -243,5 +270,42 @@ describe('MfaSection — erreurs', () => {
 		flushSync();
 
 		await waitForSelector(target, '#mfa-enable-email');
+	});
+});
+
+describe('MfaSection — passkeys', () => {
+	it('propose Activer sans passkey puis enrôle via la modale de nommage', async () => {
+		passkeyMocks.registerPasskey.mockResolvedValue({
+			id: 'pk-1',
+			recovery_codes: ['EEEEE-EEEEE']
+		});
+		const target = mountSection();
+		await waitForSelector(target, '#mfa-enable-passkey');
+
+		target.querySelector<HTMLButtonElement>('#mfa-enable-passkey')?.click();
+		flushSync();
+		await waitForSelector(target, '#passkey-name');
+
+		setInputValue(target, '#passkey-name', 'Téléphone');
+		target
+			.querySelector('#passkey-name')
+			?.closest('form')
+			?.dispatchEvent(new Event('submit', { bubbles: true, cancelable: true }));
+		flushSync();
+
+		await waitForSelector(target, '#recovery-codes-modal');
+		expect(passkeyMocks.registerPasskey).toHaveBeenCalledWith('Téléphone');
+		expect(target.querySelector('#recovery-codes-modal')?.textContent).toContain('EEEEE-EEEEE');
+	});
+
+	it('affiche Gérer avec au moins une passkey et ouvre la modale de gestion', async () => {
+		mocks.fetchMfaState.mockResolvedValue(stateWithPasskey);
+		const target = mountSection();
+		await waitForSelector(target, '#mfa-manage-passkeys');
+		expect(target.querySelector('#mfa-enable-passkey')).toBeNull();
+
+		target.querySelector<HTMLButtonElement>('#mfa-manage-passkeys')?.click();
+		flushSync();
+		await waitForSelector(target, '#passkeys-manage-modal');
 	});
 });

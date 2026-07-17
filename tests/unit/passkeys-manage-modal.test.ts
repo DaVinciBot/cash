@@ -13,7 +13,7 @@ const mocks = vi.hoisted(() => ({
 
 vi.mock('$lib/settings/passkeys', () => mocks);
 
-import PasskeysSection from '../../src/lib/components/settings/PasskeysSection.svelte';
+import PasskeysManageModal from '../../src/lib/components/modals/PasskeysManageModal.svelte';
 
 const PASSKEYS = [
 	{
@@ -35,11 +35,12 @@ const PASSKEYS = [
 ];
 
 let cleanup: (() => void) | null = null;
+const onClose = vi.fn();
 
-function mountSection() {
+function mountModal() {
 	const target = document.createElement('div');
 	document.body.appendChild(target);
-	const instance = mount(PasskeysSection, { target });
+	const instance = mount(PasskeysManageModal, { target, props: { onClose } });
 	flushSync();
 	cleanup = () => {
 		void unmount(instance);
@@ -87,29 +88,33 @@ afterEach(() => {
 	vi.restoreAllMocks();
 });
 
-describe('PasskeysSection', () => {
+describe('PasskeysManageModal', () => {
 	it('liste les passkeys avec badge synchronisée', async () => {
-		const target = mountSection();
+		const target = mountModal();
 		await waitForSelector(target, '#passkey-row-pk-1');
-		expect(target.querySelector('#passkeys-section')?.textContent).toContain('MacBook du bureau');
-		expect(target.querySelector('#passkeys-section')?.textContent).toContain('Clé USB');
+		const text = target.querySelector('#passkeys-manage-modal')?.textContent;
+		expect(text).toContain('MacBook du bureau');
+		expect(text).toContain('Clé USB');
 		expect(target.querySelector('#passkey-row-pk-1')?.textContent).toContain('Synchronisée');
 		expect(target.querySelector('#passkey-row-pk-2')?.textContent).not.toContain('Synchronisée');
 	});
 
 	it('affiche un état vide sans passkey', async () => {
 		mocks.fetchPasskeys.mockResolvedValue([]);
-		const target = mountSection();
+		const target = mountModal();
 		await vi.waitFor(() => {
 			flushSync();
-			expect(target.querySelector('#passkeys-section')?.textContent).toContain('Aucune passkey');
+			expect(target.querySelector('#passkeys-manage-modal')?.textContent).toContain(
+				'Aucune passkey'
+			);
 		});
 	});
 
-	it('ajoute une passkey via la modale de nommage et affiche les codes de récupération', async () => {
-		mocks.registerPasskey.mockResolvedValue({ id: 'pk-3', recovery_codes: ['AAAAA-BBBBB'] });
-		const target = mountSection();
-		await waitForSelector(target, '#passkey-add');
+	it('ajoute une passkey via la modale de nommage puis recharge la liste', async () => {
+		mocks.registerPasskey.mockResolvedValue({ id: 'pk-3', recovery_codes: null });
+		const target = mountModal();
+		// attend la fin du chargement : le bouton existe mais reste désactivé avant
+		await waitForSelector(target, '#passkey-row-pk-1');
 
 		target.querySelector<HTMLButtonElement>('#passkey-add')?.click();
 		flushSync();
@@ -121,21 +126,19 @@ describe('PasskeysSection', () => {
 		await vi.waitFor(() => {
 			flushSync();
 			expect(mocks.registerPasskey).toHaveBeenCalledWith('Téléphone');
-			expect(target.querySelector('#recovery-codes-modal')).not.toBeNull();
+			expect(mocks.fetchPasskeys).toHaveBeenCalledTimes(2);
 		});
-		expect(target.textContent).toContain('AAAAA-BBBBB');
 	});
 
-	it('renomme une passkey depuis sa ligne', async () => {
+	it('renomme une passkey depuis sa ligne (nom prérempli)', async () => {
 		mocks.renamePasskey.mockResolvedValue(undefined);
-		const target = mountSection();
+		const target = mountModal();
 		await waitForSelector(target, '#passkey-rename-pk-2');
 
 		target.querySelector<HTMLButtonElement>('#passkey-rename-pk-2')?.click();
 		flushSync();
 		await waitForSelector(target, '#passkey-name');
-		const input = target.querySelector<HTMLInputElement>('#passkey-name');
-		expect(input?.value).toBe('Clé USB');
+		expect(target.querySelector<HTMLInputElement>('#passkey-name')?.value).toBe('Clé USB');
 
 		setInputValue(target, '#passkey-name', 'Clé du labo');
 		submitForm(target, '#passkey-name');
@@ -146,10 +149,10 @@ describe('PasskeysSection', () => {
 		});
 	});
 
-	it('supprime une passkey après confirmation', async () => {
+	it('supprime une passkey après confirmation et recharge', async () => {
 		mocks.deletePasskey.mockResolvedValue(undefined);
 		vi.spyOn(window, 'confirm').mockReturnValue(true);
-		const target = mountSection();
+		const target = mountModal();
 		await waitForSelector(target, '#passkey-delete-pk-1');
 
 		target.querySelector<HTMLButtonElement>('#passkey-delete-pk-1')?.click();
@@ -164,12 +167,25 @@ describe('PasskeysSection', () => {
 
 	it("annule la suppression si l'utilisateur refuse la confirmation", async () => {
 		vi.spyOn(window, 'confirm').mockReturnValue(false);
-		const target = mountSection();
+		const target = mountModal();
 		await waitForSelector(target, '#passkey-delete-pk-1');
 
 		target.querySelector<HTMLButtonElement>('#passkey-delete-pk-1')?.click();
 		flushSync();
 
 		expect(mocks.deletePasskey).not.toHaveBeenCalled();
+	});
+
+	it('le bouton Fermer appelle onClose', async () => {
+		const target = mountModal();
+		await waitForSelector(target, '#passkey-row-pk-1');
+
+		const close = Array.from(
+			target.querySelectorAll<HTMLButtonElement>('#passkeys-manage-modal button')
+		).find((button) => button.textContent.includes('Fermer'));
+		close?.click();
+		flushSync();
+
+		expect(onClose).toHaveBeenCalledTimes(1);
 	});
 });
