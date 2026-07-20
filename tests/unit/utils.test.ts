@@ -13,7 +13,7 @@ import {
 	loadSettings,
 	loadUserdata,
 	saveSettings
-} from '../../src/lib/utils';
+} from '@davincibot/lib';
 
 describe('utils helpers', () => {
 	beforeEach(() => {

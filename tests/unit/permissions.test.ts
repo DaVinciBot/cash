@@ -6,7 +6,7 @@ import {
 	filterMenuByPermissions,
 	hasAnyPermission,
 	normalizePath
-} from '../../src/lib/permissions';
+} from '@davincibot/lib';
 
 describe('permissions helpers', () => {
 	it('hasAnyPermission returns true when a match exists', () => {

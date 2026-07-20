@@ -10,7 +10,7 @@ vi.mock('@davincibot/lib/supabase', () => ({
 	getSupabaseBrowserClient: () => ({ rpc: mocks.rpc })
 }));
 
-import { submitReport, type ReportInput } from '../../src/lib/settings/report';
+import { submitReport, type ReportInput } from '@davincibot/lib/settings';
 
 const baseInput: ReportInput = {
 	type: 'bug',

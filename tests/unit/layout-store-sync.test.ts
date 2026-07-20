@@ -16,8 +16,8 @@ vi.mock('$app/navigation', () => ({
 
 import Layout from '../../src/routes/+layout.svelte';
 import { SettingsModal } from '@davincibot/components';
-import { userdata } from '../../src/lib/store';
-import type { UserProfile } from '../../src/lib/types/profile';
+import { userdata } from '@davincibot/lib';
+import type { UserProfile } from '@davincibot/lib';
 
 const profile: UserProfile = {
 	email: 'alice@example.com',

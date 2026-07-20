@@ -10,7 +10,7 @@ import {
 	findTrainingName,
 	formatSlotDate
 } from '../../src/lib/helpers/trainingTables';
-import type { TrainingListItem } from '../../src/lib/services/training';
+import type { TrainingListItem } from '@davincibot/lib';
 
 describe('training table helpers', () => {
 	it('formatSlotDate uses paris short datetime formatter', () => {

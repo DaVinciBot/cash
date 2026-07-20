@@ -16,10 +16,10 @@ vi.mock('@davincibot/lib/settings', async (importOriginal) => {
 	return { ...actual, submitReport: mocks.submitReport };
 });
 
-import type * as reportModule from '../../src/lib/settings/report';
+import type * as reportModule from '@davincibot/lib/settings';
 import { ReportPanel } from '@davincibot/components';
-import { userdata } from '../../src/lib/store';
-import type { UserProfile } from '../../src/lib/types/profile';
+import { userdata } from '@davincibot/lib';
+import type { UserProfile } from '@davincibot/lib';
 
 const profile: UserProfile = {
 	email: 'alice@example.com',
