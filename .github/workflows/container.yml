@@ -20,7 +20,7 @@ permissions:
 jobs:
   build-and-publish:
     name: Build and Publish
-    uses: DaVinciBot/shared-workflows/.github/workflows/container.yml@v4.1.0
+    uses: DaVinciBot/shared-workflows/.github/workflows/container.yml@v5.0.0
     with:
       push: ${{ github.event_name == 'push' }}
 
