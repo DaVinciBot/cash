@@ -494,13 +494,11 @@
 								message: (error as Error | null)?.message ?? 'Erreur inconnue'
 							});
 							if (isNewlyCreated && createdUserId) {
-								await supabase
-									.from('profiles')
-									.update({
-										status: 'disabled',
-										status_reason: 'rollback_import_failed'
-									})
-									.eq('id', createdUserId);
+								await supabase.rpc('set_profile_status', {
+									p_profile: createdUserId,
+									p_status: 'disabled',
+									p_reason: 'rollback_import_failed'
+								});
 								try {
 									await deleteAuthUser(createdUserId);
 								} catch {
@@ -828,13 +826,11 @@
 						: [];
 
 					// update the profile (nom + override permissions)
-					const { error: profileError } = await supabase
-						.from('profiles')
-						.update({
-							username: nom,
-							permissions: extractedPermissions
-						})
-						.eq('id', id);
+					const { error: profileError } = await supabase.rpc('admin_update_profile', {
+						p_profile: id,
+						p_username: nom,
+						p_permissions: extractedPermissions
+					});
 					if (profileError) {
 						alert(
 							'Erreur lors de la mise à jour du profil : ' +

@@ -1,22 +1,20 @@
-import { env } from '$env/dynamic/public';
+import { env as privateEnv } from '$env/dynamic/private';
+import { env as publicEnv } from '$env/dynamic/public';
 import { createClient, type SupabaseClient } from '@supabase/supabase-js';
 import { json } from '@sveltejs/kit';
 import type { Database } from '../../../../../../database.types.ts';
 import type { RequestEvent } from './$types';
 
-const getAdminClient = async (locals: App.Locals): Promise<SupabaseClient<Database>> => {
-	const supabaseUrl = env.PUBLIC_SUPABASE_URL;
+const getAdminClient = (): SupabaseClient<Database> => {
+	const supabaseUrl = publicEnv.PUBLIC_SUPABASE_URL;
 	if (!supabaseUrl) {
 		throw new Error('Missing PUBLIC_SUPABASE_URL.');
 	}
-	const result = (await locals.supabase.rpc('get_service_key')) as {
-		data: string | null;
-		error: { message: string } | null;
-	};
-	if (result.error || !result.data) {
-		throw new Error(result.error?.message ?? 'Unable to fetch service key.');
+	const key = privateEnv.SUPABASE_SECRET_KEY;
+	if (!key) {
+		throw new Error('Missing SUPABASE_SECRET_KEY.');
 	}
-	return createClient(supabaseUrl, result.data, {
+	return createClient<Database>(supabaseUrl, key, {
 		auth: { persistSession: false, autoRefreshToken: false }
 	});
 };
@@ -71,7 +69,7 @@ export const POST = async (event: RequestEvent) => {
 	}
 
 	try {
-		const admin = await getAdminClient(locals);
+		const admin = getAdminClient();
 		const { data, error } = await admin.auth.admin.getUserById(userId);
 		if (error) {
 			return json({ error: error.message }, { status: 500 });

@@ -14,15 +14,11 @@ const updateProfileStatus = async (
 	userId: string,
 	status: 'active' | 'disabled'
 ) => {
-	return (await locals.supabase
-		.from('profiles')
-		.update({
-			status,
-			status_reason: status === 'disabled' ? 'disabled_by_admin' : null,
-			status_updated_at: new Date().toISOString(),
-			status_updated_by: locals.user?.id ?? null
-		})
-		.eq('id', userId)) as { data: unknown; error: { message: string } | null };
+	return (await locals.supabase.rpc('set_profile_status', {
+		p_profile: userId,
+		p_status: status,
+		p_reason: status === 'disabled' ? 'disabled_by_admin' : null
+	})) as { data: unknown; error: { message: string } | null };
 };
 
 export const DELETE = async (event: RequestEvent) => {
