@@ -2,8 +2,7 @@ import { describe, expect, it, vi } from 'vitest';
 
 import { flushSync, mount, unmount } from 'svelte';
 
-import OverlayBackdrop from '../../src/lib/components/overlay/OverlayBackdrop.svelte';
-import { overlayCount } from '../../src/lib/components/overlay/overlay-stack.svelte';
+import { OverlayBackdrop, overlayCount } from '@davincibot/components';
 
 function mountBackdrop(onClose?: (event: Event) => void) {
 	const target = document.createElement('div');

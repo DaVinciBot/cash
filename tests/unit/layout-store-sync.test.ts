@@ -15,7 +15,7 @@ vi.mock('$app/navigation', () => ({
 }));
 
 import Layout from '../../src/routes/+layout.svelte';
-import SettingsModal from '../../src/lib/components/settings/SettingsModal.svelte';
+import { SettingsModal } from '@davincibot/components';
 import { userdata } from '../../src/lib/store';
 import type { UserProfile } from '../../src/lib/types/profile';
 
