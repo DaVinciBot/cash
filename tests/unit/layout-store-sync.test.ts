@@ -3,7 +3,7 @@ import { describe, expect, it, vi } from 'vitest';
 import { flushSync, mount, unmount } from 'svelte';
 
 vi.mock('$env/dynamic/public', () => ({ env: {} }));
-vi.mock('$lib/supabaseClient', () => ({
+vi.mock('@davincibot/lib/supabase', () => ({
 	getSupabaseBrowserClient: () => ({})
 }));
 vi.mock('$app/state', () => ({

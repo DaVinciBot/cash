@@ -10,7 +10,7 @@ import {
 	revokeAllSessions,
 	revokeConnection,
 	revokeSession
-} from '$lib/settings/sessions';
+} from '@davincibot/lib/settings';
 
 const jsonResponse = (status: number, body: unknown) => ({
 	ok: status < 400,

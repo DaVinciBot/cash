@@ -3,7 +3,7 @@ import { beforeEach, describe, expect, it, vi } from 'vitest';
 import { flushSync, mount, unmount } from 'svelte';
 
 vi.mock('$env/dynamic/public', () => ({ env: {} }));
-vi.mock('$lib/supabaseClient', () => ({
+vi.mock('@davincibot/lib/supabase', () => ({
 	getSupabaseBrowserClient: () => ({})
 }));
 
@@ -70,6 +70,20 @@ describe('SettingsModal', () => {
 
 		expect(target.querySelector('#password')).not.toBeNull();
 		expect(target.querySelector('#password-confirm')).not.toBeNull();
+		expect(target.querySelector('#username')).toBeNull();
+
+		cleanup();
+	});
+
+	it('bascule sur le panneau Signaler un problème au clic dans la sidebar', () => {
+		const { target, cleanup } = mountModal();
+
+		findCategoryButton(target, 'Signaler un problème').click();
+		flushSync();
+
+		expect(target.querySelector('#report-type')).not.toBeNull();
+		expect(target.querySelector('#report-title')).not.toBeNull();
+		expect(target.querySelector('#report-description')).not.toBeNull();
 		expect(target.querySelector('#username')).toBeNull();
 
 		cleanup();

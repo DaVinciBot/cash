@@ -12,7 +12,7 @@ const mocks = vi.hoisted(() => {
 	return { updateEq, update, upload, getPublicUrl };
 });
 
-vi.mock('$lib/supabaseClient', () => ({
+vi.mock('@davincibot/lib/supabase', () => ({
 	getSupabaseBrowserClient: () => ({
 		from: () => ({ update: mocks.update }),
 		storage: {
