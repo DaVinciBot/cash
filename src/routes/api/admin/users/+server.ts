@@ -1,23 +1,21 @@
+import { env as privateEnv } from '$env/dynamic/private';
+import { env as publicEnv } from '$env/dynamic/public';
 import { sidCookieName } from '$lib/server/authProxy';
-import { env } from '$env/dynamic/public';
 import { createClient, type SupabaseClient } from '@supabase/supabase-js';
 import { json } from '@sveltejs/kit';
 import type { Database } from '@davincibot/database-types';
 import type { RequestEvent } from './$types';
 
-const getAdminClient = async (locals: App.Locals): Promise<SupabaseClient<Database>> => {
-	const supabaseUrl = env.PUBLIC_SUPABASE_URL;
+const getAdminClient = (): SupabaseClient<Database> => {
+	const supabaseUrl = publicEnv.PUBLIC_SUPABASE_URL;
 	if (!supabaseUrl) {
 		throw new Error('Missing PUBLIC_SUPABASE_URL.');
 	}
-	const { data, error } = (await locals.supabase.rpc('get_service_key')) as {
-		data: string | null;
-		error: { message: string } | null;
-	};
-	if (error || !data) {
-		throw new Error(error?.message ?? 'Unable to fetch service key.');
+	const key = privateEnv.SUPABASE_SECRET_KEY;
+	if (!key) {
+		throw new Error('Missing SUPABASE_SECRET_KEY.');
 	}
-	return createClient<Database>(supabaseUrl, data, {
+	return createClient<Database>(supabaseUrl, key, {
 		auth: { persistSession: false, autoRefreshToken: false }
 	});
 };
@@ -40,7 +38,7 @@ export const GET = async (event: RequestEvent) => {
 	const perPage = Math.min(200, Math.max(1, Number(url.searchParams.get('perPage') ?? 100)));
 
 	try {
-		const admin = await getAdminClient(locals);
+		const admin = getAdminClient();
 		const { data, error } = await admin.auth.admin.listUsers({ page, perPage });
 		if (error) {
 			return json({ error: error.message }, { status: 500 });
@@ -69,7 +67,7 @@ export const POST = async (event: RequestEvent) => {
 
 	// Délégué au service auth : il re-vérifie la session (cookie sid forwardé) et
 	// la permission members.invite.send, puis envoie l'invitation.
-	const rawAuthBase = env.PUBLIC_AUTH_BASE_URL;
+	const rawAuthBase = publicEnv.PUBLIC_AUTH_BASE_URL;
 	const authBase = rawAuthBase ? rawAuthBase.replace(/\/$/, '') : 'https://auth.davincibot.fr';
 	const sid = cookies.get(sidCookieName());
 	const response = await fetch(`${authBase}/api/invitations`, {
