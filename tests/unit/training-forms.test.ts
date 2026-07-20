@@ -1,6 +1,6 @@
 import { describe, expect, it, vi } from 'vitest';
 
-vi.mock('$lib/helpers/parisTime', () => ({
+vi.mock('@davincibot/lib', () => ({
 	formatParisDatetimeLocal: vi.fn((value: string) => `local:${value}`)
 }));
 

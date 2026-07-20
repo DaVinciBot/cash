@@ -1,5 +1,7 @@
 import { afterEach, describe, expect, it, vi } from 'vitest';
-import { SessionCache } from '$lib/server/sessionCache';
+// Test unitaire Node : le subpath server-only n'atteint aucun bundle client.
+// eslint-disable-next-line no-restricted-imports
+import { SessionCache } from '@davincibot/lib/server';
 
 const TTL = 5 * 60 * 1000;
 const STALE_MAX = 15 * 60 * 1000;

@@ -1,12 +1,12 @@
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 
-vi.mock('$lib/store', () => ({
+vi.mock('@davincibot/lib', () => ({
 	userdata: {
 		set: vi.fn()
 	}
 }));
 
-import { userdata } from '$lib/store';
+import { userdata } from '@davincibot/lib';
 import {
 	hashCode,
 	hideOnClickOutside,
