@@ -49,9 +49,9 @@
 	},
 	"_note": "don't update prettier-plugin-svelte to 4.x until a compatible version of Prettier is released",
 	"dependencies": {
-		"@davincibot/components": "^1.0.0",
-		"@davincibot/database-types": "^1.1.0",
-		"@davincibot/lib": "^1.3.0",
+		"@davincibot/components": "^3.0.1",
+		"@davincibot/database-types": "^2.0.0",
+		"@davincibot/lib": "^1.4.1",
 		"@lucide/svelte": "^1.17.0",
 		"@popperjs/core": "^2.11.8",
 		"@simplewebauthn/browser": "^13.3.0",
