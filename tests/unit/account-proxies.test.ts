@@ -8,7 +8,7 @@ vi.mock('$env/dynamic/public', () => ({
 	}
 }));
 
-const { forwardToAuth } = await import('@davincibot/lib/server');
+const { forwardToAuth } = await import('$lib/server/authProxy');
 const { sessionCache } = await import('$lib/server/sessionCacheInstance');
 const { GET: getSessions } = await import('../../src/routes/api/account/sessions/+server');
 const { POST: revokeSession } =
