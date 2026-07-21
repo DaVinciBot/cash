@@ -1,4 +1,4 @@
-import { forwardToAuth } from '$lib/server/authProxy';
+import { forwardToAuth } from '@davincibot/lib/server';
 import { sessionCache } from '$lib/server/sessionCacheInstance';
 import { json } from '@sveltejs/kit';
 import type { RequestHandler } from './$types';

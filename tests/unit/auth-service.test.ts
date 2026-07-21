@@ -8,7 +8,7 @@ vi.mock('$env/dynamic/public', () => ({
 	}
 }));
 
-const { resolveSessionViaAuth } = await import('$lib/server/authService');
+const { resolveSessionViaAuth } = await import('@davincibot/lib/server');
 
 const validPayload = {
 	ok: true,

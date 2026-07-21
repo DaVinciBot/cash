@@ -1,9 +1,7 @@
-import { sidCookieName } from '$lib/server/authProxy';
+import { createAnonClient, createUserClient, resolveSessionViaAuth, sidCookieName } from '@davincibot/lib/server';
 import { resolve as resolveRoute } from '$app/paths';
 import { buildLoginUrl } from '@davincibot/lib';
-import { resolveSessionViaAuth } from '$lib/server/authService';
 import { sessionCache } from '$lib/server/sessionCacheInstance';
-import { createAnonClient, createUserClient } from '$lib/server/sso';
 import type { User } from '@supabase/supabase-js';
 import { error, redirect, type Handle, type RequestEvent } from '@sveltejs/kit';
 
