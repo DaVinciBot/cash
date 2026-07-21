@@ -1,9 +1,9 @@
 <script lang="ts">
 	import { CrudForm } from '@davincibot/components';
 	import { Spinner } from '@davincibot/components';
-	import { AdminHeader } from '@davincibot/components';
-	import { AdminSlotSection } from '@davincibot/components';
-	import { AdminTrainingSection } from '@davincibot/components';
+	import AdminHeader from '$lib/components/training/admin/AdminHeader.svelte';
+	import AdminSlotSection from '$lib/components/training/admin/AdminSlotSection.svelte';
+	import AdminTrainingSection from '$lib/components/training/admin/AdminTrainingSection.svelte';
 	import { CTAButton } from '@davincibot/components';
 	import { getParisDateKey, parseParisDatetimeLocal } from '@davincibot/lib';
 	import {
