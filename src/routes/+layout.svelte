@@ -14,8 +14,8 @@
 	import type { PageData } from './$types';
 
 	import { SideBar } from '@davincibot/components';
-	import { SettingsModal } from '@davincibot/components';
-	import { UserBadge } from '@davincibot/components';
+	import SettingsModal from '$lib/components/settings/SettingsModal.svelte';
+	import UserBadge from '$lib/components/share/UserBadge.svelte';
 	import '../app.css';
 
 	const { data, children }: { data: PageData; children?: Snippet } = $props();

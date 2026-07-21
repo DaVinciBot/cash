@@ -1,8 +1,8 @@
 <script lang="ts">
 	import { Table } from '@davincibot/components';
-	import { CrudForm } from '@davincibot/components';
-	import { InfoModal as SucessModal } from '@davincibot/components';
-	import { ReadModal } from '@davincibot/components';
+	import CrudForm from '$lib/components/modals/CrudForm.svelte';
+	import SucessModal from '$lib/components/modals/InfoModal.svelte';
+	import ReadModal from '$lib/components/modals/ReadModal.svelte';
 
 	import { triggerTableRefresh } from '@davincibot/lib';
 	import { getSupabaseBrowserClient } from '@davincibot/lib/supabase';

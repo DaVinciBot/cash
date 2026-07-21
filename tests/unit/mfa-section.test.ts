@@ -27,7 +27,7 @@ const passkeyMocks = vi.hoisted(() => ({
 // un seul vi.mock, sinon le second écraserait le premier.
 vi.mock('@davincibot/lib/settings', () => ({ ...mocks, ...passkeyMocks }));
 
-import { MfaSection } from '@davincibot/components';
+import MfaSection from '$lib/components/settings/MfaSection.svelte';
 
 const stateWithoutMfa = {
 	methods: [],

@@ -7,7 +7,7 @@
 	import type { ItemRow, OrderRow } from '@davincibot/database-types';
 
 	import { Table } from '@davincibot/components';
-	import { ReadDrawer } from '@davincibot/components';
+	import ReadDrawer from '$lib/components/drawers/ReadDrawer.svelte';
 
 	let skip = false;
 	let user = $state<UserData>(null);

@@ -1,5 +1,5 @@
 <script lang="ts">
-	import { CrudForm } from '@davincibot/components';
+	import CrudForm from '$lib/components/modals/CrudForm.svelte';
 	import { Spinner } from '@davincibot/components';
 	import AdminHeader from '$lib/components/training/admin/AdminHeader.svelte';
 	import AdminSlotSection from '$lib/components/training/admin/AdminSlotSection.svelte';

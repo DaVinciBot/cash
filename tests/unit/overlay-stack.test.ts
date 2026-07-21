@@ -1,9 +1,6 @@
 import { describe, expect, it } from 'vitest';
 
-import {
-	overlayCount,
-	registerOverlay
-} from '@davincibot/components';
+import { overlayCount, registerOverlay } from '@davincibot/components';
 
 describe('overlay-stack', () => {
 	it('le premier overlay enregistré est au sommet', () => {

@@ -1,12 +1,5 @@
 <script lang="ts">
-	import {
-		CTAButton,
-		Table,
-		type Action,
-		type DBInfo,
-		type Filter,
-		type ParseItems
-	} from '@davincibot/components';
+	import { CTAButton, Table, type Action, type DBInfo, type Filter, type ParseItems } from '@davincibot/components';
 	import type { TrainingListItem } from '@davincibot/lib';
 
 	const noop = () => undefined;

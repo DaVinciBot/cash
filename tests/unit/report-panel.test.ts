@@ -17,7 +17,7 @@ vi.mock('@davincibot/lib/settings', async (importOriginal) => {
 });
 
 import type * as reportModule from '@davincibot/lib/settings';
-import { ReportPanel } from '@davincibot/components';
+import ReportPanel from '$lib/components/settings/ReportPanel.svelte';
 import { userdata } from '@davincibot/lib';
 import type { UserProfile } from '@davincibot/lib';
 

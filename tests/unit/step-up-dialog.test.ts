@@ -20,7 +20,7 @@ const mocks = vi.hoisted(() => ({
 
 vi.mock('@davincibot/lib/settings', () => mocks);
 
-import { StepUpDialog } from '@davincibot/components';
+import StepUpDialog from '$lib/components/settings/StepUpDialog.svelte';
 import { requestStepUp, stepUpRequest } from '@davincibot/lib/settings';
 
 let cleanup: (() => void) | null = null;

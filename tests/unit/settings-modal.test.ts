@@ -7,7 +7,7 @@ vi.mock('@davincibot/lib/supabase', () => ({
 	getSupabaseBrowserClient: () => ({})
 }));
 
-import { SettingsModal } from '@davincibot/components';
+import SettingsModal from '$lib/components/settings/SettingsModal.svelte';
 import type { SettingsCategory } from '@davincibot/lib/settings';
 import { userdata } from '@davincibot/lib';
 import type { UserProfile } from '@davincibot/lib';

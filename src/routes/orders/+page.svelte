@@ -7,8 +7,8 @@
 	import { onMount } from 'svelte';
 
 	import { Table } from '@davincibot/components';
-	import { ReadDrawer } from '@davincibot/components';
-	import { CrudForm } from '@davincibot/components';
+	import ReadDrawer from '$lib/components/drawers/ReadDrawer.svelte';
+	import CrudForm from '$lib/components/modals/CrudForm.svelte';
 
 	interface OrderRow {
 		id: number;

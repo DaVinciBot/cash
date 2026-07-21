@@ -31,7 +31,7 @@ const mfaMocks = vi.hoisted(() => ({
 // un seul vi.mock, sinon le second écraserait le premier.
 vi.mock('@davincibot/lib/settings', () => ({ ...mocks, ...mfaMocks }));
 
-import { SecurityPanel } from '@davincibot/components';
+import SecurityPanel from '$lib/components/settings/SecurityPanel.svelte';
 
 // La session courante est volontairement en dernier : le composant doit la remonter en tête.
 const sessions = [

@@ -13,7 +13,7 @@ const mocks = vi.hoisted(() => ({
 
 vi.mock('@davincibot/lib/settings', () => mocks);
 
-import { PasskeysManageModal } from '@davincibot/components';
+import PasskeysManageModal from '$lib/components/modals/PasskeysManageModal.svelte';
 
 const PASSKEYS = [
 	{

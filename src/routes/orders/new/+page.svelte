@@ -4,7 +4,7 @@
 	import { userdata } from '@davincibot/lib';
 	import { getSupabaseBrowserClient } from '@davincibot/lib/supabase';
 
-	import { InfoModal } from '@davincibot/components';
+	import InfoModal from '$lib/components/modals/InfoModal.svelte';
 	import { mountClosable } from '@davincibot/lib';
 
 	interface ItemEntry {

@@ -1,8 +1,8 @@
 <script lang="ts">
 	import { resolve } from '$app/paths';
 	import { Table } from '@davincibot/components';
-	import { ReadDrawer } from '@davincibot/components';
-	import { InfoModal as SucessModal } from '@davincibot/components';
+	import ReadDrawer from '$lib/components/drawers/ReadDrawer.svelte';
+	import SucessModal from '$lib/components/modals/InfoModal.svelte';
 	import { UserImportModal } from '@davincibot/components';
 	import {
 		GLOBAL_ROLE_LABELS_FR,
