@@ -1,4 +1,9 @@
-import { createAnonClient, createUserClient, resolveSessionViaAuth, sidCookieName } from '@davincibot/lib/server';
+import {
+	createAnonClient,
+	createUserClient,
+	resolveSessionViaAuth,
+	sidCookieName
+} from '@davincibot/lib/server';
 import { resolve as resolveRoute } from '$app/paths';
 import { buildLoginUrl } from '@davincibot/lib';
 import { sessionCache } from '$lib/server/sessionCacheInstance';

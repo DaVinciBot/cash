@@ -1,7 +1,8 @@
 <script lang="ts">
 	import { OverlayBackdrop } from '@davincibot/components';
 	import {
-		logOut, REPORT_CATEGORY,
+		logOut,
+		REPORT_CATEGORY,
 		SETTINGS_CATEGORIES,
 		type SettingsCategory
 	} from '@davincibot/lib/settings';

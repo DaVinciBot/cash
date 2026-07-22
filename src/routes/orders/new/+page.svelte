@@ -231,8 +231,7 @@
 					name="comment"
 					id="comment"
 					class=" focus:ring-primary-500 focus:border-primary-500 block w-full rounded-lg border border-gray-600 bg-gray-700 p-2.5 text-sm text-white placeholder-gray-400"
-					placeholder="Commentaire"
-				></textarea>
+					placeholder="Commentaire"></textarea>
 			</div>
 			<div class="col-span-2">
 				<label for="tags">Tags</label>

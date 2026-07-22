@@ -637,8 +637,7 @@
 					id="excerpt"
 					rows="3"
 					class="w-full rounded border border-gray-700 bg-gray-900 px-3 py-2"
-					bind:value={meta.excerpt}
-				></textarea>
+					bind:value={meta.excerpt}></textarea>
 			</div>
 			<div>
 				<label class="mb-1 block text-sm" for="tags"

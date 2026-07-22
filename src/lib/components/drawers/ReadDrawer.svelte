@@ -639,8 +639,7 @@
 									placeholder={field.placeholder ?? field.name.toLowerCase()}
 									required={field.required}
 									value={stringValue(field.value)}
-									readonly={field.readonly ?? false}
-								></textarea>
+									readonly={field.readonly ?? false}></textarea>
 							{:else if field.type === 'img'}
 								<input
 									type="file"

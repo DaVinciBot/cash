@@ -162,8 +162,7 @@
 				placeholder="Ce qui s'est passé, ce qui était attendu…"
 				class="border-light-blue/30 bg-dark-blue/60 text-light-blue placeholder:text-dark-light-blue/50 focus:border-light-blue/70 block w-full resize-y rounded-xl border p-2.5 text-sm focus:outline-none disabled:opacity-50"
 				disabled={submitting}
-				bind:value={description}
-			></textarea>
+				bind:value={description}></textarea>
 		</div>
 
 		<div>
