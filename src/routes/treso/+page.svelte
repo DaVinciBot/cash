@@ -1,12 +1,11 @@
 <script lang="ts">
-	import { Table } from '@davincibot/components';
 	import CrudForm from '$lib/components/modals/CrudForm.svelte';
 	import SucessModal from '$lib/components/modals/InfoModal.svelte';
 	import ReadModal from '$lib/components/modals/ReadModal.svelte';
+	import { Table } from '@davincibot/components';
 
-	import { triggerTableRefresh } from '@davincibot/lib';
+	import { mountClosable, triggerTableRefresh } from '@davincibot/lib';
 	import { getSupabaseBrowserClient } from '@davincibot/lib/supabase';
-	import { mountClosable } from '@davincibot/lib';
 	import { onMount, unmount } from 'svelte';
 	import { SvelteDate, SvelteMap } from 'svelte/reactivity';
 	import { Bar } from 'svelte5-chartjs';
@@ -415,18 +414,20 @@
 		if (!row) {
 			return;
 		}
-		const id = row.querySelector('th')?.dataset.utils;
+		const id = Number(row.querySelector('th')?.dataset.utils ?? NaN);
+		if (Number.isNaN(id)) {
+			return;
+		}
 		const thirdCellEl = row.querySelector('td:nth-child(3)');
 		const thirdCell = thirdCellEl instanceof HTMLElement ? thirdCellEl : null;
 		const [current_uid, current_avatar] = (thirdCell?.dataset.utils ?? '+').split('+');
 		const current_name = thirdCell?.innerText ?? '';
 
 		const supabase = getSupabaseBrowserClient();
-		const { data, error } = (await supabase
-			.from('spending')
-			.select('*')
-			.eq('id', id ?? '')
-			.single()) as { data: SpendingDetail | null; error: unknown };
+		const { data, error } = (await supabase.from('spending').select('*').eq('id', id).single()) as {
+			data: SpendingDetail | null;
+			error: unknown;
+		};
 		if (error || !data) {
 			return;
 		}
@@ -548,10 +549,11 @@
 					);
 					let editAuthorUid = '';
 					let editJustificatifFiles: File[] = [];
-					let editAmount: FormDataEntryValue | null = null;
-					let editDate: FormDataEntryValue | null = null;
-					let editIsPositive: FormDataEntryValue | null = null;
-					let editDescription: FormDataEntryValue | null = null;
+					// Les valeurs de FormData sont des strings : typer selon les colonnes.
+					let editAmount: number | null = null;
+					let editDate: string | null = null;
+					let editIsPositive: boolean | null = null;
+					let editDescription: string | null = null;
 					for (const [key, value] of form_data.entries()) {
 						if (key.startsWith('author')) {
 							const label = document.querySelector('label[for="author"]');
@@ -568,15 +570,19 @@
 								files.pop();
 							}
 							editJustificatifFiles = files;
-						} else if (key === 'amount') {
-							editAmount = value;
-						} else if (key === 'date') {
+						} else if (key === 'amount' && typeof value === 'string') {
+							editAmount = parseFloat(value);
+						} else if (key === 'date' && typeof value === 'string') {
 							editDate = value;
-						} else if (key === 'is_positive') {
-							editIsPositive = value;
-						} else if (key === 'description') {
+						} else if (key === 'is_positive' && typeof value === 'string') {
+							editIsPositive = value === 'true';
+						} else if (key === 'description' && typeof value === 'string') {
 							editDescription = value;
 						}
+					}
+					if (editAmount === null || Number.isNaN(editAmount) || editIsPositive === null) {
+						alert('Veuillez remplir correctement tous les champs.');
+						return;
 					}
 
 					// update spending
@@ -590,7 +596,7 @@
 							description: editDescription,
 							author: editAuthorUid
 						})
-						.eq('id', id ?? '')
+						.eq('id', id)
 						.select('id')
 						.single()) as { data: { id: number } | null; error: unknown };
 					if (updateError) {
@@ -708,7 +714,10 @@
 			handler: async (e: Event) => {
 				// get the info from the order
 				const target = e.target as HTMLElement;
-				const id = target.closest('tr')?.querySelector('th')?.dataset.utils;
+				const id = Number(target.closest('tr')?.querySelector('th')?.dataset.utils ?? NaN);
+				if (Number.isNaN(id)) {
+					return;
+				}
 
 				const supabase = getSupabaseBrowserClient();
 				const { data, error } = (await supabase
@@ -716,7 +725,7 @@
 					.select(
 						'id, description, author(username, id), amount, is_positive, date, order_id(id, comment, requestedBy(username), projectId(name), status, tags), bank_id(name)'
 					)
-					.eq('id', id ?? '')
+					.eq('id', id)
 					.single()) as { data: SpendingDetail | null; error: unknown };
 
 				if (error || !data) {

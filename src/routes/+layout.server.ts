@@ -1,14 +1,14 @@
-import { buildLoginUrl } from '@davincibot/lib';
+import type { ProjectRow } from '@davincibot/database-types';
+import type { UserProfile, UserProject } from '@davincibot/lib';
 import {
 	ADMIN_MENU,
+	buildLoginUrl,
 	canAccessAdminPath,
 	filterMenuByPermissions,
 	type EffectivePermission,
 	type GlobalPermission
 } from '@davincibot/lib';
-import type { UserProfile, UserProject } from '@davincibot/lib';
 import { redirect } from '@sveltejs/kit';
-import type { ProjectRow } from '@davincibot/database-types';
 import type { LayoutServerLoad } from './$types';
 
 interface ProfileRow {
@@ -24,7 +24,7 @@ interface ProfileRow {
 		role: string;
 		project: {
 			id: number;
-			name: string;
+			name: string | null;
 			debut: string | null;
 		} | null;
 	}[];

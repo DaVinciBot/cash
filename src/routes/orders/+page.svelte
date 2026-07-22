@@ -1,14 +1,19 @@
 <script lang="ts">
-	import { hasAnyPermission } from '@davincibot/lib';
+	import type { Enums } from '@davincibot/database-types';
 	import type { UserData } from '@davincibot/lib';
-	import { userdata } from '@davincibot/lib';
+	import {
+		hasAnyPermission,
+		loadUserdata,
+		mountClosable,
+		statusText,
+		userdata
+	} from '@davincibot/lib';
 	import { getSupabaseBrowserClient } from '@davincibot/lib/supabase';
-	import { loadUserdata, mountClosable, statusText } from '@davincibot/lib';
 	import { onMount } from 'svelte';
 
-	import { Table } from '@davincibot/components';
 	import ReadDrawer from '$lib/components/drawers/ReadDrawer.svelte';
 	import CrudForm from '$lib/components/modals/CrudForm.svelte';
+	import { Table } from '@davincibot/components';
 
 	interface OrderRow {
 		id: number;
@@ -166,7 +171,11 @@
 			type: 'view',
 			handler: async (e: Event) => {
 				const target = e.target as HTMLElement;
-				const id = target.closest('tr')?.querySelector('th')?.dataset.utils;
+				// L'id de commande transite en string via le dataset : colonne numérique.
+				const id = Number(target.closest('tr')?.querySelector('th')?.dataset.utils ?? NaN);
+				if (Number.isNaN(id)) {
+					return;
+				}
 
 				const supabase = getSupabaseBrowserClient();
 				const { data, error } = (await supabase
@@ -174,7 +183,7 @@
 					.select(
 						'id, creationDate, projectId, status, status_reason, lastUpdate, items(*), comment, tags, requestedBy(id, username), price, name'
 					)
-					.eq('id', id ?? '')
+					.eq('id', id)
 					.single()) as { data: OrderDetail | null; error: unknown };
 
 				if (error || !data) {
@@ -349,7 +358,7 @@
 				let custom_actions: unknown[] = [];
 
 				if (canEditOrders) {
-					const lifecycleTransitions: { value: string; name: string }[] = [];
+					const lifecycleTransitions: { value: Enums<'order_status'>; name: string }[] = [];
 					if (data.status === 'pending_cdp') {
 						lifecycleTransitions.push({ value: 'pending_treso', name: 'Passer en revue Tréso' });
 					}
@@ -369,7 +378,7 @@
 								title: lifecycleTransitions,
 								type: 'selector',
 								handler: async (e: Event) => {
-									const new_status = (e.target as HTMLSelectElement).value;
+									const new_status = (e.target as HTMLSelectElement).value as Enums<'order_status'>;
 									const finalPrice = price;
 
 									if (new_status === 'pending_delivery') {
@@ -448,7 +457,7 @@
 															price: finalP,
 															status_reason: null
 														})
-														.eq('id', id ?? '');
+														.eq('id', id);
 													if (updErr) {
 														alert(`Échec de la mise à jour de la commande: ${updErr.message}`);
 														return;
@@ -486,7 +495,7 @@
 											price: parseFloat(finalPrice),
 											status_reason: null
 										})
-										.eq('id', id ?? '');
+										.eq('id', id);
 
 									if (updErr2) {
 										alert(`Échec de la mise à jour de la commande: ${updErr2.message}`);
@@ -509,7 +518,7 @@
 								const { error: updErr } = await supabase2
 									.from('orders')
 									.update({ status: new_status, status_reason: null })
-									.eq('id', id ?? '');
+									.eq('id', id);
 
 								if (updErr) {
 									alert(`Échec de la mise à jour de la commande: ${updErr.message}`);
@@ -525,7 +534,7 @@
 				const updates = (await supabase2
 					.from('updates')
 					.select('id, message, date, author(username), type')
-					.eq('order_id', id ?? '')
+					.eq('order_id', id)
 					.order('date', { ascending: false })) as { data: UpdateRow[] | null; error: unknown };
 
 				if (updates.error || !updates.data) {
@@ -600,7 +609,7 @@
 											title: 'Refuser',
 											type: 'delete',
 											handler: async (_e: MouseEvent) => {
-												let new_status: string | null = null;
+												let new_status: Enums<'order_status'> | null = null;
 												if (data.status === 'pending_cdp') {
 													new_status = 'refused_cdp';
 												} else if (data.status === 'pending_treso') {
@@ -631,7 +640,7 @@
 												const { error: refuseErr } = await supabase3
 													.from('orders')
 													.update({ status: new_status, status_reason: reason })
-													.eq('id', id ?? '');
+													.eq('id', id);
 
 												if (refuseErr) {
 													alert(`Échec du changement de statut: ${refuseErr.message}`);

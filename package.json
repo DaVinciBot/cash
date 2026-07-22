@@ -49,7 +49,7 @@
 	},
 	"dependencies": {
 		"@davincibot/components": "^3.0.1",
-		"@davincibot/database-types": "^2.0.0",
+		"@davincibot/database-types": "^2.0.1",
 		"@davincibot/lib": "^1.4.1",
 		"@lucide/svelte": "^1.17.0",
 		"@popperjs/core": "^2.11.8",

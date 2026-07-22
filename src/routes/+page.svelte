@@ -1,13 +1,12 @@
 <script lang="ts">
-	import type { UserData } from '@davincibot/lib';
-	import { userdata } from '@davincibot/lib';
-	import { getSupabaseBrowserClient } from '@davincibot/lib/supabase';
-	import { loadUserdata, mountClosable, statusText } from '@davincibot/lib';
-	import { onMount } from 'svelte';
 	import type { ItemRow, OrderRow } from '@davincibot/database-types';
+	import type { UserData } from '@davincibot/lib';
+	import { loadUserdata, mountClosable, statusText, userdata } from '@davincibot/lib';
+	import { getSupabaseBrowserClient } from '@davincibot/lib/supabase';
+	import { onMount } from 'svelte';
 
-	import { Table } from '@davincibot/components';
 	import ReadDrawer from '$lib/components/drawers/ReadDrawer.svelte';
+	import { Table } from '@davincibot/components';
 
 	let skip = false;
 	let user = $state<UserData>(null);
@@ -83,7 +82,10 @@
 			type: 'view',
 			handler: async (e: Event) => {
 				const target = e.target as HTMLElement;
-				const id = target.closest('tr')?.querySelector('th')?.dataset.utils;
+				const id = Number(target.closest('tr')?.querySelector('th')?.dataset.utils ?? NaN);
+				if (Number.isNaN(id)) {
+					return;
+				}
 
 				const supabase = getSupabaseBrowserClient();
 				const { data, error } = (await supabase
@@ -91,7 +93,7 @@
 					.select(
 						'id, creationDate, projectId, status, status_reason, lastUpdate, items(*), comment, price, name'
 					)
-					.eq('id', id ?? '')
+					.eq('id', id)
 					.single()) as { data: OrderDetail | null; error: unknown };
 
 				if (error || !data) {
@@ -171,7 +173,7 @@
 				const updates = (await supabase
 					.from('updates')
 					.select('id, message, date, author(username), type')
-					.eq('order_id', id ?? '')
+					.eq('order_id', id)
 					.order('date', { ascending: false })) as { data: UpdateRow[] | null; error: unknown };
 
 				if (updates.error || !updates.data) {
@@ -228,7 +230,7 @@
 									const { data: cancelData, error: cancelError } = (await supabaseClient
 										.from('orders')
 										.update({ status: 'canceled_user', status_reason: reason })
-										.eq('id', id ?? '')
+										.eq('id', id)
 										.select()
 										.single()) as { data: OrderRow | null; error: unknown };
 									if (cancelError) {

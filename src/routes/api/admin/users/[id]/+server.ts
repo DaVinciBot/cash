@@ -17,7 +17,7 @@ const updateProfileStatus = async (
 	return (await locals.supabase.rpc('set_profile_status', {
 		p_profile: userId,
 		p_status: status,
-		p_reason: status === 'disabled' ? 'disabled_by_admin' : null
+		p_reason: status === 'disabled' ? 'disabled_by_admin' : undefined
 	})) as { data: unknown; error: { message: string } | null };
 };
 

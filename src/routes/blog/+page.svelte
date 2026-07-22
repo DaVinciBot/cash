@@ -1,5 +1,6 @@
 <script lang="ts">
 	import { Stepper } from '@davincibot/components';
+	import type { Enums, Json } from '@davincibot/database-types';
 	import { getSupabaseBrowserClient, supabaseKey, supabaseUrl } from '@davincibot/lib/supabase';
 	import { Carta, CartaEditor } from 'carta-md';
 	import 'carta-md/default.css';
@@ -49,7 +50,7 @@
 		title: string | null;
 		slug: string | null;
 		body: string | null;
-		state: string | null;
+		state: Enums<'blog_state'> | null;
 		data: MetaData | null;
 	}
 
@@ -74,7 +75,7 @@
 	let title = $state('');
 	let slug = $state('');
 	let body = $state('');
-	let articleState: string = $state('draft');
+	let articleState: Enums<'blog_state'> = $state('draft');
 	let meta = $state<MetaData>({
 		excerpt: '',
 		heroImage: '',
@@ -377,7 +378,7 @@
 				slug,
 				body,
 				state: articleState,
-				data: meta
+				data: meta as unknown as Json
 			};
 			// upsert by primary key (slug)
 			const { error } = await supabase.from('blog').upsert(row).select('slug').single();

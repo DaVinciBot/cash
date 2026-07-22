@@ -3,8 +3,7 @@
 	import { onMount } from 'svelte';
 
 	import type { UserData } from '@davincibot/lib';
-	import { userdata } from '@davincibot/lib';
-	import { loadUserdata } from '@davincibot/lib';
+	import { loadUserdata, userdata } from '@davincibot/lib';
 
 	import { Bar, Pie } from 'svelte5-chartjs';
 
@@ -168,13 +167,15 @@
 		if (selectedProjectId === 0) {
 			project.budget = { budget: 0, year: String(year), current: null, cost: 0 };
 		}
-		if (!project.budget) {
+		if (selectedProjectId === undefined || !project.budget) {
 			return;
 		}
+		// Les RPC attendent l'année en numérique ; elle circule en string côté UI.
+		const rpcYear = Number(selectedYear ?? project.budget.year ?? year);
 		const supabase = getSupabaseBrowserClient();
 		const { data: costData, error: costErr } = (await supabase.rpc('get_project_cost', {
 			projectid: selectedProjectId,
-			year: selectedYear ?? project.budget.year
+			year: rpcYear
 		})) as { data: number | null; error: unknown };
 		if (costErr) {
 			return;
@@ -184,7 +185,7 @@
 		// Fetch aggregated stats in one call (try with year, fallback without)
 		let statsResult = (await supabase.rpc('get_project_stats', {
 			projectid: selectedProjectId,
-			year: selectedYear ?? project.budget.year
+			year: rpcYear
 		})) as { data: StatsData | null; error: unknown };
 		if (statsResult.error) {
 			statsResult = (await supabase.rpc('get_project_stats', {

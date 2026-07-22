@@ -1,20 +1,19 @@
 <script lang="ts">
 	import { resolve } from '$app/paths';
-	import { Table } from '@davincibot/components';
 	import ReadDrawer from '$lib/components/drawers/ReadDrawer.svelte';
 	import SucessModal from '$lib/components/modals/InfoModal.svelte';
-	import { UserImportModal } from '@davincibot/components';
+	import { Table, UserImportModal } from '@davincibot/components';
 	import {
 		GLOBAL_ROLE_LABELS_FR,
 		hasAnyPermission,
+		mountClosable,
 		PROJECT_ROLE_LABELS_FR,
+		userdata,
 		type GlobalPermission,
 		type GlobalRole,
 		type ProjectRole
 	} from '@davincibot/lib';
-	import { userdata } from '@davincibot/lib';
 	import { getSupabaseBrowserClient } from '@davincibot/lib/supabase';
-	import { mountClosable } from '@davincibot/lib';
 	import { SvelteMap } from 'svelte/reactivity';
 
 	interface AuthUser {
@@ -434,7 +433,8 @@
 									last_sign_in_at: null
 								});
 							} else {
-								const profileId = createdUserId;
+								// existingAuth est défini dans cette branche : son id aussi.
+								const profileId = existingAuth.id;
 								const { data: existingProfileRows, error: existingProfileError } = (await supabase
 									.from('profiles')
 									.select('id, username')
@@ -894,7 +894,9 @@
 						...projectsToUpdate
 							.map((p) => p.project_id?.toString())
 							.filter((pid): pid is string => Boolean(pid))
-					];
+					]
+						.map((pid) => Number(pid))
+						.filter((pid) => Number.isInteger(pid));
 					if (projectIdsToRevoke.length > 0) {
 						const { error: revokeError } = await supabase
 							.from('member_of')
@@ -915,15 +917,15 @@
 					const rowsToInsert = [
 						...projectsToAdd.map((p) => ({
 							profile: id,
-							project: p.project_id,
+							project: Number(p.project_id),
 							role: (p.role || 'project_member') as ProjectRole
 						})),
 						...projectsToUpdate.map((p) => ({
 							profile: id,
-							project: p.project_id,
+							project: Number(p.project_id),
 							role: (p.role || 'project_member') as ProjectRole
 						}))
-					];
+					].filter((row) => Number.isInteger(row.project));
 					if (rowsToInsert.length > 0) {
 						const { error: addError } = await supabase.from('member_of').insert(rowsToInsert);
 						if (addError) {

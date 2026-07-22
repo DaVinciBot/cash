@@ -1,11 +1,8 @@
 <script lang="ts">
 	import CrudForm from '$lib/components/modals/CrudForm.svelte';
-	import { Spinner } from '@davincibot/components';
 	import AdminHeader from '$lib/components/training/admin/AdminHeader.svelte';
 	import AdminSlotSection from '$lib/components/training/admin/AdminSlotSection.svelte';
 	import AdminTrainingSection from '$lib/components/training/admin/AdminTrainingSection.svelte';
-	import { CTAButton } from '@davincibot/components';
-	import { getParisDateKey, parseParisDatetimeLocal } from '@davincibot/lib';
 	import {
 		buildSlotFields,
 		buildSummaryFields,
@@ -20,11 +17,16 @@
 		findTrainingName,
 		formatSlotDate
 	} from '$lib/helpers/trainingTables';
+	import { CTAButton, Spinner } from '@davincibot/components';
+	import type { CrudField } from '@davincibot/lib';
 	import {
 		createTraining,
 		createTrainingSlot,
+		getParisDateKey,
 		getTrainingList,
 		getTrainingSlots,
+		parseParisDatetimeLocal,
+		triggerTableRefresh,
 		updateTraining,
 		updateTrainingSlot,
 		type SlotStatus,
@@ -33,9 +35,7 @@
 		type TrainingSlotListItem,
 		type UpdateTrainingSlotPayload
 	} from '@davincibot/lib';
-	import { triggerTableRefresh } from '@davincibot/lib';
 	import { getSupabaseBrowserClient } from '@davincibot/lib/supabase';
-	import type { CrudField } from '@davincibot/lib';
 	import { onMount } from 'svelte';
 
 	function getFormString(formData: FormData, key: string): string {
@@ -81,7 +81,7 @@ DVBisous ! :robot:`;
 	const trainingTableTopic = 'admin-trainings';
 	const slotTableTopic = 'admin-slots';
 	const trainingDbInfo = {
-		table: 'training',
+		table: 'training' as const,
 		key: 'id,name,category,description,prerequisites',
 		ordering: 'name:asc'
 	};
