@@ -1,12 +1,12 @@
 <script lang="ts">
-	import type { UserData } from '$lib/store';
-	import { userdata } from '$lib/store';
-	import { getSupabaseBrowserClient } from '$lib/supabaseClient';
-	import { loadUserdata, mountClosable, statusText } from '$lib/utils';
+	import type { UserData } from '@davincibot/lib';
+	import { userdata } from '@davincibot/lib';
+	import { getSupabaseBrowserClient } from '@davincibot/lib/supabase';
+	import { loadUserdata, mountClosable, statusText } from '@davincibot/lib';
 	import { onMount } from 'svelte';
-	import type { ItemRow, OrderRow } from '../database.types';
+	import type { ItemRow, OrderRow } from '@davincibot/database-types';
 
-	import Table from '$lib/components/admin/Table.svelte';
+	import { Table } from '@davincibot/components';
 	import ReadDrawer from '$lib/components/drawers/ReadDrawer.svelte';
 
 	let skip = false;

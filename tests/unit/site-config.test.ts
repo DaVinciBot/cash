@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest';
 
-import { SITE, canonicalFor } from '../../src/lib/config/site';
+import { SITE, canonicalFor } from '@davincibot/lib';
 
 describe('site config helpers', () => {
 	it('exposes expected site origin', () => {

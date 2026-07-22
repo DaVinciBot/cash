@@ -2,7 +2,7 @@ import { env as privateEnv } from '$env/dynamic/private';
 import { env as publicEnv } from '$env/dynamic/public';
 import { createClient, type SupabaseClient } from '@supabase/supabase-js';
 import { json } from '@sveltejs/kit';
-import type { Database } from '../../../../../../database.types.ts';
+import type { Database } from '@davincibot/database-types';
 import type { RequestEvent } from './$types';
 
 const getAdminClient = (): SupabaseClient<Database> => {

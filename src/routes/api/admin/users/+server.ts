@@ -1,9 +1,9 @@
 import { env as privateEnv } from '$env/dynamic/private';
 import { env as publicEnv } from '$env/dynamic/public';
-import { sidCookieName } from '$lib/server/authProxy';
+import { sidCookieName } from '@davincibot/lib/server';
 import { createClient, type SupabaseClient } from '@supabase/supabase-js';
 import { json } from '@sveltejs/kit';
-import type { Database } from '../../../../database.types';
+import type { Database } from '@davincibot/database-types';
 import type { RequestEvent } from './$types';
 
 const getAdminClient = (): SupabaseClient<Database> => {

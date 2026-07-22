@@ -1,12 +1,12 @@
 <script lang="ts">
-	import { hasAnyPermission } from '$lib/permissions';
-	import type { UserData } from '$lib/store';
-	import { userdata } from '$lib/store';
-	import { getSupabaseBrowserClient } from '$lib/supabaseClient';
-	import { loadUserdata, mountClosable, statusText } from '$lib/utils';
+	import { hasAnyPermission } from '@davincibot/lib';
+	import type { UserData } from '@davincibot/lib';
+	import { userdata } from '@davincibot/lib';
+	import { getSupabaseBrowserClient } from '@davincibot/lib/supabase';
+	import { loadUserdata, mountClosable, statusText } from '@davincibot/lib';
 	import { onMount } from 'svelte';
 
-	import Table from '$lib/components/admin/Table.svelte';
+	import { Table } from '@davincibot/components';
 	import ReadDrawer from '$lib/components/drawers/ReadDrawer.svelte';
 	import CrudForm from '$lib/components/modals/CrudForm.svelte';
 

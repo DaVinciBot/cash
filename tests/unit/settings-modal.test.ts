@@ -3,14 +3,14 @@ import { beforeEach, describe, expect, it, vi } from 'vitest';
 import { flushSync, mount, unmount } from 'svelte';
 
 vi.mock('$env/dynamic/public', () => ({ env: {} }));
-vi.mock('$lib/supabaseClient', () => ({
+vi.mock('@davincibot/lib/supabase', () => ({
 	getSupabaseBrowserClient: () => ({})
 }));
 
-import SettingsModal from '../../src/lib/components/settings/SettingsModal.svelte';
-import type { SettingsCategory } from '../../src/lib/settings/categories';
-import { userdata } from '../../src/lib/store';
-import type { UserProfile } from '../../src/lib/types/profile';
+import SettingsModal from '$lib/components/settings/SettingsModal.svelte';
+import type { SettingsCategory } from '@davincibot/lib/settings';
+import { userdata } from '@davincibot/lib';
+import type { UserProfile } from '@davincibot/lib';
 
 const profile: UserProfile = {
 	email: 'alice@example.com',

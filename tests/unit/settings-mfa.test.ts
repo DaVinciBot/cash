@@ -2,7 +2,7 @@ import { afterEach, describe, expect, it, vi } from 'vitest';
 
 vi.mock('$env/dynamic/public', () => ({ env: {} }));
 // URL relative : jsdom ne sait pas naviguer vers un autre domaine.
-vi.mock('$lib/config/auth', () => ({ buildLoginUrl: () => '#login' }));
+vi.mock('@davincibot/lib', () => ({ buildLoginUrl: () => '#login' }));
 
 import {
 	disableMfaMethod,
@@ -14,8 +14,8 @@ import {
 	stepUpVerify,
 	verifyEmailEnrollment,
 	verifyTotpEnrollment
-} from '$lib/settings/mfa';
-import { ElevationRequiredError } from '$lib/settings/stepUp';
+} from '@davincibot/lib/settings';
+import { ElevationRequiredError } from '@davincibot/lib/settings';
 
 const jsonResponse = (status: number, body: unknown) => ({
 	ok: status < 400,

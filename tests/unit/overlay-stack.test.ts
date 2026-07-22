@@ -1,9 +1,6 @@
 import { describe, expect, it } from 'vitest';
 
-import {
-	overlayCount,
-	registerOverlay
-} from '../../src/lib/components/overlay/overlay-stack.svelte';
+import { overlayCount, registerOverlay } from '@davincibot/components';
 
 describe('overlay-stack', () => {
 	it('le premier overlay enregistré est au sommet', () => {

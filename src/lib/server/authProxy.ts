@@ -1,9 +1,6 @@
 import { env } from '$env/dynamic/public';
 import type { Cookies } from '@sveltejs/kit';
-
-// Préfixe optionnel (ex. "dev-") aligné sur le service auth : isole les cookies
-// d'un environnement qui partage le domaine racine avec la prod.
-export const sidCookieName = (): string => `${env.PUBLIC_COOKIE_PREFIX ?? ''}sid`;
+import { sidCookieName } from '@davincibot/lib/server';
 
 export interface AuthProxyResponse {
 	status: number;

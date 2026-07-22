@@ -1,4 +1,4 @@
-import { sidCookieName } from '$lib/server/authProxy';
+import { sidCookieName } from '@davincibot/lib/server';
 import { env } from '$env/dynamic/public';
 import { json } from '@sveltejs/kit';
 import type { RequestHandler } from './$types';

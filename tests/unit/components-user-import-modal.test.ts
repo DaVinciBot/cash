@@ -1,7 +1,7 @@
 import { describe, expect, it, vi } from 'vitest';
 
 import { mount } from 'svelte';
-import UserImportModal from '../../src/lib/components/modals/UserImportModal.svelte';
+import { UserImportModal } from '@davincibot/components';
 
 describe('UserImportModal (components submodule)', () => {
 	it('submits a valid simple user payload', async () => {

@@ -12,7 +12,7 @@ const mocks = vi.hoisted(() => {
 	return { updateEq, update, upload, getPublicUrl };
 });
 
-vi.mock('$lib/supabaseClient', () => ({
+vi.mock('@davincibot/lib/supabase', () => ({
 	getSupabaseBrowserClient: () => ({
 		from: () => ({ update: mocks.update }),
 		storage: {
@@ -21,10 +21,10 @@ vi.mock('$lib/supabaseClient', () => ({
 	})
 }));
 
-import { changePassword, updateUsername, uploadAvatar } from '../../src/lib/settings/account';
-import { parseSettingsCategory } from '../../src/lib/settings/categories';
-import { userdata } from '../../src/lib/store';
-import type { UserProfile } from '../../src/lib/types/profile';
+import { changePassword, updateUsername, uploadAvatar } from '@davincibot/lib/settings';
+import { parseSettingsCategory } from '@davincibot/lib/settings';
+import { userdata } from '@davincibot/lib';
+import type { UserProfile } from '@davincibot/lib';
 
 const profile: UserProfile = {
 	email: 'alice@example.com',

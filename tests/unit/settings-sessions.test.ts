@@ -2,7 +2,7 @@ import { afterEach, describe, expect, it, vi } from 'vitest';
 
 vi.mock('$env/dynamic/public', () => ({ env: {} }));
 // URL relative : jsdom ne sait pas naviguer vers un autre domaine.
-vi.mock('$lib/config/auth', () => ({ buildLoginUrl: () => '#login' }));
+vi.mock('@davincibot/lib', () => ({ buildLoginUrl: () => '#login' }));
 
 import {
 	fetchConnections,
@@ -10,7 +10,7 @@ import {
 	revokeAllSessions,
 	revokeConnection,
 	revokeSession
-} from '$lib/settings/sessions';
+} from '@davincibot/lib/settings';
 
 const jsonResponse = (status: number, body: unknown) => ({
 	ok: status < 400,

@@ -2,7 +2,7 @@ import { afterEach, describe, expect, it } from 'vitest';
 
 import { flushSync, mount, unmount } from 'svelte';
 
-import CodeInput from '../../src/lib/components/utils/CodeInput.svelte';
+import { CodeInput } from '@davincibot/components';
 
 let cleanup: (() => void) | null = null;
 

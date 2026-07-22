@@ -1,14 +1,14 @@
-import { buildLoginUrl } from '$lib/config/auth';
+import { buildLoginUrl } from '@davincibot/lib';
 import {
 	ADMIN_MENU,
 	canAccessAdminPath,
 	filterMenuByPermissions,
 	type EffectivePermission,
 	type GlobalPermission
-} from '$lib/permissions';
-import type { UserProfile, UserProject } from '$lib/types/profile';
+} from '@davincibot/lib';
+import type { UserProfile, UserProject } from '@davincibot/lib';
 import { redirect } from '@sveltejs/kit';
-import type { ProjectRow } from '../database.types';
+import type { ProjectRow } from '@davincibot/database-types';
 import type { LayoutServerLoad } from './$types';
 
 interface ProfileRow {

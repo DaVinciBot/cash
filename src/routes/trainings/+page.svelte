@@ -1,11 +1,11 @@
 <script lang="ts">
 	import CrudForm from '$lib/components/modals/CrudForm.svelte';
-	import Spinner from '$lib/components/share/Spinner.svelte';
+	import { Spinner } from '@davincibot/components';
 	import AdminHeader from '$lib/components/training/admin/AdminHeader.svelte';
 	import AdminSlotSection from '$lib/components/training/admin/AdminSlotSection.svelte';
 	import AdminTrainingSection from '$lib/components/training/admin/AdminTrainingSection.svelte';
-	import CTAButton from '$lib/components/utils/CTAButton.svelte';
-	import { getParisDateKey, parseParisDatetimeLocal } from '$lib/helpers/parisTime';
+	import { CTAButton } from '@davincibot/components';
+	import { getParisDateKey, parseParisDatetimeLocal } from '@davincibot/lib';
 	import {
 		buildSlotFields,
 		buildSummaryFields,
@@ -32,10 +32,10 @@
 		type TrainingListItem,
 		type TrainingSlotListItem,
 		type UpdateTrainingSlotPayload
-	} from '$lib/services/training';
-	import { triggerTableRefresh } from '$lib/store';
-	import { getSupabaseBrowserClient } from '$lib/supabaseClient';
-	import type { CrudField } from '$lib/types/crud';
+	} from '@davincibot/lib';
+	import { triggerTableRefresh } from '@davincibot/lib';
+	import { getSupabaseBrowserClient } from '@davincibot/lib/supabase';
+	import type { CrudField } from '@davincibot/lib';
 	import { onMount } from 'svelte';
 
 	function getFormString(formData: FormData, key: string): string {

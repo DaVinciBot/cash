@@ -3,7 +3,7 @@ import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import { flushSync, mount, unmount } from 'svelte';
 
 vi.mock('$env/dynamic/public', () => ({ env: {} }));
-vi.mock('$lib/supabaseClient', () => ({
+vi.mock('@davincibot/lib/supabase', () => ({
 	getSupabaseBrowserClient: () => ({})
 }));
 
@@ -14,8 +14,6 @@ const mocks = vi.hoisted(() => ({
 	fetchConnections: vi.fn(),
 	revokeConnection: vi.fn()
 }));
-
-vi.mock('$lib/settings/sessions', () => mocks);
 
 const mfaMocks = vi.hoisted(() => ({
 	fetchMfaState: vi.fn(),
@@ -29,9 +27,11 @@ const mfaMocks = vi.hoisted(() => ({
 	stepUpVerify: vi.fn()
 }));
 
-vi.mock('$lib/settings/mfa', () => mfaMocks);
+// sessions et mfa sont réexportés par le même barrel @davincibot/lib/settings :
+// un seul vi.mock, sinon le second écraserait le premier.
+vi.mock('@davincibot/lib/settings', () => ({ ...mocks, ...mfaMocks }));
 
-import SecurityPanel from '../../src/lib/components/settings/SecurityPanel.svelte';
+import SecurityPanel from '$lib/components/settings/SecurityPanel.svelte';
 
 // La session courante est volontairement en dernier : le composant doit la remonter en tête.
 const sessions = [

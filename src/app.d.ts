@@ -1,8 +1,8 @@
-import type { EffectivePermission, GlobalPermission } from '$lib/permissions';
-import type { UserProfile } from '$lib/types/profile';
+import type { EffectivePermission, GlobalPermission } from '@davincibot/lib';
+import type { UserProfile } from '@davincibot/lib';
 import type { SupabaseClient, User } from '@supabase/supabase-js';
 import type { Cookies } from '@sveltejs/kit';
-import type { Database } from './database.types.ts';
+import type { Database } from '@davincibot/database-types';
 
 // Le refresh token ne quitte jamais le service auth : les sites ne voient
 // passer que l'access token.

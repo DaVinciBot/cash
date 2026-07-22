@@ -11,9 +11,9 @@ const mocks = vi.hoisted(() => ({
 	deletePasskey: vi.fn()
 }));
 
-vi.mock('$lib/settings/passkeys', () => mocks);
+vi.mock('@davincibot/lib/settings', () => mocks);
 
-import PasskeysManageModal from '../../src/lib/components/modals/PasskeysManageModal.svelte';
+import PasskeysManageModal from '$lib/components/modals/PasskeysManageModal.svelte';
 
 const PASSKEYS = [
 	{

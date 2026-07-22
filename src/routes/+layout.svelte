@@ -2,18 +2,18 @@
 	import { afterNavigate, replaceState } from '$app/navigation';
 	import { resolve } from '$app/paths';
 	import { page } from '$app/state';
-	import { parseSettingsCategory } from '$lib/settings/categories';
+	import { parseSettingsCategory } from '@davincibot/lib/settings';
 	import {
 		closeSettings,
 		openSettings,
 		settingsModal,
 		userdata,
 		type SettingsModalState
-	} from '$lib/store';
+	} from '@davincibot/lib';
 	import { onDestroy, untrack, type Snippet } from 'svelte';
 	import type { PageData } from './$types';
 
-	import SideBar from '$lib/components/admin/SideBar.svelte';
+	import { SideBar } from '@davincibot/components';
 	import SettingsModal from '$lib/components/settings/SettingsModal.svelte';
 	import UserBadge from '$lib/components/share/UserBadge.svelte';
 	import '../app.css';

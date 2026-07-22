@@ -18,10 +18,10 @@ const mocks = vi.hoisted(() => ({
 	stepUpVerifyWebauthn: vi.fn()
 }));
 
-vi.mock('$lib/settings/mfa', () => mocks);
+vi.mock('@davincibot/lib/settings', () => mocks);
 
-import StepUpDialog from '../../src/lib/components/settings/StepUpDialog.svelte';
-import { requestStepUp, stepUpRequest } from '$lib/settings/stepUp';
+import StepUpDialog from '$lib/components/settings/StepUpDialog.svelte';
+import { requestStepUp, stepUpRequest } from '@davincibot/lib/settings';
 
 let cleanup: (() => void) | null = null;
 

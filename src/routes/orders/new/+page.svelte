@@ -1,11 +1,11 @@
 <script lang="ts">
 	import { goto } from '$app/navigation';
 	import { resolve } from '$app/paths';
-	import { userdata } from '$lib/store';
-	import { getSupabaseBrowserClient } from '$lib/supabaseClient';
+	import { userdata } from '@davincibot/lib';
+	import { getSupabaseBrowserClient } from '@davincibot/lib/supabase';
 
 	import InfoModal from '$lib/components/modals/InfoModal.svelte';
-	import { mountClosable } from '$lib/utils';
+	import { mountClosable } from '@davincibot/lib';
 
 	interface ItemEntry {
 		nom: string;

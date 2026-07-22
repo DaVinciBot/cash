@@ -16,8 +16,6 @@ const mocks = vi.hoisted(() => ({
 	stepUpVerify: vi.fn()
 }));
 
-vi.mock('$lib/settings/mfa', () => mocks);
-
 const passkeyMocks = vi.hoisted(() => ({
 	fetchPasskeys: vi.fn(),
 	registerPasskey: vi.fn(),
@@ -25,9 +23,11 @@ const passkeyMocks = vi.hoisted(() => ({
 	deletePasskey: vi.fn()
 }));
 
-vi.mock('$lib/settings/passkeys', () => passkeyMocks);
+// mfa et passkeys sont réexportés par le même barrel @davincibot/lib/settings :
+// un seul vi.mock, sinon le second écraserait le premier.
+vi.mock('@davincibot/lib/settings', () => ({ ...mocks, ...passkeyMocks }));
 
-import MfaSection from '../../src/lib/components/settings/MfaSection.svelte';
+import MfaSection from '$lib/components/settings/MfaSection.svelte';
 
 const stateWithoutMfa = {
 	methods: [],

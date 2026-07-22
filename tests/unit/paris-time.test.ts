@@ -11,7 +11,7 @@ import {
 	getParisDateUtc,
 	getParisMidnightUtcFromParts,
 	parseParisDatetimeLocal
-} from '../../src/lib/helpers/parisTime';
+} from '@davincibot/lib';
 
 describe('paris time helpers', () => {
 	it('formats valid dates and times', () => {
