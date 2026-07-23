@@ -20,7 +20,7 @@ RUN --mount=type=secret,id=npm_token,env=NPM_TOKEN pnpm install --frozen-lockfil
 COPY . .
 RUN pnpm build
 
-FROM base AS runner
+FROM node:24.11.0-slim AS runner
 
 ENV NODE_ENV=production
 
@@ -29,6 +29,11 @@ ENV NODE_ENV=production
 RUN apt-get update \
     && apt-get upgrade -y --no-install-recommends \
     && rm -rf /var/lib/apt/lists/*
+
+# Runtime = `node build` uniquement : retirer npm/npx/corepack supprime leur
+# outillage vendored (ex. tar CVE-2026-59873) du périmètre des scans d'image.
+RUN rm -rf /usr/local/lib/node_modules/npm /usr/local/lib/node_modules/corepack \
+    /usr/local/bin/npm /usr/local/bin/npx /usr/local/bin/corepack
 
 WORKDIR /app
 
