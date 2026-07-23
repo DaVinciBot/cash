@@ -513,20 +513,15 @@
 
 <!-- Drawer -->
 <div
-	id={'drawer-' + id}
-	tabindex="-1"
 	class="fixed top-0 right-0 z-50 flex h-full flex-col bg-gray-800 shadow-lg transition-transform duration-300"
+	id={'drawer-' + id}
 	style={`transform: translateX(0); width: ${String(width)}px;`}
+	tabindex="-1"
 >
 	<!-- Resize handle (left edge) -->
 	<button
-		type="button"
 		aria-label="Resize drawer"
 		class="group absolute top-0 left-0 h-full w-2 cursor-col-resize bg-transparent focus:outline-none"
-		onmousedown={(e: MouseEvent) => {
-			beginResize(e.clientX);
-		}}
-		ontouchstart={onResizeTouchStart}
 		onkeydown={(e: KeyboardEvent) => {
 			// keyboard resizing: arrow left increases width (drawer anchored right)
 			const step = e.shiftKey ? 40 : 10;
@@ -537,6 +532,11 @@
 				width = Math.max(minWidth, width - step);
 			}
 		}}
+		onmousedown={(e: MouseEvent) => {
+			beginResize(e.clientX);
+		}}
+		ontouchstart={onResizeTouchStart}
+		type="button"
 	>
 		<span class="absolute top-0 right-0 h-full w-1 bg-transparent group-hover:bg-gray-600/60"
 		></span>
@@ -550,15 +550,15 @@
 			{/if}
 		</div>
 		<button
-			type="button"
 			class="rounded-lg bg-transparent p-1.5 text-sm text-gray-400 hover:bg-gray-600 hover:text-white"
 			onclick={__onClose}
+			type="button"
 		>
 			<svg aria-hidden="true" class="h-5 w-5" fill="currentColor" viewBox="0 0 20 20">
 				<path
-					fill-rule="evenodd"
-					d="M4.293 4.293a1 1 0 011.414 0L10 8.586l4.293-4.293a1 1 0 111.414 1.414L11.414 10l4.293 4.293a1 1 0 01-1.414 1.414L10 11.414l-4.293 4.293a1 1 0 01-1.414-1.414L8.586 10 4.293 5.707a1 1 0 010-1.414z"
 					clip-rule="evenodd"
+					d="M4.293 4.293a1 1 0 011.414 0L10 8.586l4.293-4.293a1 1 0 111.414 1.414L11.414 10l4.293 4.293a1 1 0 01-1.414 1.414L10 11.414l-4.293 4.293a1 1 0 01-1.414-1.414L8.586 10 4.293 5.707a1 1 0 010-1.414z"
+					fill-rule="evenodd"
 				></path>
 			</svg>
 			<span class="sr-only">Close drawer</span>
@@ -701,7 +701,6 @@
 													aria-hidden="true"
 													height="16"
 													viewBox="0 0 16 16"
-													version="1.1"
 													width="16"
 													fill="white"
 													data-view-component="true"
@@ -1321,7 +1320,6 @@
 									{:else if mime === 'application/pdf' && isMobile}
 										<iframe
 											src={`https://docs.google.com/viewer?url=${encodeURIComponent(url ?? '')}&embedded=true`}
-											frameborder="0"
 											class="h-full w-full"
 											title={name}
 										></iframe>
@@ -1461,7 +1459,6 @@
 																class="ml-1 inline h-4 w-4 transition-all"
 																xmlns="http://www.w3.org/2000/svg"
 																xmlns:xlink="http://www.w3.org/1999/xlink"
-																version="1.1"
 																id="Capa_1"
 																x="0px"
 																y="0px"

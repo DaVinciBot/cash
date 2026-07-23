@@ -437,7 +437,7 @@
 		// get files names
 		const { data: file_data, error: fileErr } = (await supabase.storage
 			.from('proof')
-			.list(`invoices/${id ?? ''}`, {
+			.list(`invoices/${String(id)}`, {
 				limit: 20,
 				offset: 0,
 				sortBy: { column: 'name', order: 'asc' }
@@ -474,7 +474,7 @@
 							const supabase2 = getSupabaseBrowserClient();
 							const { error: removeErr } = await supabase2.storage
 								.from('proof')
-								.remove([`invoices/${id ?? ''}/${value}`]);
+								.remove([`invoices/${String(id)}/${value}`]);
 							if (removeErr) {
 								alert('	Une erreur est survenue lors de la suppression du justificatif');
 							}
@@ -755,7 +755,7 @@
 				// get the proof
 				const { data: dat, error: proofErr } = (await supabase.storage
 					.from('proof')
-					.list(`invoices/${id ?? ''}`, {
+					.list(`invoices/${String(id)}`, {
 						limit: 20,
 						offset: 0,
 						sortBy: { column: 'name', order: 'asc' }
@@ -766,7 +766,7 @@
 				}
 
 				const fileList = Array.isArray(dat) ? dat : [];
-				const files = [...fileList.map((file) => `invoices/${id ?? ''}/${file.name}`)];
+				const files = [...fileList.map((file) => `invoices/${String(id)}/${file.name}`)];
 
 				// compute author safely (can be array or object)
 				let authorName = 'Aucun';
@@ -851,22 +851,22 @@
 	<!-- Tabs header -->
 	<div class="mt-4 flex gap-2">
 		<button
+			aria-pressed={selectedTab === 'detail'}
 			class="rounded-md border px-4 py-2 text-sm font-medium transition-colors
 				{selectedTab === 'detail'
 				? 'border-gray-600 bg-gray-700 text-white'
 				: 'hover:bg-gray-750 border-gray-700 bg-gray-800 text-gray-300'}"
 			onclick={() => (selectedTab = 'detail')}
-			aria-pressed={selectedTab === 'detail'}
 		>
 			Détail
 		</button>
 		<button
+			aria-pressed={selectedTab === 'cashflow'}
 			class="rounded-md border px-4 py-2 text-sm font-medium transition-colors
 				{selectedTab === 'cashflow'
 				? 'border-gray-600 bg-gray-700 text-white'
 				: 'hover:bg-gray-750 border-gray-700 bg-gray-800 text-gray-300'}"
 			onclick={() => (selectedTab = 'cashflow')}
-			aria-pressed={selectedTab === 'cashflow'}
 		>
 			Cashflow
 		</button>
