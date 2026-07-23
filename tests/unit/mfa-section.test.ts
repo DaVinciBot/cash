@@ -24,8 +24,14 @@ const passkeyMocks = vi.hoisted(() => ({
 }));
 
 // mfa et passkeys sont réexportés par le même barrel @davincibot/lib/settings :
-// un seul vi.mock, sinon le second écraserait le premier.
-vi.mock('@davincibot/lib/settings', () => ({ ...mocks, ...passkeyMocks }));
+// un seul vi.mock, sinon le second écraserait le premier. On garde le reste du
+// barrel réel (stepUpRequest, withStepUp, alertUnlessCancelled…) dont dépend la
+// section.
+vi.mock('@davincibot/lib/settings', async (importOriginal) => ({
+	...(await importOriginal<typeof import('@davincibot/lib/settings')>()),
+	...mocks,
+	...passkeyMocks
+}));
 
 import MfaSection from '$lib/components/settings/MfaSection.svelte';
 

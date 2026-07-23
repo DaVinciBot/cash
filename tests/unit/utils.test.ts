@@ -1,10 +1,5 @@
 import { beforeEach, describe, expect, it, vi } from 'vitest';
-
-vi.mock('@davincibot/lib', () => ({
-	userdata: {
-		set: vi.fn()
-	}
-}));
+import { get } from 'svelte/store';
 
 import { userdata } from '@davincibot/lib';
 import {
@@ -17,13 +12,13 @@ import {
 
 describe('utils helpers', () => {
 	beforeEach(() => {
-		vi.mocked(userdata.set).mockClear();
+		userdata.set(null);
 		window.localStorage.clear();
 	});
 
 	it('loadUserdata writes to userdata store', () => {
 		loadUserdata(null);
-		expect(userdata.set).toHaveBeenCalledWith(null);
+		expect(get(userdata)).toBeNull();
 
 		const mockUser = {
 			id: 'u-1',
@@ -35,7 +30,7 @@ describe('utils helpers', () => {
 			allProjects: null
 		};
 		loadUserdata(mockUser);
-		expect(userdata.set).toHaveBeenCalledWith(mockUser);
+		expect(get(userdata)).toEqual(mockUser);
 	});
 
 	it('loadSettings and saveSettings persist JSON values', () => {

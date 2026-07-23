@@ -11,7 +11,12 @@ const mocks = vi.hoisted(() => ({
 	deletePasskey: vi.fn()
 }));
 
-vi.mock('@davincibot/lib/settings', () => mocks);
+// On garde le reste du barrel réel (withStepUp, alertUnlessCancelled…) dont
+// dépend la modale, et on ne remplace que les appels réseau passkeys.
+vi.mock('@davincibot/lib/settings', async (importOriginal) => ({
+	...(await importOriginal<typeof import('@davincibot/lib/settings')>()),
+	...mocks
+}));
 
 import PasskeysManageModal from '$lib/components/modals/PasskeysManageModal.svelte';
 

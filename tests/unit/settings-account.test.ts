@@ -2,21 +2,17 @@ import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 
 import { get } from 'svelte/store';
 
-vi.mock('$env/dynamic/public', () => ({ env: {} }));
-
 const mocks = vi.hoisted(() => {
-	const updateEq = vi.fn();
-	const update = vi.fn(() => ({ eq: updateEq }));
+	const rpc = vi.fn();
 	const upload = vi.fn();
-	const getPublicUrl = vi.fn();
-	return { updateEq, update, upload, getPublicUrl };
+	return { rpc, upload };
 });
 
 vi.mock('@davincibot/lib/supabase', () => ({
 	getSupabaseBrowserClient: () => ({
-		from: () => ({ update: mocks.update }),
+		rpc: mocks.rpc,
 		storage: {
-			from: () => ({ upload: mocks.upload, getPublicUrl: mocks.getPublicUrl })
+			from: () => ({ upload: mocks.upload })
 		}
 	})
 }));
@@ -63,18 +59,17 @@ describe('parseSettingsCategory', () => {
 });
 
 describe('updateUsername', () => {
-	it('met à jour profiles puis le store', async () => {
-		mocks.updateEq.mockResolvedValue({ error: null });
+	it('appelle le RPC puis met à jour le store', async () => {
+		mocks.rpc.mockResolvedValue({ data: 'Bob', error: null });
 
 		await updateUsername('user-1', 'Bob');
 
-		expect(mocks.update).toHaveBeenCalledWith({ username: 'Bob' });
-		expect(mocks.updateEq).toHaveBeenCalledWith('id', 'user-1');
+		expect(mocks.rpc).toHaveBeenCalledWith('update_my_username', { p_username: 'Bob' });
 		expect(get(userdata)?.name).toBe('Bob');
 	});
 
 	it('lève une erreur sans toucher au store en cas d’échec', async () => {
-		mocks.updateEq.mockResolvedValue({ error: { message: 'nope' } });
+		mocks.rpc.mockResolvedValue({ data: null, error: { message: 'nope' } });
 
 		await expect(updateUsername('user-1', 'Bob')).rejects.toThrow();
 		expect(get(userdata)?.name).toBe('Alice');
@@ -82,12 +77,10 @@ describe('updateUsername', () => {
 });
 
 describe('uploadAvatar', () => {
-	it('upload puis met à jour avatar_url et le store avec un cache-buster', async () => {
+	it('upload puis met à jour avatar_url et le store via le RPC', async () => {
+		const avatarUrl = 'https://cdn.test/avatars/user-1/avatar.png?v=123';
 		mocks.upload.mockResolvedValue({ error: null });
-		mocks.getPublicUrl.mockReturnValue({
-			data: { publicUrl: 'https://cdn.test/avatars/user-1/avatar.png' }
-		});
-		mocks.updateEq.mockResolvedValue({ error: null });
+		mocks.rpc.mockResolvedValue({ data: avatarUrl, error: null });
 
 		const url = await uploadAvatar('user-1', new File(['x'], 'photo.png', { type: 'image/png' }));
 
@@ -95,9 +88,12 @@ describe('uploadAvatar', () => {
 			cacheControl: '3600',
 			upsert: true
 		});
-		expect(url).toMatch(/^https:\/\/cdn\.test\/avatars\/user-1\/avatar\.png\?v=\d+$/);
-		expect(mocks.update).toHaveBeenCalledWith({ avatar_url: url });
-		expect(get(userdata)?.avatar).toBe(url);
+		expect(mocks.rpc).toHaveBeenCalledWith(
+			'update_my_avatar',
+			expect.objectContaining({ p_extension: 'png' })
+		);
+		expect(url).toBe(avatarUrl);
+		expect(get(userdata)?.avatar).toBe(avatarUrl);
 	});
 
 	it('traduit l’erreur 413 en message lisible', async () => {

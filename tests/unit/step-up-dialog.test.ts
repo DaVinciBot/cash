@@ -3,8 +3,6 @@ import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import { flushSync, mount, unmount } from 'svelte';
 import { get } from 'svelte/store';
 
-vi.mock('$env/dynamic/public', () => ({ env: {} }));
-
 const mocks = vi.hoisted(() => ({
 	fetchMfaState: vi.fn(),
 	startEmailEnrollment: vi.fn(),
@@ -18,7 +16,12 @@ const mocks = vi.hoisted(() => ({
 	stepUpVerifyWebauthn: vi.fn()
 }));
 
-vi.mock('@davincibot/lib/settings', () => mocks);
+// On garde le vrai store stepUpRequest / requestStepUp / withStepUp / helpers
+// d'erreur (le dialogue s'y abonne) et on ne remplace que les appels réseau.
+vi.mock('@davincibot/lib/settings', async (importOriginal) => ({
+	...(await importOriginal<typeof import('@davincibot/lib/settings')>()),
+	...mocks
+}));
 
 import StepUpDialog from '$lib/components/settings/StepUpDialog.svelte';
 import { requestStepUp, stepUpRequest } from '@davincibot/lib/settings';

@@ -28,8 +28,14 @@ const mfaMocks = vi.hoisted(() => ({
 }));
 
 // sessions et mfa sont réexportés par le même barrel @davincibot/lib/settings :
-// un seul vi.mock, sinon le second écraserait le premier.
-vi.mock('@davincibot/lib/settings', () => ({ ...mocks, ...mfaMocks }));
+// un seul vi.mock, sinon le second écraserait le premier. On garde le reste du
+// barrel réel (stepUpRequest, withStepUp, alertUnlessCancelled…) dont dépend le
+// StepUpDialog monté par le panneau.
+vi.mock('@davincibot/lib/settings', async (importOriginal) => ({
+	...(await importOriginal<typeof import('@davincibot/lib/settings')>()),
+	...mocks,
+	...mfaMocks
+}));
 
 import SecurityPanel from '$lib/components/settings/SecurityPanel.svelte';
 

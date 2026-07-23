@@ -1,11 +1,8 @@
 import { afterEach, describe, expect, it, vi } from 'vitest';
 
-vi.mock('$env/dynamic/public', () => ({ env: {} }));
-// URL relative : jsdom ne sait pas naviguer vers un autre domaine.
-vi.mock('@davincibot/lib', () => ({ buildLoginUrl: () => '#login' }));
-
 import {
 	disableMfaMethod,
+	ElevationRequiredError,
 	fetchMfaState,
 	regenerateRecoveryCodes,
 	startEmailEnrollment,
@@ -15,13 +12,47 @@ import {
 	verifyEmailEnrollment,
 	verifyTotpEnrollment
 } from '@davincibot/lib/settings';
-import { ElevationRequiredError } from '@davincibot/lib/settings';
 
 const jsonResponse = (status: number, body: unknown) => ({
 	ok: status < 400,
 	status,
 	json: () => Promise.resolve(body)
 });
+
+// Sur 401, la lib affecte window.location.href = buildLoginUrl(...). jsdom ne
+// navigue pas vers un autre domaine : on remplace location par un espion pour
+// observer la cible de la redirection.
+const stubLocationHref = () => {
+	const original = window.location;
+	let assignedHref = '';
+	Object.defineProperty(window, 'location', {
+		configurable: true,
+		value: new Proxy(original, {
+			get(target, prop) {
+				if (prop === 'href') {
+					return assignedHref || target.href;
+				}
+				const value = Reflect.get(target, prop);
+				return typeof value === 'function' ? value.bind(target) : value;
+			},
+			set(target, prop, value) {
+				if (prop === 'href') {
+					assignedHref = value as string;
+					return true;
+				}
+				return Reflect.set(target, prop, value);
+			}
+		})
+	});
+	return {
+		get href() {
+			return assignedHref;
+		},
+		restore() {
+			Object.defineProperty(window, 'location', { configurable: true, value: original });
+		}
+	};
+};
 
 afterEach(() => {
 	vi.unstubAllGlobals();
@@ -44,8 +75,12 @@ describe('fetchMfaState', () => {
 
 	it('renvoie vers la connexion sur un 401', async () => {
 		vi.stubGlobal('fetch', vi.fn().mockResolvedValue(jsonResponse(401, {})));
+		const location = stubLocationHref();
+
 		await expect(fetchMfaState()).rejects.toThrow('Session expirée');
-		expect(window.location.hash).toBe('#login');
+		expect(location.href).toContain('/login?redirect=');
+
+		location.restore();
 	});
 });
 
