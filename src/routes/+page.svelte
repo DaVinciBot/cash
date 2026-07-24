@@ -302,6 +302,6 @@
 </div>
 <div class="w-full py-2 sm:px-8 lg:px-16">
 	<div class="rounded-lg bg-gray-800">
-		<Table {headers} {dbInfo} {parseItems} {actions} {filters} type="commande" type_accord="une" />
+		<Table {actions} {dbInfo} {filters} {headers} {parseItems} type="commande" type_accord="une" />
 	</div>
 </div>

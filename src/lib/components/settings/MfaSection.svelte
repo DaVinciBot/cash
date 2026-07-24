@@ -147,7 +147,7 @@
 		<p class="text-dark-light-blue m-0 text-sm">Chargement…</p>
 	{:else if loadError}
 		<p class="m-0 mb-3 text-sm text-red-400">{loadError}</p>
-		<CtaButton variant="secondary" size="sm" fullWidth={false} onclick={() => void load()}>
+		<CtaButton fullWidth={false} onclick={() => void load()} size="sm" variant="secondary">
 			Réessayer
 		</CtaButton>
 	{:else}
@@ -165,10 +165,10 @@
 				{#if emailMethod}
 					<button
 						id="mfa-disable-email"
-						type="button"
 						class="ml-auto shrink-0 cursor-pointer rounded-lg border-0 bg-transparent px-2 py-1 text-sm text-red-400 hover:bg-red-500/10 disabled:cursor-not-allowed disabled:opacity-50"
 						disabled={busy}
 						onclick={() => void handleDisable(emailMethod.id, 'Code par e-mail', 'disable-email')}
+						type="button"
 					>
 						{busyAction === 'disable-email' ? 'Chargement…' : 'Désactiver'}
 					</button>
@@ -176,11 +176,11 @@
 					<div class="ml-auto shrink-0">
 						<CtaButton
 							id="mfa-enable-email"
-							variant="secondary"
-							size="sm"
-							fullWidth={false}
 							disabled={busy || enrollingEmail}
+							fullWidth={false}
 							onclick={() => void handleEnableEmail()}
+							size="sm"
+							variant="secondary"
 						>
 							{busyAction === 'enable-email' ? 'Envoi…' : 'Activer'}
 						</CtaButton>
@@ -201,11 +201,11 @@
 				{#if totpMethod}
 					<button
 						id="mfa-disable-totp"
-						type="button"
 						class="ml-auto shrink-0 cursor-pointer rounded-lg border-0 bg-transparent px-2 py-1 text-sm text-red-400 hover:bg-red-500/10 disabled:cursor-not-allowed disabled:opacity-50"
 						disabled={busy}
 						onclick={() =>
 							void handleDisable(totpMethod.id, "Application d'authentification", 'disable-totp')}
+						type="button"
 					>
 						{busyAction === 'disable-totp' ? 'Chargement…' : 'Désactiver'}
 					</button>
@@ -213,11 +213,11 @@
 					<div class="ml-auto shrink-0">
 						<CtaButton
 							id="mfa-enable-totp"
-							variant="secondary"
-							size="sm"
-							fullWidth={false}
 							disabled={busy || totpEnrollment !== null}
+							fullWidth={false}
 							onclick={() => void handleEnableTotp()}
+							size="sm"
+							variant="secondary"
 						>
 							{busyAction === 'enable-totp' ? 'Chargement…' : 'Activer'}
 						</CtaButton>
@@ -239,25 +239,25 @@
 					{#if webauthnMethod}
 						<CtaButton
 							id="mfa-manage-passkeys"
-							variant="secondary"
-							size="sm"
-							fullWidth={false}
 							disabled={busy}
+							fullWidth={false}
 							onclick={() => (managingPasskeys = true)}
+							size="sm"
+							variant="secondary"
 						>
 							Gérer
 						</CtaButton>
 					{:else}
 						<CtaButton
 							id="mfa-enable-passkey"
-							variant="secondary"
-							size="sm"
-							fullWidth={false}
 							disabled={busy || enrollingPasskey || !passkeySupported}
+							fullWidth={false}
+							onclick={() => (enrollingPasskey = true)}
+							size="sm"
 							title={passkeySupported
 								? undefined
 								: 'Ce navigateur ne prend pas en charge les passkeys.'}
-							onclick={() => (enrollingPasskey = true)}
+							variant="secondary"
 						>
 							{busyAction === 'enable-passkey' ? 'Chargement…' : 'Activer'}
 						</CtaButton>
@@ -273,11 +273,11 @@
 					{mfaState.recovery_codes_remaining} codes de récupération restants
 				</p>
 				<CtaButton
-					variant="secondary"
-					size="sm"
-					fullWidth={false}
 					disabled={busy}
+					fullWidth={false}
 					onclick={() => void handleRegenerate()}
+					size="sm"
+					variant="secondary"
 				>
 					{busyAction === 'regenerate' ? 'Génération…' : 'Régénérer les codes'}
 				</CtaButton>
@@ -303,13 +303,13 @@
 
 	{#if enrollingPasskey}
 		<PasskeyNameModal
-			title="Ajouter une passkey"
-			description="Donne-lui un nom pour la retrouver, puis suis les instructions de ton navigateur."
 			confirmLabel="Continuer"
+			description="Donne-lui un nom pour la retrouver, puis suis les instructions de ton navigateur."
+			onCancel={() => (enrollingPasskey = false)}
 			onSubmit={(name) => {
 				void handleEnablePasskey(name);
 			}}
-			onCancel={() => (enrollingPasskey = false)}
+			title="Ajouter une passkey"
 		/>
 	{/if}
 

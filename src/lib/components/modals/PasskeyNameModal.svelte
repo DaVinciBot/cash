@@ -36,10 +36,10 @@
 
 <div
 	id="passkey-name-modal"
-	role="dialog"
-	aria-modal="true"
-	aria-label={title}
 	class="fixed inset-0 z-50 flex items-center justify-center p-4"
+	aria-label={title}
+	aria-modal="true"
+	role="dialog"
 >
 	<OverlayBackdrop />
 	<div
@@ -53,25 +53,25 @@
 		{/if}
 		<form class="grid gap-4" onsubmit={handleSubmit}>
 			<input
-				type="text"
 				id="passkey-name"
+				class="border-light-blue/30 bg-dark-blue/60 text-light-blue placeholder:text-dark-light-blue/50 focus:border-light-blue/70 block w-full rounded-xl border p-2.5 text-sm focus:outline-none"
 				aria-label="Nom de la passkey"
 				autocomplete="off"
-				spellcheck="false"
 				maxlength="64"
 				placeholder="Ex. MacBook du bureau"
-				class="border-light-blue/30 bg-dark-blue/60 text-light-blue placeholder:text-dark-light-blue/50 focus:border-light-blue/70 block w-full rounded-xl border p-2.5 text-sm focus:outline-none"
+				spellcheck="false"
+				type="text"
 				bind:value={name}
 			/>
 			<div class="flex items-center justify-end gap-2">
 				<button
-					type="button"
 					class="text-dark-light-blue cursor-pointer rounded-lg border-0 bg-transparent px-2 py-1 text-sm hover:underline"
 					onclick={onCancel}
+					type="button"
 				>
 					Annuler
 				</button>
-				<CtaButton type="submit" variant="secondary" size="sm" fullWidth={false}>
+				<CtaButton fullWidth={false} size="sm" type="submit" variant="secondary">
 					{confirmLabel}
 				</CtaButton>
 			</div>

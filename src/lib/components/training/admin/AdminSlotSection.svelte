@@ -50,21 +50,21 @@
 			<p class="text-light-blue/70 text-sm">Planifiez, suivez et ajustez les sessions.</p>
 		</div>
 		<div class="flex flex-col sm:w-40 sm:flex-row sm:flex-wrap">
-			<CTAButton type="button" variant="secondary" size="sm" onclick={onAddSlot}>Ajouter</CTAButton>
+			<CTAButton onclick={onAddSlot} size="sm" type="button" variant="secondary">Ajouter</CTAButton>
 		</div>
 	</div>
 
 	<div class="border-light-blue/10 mt-6 overflow-hidden rounded-2xl border">
 		<div class="hidden md:block">
 			<Table
-				headers={['Début', 'Formation', 'Formateur·ice', 'Statut', 'Actions']}
-				dbInfo={slotDbInfo}
-				parseItems={parseSlotItems}
 				actions={slotActions}
-				refreshTopic={slotTableTopic}
-				filters={slotFilters}
-				searchable="training.name"
+				dbInfo={slotDbInfo}
 				emptyMessage="Aucune session"
+				filters={slotFilters}
+				headers={['Début', 'Formation', 'Formateur·ice', 'Statut', 'Actions']}
+				parseItems={parseSlotItems}
+				refreshTopic={slotTableTopic}
+				searchable="training.name"
 				size={10}
 			/>
 		</div>
@@ -95,9 +95,9 @@
 								<div class="flex items-center gap-2">
 									{#if slot.trainer_avatar_url}
 										<img
-											src={slot.trainer_avatar_url}
-											alt={slot.trainer_username ?? 'Formateur·ice'}
 											class="h-6 w-6 rounded-full"
+											alt={slot.trainer_username ?? 'Formateur·ice'}
+											src={slot.trainer_avatar_url}
 										/>
 									{/if}
 									<span>{slot.trainer_username ?? 'A definir'}</span>

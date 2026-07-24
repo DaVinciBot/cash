@@ -150,24 +150,24 @@
 						<div>
 							<label for={`name-${String(i)}`}>Nom</label>
 							<input
-								type="text"
-								name={`name-${String(i)}`}
 								id={`name-${String(i)}`}
+								name={`name-${String(i)}`}
 								class=" focus:ring-primary-500 focus:border-primary-500 w-full rounded-lg border border-gray-600 bg-gray-700 p-2.5 text-sm text-white placeholder-gray-400"
 								placeholder="Vis"
 								required
+								type="text"
 								bind:value={item.nom}
 							/>
 						</div>
 						<div>
 							<label for={`lien-${String(i)}`}>Lien</label>
 							<input
-								type="text"
-								name={`lien-${String(i)}`}
 								id={`lien-${String(i)}`}
+								name={`lien-${String(i)}`}
 								class=" focus:ring-primary-500 focus:border-primary-500 w-full rounded-lg border border-gray-600 bg-gray-700 p-2.5 text-sm text-white placeholder-gray-400"
 								placeholder="https://fr.rs-online.com/web/"
 								required
+								type="text"
 								bind:value={item.lien}
 							/>
 						</div>
@@ -175,15 +175,15 @@
 							<label for={`price-${String(i)}`}>Prix</label>
 							<div class="flex">
 								<input
-									type="number"
-									name={`price-${String(i)}`}
 									id={`price-${String(i)}`}
+									name={`price-${String(i)}`}
 									class=" focus:ring-primary-500 focus:border-primary-500 w-full rounded-s-lg border-y border-s border-gray-600 bg-gray-700 p-2.5 text-sm text-white placeholder-gray-400"
+									min="0"
 									placeholder="15.5"
 									required
-									bind:value={item.price}
 									step="0.01"
-									min="0"
+									type="number"
+									bind:value={item.price}
 								/>
 								<div
 									class=" focus:ring-primary-500 focus:border-primary-500 block w-7 rounded-e-lg border border-gray-600 bg-gray-700 p-2.5 text-sm text-gray-400 placeholder-gray-400"
@@ -195,15 +195,15 @@
 						<div>
 							<label for={`quantity-${String(i)}`}>Quantité</label>
 							<input
-								type="number"
-								name={`quantity-${String(i)}`}
 								id={`quantity-${String(i)}`}
+								name={`quantity-${String(i)}`}
 								class=" focus:ring-primary-500 focus:border-primary-500 w-full rounded-lg border border-gray-600 bg-gray-700 p-2.5 text-sm text-white placeholder-gray-400"
+								min="1"
 								placeholder="5"
 								required
-								bind:value={item.quantity}
 								step="1"
-								min="1"
+								type="number"
+								bind:value={item.quantity}
 							/>
 						</div>
 					</div>
@@ -212,12 +212,12 @@
 
 			<div class="my-5">
 				<button
-					type="button"
 					class="hover:bg-primary-600 focus:ring-primary-800 w-full rounded-lg border-2 border-dashed border-gray-100 px-4 align-middle text-xl text-white transition-all hover:border-transparent focus:ring-4 focus:outline-none"
 					onclick={(e: MouseEvent) => {
 						e.preventDefault();
 						items = [...items, { nom: '', lien: '', price: '', quantity: '' }];
 					}}
+					type="button"
 				>
 					+
 				</button>
@@ -228,8 +228,8 @@
 			<div class="col-span-2">
 				<label for="comment">Commentaire</label>
 				<textarea
-					name="comment"
 					id="comment"
+					name="comment"
 					class=" focus:ring-primary-500 focus:border-primary-500 block w-full rounded-lg border border-gray-600 bg-gray-700 p-2.5 text-sm text-white placeholder-gray-400"
 					placeholder="Commentaire"></textarea>
 			</div>
@@ -237,9 +237,9 @@
 				<label for="tags">Tags</label>
 				<select
 					id="tags"
+					class=" focus:ring-primary-500 focus:border-primary-500 block w-full rounded-lg border border-gray-600 bg-gray-700 p-2.5 text-sm text-white placeholder-gray-400"
 					multiple
 					size="3"
-					class=" focus:ring-primary-500 focus:border-primary-500 block w-full rounded-lg border border-gray-600 bg-gray-700 p-2.5 text-sm text-white placeholder-gray-400"
 					bind:value={selectedTags}
 				>
 					{#each TAG_OPTIONS as t (t)}
@@ -254,8 +254,8 @@
 				<div class="col-span-2">
 					<label for="project">Sélection du projet</label>
 					<select
-						name="project"
 						id="project"
+						name="project"
 						class=" focus:ring-primary-500 focus:border-primary-500 block w-full rounded-lg border border-gray-600 bg-gray-700 p-2.5 text-sm text-white placeholder-gray-400"
 					>
 						{#each Object.entries(projectTitle) as [key, value] (key)}
@@ -267,9 +267,9 @@
 
 			<div class="col-span-2">
 				<button
-					type="submit"
 					class="bg-primary-600 hover:bg-primary-800 focus:ring-primary-800 rounded-lg px-4 py-2 text-sm font-medium text-white transition-all hover:border-transparent focus:ring-4 focus:outline-none"
-					onclick={onSubmit}>Envoyer</button
+					onclick={onSubmit}
+					type="submit">Envoyer</button
 				>
 			</div>
 		</div>

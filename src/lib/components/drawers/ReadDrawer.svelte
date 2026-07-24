@@ -513,15 +513,15 @@
 
 <!-- Drawer -->
 <div
-	class="fixed top-0 right-0 z-50 flex h-full flex-col bg-gray-800 shadow-lg transition-transform duration-300"
 	id={'drawer-' + id}
 	style={`transform: translateX(0); width: ${String(width)}px;`}
+	class="fixed top-0 right-0 z-50 flex h-full flex-col bg-gray-800 shadow-lg transition-transform duration-300"
 	tabindex="-1"
 >
 	<!-- Resize handle (left edge) -->
 	<button
-		aria-label="Resize drawer"
 		class="group absolute top-0 left-0 h-full w-2 cursor-col-resize bg-transparent focus:outline-none"
+		aria-label="Resize drawer"
 		onkeydown={(e: KeyboardEvent) => {
 			// keyboard resizing: arrow left increases width (drawer anchored right)
 			const step = e.shiftKey ? 40 : 10;
@@ -554,7 +554,7 @@
 			onclick={__onClose}
 			type="button"
 		>
-			<svg aria-hidden="true" class="h-5 w-5" fill="currentColor" viewBox="0 0 20 20">
+			<svg class="h-5 w-5" aria-hidden="true" fill="currentColor" viewBox="0 0 20 20">
 				<path
 					clip-rule="evenodd"
 					d="M4.293 4.293a1 1 0 011.414 0L10 8.586l4.293-4.293a1 1 0 111.414 1.414L11.414 10l4.293 4.293a1 1 0 01-1.414 1.414L10 11.414l-4.293 4.293a1 1 0 01-1.414-1.414L8.586 10 4.293 5.707a1 1 0 010-1.414z"
@@ -573,7 +573,7 @@
 	<!-- Content -->
 	<div class="flex-1 space-y-4 overflow-y-auto p-4">
 		{#if isEditing}
-			<form onsubmit={handleSave} bind:this={forms}>
+			<form bind:this={forms} onsubmit={handleSave}>
 				<div class="mb-4 grid gap-4 sm:grid-cols-2">
 					{#each fields as field (getFieldKey(field))}
 						<div class={field.wide ? 'col-span-2' : ''}>
@@ -586,9 +586,9 @@
 								</p>
 							{:else if field.type !== 'duplicate' && field.type !== 'info'}
 								<label
-									for={getFieldKey(field)}
 									class="mb-2 block text-sm font-medium text-white"
-									data-utils={stringValue(field.data)}>{field.name}</label
+									data-utils={stringValue(field.data)}
+									for={getFieldKey(field)}>{field.name}</label
 								>
 							{/if}
 							{#if field.type === 'select'}
@@ -596,8 +596,8 @@
 									id={getFieldKey(field)}
 									name={getFieldKey(field)}
 									class=" focus:border-primary-500 focus:ring-primary-500 block w-full rounded-lg border border-gray-600 bg-gray-700 p-2.5 text-sm text-white placeholder-gray-400"
-									onchange={field.onChange ?? null}
 									disabled={field.readonly ?? false}
+									onchange={field.onChange ?? null}
 								>
 									{#if !field.readonly}<option selected={!field.autoselect} value="NULL"
 											>----------</option
@@ -605,9 +605,9 @@
 									{/if}
 									{#each field.options ?? [] as option (option.value)}
 										<option
-											value={option.value}
 											data-utils={option.data ?? ''}
-											selected={option.selected}>{option.text}</option
+											selected={option.selected}
+											value={option.value}>{option.text}</option
 										>
 									{/each}
 								</select>
@@ -619,34 +619,33 @@
 								</p>
 							{:else if field.type === 'number'}
 								<input
-									type="number"
-									name={getFieldKey(field)}
 									id={getFieldKey(field)}
+									name={getFieldKey(field)}
 									class=" focus:border-primary-500 focus:ring-primary-500 block w-full rounded-lg border border-gray-600 bg-gray-700 p-2.5 text-sm text-white placeholder-gray-400"
-									placeholder={field.placeholder ?? field.name.toLowerCase()}
-									required={field.required}
-									value={inputValue(field.value)}
-									min={field.min ?? 0}
 									max={field.max ?? 2000}
-									step={field.step ?? 1}
+									min={field.min ?? 0}
+									placeholder={field.placeholder ?? field.name.toLowerCase()}
 									readonly={field.readonly ?? false}
+									required={field.required}
+									step={field.step ?? 1}
+									type="number"
+									value={inputValue(field.value)}
 								/>
 							{:else if field.type === 'textarea'}
 								<textarea
-									name={getFieldKey(field)}
 									id={getFieldKey(field)}
+									name={getFieldKey(field)}
 									class=" focus:border-primary-500 focus:ring-primary-500 block w-full rounded-lg border border-gray-600 bg-gray-700 p-2.5 text-sm text-white placeholder-gray-400"
 									placeholder={field.placeholder ?? field.name.toLowerCase()}
+									readonly={field.readonly ?? false}
 									required={field.required}
-									value={stringValue(field.value)}
-									readonly={field.readonly ?? false}></textarea>
+									value={stringValue(field.value)}></textarea>
 							{:else if field.type === 'img'}
 								<input
-									type="file"
-									name={getFieldKey(field)}
 									id={getFieldKey(field)}
-									accept="image/png, image/jpeg"
+									name={getFieldKey(field)}
 									class="hidden"
+									accept="image/png, image/jpeg"
 									onchange={field.onChange ??
 										((e) => {
 											const input = e.currentTarget;
@@ -665,23 +664,24 @@
 											};
 											reader.readAsDataURL(file);
 										})}
+									type="file"
 								/>
 								<label
-									for={getFieldKey(field)}
 									class="focus:border-primary-500 focus:ring-primary-500 flex h-12 w-full items-center justify-center rounded-lg border border-gray-600 bg-gray-700 p-2.5 text-sm text-white placeholder-gray-400"
+									for={getFieldKey(field)}
 								>
 									{#if field.value}
 										<img
 											id="svelte_breffffffffff"
-											src={stringValue(field.value)}
-											alt={field.name}
 											class="h-full w-full rounded-lg object-contain"
+											alt={field.name}
+											src={stringValue(field.value)}
 										/>
 									{:else}
 										<svg
-											xmlns="http://www.w3.org/2000/svg"
-											viewBox="0 0 24 24"
 											class="h-6 w-6 fill-gray-400"
+											viewBox="0 0 24 24"
+											xmlns="http://www.w3.org/2000/svg"
 											><path
 												d="M12 8.25a.75.75 0 0 1 .75.75v2.25H15a.75.75 0 0 1 0 1.5h-2.25V15a.75.75 0 0 1-1.5 0v-2.25H9a.75.75 0 0 1 0-1.5h2.25V9a.75.75 0 0 1 .75-.75Z"
 											></path><path
@@ -698,13 +698,13 @@
 										{#each documentPreviews(field.value) as doc (doc.id ?? doc.name)}
 											<div class="flex w-full items-center gap-2 border-gray-600 py-1">
 												<svg
+													class="octicon octicon-file"
 													aria-hidden="true"
+													data-view-component="true"
+													fill="white"
 													height="16"
 													viewBox="0 0 16 16"
 													width="16"
-													fill="white"
-													data-view-component="true"
-													class="octicon octicon-file"
 												>
 													<path
 														d="M2 1.75C2 .784 2.784 0 3.75 0h6.586c.464 0 .909.184 1.237.513l2.914 2.914c.329.328.513.773.513 1.237v9.586A1.75 1.75 0 0 1 13.25 16h-9.5A1.75 1.75 0 0 1 2 14.25Zm1.75-.25a.25.25 0 0 0-.25.25v12.5c0 .138.112.25.25.25h9.5a.25.25 0 0 0 .25-.25V6h-2.75A1.75 1.75 0 0 1 9 4.25V1.5Zm6.75.062V4.25c0 .138.112.25.25.25h2.688l-.011-.013-2.914-2.914-.013-.011Z"
@@ -714,9 +714,8 @@
 													{doc.name}
 												</p>
 												<button
-													type="button"
-													aria-label="Remove document"
 													class="hover: ml-auto inline-flex items-center rounded-lg bg-transparent p-1.5 text-sm text-gray-400 hover:bg-gray-600 hover:text-white"
+													aria-label="Remove document"
 													onclick={async (e: MouseEvent) => {
 														field.value = documentPreviews(field.value).filter(
 															(el) => el.name !== doc.name
@@ -725,16 +724,17 @@
 															await field.onRemove(e, doc.name);
 														}
 													}}
+													type="button"
 												>
 													<svg
-														aria-hidden="true"
-														height="16"
-														viewBox="0 0 16 16"
-														version="1.1"
-														width="16"
-														data-view-component="true"
 														class="octicon octicon-x"
+														aria-hidden="true"
+														data-view-component="true"
 														fill="white"
+														height="16"
+														version="1.1"
+														viewBox="0 0 16 16"
+														width="16"
 													>
 														<path
 															d="M3.72 3.72a.75.75 0 0 1 1.06 0L8 6.94l3.22-3.22a.749.749 0 0 1 1.275.326.749.749 0 0 1-.215.734L9.06 8l3.22 3.22a.749.749 0 0 1-.326 1.275.749.749 0 0 1-.734-.215L8 9.06l-3.22 3.22a.751.751 0 0 1-1.042-.018.751.751 0 0 1-.018-1.042L6.94 8 3.72 4.78a.75.75 0 0 1 0-1.06Z"
@@ -746,12 +746,11 @@
 									</div>
 								{/if}
 								<input
-									type="file"
-									name={getFieldKey(field)}
 									id={getFieldKey(field)}
-									multiple={field.multiple ?? false}
-									accept="image/png, image/jpeg, application/pdf, application/octet-stream"
+									name={getFieldKey(field)}
 									class="hidden"
+									accept="image/png, image/jpeg, application/pdf, application/octet-stream"
+									multiple={field.multiple ?? false}
 									onchange={field.onChange ??
 										((e) => {
 											const input = e.currentTarget;
@@ -798,17 +797,18 @@
 												}
 											}
 										})}
+									type="file"
 								/>
 								<label
-									for={getFieldKey(field)}
 									class="focus:border-primary-500 focus:ring-primary-500 flex h-12 w-full items-center justify-center rounded-lg border border-gray-600 bg-gray-700 p-2.5 text-sm text-white placeholder-gray-400"
+									for={getFieldKey(field)}
 								>
 									{#if field.value && field.data === 'image' && !field.multiple}
 										<img
 											id="svelte_breffffffffff"
-											src={stringValue(field.value)}
-											alt={field.name}
 											class="h-full w-full rounded-lg object-contain"
+											alt={field.name}
+											src={stringValue(field.value)}
 										/>
 									{:else if field.value && field.data === 'application' && !field.multiple}
 										<p>
@@ -816,9 +816,9 @@
 										</p>
 									{:else}
 										<svg
-											xmlns="http://www.w3.org/2000/svg"
-											viewBox="0 0 24 24"
 											class="h-6 w-6 fill-gray-400"
+											viewBox="0 0 24 24"
+											xmlns="http://www.w3.org/2000/svg"
 											><path
 												d="M12 8.25a.75.75 0 0 1 .75.75v2.25H15a.75.75 0 0 1 0 1.5h-2.25V15a.75.75 0 0 1-1.5 0v-2.25H9a.75.75 0 0 1 0-1.5h2.25V9a.75.75 0 0 1 .75-.75Z"
 											></path><path
@@ -830,7 +830,6 @@
 							{:else if field.type === 'duplicate'}
 								<!--Duplicate is a + btn to replicate the last collumn -->
 								<button
-									type="button"
 									class="focus:border-primary-500 focus:ring-primary-500 flex h-8 w-full items-center justify-center rounded-lg border border-gray-600 bg-gray-700 p-2.5 text-sm text-white placeholder-gray-400"
 									onclick={() => {
 										const clean_filter = fields.filter((el) => el.type !== 'duplicate');
@@ -873,6 +872,7 @@
 											{ name: 'duplicate', type: 'duplicate', wide: true }
 										];
 									}}
+									type="button"
 									>+
 								</button>
 							{:else if field.type === 'autocomplete'}
@@ -882,20 +882,15 @@
 								>
 									{#if field.image}
 										<img
-											src={field.image}
-											alt={field.name}
 											class="mr-1 -ml-1 h-6 w-6 rounded-full"
+											alt={field.name}
+											src={field.image}
 										/>
 									{/if}
 									<input
-										type="text"
 										id={getFieldKey(field)}
-										class=" bordertext-sm focus:border-primary-500 focus:ring-primary-500 block w-full rounded-lg border-gray-600 bg-gray-700 p-2.5 text-white placeholder-gray-400"
-										placeholder={field.placeholder ?? field.name.toLowerCase()}
-										required={field.required}
-										value={stringValue(field.value)}
-										readonly={field.readonly ?? false}
 										name={getFieldKey(field)}
+										class=" bordertext-sm focus:border-primary-500 focus:ring-primary-500 block w-full rounded-lg border-gray-600 bg-gray-700 p-2.5 text-white placeholder-gray-400"
 										oninput={async (
 											e: Event & {
 												currentTarget: EventTarget & HTMLInputElement;
@@ -908,6 +903,11 @@
 												? ((await completion) ?? [])
 												: (completion ?? []);
 										}}
+										placeholder={field.placeholder ?? field.name.toLowerCase()}
+										readonly={field.readonly ?? false}
+										required={field.required}
+										type="text"
+										value={stringValue(field.value)}
 									/>
 								</div>
 								{#if autocompleteCompletion.length > 0}
@@ -916,7 +916,6 @@
 									>
 										{#each autocompleteCompletion as c (completionKey(c))}
 											<button
-												type="button"
 												class=" flex w-full
 												items-center rounded-lg border-b border-gray-700 {c.image ? 'p-1' : ''} cursor-pointer"
 												onclick={async () => {
@@ -930,9 +929,10 @@
 													// call onSelect function if exists
 													await field.onSelect?.(c.value);
 												}}
+												type="button"
 											>
 												{#if c.image}
-													<img src={c.image} alt={c.text} class="mr-1 -ml-1 h-6 w-6 rounded-full" />
+													<img class="mr-1 -ml-1 h-6 w-6 rounded-full" alt={c.text} src={c.image} />
 												{/if}
 												<p>
 													{c.text}
@@ -953,25 +953,25 @@
 												class="flex items-center rounded-md bg-blue-600 px-2 py-1 text-sm text-white"
 											>
 												{#if item.image}
-													<img src={item.image} alt={item.text} class="mr-1 h-4 w-4 rounded-full" />
+													<img class="mr-1 h-4 w-4 rounded-full" alt={item.text} src={item.image} />
 												{/if}
 												<span>{item.text}</span>
 												<button
-													type="button"
-													aria-label={`Remove ${item.text}`}
 													class="ml-2 text-white hover:text-gray-300"
+													aria-label={`Remove ${item.text}`}
 													onclick={async () => {
 														const nextValue = selectedItems.filter((v) => v.value !== item.value);
 														field.value = nextValue;
 														field.data = nextValue.map((v) => v.value);
 														await field.onRemove?.(item.value);
 													}}
+													type="button"
 												>
 													<svg class="h-3 w-3" fill="currentColor" viewBox="0 0 20 20">
 														<path
-															fill-rule="evenodd"
-															d="M4.293 4.293a1 1 0 011.414 0L10 8.586l4.293-4.293a1 1 0 111.414 1.414L11.414 10l4.293 4.293a1 1 0 01-1.414 1.414L10 11.414l-4.293 4.293a1 1 0 01-1.414-1.414L8.586 10 4.293 5.707a1 1 0 010-1.414z"
 															clip-rule="evenodd"
+															d="M4.293 4.293a1 1 0 011.414 0L10 8.586l4.293-4.293a1 1 0 111.414 1.414L11.414 10l4.293 4.293a1 1 0 01-1.414 1.414L10 11.414l-4.293 4.293a1 1 0 01-1.414-1.414L8.586 10 4.293 5.707a1 1 0 010-1.414z"
+															fill-rule="evenodd"
 														></path>
 													</svg>
 												</button>
@@ -982,13 +982,9 @@
 								<!-- Search input -->
 								<div class="relative w-full">
 									<input
-										type="text"
 										id={getFieldKey(field)}
-										class="focus:border-primary-500 focus:ring-primary-500 block w-full rounded-lg border border-gray-600 bg-gray-700 p-2.5 text-sm text-white placeholder-gray-400"
-										placeholder={field.placeholder ?? field.name.toLowerCase()}
-										value={field.searchTerm ?? ''}
-										readonly={field.readonly ?? false}
 										name={getFieldKey(field)}
+										class="focus:border-primary-500 focus:ring-primary-500 block w-full rounded-lg border border-gray-600 bg-gray-700 p-2.5 text-sm text-white placeholder-gray-400"
 										oninput={async (
 											e: Event & {
 												currentTarget: EventTarget & HTMLInputElement;
@@ -1010,6 +1006,10 @@
 												field.completion = [];
 											}
 										}}
+										placeholder={field.placeholder ?? field.name.toLowerCase()}
+										readonly={field.readonly ?? false}
+										type="text"
+										value={field.searchTerm ?? ''}
 									/>
 									{#if autocompleteCompletion.length > 0}
 										<div
@@ -1019,7 +1019,6 @@
 												{@const isSelected = selectedItems.some((v) => v.value === c.value)}
 												{#if !isSelected}
 													<button
-														type="button"
 														class="flex w-full items-center rounded-lg border-b border-gray-700 {c.image
 															? 'p-1'
 															: ''} cursor-pointer hover:bg-gray-600"
@@ -1048,12 +1047,13 @@
 															// call onSelect function if exists
 															await field.onSelect?.(c.value);
 														}}
+														type="button"
 													>
 														{#if c.image}
 															<img
-																src={c.image}
-																alt={c.text}
 																class="mr-1 -ml-1 h-6 w-6 rounded-full"
+																alt={c.text}
+																src={c.image}
 															/>
 														{/if}
 														<p>{c.text}</p>
@@ -1076,22 +1076,22 @@
 											</p>
 											{#each packages as pack (pack.label)}
 												<button
-													type="button"
 													class="hover:bg-primary-600 rounded-md border border-gray-500 bg-gray-700 px-2 py-1 text-xs text-white transition-colors"
 													onclick={() => {
 														setFieldValue(field, [...pack.perms]);
 													}}
+													type="button"
 												>
 													{pack.label}
 												</button>
 											{/each}
 											<div class="mt-1 flex w-full justify-end border-t border-gray-700 pt-2">
 												<button
-													type="button"
 													class="px-2 py-1 text-xs text-red-400 underline hover:text-red-300"
 													onclick={() => {
 														setFieldValue(field, []);
 													}}
+													type="button"
 												>
 													Tout décocher
 												</button>
@@ -1110,9 +1110,8 @@
 													{#each perms as perm (perm.value)}
 														<label class="group inline-flex cursor-pointer items-center">
 															<input
-																type="checkbox"
 																name={field.id ?? 'permissions'}
-																value={perm.value}
+																class="text-primary-600 focus:ring-primary-600 h-4 w-4 cursor-pointer rounded border-gray-500 bg-gray-900 transition duration-200 focus:ring-2"
 																checked={permissionValues.includes(perm.value)}
 																onchange={(e: Event) => {
 																	const input = e.currentTarget;
@@ -1132,7 +1131,8 @@
 																		);
 																	}
 																}}
-																class="text-primary-600 focus:ring-primary-600 h-4 w-4 cursor-pointer rounded border-gray-500 bg-gray-900 transition duration-200 focus:ring-2"
+																type="checkbox"
+																value={perm.value}
 															/>
 															<span
 																class="ml-2 text-sm text-gray-300 transition-colors group-hover:text-white"
@@ -1157,10 +1157,10 @@
 												<option value={null}>Sélectionner un projet</option>
 												{#each field.projects ?? [] as p (p.value)}
 													<option
-														value={p.value}
 														disabled={rolesValue.some(
 															(value, i) => i !== idx && value.project_id === p.value
-														)}>{p.name}</option
+														)}
+														value={p.value}>{p.name}</option
 													>
 												{/each}
 											</select>
@@ -1173,29 +1173,28 @@
 												{/each}
 											</select>
 											<button
-												type="button"
-												aria-label="Supprimer ce projet"
 												class="rounded-lg bg-transparent p-2 text-red-500 hover:bg-gray-700 hover:text-red-400"
+												aria-label="Supprimer ce projet"
 												onclick={() => {
 													field.value = rolesValue.filter((_, i) => i !== idx);
 												}}
+												type="button"
 											>
 												<svg
-													aria-hidden="true"
 													class="h-5 w-5"
+													aria-hidden="true"
 													fill="currentColor"
 													viewBox="0 0 20 20"
 													><path
-														fill-rule="evenodd"
-														d="M9 2a1 1 0 00-.894.553L7.382 4H4a1 1 0 000 2v10a2 2 0 002 2h8a2 2 0 002-2V6a1 1 0 100-2h-3.382l-.724-1.447A1 1 0 0011 2H9zM7 8a1 1 0 012 0v6a1 1 0 11-2 0V8zm5-1a1 1 0 00-1 1v6a1 1 0 102 0V8a1 1 0 00-1-1z"
 														clip-rule="evenodd"
+														d="M9 2a1 1 0 00-.894.553L7.382 4H4a1 1 0 000 2v10a2 2 0 002 2h8a2 2 0 002-2V6a1 1 0 100-2h-3.382l-.724-1.447A1 1 0 0011 2H9zM7 8a1 1 0 012 0v6a1 1 0 11-2 0V8zm5-1a1 1 0 00-1 1v6a1 1 0 102 0V8a1 1 0 00-1-1z"
+														fill-rule="evenodd"
 													></path></svg
 												>
 											</button>
 										</div>
 									{/each}
 									<button
-										type="button"
 										class="text-primary-500 mt-2 flex w-full items-center justify-center gap-2 rounded-lg border border-dashed border-gray-600 p-2 text-sm hover:bg-gray-700"
 										onclick={() => {
 											field.value = [
@@ -1203,48 +1202,49 @@
 												{ project_id: null, role: field.defaultRole ?? 'membre' }
 											];
 										}}
+										type="button"
 									>
 										<svg
 											class="mr-2 h-3.5 w-3.5"
+											aria-hidden="true"
 											fill="currentColor"
 											viewBox="0 0 20 20"
 											xmlns="http://www.w3.org/2000/svg"
-											aria-hidden="true"
 											><path
 												clip-rule="evenodd"
-												fill-rule="evenodd"
 												d="M10 3a1 1 0 011 1v5h5a1 1 0 110 2h-5v5a1 1 0 11-2 0v-5H4a1 1 0 110-2h5V4a1 1 0 011-1z"
+												fill-rule="evenodd"
 											></path></svg
 										>Ajouter un projet
 									</button>
 									<input
-										type="hidden"
 										name={getFieldKey(field)}
+										type="hidden"
 										value={JSON.stringify(rolesValue)}
 									/>
 								</div>
 							{:else if field.type === 'checkbox'}
 								<input
-									type="checkbox"
 									id={getFieldKey(field)}
 									name={getFieldKey(field)}
 									class="focus:border-primary-500 focus:ring-primary-500 block w-full rounded-lg border border-gray-600 bg-gray-700 p-2.5 text-sm text-white placeholder-gray-400"
-									placeholder={field.placeholder ?? field.name.toLowerCase()}
-									required={field.required}
 									checked={field.checked ?? false}
-									value={stringValue(field.value)}
+									placeholder={field.placeholder ?? field.name.toLowerCase()}
 									readonly={field.readonly ?? false}
+									required={field.required}
+									type="checkbox"
+									value={stringValue(field.value)}
 								/>
 							{:else}
 								<input
-									type={field.type}
-									name={getFieldKey(field)}
 									id={getFieldKey(field)}
+									name={getFieldKey(field)}
 									class="focus:border-primary-500 focus:ring-primary-500 block w-full rounded-lg border border-gray-600 bg-gray-700 p-2.5 text-sm text-white placeholder-gray-400"
 									placeholder={field.placeholder ?? field.name.toLowerCase()}
-									required={field.required}
-									value={inputValue(field.value)}
 									readonly={field.readonly ?? false}
+									required={field.required}
+									type={field.type}
+									value={inputValue(field.value)}
 								/>
 							{/if}
 						</div>
@@ -1252,13 +1252,13 @@
 				</div>
 				<div class="flex space-x-2">
 					<button
-						type="submit"
-						class="rounded-lg bg-green-600 px-4 py-2 text-white hover:bg-green-700">Save</button
+						class="rounded-lg bg-green-600 px-4 py-2 text-white hover:bg-green-700"
+						type="submit">Save</button
 					>
 					<button
-						type="button"
 						class="rounded-lg bg-gray-700 px-4 py-2 text-gray-400 hover:bg-gray-600"
-						onclick={handleCancel}>Cancel</button
+						onclick={handleCancel}
+						type="button">Cancel</button
 					>
 				</div>
 			</form>
@@ -1268,8 +1268,8 @@
 					<h3 class="mb-2 text-lg font-semibold text-white">Pièces jointes</h3>
 					<div class="mb-2 flex items-center">
 						<button
-							aria-label="Previous file"
 							class="rounded-lg bg-transparent p-1.5 text-sm text-gray-400 hover:bg-gray-600 hover:text-white"
+							aria-label="Previous file"
 							onclick={() => {
 								if (current_file_index > 0) {
 									current_file_index--;
@@ -1280,9 +1280,9 @@
 						>
 							<svg class="h-5 w-5" fill="white" viewBox="0 0 20 20"
 								><path
-									fill-rule="evenodd"
-									d="M12.707 5.293a1 1 0 010 1.414L9.414 10l3.293 3.293a1 1 0 01-1.414 1.414l-4-4a1 1 0 010-1.414l4-4a1 1 0 011.414 0z"
 									clip-rule="evenodd"
+									d="M12.707 5.293a1 1 0 010 1.414L9.414 10l3.293 3.293a1 1 0 01-1.414 1.414l-4-4a1 1 0 010-1.414l4-4a1 1 0 011.414 0z"
+									fill-rule="evenodd"
 								></path></svg
 							>
 						</button>
@@ -1290,8 +1290,8 @@
 							{current_file || 'Chargement'} - {current_file_index + 1}/{files.length}
 						</p>
 						<button
-							aria-label="Next file"
 							class="rounded-lg bg-transparent p-1.5 text-sm text-gray-400 hover:bg-gray-600 hover:text-white"
+							aria-label="Next file"
 							onclick={() => {
 								if (current_file_index < files.length - 1) {
 									current_file_index++;
@@ -1302,29 +1302,29 @@
 						>
 							<svg class="h-5 w-5 rotate-180" fill="white" viewBox="0 0 20 20"
 								><path
-									fill-rule="evenodd"
-									d="M12.707 5.293a1 1 0 010 1.414L9.414 10l3.293 3.293a1 1 0 01-1.414 1.414l-4-4a1 1 0 010-1.414l4-4a1 1 0 011.414 0z"
 									clip-rule="evenodd"
+									d="M12.707 5.293a1 1 0 010 1.414L9.414 10l3.293 3.293a1 1 0 01-1.414 1.414l-4-4a1 1 0 010-1.414l4-4a1 1 0 011.414 0z"
+									fill-rule="evenodd"
 								></path></svg
 							>
 						</button>
 					</div>
 					<div class="flex aspect-[1/1.414] h-auto w-full gap-2 overflow-x-hidden">
-						<div class="flex rounded-lg" bind:this={scroll_body}>
+						<div bind:this={scroll_body} class="flex rounded-lg">
 							{#each files_array as { mime, url }, i (url ?? String(i))}
 								{@const name = getSignedFileName(url)}
 								<div class="flex w-full flex-col">
 									{#if mime === 'application/pdf' && !isMobile}
-										<iframe src={url ?? ''} frameborder="0" class="h-full w-full" title={name}
+										<iframe class="h-full w-full" frameborder="0" src={url ?? ''} title={name}
 										></iframe>
 									{:else if mime === 'application/pdf' && isMobile}
 										<iframe
-											src={`https://docs.google.com/viewer?url=${encodeURIComponent(url ?? '')}&embedded=true`}
 											class="h-full w-full"
+											src={`https://docs.google.com/viewer?url=${encodeURIComponent(url ?? '')}&embedded=true`}
 											title={name}
 										></iframe>
 									{:else if mime.startsWith('image/')}
-										<img src={url ?? ''} alt={name} class="w-full max-w-full" />
+										<img class="w-full max-w-full" alt={name} src={url ?? ''} />
 									{/if}
 								</div>
 							{/each}
@@ -1386,18 +1386,18 @@
 													<svg
 														class="mr-1 h-3 w-3"
 														aria-hidden="true"
-														xmlns="http://www.w3.org/2000/svg"
-														width="24"
-														height="24"
 														fill="none"
+														height="24"
 														viewBox="0 0 24 24"
+														width="24"
+														xmlns="http://www.w3.org/2000/svg"
 													>
 														<path
+															d="M12 8v4l3 3m6-3a9 9 0 1 1-18 0 9 9 0 0 1 18 0Z"
 															stroke="currentColor"
 															stroke-linecap="round"
 															stroke-linejoin="round"
 															stroke-width="2"
-															d="M12 8v4l3 3m6-3a9 9 0 1 1-18 0 9 9 0 0 1 18 0Z"
 														/>
 													</svg>
 													{value.date}
@@ -1446,27 +1446,27 @@
 											<tr data-utils={String(listItem.id)}>
 												<td class="fill-gray-400 p-2 hover:fill-gray-200"
 													><button
-														type="button"
 														class="text-left"
 														onclick={() => {
 															if (listItem.link) {
 																window.open(listItem.link, '_blank', 'noopener,noreferrer');
 															}
 														}}
+														type="button"
 													>
 														{#if listItem.link}
 															<svg
+																id="Capa_1"
+																style="enable-background:new 0 0 511.904 511.904;"
 																class="ml-1 inline h-4 w-4 transition-all"
+																height="16"
+																viewBox="0 0 511.904 511.904"
+																width="16"
+																x="0px"
 																xmlns="http://www.w3.org/2000/svg"
 																xmlns:xlink="http://www.w3.org/1999/xlink"
-																id="Capa_1"
-																x="0px"
 																y="0px"
-																viewBox="0 0 511.904 511.904"
-																style="enable-background:new 0 0 511.904 511.904;"
 																xml:space="preserve"
-																width="16"
-																height="16"
 															>
 																<g>
 																	<path
@@ -1489,19 +1489,19 @@
 													<td class="flex justify-end gap-2 p-2">
 														{#if detail.onEdit}
 															<button
-																type="button"
-																aria-label="Edit item"
 																class="bg-primary-600 hover:bg-primary-700 focus:ring-primary-800 inline-flex items-center rounded-lg p-2 text-center text-sm font-medium text-white focus:ring-4 focus:outline-none"
+																aria-label="Edit item"
 																onclick={() => {
 																	detail.onEdit?.(listItem);
 																}}
+																type="button"
 															>
 																<svg
 																	class="h-4 w-4"
+																	aria-hidden="true"
 																	fill="currentColor"
 																	viewBox="0 0 20 20"
 																	xmlns="http://www.w3.org/2000/svg"
-																	aria-hidden="true"
 																>
 																	<path
 																		d="M13.586 3.586a2 2 0 112.828 2.828l-.793.793-2.828-2.828.793-.793zM11.379 5.793L3 14.172V17h2.828l8.38-8.379-2.83-2.828z"
@@ -1510,9 +1510,8 @@
 															</button>
 														{/if}
 														<button
-															type="button"
-															aria-label="Delete item"
 															class="inline-flex items-center rounded-lg bg-red-600 p-2 text-center text-sm font-medium text-white hover:bg-red-700 focus:ring-4 focus:ring-red-300 focus:outline-none"
+															aria-label="Delete item"
 															onclick={async () => {
 																if (detail.onDelete) {
 																	await detail.onDelete(listItem);
@@ -1532,17 +1531,18 @@
 																);
 																tr?.remove();
 															}}
+															type="button"
 														>
 															<svg
-																aria-hidden="true"
 																class="h-4 w-4"
+																aria-hidden="true"
 																fill="currentColor"
 																viewBox="0 0 20 20"
 															>
 																<path
-																	fill-rule="evenodd"
-																	d="M9 2a1 1 0 00-.894.553L7.382 4H4a1 1 0 000 2v10a2 2 0 002 2h8a2 2 0 002-2V6a1 1 0 100-2h-3.382l-.724-1.447A1 1 0 0011 2H9zM7 8a1 1 0 012 0v6a1 1 0 11-2 0V8zm5-1a1 1 0 00-1 1v6a1 1 0 102 0V8a1 1 0 00-1-1z"
 																	clip-rule="evenodd"
+																	d="M9 2a1 1 0 00-.894.553L7.382 4H4a1 1 0 000 2v10a2 2 0 002 2h8a2 2 0 002-2V6a1 1 0 100-2h-3.382l-.724-1.447A1 1 0 0011 2H9zM7 8a1 1 0 012 0v6a1 1 0 11-2 0V8zm5-1a1 1 0 00-1 1v6a1 1 0 102 0V8a1 1 0 00-1-1z"
+																	fill-rule="evenodd"
 																></path>
 															</svg>
 														</button>
@@ -1569,24 +1569,24 @@
 		<!-- toggle edit mode if fields provided -->
 		{#if !isEditing && fields.length > 0}
 			<button
-				type="button"
 				class="bg-primary-600 hover:bg-primary-700 focus:ring-primary-800 inline-flex items-center rounded-lg px-5 py-2.5 text-center text-sm font-medium text-white focus:ring-4 focus:outline-none"
 				onclick={() => {
 					isEditing = true;
 					parseValuesToFields();
 				}}
+				type="button"
 			>
 				<svg
-					aria-hidden="true"
 					class="mr-1 -ml-1 h-5 w-5"
+					aria-hidden="true"
 					fill="currentColor"
 					viewBox="0 0 20 20"
 					xmlns="http://www.w3.org/2000/svg"
 					><path d="M17.414 2.586a2 2 0 00-2.828 0L7 10.172V13h2.828l7.586-7.586a2 2 0 000-2.828z"
 					></path><path
-						fill-rule="evenodd"
-						d="M2 6a2 2 0 012-2h4a1 1 0 010 2H4v10h10v-4a1 1 0 112 0v4a2 2 0 01-2 2H4a2 2 0 01-2-2V6z"
 						clip-rule="evenodd"
+						d="M2 6a2 2 0 012-2h4a1 1 0 010 2H4v10h10v-4a1 1 0 112 0v4a2 2 0 01-2 2H4a2 2 0 01-2-2V6z"
+						fill-rule="evenodd"
 					></path></svg
 				>
 				Modifier
@@ -1598,7 +1598,7 @@
 					class=" focus:border-primary-500 focus:ring-primary-500 block w-full rounded-lg border border-gray-600 bg-gray-700 p-2.5 text-sm text-white placeholder-gray-400"
 					onchange={action.handler}
 				>
-					<option value="" disabled selected>Choisir une option</option>
+					<option disabled selected value="">Choisir une option</option>
 					{#each action.title as { name, value } (value)}
 						<option {value}>{name}</option>
 					{/each}
@@ -1606,20 +1606,20 @@
 			{/if}
 			{#if action.type === 'validate'}
 				<button
-					type="button"
 					class="bg-primary-700 hover:bg-primary-800 focus:ring-primary-300 inline-flex items-center rounded-lg px-5 py-2.5 text-center text-sm font-medium text-white focus:ring-4 focus:outline-none"
 					onclick={action.handler}
+					type="button"
 				>
 					<svg
-						aria-hidden="true"
 						class="mr-1.5 -ml-1 h-5 w-5"
+						aria-hidden="true"
 						fill="currentColor"
 						viewBox="0 0 20 20"
 					>
 						<path
-							fill-rule="evenodd"
-							d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z"
 							clip-rule="evenodd"
+							d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z"
+							fill-rule="evenodd"
 						></path>
 					</svg>
 					{action.title}
@@ -1627,20 +1627,20 @@
 			{/if}
 			{#if action.type === 'delete'}
 				<button
-					type="button"
 					class="inline-flex items-center rounded-lg bg-red-600 px-5 py-2.5 text-center text-sm font-medium text-white hover:bg-red-700 focus:ring-4 focus:ring-red-300 focus:outline-none"
 					onclick={action.handler}
+					type="button"
 				>
 					<svg
-						aria-hidden="true"
 						class="mr-1.5 -ml-1 h-5 w-5"
+						aria-hidden="true"
 						fill="currentColor"
 						viewBox="0 0 20 20"
 					>
 						<path
-							fill-rule="evenodd"
-							d="M9 2a1 1 0 00-.894.553L7.382 4H4a1 1 0 000 2v10a2 2 0 002 2h8a2 2 0 002-2V6a1 1 0 100-2h-3.382l-.724-1.447A1 1 0 0011 2H9zM7 8a1 1 0 012 0v6a1 1 0 11-2 0V8zm5-1a1 1 0 00-1 1v6a1 1 0 102 0V8a1 1 0 00-1-1z"
 							clip-rule="evenodd"
+							d="M9 2a1 1 0 00-.894.553L7.382 4H4a1 1 0 000 2v10a2 2 0 002 2h8a2 2 0 002-2V6a1 1 0 100-2h-3.382l-.724-1.447A1 1 0 0011 2H9zM7 8a1 1 0 012 0v6a1 1 0 11-2 0V8zm5-1a1 1 0 00-1 1v6a1 1 0 102 0V8a1 1 0 00-1-1z"
+							fill-rule="evenodd"
 						></path>
 					</svg>
 					{action.title}

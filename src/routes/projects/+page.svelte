@@ -224,7 +224,7 @@
 	<div class="flex h-14 w-full items-center justify-between">
 		<h2 class="h-full w-full self-center align-middle text-3xl font-bold tracking-tight text-white">
 			{#if (user?.projects.length ?? 0) > 1}
-				<div class="relative inline-block h-full min-w-64 md:min-w-72" bind:this={dropdownEl}>
+				<div bind:this={dropdownEl} class="relative inline-block h-full min-w-64 md:min-w-72">
 					<button
 						class="flex h-full w-full items-center justify-between rounded-md border border-gray-800 bg-gray-900 px-6 py-2 text-2xl font-bold text-white hover:bg-gray-800"
 						onclick={() => (showDropdown = !showDropdown)}
@@ -234,10 +234,10 @@
 							'Sélectionner un projet'}
 						<svg class="ml-2 h-6 w-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
 							<path
+								d="M19 9l-7 7-7-7"
 								stroke-linecap="round"
 								stroke-linejoin="round"
 								stroke-width="2"
-								d="M19 9l-7 7-7-7"
 							/>
 						</svg>
 					</button>
@@ -271,9 +271,9 @@
 			<select
 				id="year"
 				class="h-full rounded-md border border-gray-800 bg-gray-900 px-3 py-2 text-white"
+				aria-label="Sélection de l'année du budget"
 				onchange={handleYearChange}
 				bind:value={selectedYear}
-				aria-label="Sélection de l'année du budget"
 			>
 				{#if budgets.length}
 					{#each budgets.sort((a, b) => parseInt(b.year ?? '0', 10) - parseInt(a.year ?? '0', 10)) as b (b.year)}

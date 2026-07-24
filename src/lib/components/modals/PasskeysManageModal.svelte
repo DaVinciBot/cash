@@ -101,10 +101,10 @@
 
 <div
 	id="passkeys-manage-modal"
-	role="dialog"
-	aria-modal="true"
-	aria-label="Gérer les passkeys"
 	class="fixed inset-0 z-50 flex items-center justify-center p-4"
+	aria-label="Gérer les passkeys"
+	aria-modal="true"
+	role="dialog"
 >
 	<OverlayBackdrop />
 	<div
@@ -116,7 +116,7 @@
 			<p class="text-dark-light-blue m-0 text-sm">Chargement…</p>
 		{:else if loadError}
 			<p class="m-0 mb-3 text-sm text-red-400">{loadError}</p>
-			<CtaButton variant="secondary" size="sm" fullWidth={false} onclick={() => void load()}>
+			<CtaButton fullWidth={false} onclick={() => void load()} size="sm" variant="secondary">
 				Réessayer
 			</CtaButton>
 		{:else if passkeys.length === 0}
@@ -139,25 +139,25 @@
 						</div>
 						<button
 							id={`passkey-rename-${passkey.id}`}
-							type="button"
-							aria-label="Renommer cette passkey"
-							title="Renommer cette passkey"
 							class="text-dark-light-blue hover:bg-light-blue/10 shrink-0 cursor-pointer rounded-lg border-0 bg-transparent p-2 disabled:cursor-not-allowed disabled:opacity-50"
+							aria-label="Renommer cette passkey"
 							disabled={busy}
 							onclick={() => {
 								openRename(passkey);
 							}}
+							title="Renommer cette passkey"
+							type="button"
 						>
 							<Pencil class="size-4" />
 						</button>
 						<button
 							id={`passkey-delete-${passkey.id}`}
-							type="button"
-							aria-label="Supprimer cette passkey"
-							title="Supprimer cette passkey"
 							class="shrink-0 cursor-pointer rounded-lg border-0 bg-transparent p-2 text-red-400 hover:bg-red-500/10 disabled:cursor-not-allowed disabled:opacity-50"
+							aria-label="Supprimer cette passkey"
 							disabled={busy}
 							onclick={() => void handleDelete(passkey)}
+							title="Supprimer cette passkey"
+							type="button"
 						>
 							<Trash2 class="size-4" />
 						</button>
@@ -176,11 +176,11 @@
 			{#if supported}
 				<CtaButton
 					id="passkey-add"
-					variant="secondary"
-					size="sm"
-					fullWidth={false}
 					disabled={busy || loading}
+					fullWidth={false}
 					onclick={openAdd}
+					size="sm"
+					variant="secondary"
 				>
 					Ajouter une passkey
 				</CtaButton>
@@ -188,9 +188,9 @@
 				<span></span>
 			{/if}
 			<button
-				type="button"
 				class="text-dark-light-blue cursor-pointer rounded-lg border-0 bg-transparent px-2 py-1 text-sm hover:underline"
 				onclick={onClose}
+				type="button"
 			>
 				Fermer
 			</button>
@@ -200,19 +200,19 @@
 
 {#if nameModalOpen}
 	<PasskeyNameModal
-		title={renameTarget ? 'Renommer la passkey' : 'Ajouter une passkey'}
+		confirmLabel={renameTarget ? 'Renommer' : 'Continuer'}
 		description={renameTarget
 			? null
 			: 'Donne-lui un nom pour la retrouver, puis suis les instructions de ton navigateur.'}
 		initialName={renameTarget?.friendly_name ?? ''}
-		confirmLabel={renameTarget ? 'Renommer' : 'Continuer'}
-		onSubmit={(name) => {
-			void handleNameSubmit(name);
-		}}
 		onCancel={() => {
 			nameModalOpen = false;
 			renameTarget = null;
 		}}
+		onSubmit={(name) => {
+			void handleNameSubmit(name);
+		}}
+		title={renameTarget ? 'Renommer la passkey' : 'Ajouter une passkey'}
 	/>
 {/if}
 

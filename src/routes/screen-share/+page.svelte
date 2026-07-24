@@ -143,11 +143,11 @@
 <!-- Info Button (top right, outside layout) -->
 <button
 	class="fixed top-20 right-4 z-20 rounded-full p-2 hover:bg-gray-600 focus:outline-none"
+	aria-label="Afficher les instructions"
 	onclick={(e: MouseEvent) => {
 		e.stopPropagation();
 		showToolbox = !showToolbox;
 	}}
-	aria-label="Afficher les instructions"
 >
 	<svg
 		class="h-6 w-6 text-blue-500"
@@ -156,9 +156,9 @@
 		stroke-width="2"
 		viewBox="0 0 24 24"
 	>
-		<circle cx="12" cy="12" r="10" stroke="currentColor" stroke-width="2" fill="none" />
-		<path d="M12 16v-4" stroke="currentColor" stroke-width="2" stroke-linecap="round" />
-		<circle cx="12" cy="8" r="1" fill="currentColor" />
+		<circle cx="12" cy="12" fill="none" r="10" stroke="currentColor" stroke-width="2" />
+		<path d="M12 16v-4" stroke="currentColor" stroke-linecap="round" stroke-width="2" />
+		<circle cx="12" cy="8" fill="currentColor" r="1" />
 	</svg>
 </button>
 
@@ -176,9 +176,9 @@
 		stroke-width="2"
 		viewBox="0 0 24 24"
 	>
-		<circle cx="12" cy="12" r="10" stroke="currentColor" stroke-width="2" fill="none" />
-		<path d="M12 16v-4" stroke="currentColor" stroke-width="2" stroke-linecap="round" />
-		<circle cx="12" cy="8" r="1" fill="currentColor" />
+		<circle cx="12" cy="12" fill="none" r="10" stroke="currentColor" stroke-width="2" />
+		<path d="M12 16v-4" stroke="currentColor" stroke-linecap="round" stroke-width="2" />
+		<circle cx="12" cy="8" fill="currentColor" r="1" />
 	</svg>
 	<div>
 		<p class="mb-1 font-semibold">Comment se connecter&nbsp;?</p>
@@ -210,17 +210,17 @@
 				viewBox="0 0 24 24"
 			>
 				<rect
-					x="3"
-					y="4"
-					width="18"
+					fill="none"
 					height="12"
 					rx="2"
 					stroke="currentColor"
 					stroke-width="2"
-					fill="none"
+					width="18"
+					x="3"
+					y="4"
 				/>
-				<path d="M8 20h8" stroke="currentColor" stroke-width="2" stroke-linecap="round" />
-				<path d="M12 16v4" stroke="currentColor" stroke-width="2" stroke-linecap="round" />
+				<path d="M8 20h8" stroke="currentColor" stroke-linecap="round" stroke-width="2" />
+				<path d="M12 16v4" stroke="currentColor" stroke-linecap="round" stroke-width="2" />
 			</svg>
 			<h1 class="text-2xl font-bold text-gray-200">SmartShare</h1>
 		</div>
@@ -232,7 +232,7 @@
 				stroke-width="2"
 				viewBox="0 0 24 24"
 			>
-				<circle cx="12" cy="12" r="10" stroke="white" fill="currentColor" stroke-width="2" />
+				<circle cx="12" cy="12" fill="currentColor" r="10" stroke="white" stroke-width="2" />
 			</svg>
 			<p class="text-gray-300">
 				Statut WebSocket
@@ -252,14 +252,14 @@
 				viewBox="0 0 24 24"
 			>
 				<rect
-					x="4"
-					y="7"
-					width="16"
+					fill="currentColor"
 					height="10"
 					rx="2"
 					stroke="white"
 					stroke-width="2"
-					fill="currentColor"
+					width="16"
+					x="4"
+					y="7"
 				/>
 			</svg>
 			<p class="text-gray-300">
@@ -273,9 +273,9 @@
 		</div>
 		<div class="flex">
 			<button
-				onclick={startShare}
-				disabled={!canCastSmartShare || is_busy || sharing}
 				class="bg-primary-600 hover:bg-primary-700 flex-1 rounded px-4 py-2 font-semibold text-white transition disabled:cursor-not-allowed disabled:opacity-50"
+				disabled={!canCastSmartShare || is_busy || sharing}
+				onclick={startShare}
 			>
 				<svg
 					class="-mt-1 mr-2 inline h-5 w-5"
@@ -285,24 +285,24 @@
 					viewBox="0 0 24 24"
 				>
 					<rect
-						x="3"
-						y="4"
-						width="18"
+						fill="none"
 						height="12"
 						rx="2"
 						stroke="currentColor"
 						stroke-width="2"
-						fill="none"
+						width="18"
+						x="3"
+						y="4"
 					/>
-					<path d="M8 20h8" stroke="currentColor" stroke-width="2" stroke-linecap="round" />
-					<path d="M12 16v4" stroke="currentColor" stroke-width="2" stroke-linecap="round" />
+					<path d="M8 20h8" stroke="currentColor" stroke-linecap="round" stroke-width="2" />
+					<path d="M12 16v4" stroke="currentColor" stroke-linecap="round" stroke-width="2" />
 				</svg>
 				Caster
 			</button>
 			{#if canManageTraining}
 				<button
-					onclick={sendKill}
 					class="ml-4 flex-1 rounded bg-red-500 px-4 py-2 font-semibold text-white transition hover:bg-red-600"
+					onclick={sendKill}
 				>
 					<svg
 						class="-mt-1 mr-2 inline h-5 w-5"
@@ -314,8 +314,8 @@
 						<path
 							d="M6 18L18 6M6 6l12 12"
 							stroke="currentColor"
-							stroke-width="2"
 							stroke-linecap="round"
+							stroke-width="2"
 						/>
 					</svg>
 					Kill switch

@@ -536,9 +536,9 @@
 				<label class="flex items-center gap-2 text-xs">
 					<span class="opacity-80">Ajouter un fichier</span>
 					<input
-						type="file"
 						class="text-xs file:mr-4 file:rounded file:border-0 file:bg-gray-700 file:px-2 file:py-1 file:text-xs file:text-white hover:file:bg-gray-600"
 						onchange={handleUpload}
+						type="file"
 					/>
 				</label>
 			</div>
@@ -547,11 +547,11 @@
 		<!-- Sidebar -->
 		<div class="flex flex-col gap-4 rounded-lg border border-gray-700 bg-gray-800/40 p-3">
 			<div>
-				<label for="search" class="mb-1 block text-sm">Rechercher par titre</label>
+				<label class="mb-1 block text-sm" for="search">Rechercher par titre</label>
 				<input
 					id="search"
-					placeholder="Rechercher..."
 					class="w-full rounded border border-gray-700 bg-gray-900 px-3 py-2"
+					placeholder="Rechercher..."
 					bind:value={search}
 				/>
 			</div>
@@ -567,13 +567,13 @@
 								.includes(search.toLowerCase())) as a (a.slug)}
 							<li>
 								<button
-									type="button"
 									class={`w-full cursor-pointer rounded p-2 text-left hover:bg-gray-700/40 ${a.slug === selectedSlug ? 'bg-gray-700/30' : ''}`}
 									onclick={() => {
 										if (a.slug) {
 											void loadArticle(a.slug);
 										}
 									}}
+									type="button"
 								>
 									<div class="text-sm font-medium">{a.title}</div>
 									<div class="flex items-center justify-between gap-2">
@@ -608,8 +608,8 @@
 				<input
 					id="title"
 					class="w-full rounded border border-gray-700 bg-gray-900 px-3 py-2"
-					bind:value={title}
 					oninput={() => (slug = toSlug(title))}
+					bind:value={title}
 				/>
 			</div>
 			<div>
@@ -636,8 +636,8 @@
 				<label class="mb-1 block text-sm" for="excerpt">Extrait</label>
 				<textarea
 					id="excerpt"
-					rows="3"
 					class="w-full rounded border border-gray-700 bg-gray-900 px-3 py-2"
+					rows="3"
 					bind:value={meta.excerpt}></textarea>
 			</div>
 			<div>
@@ -659,16 +659,16 @@
 				/>
 				<div class="mt-2 flex items-center gap-2">
 					<input
-						type="file"
+						class="text-xs file:mr-4 file:rounded file:border-0 file:bg-gray-700 file:px-2 file:py-1 file:text-xs file:text-white hover:file:bg-gray-600"
 						accept="image/*"
 						onchange={handleCoverUpload}
-						class="text-xs file:mr-4 file:rounded file:border-0 file:bg-gray-700 file:px-2 file:py-1 file:text-xs file:text-white hover:file:bg-gray-600"
+						type="file"
 					/>
 					{#if meta.heroImage}
 						<img
-							src={meta.heroImage}
-							alt="couverture"
 							class="h-10 w-10 rounded border border-gray-700 object-cover"
+							alt="couverture"
+							src={meta.heroImage}
 						/>
 					{/if}
 				</div>
@@ -702,8 +702,8 @@
 
 			<button
 				class="bg-primary-600 hover:bg-primary-700 rounded px-4 py-2 text-white disabled:opacity-50"
-				onclick={handleSave}
 				disabled={saving}
+				onclick={handleSave}
 			>
 				{saving ? 'Enregistrement…' : 'Enregistrer'}
 			</button>

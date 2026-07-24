@@ -61,10 +61,10 @@
 
 <div
 	id="totp-enroll-modal"
-	role="dialog"
-	aria-modal="true"
-	aria-label="Activer une application d'authentification"
 	class="fixed inset-0 z-50 flex items-center justify-center p-4"
+	aria-label="Activer une application d'authentification"
+	aria-modal="true"
+	role="dialog"
 >
 	<OverlayBackdrop />
 	<div
@@ -81,11 +81,11 @@
 		<div class="mb-4 flex flex-col items-center gap-3">
 			{#if qrDataUrl}
 				<img
-					src={qrDataUrl}
-					alt="QR code d'activation"
 					class="rounded-xl bg-white p-2"
-					width="220"
+					alt="QR code d'activation"
 					height="220"
+					src={qrDataUrl}
+					width="220"
 				/>
 			{:else}
 				<p class="text-dark-light-blue m-0 text-sm">Génération du QR code…</p>
@@ -95,9 +95,9 @@
 			>
 				<code class="text-light-blue min-w-0 truncate font-mono text-xs">{enrollment.secret}</code>
 				<button
-					type="button"
 					class="text-dark-light-blue flex shrink-0 cursor-pointer items-center gap-1.5 rounded-lg border-0 bg-transparent px-2 py-1 text-xs hover:underline"
 					onclick={() => void handleCopySecret()}
+					type="button"
 				>
 					<Copy class="size-3.5" />
 					{copied ? 'Copiée !' : 'Copier'}
@@ -106,7 +106,7 @@
 		</div>
 
 		<form class="grid gap-4" onsubmit={handleSubmit}>
-			<CodeInput id="totp-enroll-code" bind:value={code} disabled={busy} />
+			<CodeInput id="totp-enroll-code" disabled={busy} bind:value={code} />
 
 			{#if errorMessage}
 				<p class="m-0 text-sm text-red-400">{errorMessage}</p>
@@ -114,14 +114,14 @@
 
 			<div class="flex items-center justify-end gap-2">
 				<button
-					type="button"
 					class="text-dark-light-blue cursor-pointer rounded-lg border-0 bg-transparent px-2 py-1 text-sm hover:underline"
 					disabled={busy}
 					onclick={onClose}
+					type="button"
 				>
 					Annuler
 				</button>
-				<CtaButton type="submit" variant="secondary" size="sm" fullWidth={false} disabled={busy}>
+				<CtaButton disabled={busy} fullWidth={false} size="sm" type="submit" variant="secondary">
 					{busy ? 'Vérification…' : 'Valider'}
 				</CtaButton>
 			</div>

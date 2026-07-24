@@ -90,15 +90,15 @@
 
 <div
 	{id}
-	tabindex="-1"
 	class="fixed top-0 right-0 left-0 z-50 h-full w-full items-center justify-center overflow-x-hidden overflow-y-auto md:inset-0"
+	tabindex="-1"
 >
 	<OverlayBackdrop />
 	<div class="relative m-auto flex h-full w-full p-4">
 		<!-- Modal content -->
 		<div
-			class="relative m-auto max-h-[calc(100vh-2rem)] max-w-[calc(100vw-2rem)] overflow-hidden rounded-lg bg-gray-800 shadow sm:min-w-96"
 			id="CrudPopup"
+			class="relative m-auto max-h-[calc(100vh-2rem)] max-w-[calc(100vw-2rem)] overflow-hidden rounded-lg bg-gray-800 shadow sm:min-w-96"
 		>
 			<div class="max-h-[calc(100vh-2rem)] overflow-y-auto p-4 sm:p-5">
 				<!-- Modal header -->
@@ -107,20 +107,20 @@
 						{title}
 					</h3>
 					<button
-						type="button"
 						class="ml-auto inline-flex cursor-pointer items-center rounded-lg bg-transparent p-1.5 text-sm text-gray-500 hover:bg-gray-600 hover:text-white"
 						onclick={(e: MouseEvent) => onClose(e)}
+						type="button"
 					>
 						<svg
-							aria-hidden="true"
 							class="h-5 w-5"
+							aria-hidden="true"
 							fill="currentColor"
 							viewBox="0 0 20 20"
 							xmlns="http://www.w3.org/2000/svg"
 							><path
-								fill-rule="evenodd"
-								d="M4.293 4.293a1 1 0 011.414 0L10 8.586l4.293-4.293a1 1 0 111.414 1.414L11.414 10l4.293 4.293a1 1 0 01-1.414 1.414L10 11.414l-4.293 4.293a1 1 0 01-1.414-1.414L8.586 10 4.293 5.707a1 1 0 010-1.414z"
 								clip-rule="evenodd"
+								d="M4.293 4.293a1 1 0 011.414 0L10 8.586l4.293-4.293a1 1 0 111.414 1.414L11.414 10l4.293 4.293a1 1 0 01-1.414 1.414L10 11.414l-4.293 4.293a1 1 0 01-1.414-1.414L8.586 10 4.293 5.707a1 1 0 010-1.414z"
+								fill-rule="evenodd"
 							></path></svg
 						>
 						<span class="sr-only">Close modal</span>
@@ -151,8 +151,8 @@
 										id={fieldId(field)}
 										name={fieldId(field)}
 										class="almarai-regular focus:border-primary-500 focus:ring-primary-500 block w-full cursor-pointer rounded-lg border border-gray-600 bg-gray-700 p-2.5 text-sm text-white placeholder-gray-400"
-										onchange={field.onChange ?? null}
 										disabled={field.readonly ?? false}
+										onchange={field.onChange ?? null}
 									>
 										{#if !field.readonly && !field.required}<option
 												selected={!field.autoselect}
@@ -161,9 +161,9 @@
 										{/if}
 										{#each field.options ?? [] as option (option.value)}
 											<option
-												value={option.value}
 												data-utils={option.data ?? ''}
-												selected={option.selected}>{option.text}</option
+												selected={option.selected}
+												value={option.value}>{option.text}</option
 											>
 										{/each}
 									</select>
@@ -175,34 +175,33 @@
 									</p>
 								{:else if field.type === 'number'}
 									<input
-										type="number"
-										name={fieldId(field)}
 										id={fieldId(field)}
+										name={fieldId(field)}
 										class=" focus:border-primary-500 focus:ring-primary-500 block w-full rounded-lg border border-gray-600 bg-gray-700 p-2.5 text-sm text-white placeholder-gray-400"
-										placeholder={field.placeholder ?? field.name.toLowerCase()}
-										required={field.required}
-										value={inputValue(field.value)}
-										min={field.min ?? 0}
 										max={field.max ?? 2000}
-										step={field.step ?? 1}
+										min={field.min ?? 0}
+										placeholder={field.placeholder ?? field.name.toLowerCase()}
 										readonly={field.readonly ?? false}
+										required={field.required}
+										step={field.step ?? 1}
+										type="number"
+										value={inputValue(field.value)}
 									/>
 								{:else if field.type === 'textarea'}
 									<textarea
-										name={fieldId(field)}
 										id={fieldId(field)}
+										name={fieldId(field)}
 										class=" focus:border-primary-500 focus:ring-primary-500 block w-full rounded-lg border border-gray-600 bg-gray-700 p-2.5 text-sm text-white placeholder-gray-400"
 										placeholder={field.placeholder ?? field.name.toLowerCase()}
+										readonly={field.readonly ?? false}
 										required={field.required}
-										value={stringValue(field.value)}
-										readonly={field.readonly ?? false}></textarea>
+										value={stringValue(field.value)}></textarea>
 								{:else if field.type === 'img'}
 									<input
-										type="file"
-										name={fieldId(field)}
 										id={fieldId(field)}
-										accept="image/png, image/jpeg"
+										name={fieldId(field)}
 										class="hidden"
+										accept="image/png, image/jpeg"
 										onchange={field.onChange ??
 											((e: Event) => {
 												const file = filesFromEvent(e)[0];
@@ -217,23 +216,24 @@
 													reader.readAsDataURL(file);
 												}
 											})}
+										type="file"
 									/>
 									<label
-										for={fieldId(field)}
 										class="focus:border-primary-500 focus:ring-primary-500 flex h-12 w-full items-center justify-center rounded-lg border border-gray-600 bg-gray-700 p-2.5 text-sm text-white placeholder-gray-400"
+										for={fieldId(field)}
 									>
 										{#if field.value}
 											<img
 												id="svelte_breffffffffff"
-												src={stringValue(field.value)}
-												alt={field.name}
 												class="h-full w-full rounded-lg object-contain"
+												alt={field.name}
+												src={stringValue(field.value)}
 											/>
 										{:else}
 											<svg
-												xmlns="http://www.w3.org/2000/svg"
-												viewBox="0 0 24 24"
 												class="h-6 w-6 fill-gray-400"
+												viewBox="0 0 24 24"
+												xmlns="http://www.w3.org/2000/svg"
 												><path
 													d="M12 8.25a.75.75 0 0 1 .75.75v2.25H15a.75.75 0 0 1 0 1.5h-2.25V15a.75.75 0 0 1-1.5 0v-2.25H9a.75.75 0 0 1 0-1.5h2.25V9a.75.75 0 0 1 .75-.75Z"
 												></path><path
@@ -250,14 +250,14 @@
 											{#each documentPreviews(field.value) as doc (doc.id ?? doc.name)}
 												<div class="flex w-full items-center gap-2 border-gray-600 py-1">
 													<svg
-														aria-hidden="true"
-														height="16"
-														viewBox="0 0 16 16"
-														version="1.1"
-														width="16"
-														fill="white"
-														data-view-component="true"
 														class="octicon octicon-file"
+														aria-hidden="true"
+														data-view-component="true"
+														fill="white"
+														height="16"
+														version="1.1"
+														viewBox="0 0 16 16"
+														width="16"
 													>
 														<path
 															d="M2 1.75C2 .784 2.784 0 3.75 0h6.586c.464 0 .909.184 1.237.513l2.914 2.914c.329.328.513.773.513 1.237v9.586A1.75 1.75 0 0 1 13.25 16h-9.5A1.75 1.75 0 0 1 2 14.25Zm1.75-.25a.25.25 0 0 0-.25.25v12.5c0 .138.112.25.25.25h9.5a.25.25 0 0 0 .25-.25V6h-2.75A1.75 1.75 0 0 1 9 4.25V1.5Zm6.75.062V4.25c0 .138.112.25.25.25h2.688l-.011-.013-2.914-2.914-.013-.011Z"
@@ -267,9 +267,8 @@
 														{doc.name}
 													</p>
 													<button
-														type="button"
-														aria-label={`Remove ${doc.name}`}
 														class="hover: ml-auto inline-flex items-center rounded-lg bg-transparent p-1.5 text-sm text-gray-400 hover:bg-gray-600 hover:text-white"
+														aria-label={`Remove ${doc.name}`}
 														onclick={async (e: MouseEvent) => {
 															field.value = documentPreviews(field.value).filter(
 																(el) => el.name !== doc.name
@@ -278,16 +277,17 @@
 																await field.onRemove(e, doc.name);
 															}
 														}}
+														type="button"
 													>
 														<svg
-															aria-hidden="true"
-															height="16"
-															viewBox="0 0 16 16"
-															version="1.1"
-															width="16"
-															data-view-component="true"
 															class="octicon octicon-x"
+															aria-hidden="true"
+															data-view-component="true"
 															fill="white"
+															height="16"
+															version="1.1"
+															viewBox="0 0 16 16"
+															width="16"
 														>
 															<path
 																d="M3.72 3.72a.75.75 0 0 1 1.06 0L8 6.94l3.22-3.22a.749.749 0 0 1 1.275.326.749.749 0 0 1-.215.734L9.06 8l3.22 3.22a.749.749 0 0 1-.326 1.275.749.749 0 0 1-.734-.215L8 9.06l-3.22 3.22a.751.751 0 0 1-1.042-.018.751.751 0 0 1-.018-1.042L6.94 8 3.72 4.78a.75.75 0 0 1 0-1.06Z"
@@ -299,12 +299,11 @@
 										</div>
 									{/if}
 									<input
-										type="file"
-										name={fieldId(field)}
 										id={fieldId(field)}
-										multiple={field.multiple ?? false}
-										accept="image/png, image/jpeg, application/pdf, application/octet-stream"
+										name={fieldId(field)}
 										class="hidden"
+										accept="image/png, image/jpeg, application/pdf, application/octet-stream"
+										multiple={field.multiple ?? false}
 										onchange={field.onChange ??
 											((e: Event) => {
 												const selectedFiles = filesFromEvent(e);
@@ -349,17 +348,18 @@
 													}
 												}
 											})}
+										type="file"
 									/>
 									<label
-										for={fieldId(field)}
 										class="focus:border-primary-500 focus:ring-primary-500 flex h-12 w-full items-center justify-center rounded-lg border border-gray-600 bg-gray-700 p-2.5 text-sm text-white placeholder-gray-400"
+										for={fieldId(field)}
 									>
 										{#if field.value && field.data === 'image' && !field.multiple}
 											<img
 												id="svelte_breffffffffff"
-												src={stringValue(field.value)}
-												alt={field.name}
 												class="h-full w-full rounded-lg object-contain"
+												alt={field.name}
+												src={stringValue(field.value)}
 											/>
 										{:else if field.value && field.data === 'application' && !field.multiple}
 											<p>
@@ -367,9 +367,9 @@
 											</p>
 										{:else}
 											<svg
-												xmlns="http://www.w3.org/2000/svg"
-												viewBox="0 0 24 24"
 												class="h-6 w-6 fill-gray-400"
+												viewBox="0 0 24 24"
+												xmlns="http://www.w3.org/2000/svg"
 												><path
 													d="M12 8.25a.75.75 0 0 1 .75.75v2.25H15a.75.75 0 0 1 0 1.5h-2.25V15a.75.75 0 0 1-1.5 0v-2.25H9a.75.75 0 0 1 0-1.5h2.25V9a.75.75 0 0 1 .75-.75Z"
 												></path><path
@@ -381,7 +381,6 @@
 								{:else if field.type === 'duplicate'}
 									<!--Duplicate is a + btn to replicate the last collumn -->
 									<button
-										type="button"
 										class="focus:border-primary-500 focus:ring-primary-500 flex h-8 w-full items-center justify-center rounded-lg border border-gray-600 bg-gray-700 p-2.5 text-sm text-white placeholder-gray-400"
 										onclick={() => {
 											const clean_filter = fields.filter((el) => el.type !== 'duplicate');
@@ -423,6 +422,7 @@
 												{ name: 'duplicate', type: 'duplicate', wide: true }
 											];
 										}}
+										type="button"
 										>+
 									</button>
 								{:else if field.type === 'autocomplete'}
@@ -436,20 +436,15 @@
 										>
 											{#if displayImage}
 												<img
-													src={displayImage}
-													alt={field.name}
 													class="ml-2 h-6 w-6 rounded-full"
+													alt={field.name}
+													src={displayImage}
 												/>
 											{/if}
 											<input
-												type="text"
 												id={fieldId(field)}
-												class=" bordertext-sm focus:border-primary-500 focus:ring-primary-500 block w-full rounded-lg border-gray-600 bg-gray-700 p-2.5 text-white placeholder-gray-400"
-												placeholder={field.placeholder ?? field.name.toLowerCase()}
-												required={field.required}
-												value={stringValue(inputValue)}
-												readonly={field.readonly ?? false}
 												name={fieldId(field)}
+												class=" bordertext-sm focus:border-primary-500 focus:ring-primary-500 block w-full rounded-lg border-gray-600 bg-gray-700 p-2.5 text-white placeholder-gray-400"
 												oninput={(
 													e: Event & {
 														currentTarget: EventTarget & HTMLInputElement;
@@ -498,6 +493,11 @@
 														};
 													}
 												}}
+												placeholder={field.placeholder ?? field.name.toLowerCase()}
+												readonly={field.readonly ?? false}
+												required={field.required}
+												type="text"
+												value={stringValue(inputValue)}
 											/>
 										</div>
 										{#if completion.length > 0}
@@ -506,7 +506,6 @@
 											>
 												{#each completion as c (completionKey(c))}
 													<button
-														type="button"
 														class="almarai-regular flex w-full items-center rounded-lg border-b border-gray-700 {c.image
 															? 'p-1'
 															: ''} cursor-pointer"
@@ -533,12 +532,13 @@
 																[fieldKey]: []
 															};
 														}}
+														type="button"
 													>
 														{#if c.image}
 															<img
-																src={c.image}
-																alt={c.text}
 																class="mr-2 -ml-3 h-6 w-6 rounded-full"
+																alt={c.text}
+																src={c.image}
 															/>
 														{/if}
 														<div class="flex flex-col items-start">
@@ -556,22 +556,22 @@
 									</div>
 								{:else if field.type === 'checkbox'}
 									<label
-										for={fieldId(field)}
 										class="flex cursor-pointer items-center gap-2.5 rounded-lg border border-gray-600 bg-gray-700 p-2 text-sm text-white"
+										for={fieldId(field)}
 									>
 										<Checkbox
 											id={fieldId(field)}
 											name={fieldId(field)}
-											value={stringValue(field.value)}
-											required={field.required}
+											checked={field.checked ?? false}
 											className="size-4"
 											disabled={field.readonly ?? false}
-											checked={field.checked ?? false}
 											onchange={(event: Event) => {
 												const target = event.currentTarget as HTMLInputElement | null;
 												field.checked = target?.checked === true;
 												fields = [...fields];
 											}}
+											required={field.required}
+											value={stringValue(field.value)}
 										/>
 										<div class="flex flex-row items-center gap-2">
 											<span class="text-sm text-white">
@@ -582,21 +582,20 @@
 									</label>
 								{:else}
 									<input
-										type={field.type}
-										name={fieldId(field)}
 										id={fieldId(field)}
+										name={fieldId(field)}
 										class="focus:border-primary-500 focus:ring-primary-500 block w-full cursor-text rounded-lg border border-gray-600 bg-gray-700 p-2.5 text-sm text-white placeholder-gray-400"
 										placeholder={field.placeholder ?? field.name.toLowerCase()}
-										required={field.required}
-										value={inputValue(field.value)}
 										readonly={field.readonly ?? false}
+										required={field.required}
+										type={field.type}
+										value={inputValue(field.value)}
 									/>
 								{/if}
 							</div>
 						{/each}
 					</div>
 					<button
-						type="submit"
 						class={`bg-primary-600 focus:ring-primary-800 inline-flex items-center rounded-lg px-5 py-2.5 text-center text-sm font-medium text-white focus:ring-4 focus:outline-none ${
 							submitting ? 'cursor-not-allowed opacity-60' : 'hover:bg-primary-700'
 						}`}
@@ -607,6 +606,7 @@
 							}
 							void onSubmit(e);
 						}}
+						type="submit"
 					>
 						<svg
 							class={`mr-1 -ml-1 h-6 w-6 ${submitting ? 'animate-spin' : ''}`}
@@ -614,9 +614,9 @@
 							viewBox="0 0 20 20"
 							xmlns="http://www.w3.org/2000/svg"
 							><path
-								fill-rule="evenodd"
-								d="M10 5a1 1 0 011 1v3h3a1 1 0 110 2h-3v3a1 1 0 11-2 0v-3H6a1 1 0 110-2h3V6a1 1 0 011-1z"
 								clip-rule="evenodd"
+								d="M10 5a1 1 0 011 1v3h3a1 1 0 110 2h-3v3a1 1 0 11-2 0v-3H6a1 1 0 110-2h3V6a1 1 0 011-1z"
+								fill-rule="evenodd"
 							></path></svg
 						>
 						{submitting ? submitLoadingLabel : submitLabel}

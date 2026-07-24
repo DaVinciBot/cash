@@ -58,7 +58,7 @@
 				class="group border-light-blue/30 relative block size-24 shrink-0 cursor-pointer overflow-hidden rounded-full border"
 				aria-label="Modifier la photo de profil"
 			>
-				<img src={user?.avatar} alt="avatar" class="size-full rounded-full object-cover" />
+				<img class="size-full rounded-full object-cover" alt="avatar" src={user?.avatar} />
 				<span
 					class="absolute inset-0 flex items-center justify-center rounded-full bg-[rgba(4,8,32,0.7)] text-sm font-semibold opacity-0 transition-opacity group-hover:opacity-100 {uploadingAvatar
 						? 'opacity-100'
@@ -67,25 +67,25 @@
 					{uploadingAvatar ? '…' : 'Modifier'}
 				</span>
 				<input
-					type="file"
 					id="avatar-file"
-					accept="image/png, image/jpeg"
 					class="hidden"
+					accept="image/png, image/jpeg"
 					disabled={uploadingAvatar}
 					onchange={handleAvatarChange}
+					type="file"
 				/>
 			</label>
 			<div
 				class="flex w-full min-w-0 flex-1 flex-col items-center gap-1 text-center sm:items-start sm:text-left"
 			>
 				<p class="text-light-blue m-0 max-w-full truncate text-lg font-semibold">{user?.name}</p>
-				<p class="text-dark-light-blue m-0 max-w-full truncate text-sm" id="profile-email">
+				<p id="profile-email" class="text-dark-light-blue m-0 max-w-full truncate text-sm">
 					{user?.email}
 				</p>
 				{#if user && user.projects.length > 0}
 					<ul
-						class="m-0 mt-2 flex list-none flex-wrap justify-center gap-2 p-0 sm:justify-start"
 						id="profile-projects"
+						class="m-0 mt-2 flex list-none flex-wrap justify-center gap-2 p-0 sm:justify-start"
 					>
 						{#each user.projects as project (project.id)}
 							<li
@@ -104,21 +104,21 @@
 		<p class="text-dark-light-blue m-0 mb-3 text-[0.65rem] tracking-[0.32em] uppercase">Pseudo</p>
 		<form class="flex flex-col gap-3 sm:flex-row sm:items-center" onsubmit={handleUsernameSubmit}>
 			<input
-				type="text"
 				id="username"
 				name="username"
-				placeholder="DaVinciBot"
 				class="border-light-blue/30 bg-dark-blue/60 text-light-blue placeholder:text-dark-light-blue/50 focus:border-light-blue/70 block w-full rounded-xl border p-2.5 text-sm focus:outline-none disabled:opacity-50"
 				disabled={savingUsername}
+				placeholder="DaVinciBot"
+				type="text"
 				bind:value={username}
 			/>
 			<CtaButton
-				type="submit"
-				variant="secondary"
-				size="sm"
-				fullWidth={false}
 				class="shrink-0"
 				disabled={savingUsername}
+				fullWidth={false}
+				size="sm"
+				type="submit"
+				variant="secondary"
 			>
 				{savingUsername ? 'Chargement…' : 'Enregistrer'}
 			</CtaButton>

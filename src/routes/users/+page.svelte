@@ -1030,7 +1030,7 @@
 </div>
 <div class="w-full py-2 sm:px-8 lg:px-16">
 	<div class="rounded-lg bg-gray-800">
-		<Table {headers} {parseItems} {filters} {dbInfo} {addNew} {actions} />
+		<Table {actions} {addNew} {dbInfo} {filters} {headers} {parseItems} />
 	</div>
 </div>
 
@@ -1040,12 +1040,12 @@
 			<div class="mb-4 flex items-center justify-between gap-3">
 				<h3 class="text-xl font-semibold text-white">Invitations en attente</h3>
 				<button
-					type="button"
 					class="rounded-lg border border-gray-600 px-3 py-2 text-sm font-medium text-gray-200 hover:bg-gray-700 disabled:cursor-not-allowed disabled:opacity-50"
+					disabled={pendingInvitesLoading || reinvitingUserId !== null}
 					onclick={() => {
 						void loadPendingInvites();
 					}}
-					disabled={pendingInvitesLoading || reinvitingUserId !== null}
+					type="button"
 				>
 					Rafraîchir
 				</button>
@@ -1082,12 +1082,12 @@
 									<td class="px-3 py-2">{formatDate(authUser.last_sign_in_at)}</td>
 									<td class="px-3 py-2 text-right">
 										<button
-											type="button"
 											class="bg-primary-700 hover:bg-primary-800 rounded-lg px-3 py-1.5 text-sm font-medium text-white disabled:cursor-not-allowed disabled:opacity-50"
+											disabled={reinvitingUserId !== null}
 											onclick={() => {
 												void reinvitePendingUser(authUser);
 											}}
-											disabled={reinvitingUserId !== null}
+											type="button"
 										>
 											{reinvitingUserId === authUser.id ? 'Envoi...' : 'Réinviter'}
 										</button>

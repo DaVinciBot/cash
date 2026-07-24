@@ -43,36 +43,36 @@
 		</p>
 		<form class="grid gap-4" onsubmit={handleSubmit}>
 			<div>
-				<label for="password" class="text-light-blue mb-2 block text-sm font-medium">
+				<label class="text-light-blue mb-2 block text-sm font-medium" for="password">
 					Nouveau mot de passe
 				</label>
 				<input
-					type="password"
 					id="password"
 					name="new-password"
-					autocomplete="new-password"
-					placeholder="********"
 					class="border-light-blue/30 bg-dark-blue/60 text-light-blue placeholder:text-dark-light-blue/50 focus:border-light-blue/70 block w-full rounded-xl border p-2.5 text-sm focus:outline-none disabled:opacity-50"
+					autocomplete="new-password"
 					disabled={saving}
+					placeholder="********"
+					type="password"
 					bind:value={password}
 				/>
 			</div>
 			<div>
-				<label for="password-confirm" class="text-light-blue mb-2 block text-sm font-medium">
+				<label class="text-light-blue mb-2 block text-sm font-medium" for="password-confirm">
 					Confirmer le mot de passe
 				</label>
 				<input
-					type="password"
 					id="password-confirm"
 					name="confirm-password"
-					autocomplete="new-password"
-					placeholder="********"
 					class="border-light-blue/30 bg-dark-blue/60 text-light-blue placeholder:text-dark-light-blue/50 focus:border-light-blue/70 block w-full rounded-xl border p-2.5 text-sm focus:outline-none disabled:opacity-50"
+					autocomplete="new-password"
 					disabled={saving}
+					placeholder="********"
+					type="password"
 					bind:value={confirmation}
 				/>
 			</div>
-			<CtaButton type="submit" variant="secondary" size="sm" fullWidth={false} disabled={saving}>
+			<CtaButton disabled={saving} fullWidth={false} size="sm" type="submit" variant="secondary">
 				{saving ? 'Chargement…' : 'Changer mon mot de passe'}
 			</CtaButton>
 		</form>

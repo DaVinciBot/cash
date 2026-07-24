@@ -108,8 +108,8 @@
 	<form class="flex flex-col gap-4" onsubmit={handleSubmit}>
 		<div>
 			<label
-				for="report-type"
 				class="text-dark-light-blue mb-1.5 block text-[0.65rem] tracking-[0.32em] uppercase"
+				for="report-type"
 			>
 				Type
 			</label>
@@ -132,36 +132,36 @@
 
 		<div>
 			<label
-				for="report-title"
 				class="text-dark-light-blue mb-1.5 block text-[0.65rem] tracking-[0.32em] uppercase"
+				for="report-title"
 			>
 				Titre
 			</label>
 			<input
-				type="text"
 				id="report-title"
-				maxlength="200"
-				placeholder="Résumé du problème"
 				class="border-light-blue/30 bg-dark-blue/60 text-light-blue placeholder:text-dark-light-blue/50 focus:border-light-blue/70 block w-full rounded-xl border p-2.5 text-sm focus:outline-none disabled:opacity-50"
 				disabled={submitting}
+				maxlength="200"
+				placeholder="Résumé du problème"
+				type="text"
 				bind:value={title}
 			/>
 		</div>
 
 		<div>
 			<label
-				for="report-description"
 				class="text-dark-light-blue mb-1.5 block text-[0.65rem] tracking-[0.32em] uppercase"
+				for="report-description"
 			>
 				Description
 			</label>
 			<textarea
 				id="report-description"
-				maxlength="2000"
-				rows="6"
-				placeholder="Ce qui s'est passé, ce qui était attendu…"
 				class="border-light-blue/30 bg-dark-blue/60 text-light-blue placeholder:text-dark-light-blue/50 focus:border-light-blue/70 block w-full resize-y rounded-xl border p-2.5 text-sm focus:outline-none disabled:opacity-50"
 				disabled={submitting}
+				maxlength="2000"
+				placeholder="Ce qui s'est passé, ce qui était attendu…"
+				rows="6"
 				bind:value={description}></textarea>
 		</div>
 
@@ -173,18 +173,18 @@
 				{#each images as image, index (image.preview)}
 					<div class="relative">
 						<img
-							src={image.preview}
-							alt="Aperçu {index + 1}"
 							class="border-light-blue/20 size-20 rounded-xl border object-cover"
+							alt="Aperçu {index + 1}"
+							src={image.preview}
 						/>
 						<button
-							type="button"
 							class="bg-dark-blue border-light-blue/30 text-light-blue hover:border-light-blue/60 absolute -top-1.5 -right-1.5 flex size-5 cursor-pointer items-center justify-center rounded-full border transition"
+							aria-label="Retirer l'image {index + 1}"
+							disabled={submitting}
 							onclick={() => {
 								removeImage(index);
 							}}
-							disabled={submitting}
-							aria-label="Retirer l'image {index + 1}"
+							type="button"
 						>
 							<X class="size-3.5" />
 						</button>
@@ -197,12 +197,12 @@
 						<ImagePlus class="size-5" />
 						Ajouter
 						<input
-							type="file"
-							accept="image/png, image/jpeg, image/webp"
-							multiple
 							class="hidden"
+							accept="image/png, image/jpeg, image/webp"
 							disabled={submitting}
+							multiple
 							onchange={handleFilesChange}
+							type="file"
 						/>
 					</label>
 				{/if}
@@ -212,9 +212,9 @@
 		<label class="text-light-blue flex w-fit cursor-pointer items-center gap-2 text-sm">
 			<Checkbox
 				id="report-anonymous"
-				bind:checked={anonymous}
 				className="size-4"
 				disabled={submitting}
+				bind:checked={anonymous}
 			/>
 			<span>Envoyer ce signalement anonymement</span>
 		</label>
@@ -227,12 +227,12 @@
 		{/if}
 
 		<CtaButton
-			type="submit"
-			variant="secondary"
-			size="sm"
-			fullWidth={false}
 			class="self-end"
 			disabled={submitting}
+			fullWidth={false}
+			size="sm"
+			type="submit"
+			variant="secondary"
 		>
 			{submitting ? 'Envoi…' : 'Envoyer'}
 		</CtaButton>

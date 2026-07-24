@@ -851,21 +851,21 @@
 	<!-- Tabs header -->
 	<div class="mt-4 flex gap-2">
 		<button
-			aria-pressed={selectedTab === 'detail'}
 			class="rounded-md border px-4 py-2 text-sm font-medium transition-colors
 				{selectedTab === 'detail'
 				? 'border-gray-600 bg-gray-700 text-white'
 				: 'hover:bg-gray-750 border-gray-700 bg-gray-800 text-gray-300'}"
+			aria-pressed={selectedTab === 'detail'}
 			onclick={() => (selectedTab = 'detail')}
 		>
 			Détail
 		</button>
 		<button
-			aria-pressed={selectedTab === 'cashflow'}
 			class="rounded-md border px-4 py-2 text-sm font-medium transition-colors
 				{selectedTab === 'cashflow'
 				? 'border-gray-600 bg-gray-700 text-white'
 				: 'hover:bg-gray-750 border-gray-700 bg-gray-800 text-gray-300'}"
+			aria-pressed={selectedTab === 'cashflow'}
 			onclick={() => (selectedTab = 'cashflow')}
 		>
 			Cashflow
@@ -879,20 +879,20 @@
 					<label class="text-sm text-gray-400" for="start">Début</label>
 					<input
 						id="start"
-						type="date"
-						bind:value={startDate}
 						class="rounded-md border border-gray-800 bg-gray-900 px-3 py-2 text-white"
 						onchange={loadCashflow}
+						type="date"
+						bind:value={startDate}
 					/>
 				</div>
 				<div class="flex flex-col">
 					<label class="text-sm text-gray-400" for="end">Fin</label>
 					<input
 						id="end"
-						type="date"
-						bind:value={endDate}
 						class="rounded-md border border-gray-800 bg-gray-900 px-3 py-2 text-white"
 						onchange={loadCashflow}
+						type="date"
+						bind:value={endDate}
 					/>
 				</div>
 			</div>
@@ -927,16 +927,16 @@
 							>
 						{/if}
 						<svg
-							class="h-5 w-5 transform text-gray-400 transition-transform duration-200"
-							viewBox="0 0 20 20"
-							fill="currentColor"
 							style={`transform: rotate(${banksOpen ? '180' : '0'}deg)`}
+							class="h-5 w-5 transform text-gray-400 transition-transform duration-200"
 							aria-hidden="true"
+							fill="currentColor"
+							viewBox="0 0 20 20"
 						>
 							<path
-								fill-rule="evenodd"
-								d="M5.23 7.21a.75.75 0 011.06.02L10 11.146l3.71-3.915a.75.75 0 111.08 1.04l-4.24 4.47a.75.75 0 01-1.08 0L5.21 8.27a.75.75 0 01.02-1.06z"
 								clip-rule="evenodd"
+								d="M5.23 7.21a.75.75 0 011.06.02L10 11.146l3.71-3.915a.75.75 0 111.08 1.04l-4.24 4.47a.75.75 0 01-1.08 0L5.21 8.27a.75.75 0 01.02-1.06z"
+								fill-rule="evenodd"
 							/>
 						</svg>
 					</div>
@@ -988,15 +988,15 @@
 			<div class="mt-4 w-full">
 				<div class="rounded-lg bg-gray-800">
 					<Table
+						{actions}
 						{addNew}
-						{parseItems}
 						{dbInfo}
 						{headers}
-						{actions}
+						{parseItems}
 						refreshTopic="spending"
+						searchable="description"
 						type="ligne"
 						type_accord="une"
-						searchable="description"
 					/>
 				</div>
 			</div>

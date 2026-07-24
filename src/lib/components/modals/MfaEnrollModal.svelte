@@ -86,10 +86,10 @@
 
 <div
 	id="mfa-enroll-modal"
-	role="dialog"
-	aria-modal="true"
-	aria-label="Activer la vérification en deux étapes"
 	class="fixed inset-0 z-50 flex items-center justify-center p-4"
+	aria-label="Activer la vérification en deux étapes"
+	aria-modal="true"
+	role="dialog"
 >
 	<OverlayBackdrop />
 	<div
@@ -105,12 +105,12 @@
 		</p>
 		<form class="grid gap-4" onsubmit={handleSubmit}>
 			<div class="grid gap-2">
-				<CodeInput id="mfa-enroll-code" bind:value={code} disabled={busy} />
+				<CodeInput id="mfa-enroll-code" disabled={busy} bind:value={code} />
 				<button
-					type="button"
 					class="text-dark-light-blue cursor-pointer rounded-lg border-0 bg-transparent p-0 text-left text-xs hover:underline disabled:cursor-not-allowed disabled:no-underline disabled:opacity-50"
 					disabled={busy || resending || resendCooldown > 0}
 					onclick={() => void handleResend()}
+					type="button"
 				>
 					{resending
 						? 'Envoi…'
@@ -126,14 +126,14 @@
 
 			<div class="flex items-center justify-end gap-2">
 				<button
-					type="button"
 					class="text-dark-light-blue cursor-pointer rounded-lg border-0 bg-transparent px-2 py-1 text-sm hover:underline"
 					disabled={busy}
 					onclick={onClose}
+					type="button"
 				>
 					Annuler
 				</button>
-				<CtaButton type="submit" variant="secondary" size="sm" fullWidth={false} disabled={busy}>
+				<CtaButton disabled={busy} fullWidth={false} size="sm" type="submit" variant="secondary">
 					{busy ? 'Vérification…' : 'Valider'}
 				</CtaButton>
 			</div>

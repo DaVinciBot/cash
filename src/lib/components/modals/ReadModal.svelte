@@ -239,17 +239,17 @@
 
 <div
 	{id}
-	tabindex="-1"
-	aria-hidden="true"
 	class="fixed top-0 right-0 left-0 z-50 h-full w-full items-center justify-center overflow-x-hidden overflow-y-auto md:inset-0"
+	aria-hidden="true"
 	data-toggle="true"
+	tabindex="-1"
 >
 	<OverlayBackdrop />
 	<div class="relative m-auto flex h-full w-full p-4">
 		<!-- Modal content -->
 		<div
-			class="modal relative m-auto max-w-[80%] min-w-96 rounded-lg bg-gray-800 p-4 sm:p-5 md:max-w-[75%] lg:max-w-[70%] xl:max-w-[65%] 2xl:max-w-[55%]"
 			id="popup-{id}"
+			class="modal relative m-auto max-w-[80%] min-w-96 rounded-lg bg-gray-800 p-4 sm:p-5 md:max-w-[75%] lg:max-w-[70%] xl:max-w-[65%] 2xl:max-w-[55%]"
 		>
 			<!-- Modal header -->
 			<div class="mb-4 flex justify-between rounded-t sm:mb-5">
@@ -264,23 +264,23 @@
 				</div>
 				<div>
 					<button
-						type="button"
 						class="inline-flex rounded-lg bg-transparent p-1.5 text-sm text-gray-400 hover:bg-gray-600 hover:text-white"
 						data-modal-toggle={id}
-						onclick={__onClose}
 						data-toggle="true"
+						onclick={__onClose}
+						type="button"
 					>
 						<svg
-							aria-hidden="true"
 							class="h-5 w-5"
+							aria-hidden="true"
+							data-toggle="true"
 							fill="currentColor"
 							viewBox="0 0 20 20"
 							xmlns="http://www.w3.org/2000/svg"
-							data-toggle="true"
 							><path
-								fill-rule="evenodd"
-								d="M4.293 4.293a1 1 0 011.414 0L10 8.586l4.293-4.293a1 1 0 111.414 1.414L11.414 10l4.293 4.293a1 1 0 01-1.414 1.414L10 11.414l-4.293 4.293a1 1 0 01-1.414-1.414L8.586 10 4.293 5.707a1 1 0 010-1.414z"
 								clip-rule="evenodd"
+								d="M4.293 4.293a1 1 0 011.414 0L10 8.586l4.293-4.293a1 1 0 111.414 1.414L11.414 10l4.293 4.293a1 1 0 01-1.414 1.414L10 11.414l-4.293 4.293a1 1 0 01-1.414-1.414L8.586 10 4.293 5.707a1 1 0 010-1.414z"
+								fill-rule="evenodd"
 							></path></svg
 						>
 						<span class="sr-only">Close modal</span>
@@ -295,13 +295,13 @@
 							<h3 class="text-lg font-semibold text-white">Pièces jointes</h3>
 							<div class="mt-2 mb-2 flex w-full justify-between">
 								<button
-									type="button"
-									aria-label="Pièce jointe précédente"
 									class="
 									inline-flex rounded-lg bg-transparent p-1.5 text-sm text-gray-400 hover:bg-gray-600 hover:text-white"
+									aria-label="Pièce jointe précédente"
 									onclick={() => {
 										moveFile(-1);
 									}}
+									type="button"
 								>
 									<svg
 										class="h-5 w-5"
@@ -310,9 +310,9 @@
 										viewBox="0 0 20 20"
 										xmlns="http://www.w3.org/2000/svg"
 										><path
-											fill-rule="evenodd"
-											d="M12.707 5.293a1 1 0 010 1.414L9.414 10l3.293 3.293a1 1 0 01-1.414 1.414l-4-4a1 1 0 010-1.414l4-4a1 1 0 011.414 0z"
 											clip-rule="evenodd"
+											d="M12.707 5.293a1 1 0 010 1.414L9.414 10l3.293 3.293a1 1 0 01-1.414 1.414l-4-4a1 1 0 010-1.414l4-4a1 1 0 011.414 0z"
+											fill-rule="evenodd"
 										></path></svg
 									>
 								</button>
@@ -321,13 +321,13 @@
 										.length}
 								</p>
 								<button
-									type="button"
-									aria-label="Pièce jointe suivante"
 									class="
 								inline-flex rounded-lg bg-transparent p-1.5 text-sm text-gray-400 hover:bg-gray-600 hover:text-white"
+									aria-label="Pièce jointe suivante"
 									onclick={() => {
 										moveFile(1);
 									}}
+									type="button"
 								>
 									<svg
 										class="h-5 w-5 rotate-180"
@@ -336,30 +336,30 @@
 										viewBox="0 0 20 20"
 										xmlns="http://www.w3.org/2000/svg"
 										><path
-											fill-rule="evenodd"
-											d="M12.707 5.293a1 1 0 010 1.414L9.414 10l3.293 3.293a1 1 0 01-1.414 1.414l-4-4a1 1 0 010-1.414l4-4a1 1 0 011.414 0z"
 											clip-rule="evenodd"
+											d="M12.707 5.293a1 1 0 010 1.414L9.414 10l3.293 3.293a1 1 0 01-1.414 1.414l-4-4a1 1 0 010-1.414l4-4a1 1 0 011.414 0z"
+											fill-rule="evenodd"
 										></path></svg
 									>
 								</button>
 							</div>
 						</div>
 						<div class="flex aspect-[1/1.414] h-auto w-88 gap-2 overflow-x-hidden md:w-96">
-							<div class="flex rounded-lg" bind:this={scroll_body}>
+							<div bind:this={scroll_body} class="flex rounded-lg">
 								{#each files_array as { mime, url, name } (url)}
 									<div class="flex w-88 flex-col md:w-96">
 										<!-- <p class="text-white">{url?.split('/')[10].split('?')[0]}</p> -->
 										{#if mime === 'application/pdf' && !isMobile}
-											<iframe src={url} frameborder="0" class="h-full" title={name}></iframe>
+											<iframe class="h-full" frameborder="0" src={url} title={name}></iframe>
 										{:else if mime === 'application/pdf' && isMobile}
 											<iframe
-												src="https://docs.google.com/viewer?url={url}&embedded=true"
-												frameborder="0"
 												class="h-full"
+												frameborder="0"
+												src="https://docs.google.com/viewer?url={url}&embedded=true"
 												title={name}
 											></iframe>
 										{:else if mime.startsWith('image/')}
-											<img src={url} alt={name} class="w-full max-w-96" />
+											<img class="w-full max-w-96" alt={name} src={url} />
 										{/if}
 									</div>
 								{/each}
@@ -380,7 +380,7 @@
 											<th scope="col">Quantité</th>
 											<th scope="col">Prix</th>
 											{#if isPendingCdp()}
-												<th scope="col" class="w-2.5"></th>
+												<th class="w-2.5" scope="col"></th>
 											{/if}
 										</tr>
 									</thead>
@@ -389,7 +389,7 @@
 											<tr data-utils={formatItemData(item)}>
 												<td class="p-2">
 													<!-- eslint-disable svelte/no-navigation-without-resolve -->
-													<a href={item.link ?? ''} target="_blank" rel="noopener noreferrer"
+													<a href={item.link ?? ''} rel="noopener noreferrer" target="_blank"
 														>{item.name}</a
 													>
 													<!-- eslint-enable svelte/no-navigation-without-resolve -->
@@ -399,23 +399,23 @@
 												{#if isPendingCdp()}
 													<td>
 														<button
-															type="button"
-															aria-label="Supprimer {item.name}"
 															class="inline-flex items-center rounded-lg bg-red-500 px-5 py-2.5 text-center text-sm font-medium text-white hover:bg-red-600 focus:ring-4 focus:ring-red-900 focus:outline-none"
+															aria-label="Supprimer {item.name}"
 															onclick={() => {
 																void removeItem(item);
 															}}
+															type="button"
 														>
 															<svg
-																aria-hidden="true"
 																class="-mx-2.5 h-5 w-5"
+																aria-hidden="true"
 																fill="currentColor"
 																viewBox="0 0 20 20"
 																xmlns="http://www.w3.org/2000/svg"
 																><path
-																	fill-rule="evenodd"
-																	d="M9 2a1 1 0 00-.894.553L7.382 4H4a1 1 0 000 2v10a2 2 0 002 2h8a2 2 0 002-2V6a1 1 0 100-2h-3.382l-.724-1.447A1 1 0 0011 2H9zM7 8a1 1 0 012 0v6a1 1 0 11-2 0V8zm5-1a1 1 0 00-1 1v6a1 1 0 102 0V8a1 1 0 00-1-1z"
 																	clip-rule="evenodd"
+																	d="M9 2a1 1 0 00-.894.553L7.382 4H4a1 1 0 000 2v10a2 2 0 002 2h8a2 2 0 002-2V6a1 1 0 100-2h-3.382l-.724-1.447A1 1 0 0011 2H9zM7 8a1 1 0 012 0v6a1 1 0 11-2 0V8zm5-1a1 1 0 00-1 1v6a1 1 0 102 0V8a1 1 0 00-1-1z"
+																	fill-rule="evenodd"
 																></path></svg
 															>
 														</button>
@@ -443,7 +443,7 @@
 							class="focus:border-primary-500 focus:ring-primary-500 block w-full rounded-lg border border-gray-600 bg-gray-700 p-2.5 text-sm text-white placeholder-gray-400"
 							onchange={action.handler}
 						>
-							<option value="" disabled selected>Choisir une option</option>
+							<option disabled selected value="">Choisir une option</option>
 							{#each action.title as { name, value } (value)}
 								<option {value}>{name}</option>
 							{/each}
@@ -451,22 +451,22 @@
 					{/if}
 					{#if action.type === 'edit'}
 						<button
-							type="button"
 							class="bg-primary-600 hover:bg-primary-700 focus:ring-primary-800 inline-flex items-center rounded-lg px-5 py-2.5 text-center text-sm font-medium text-white focus:ring-4 focus:outline-none"
 							onclick={action.handler}
+							type="button"
 						>
 							<svg
-								aria-hidden="true"
 								class="mr-1 -ml-1 h-5 w-5"
+								aria-hidden="true"
 								fill="currentColor"
 								viewBox="0 0 20 20"
 								xmlns="http://www.w3.org/2000/svg"
 								><path
 									d="M17.414 2.586a2 2 0 00-2.828 0L7 10.172V13h2.828l7.586-7.586a2 2 0 000-2.828z"
 								></path><path
-									fill-rule="evenodd"
-									d="M2 6a2 2 0 012-2h4a1 1 0 010 2H4v10h10v-4a1 1 0 112 0v4a2 2 0 01-2 2H4a2 2 0 01-2-2V6z"
 									clip-rule="evenodd"
+									d="M2 6a2 2 0 012-2h4a1 1 0 010 2H4v10h10v-4a1 1 0 112 0v4a2 2 0 01-2 2H4a2 2 0 01-2-2V6z"
+									fill-rule="evenodd"
 								></path></svg
 							>
 							{action.title}
@@ -474,20 +474,20 @@
 					{/if}
 					{#if action.type === 'validate'}
 						<button
-							type="button"
 							class="bg-primary-600 hover:bg-primary-700 focus:ring-primary-800 inline-flex items-center rounded-lg px-5 py-2.5 text-center text-sm font-medium text-white focus:ring-4 focus:outline-none"
 							onclick={action.handler}
+							type="button"
 						>
 							<svg
-								aria-hidden="true"
 								class="mr-1.5 -ml-1 h-5 w-5"
+								aria-hidden="true"
 								fill="currentColor"
 								viewBox="0 0 20 20"
 								xmlns="http://www.w3.org/2000/svg"
 								><path
-									fill-rule="evenodd"
-									d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z"
 									clip-rule="evenodd"
+									d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z"
+									fill-rule="evenodd"
 								></path></svg
 							>
 							{action.title}
@@ -495,20 +495,20 @@
 					{/if}
 					{#if action.type === 'delete'}
 						<button
-							type="button"
 							class="inline-flex items-center rounded-lg bg-red-500 px-5 py-2.5 text-center text-sm font-medium text-white hover:bg-red-600 focus:ring-4 focus:ring-red-900 focus:outline-none"
 							onclick={action.handler}
+							type="button"
 						>
 							<svg
-								aria-hidden="true"
 								class="mr-1.5 -ml-1 h-5 w-5"
+								aria-hidden="true"
 								fill="currentColor"
 								viewBox="0 0 20 20"
 								xmlns="http://www.w3.org/2000/svg"
 								><path
-									fill-rule="evenodd"
-									d="M9 2a1 1 0 00-.894.553L7.382 4H4a1 1 0 000 2v10a2 2 0 002 2h8a2 2 0 002-2V6a1 1 0 100-2h-3.382l-.724-1.447A1 1 0 0011 2H9zM7 8a1 1 0 012 0v6a1 1 0 11-2 0V8zm5-1a1 1 0 00-1 1v6a1 1 0 102 0V8a1 1 0 00-1-1z"
 									clip-rule="evenodd"
+									d="M9 2a1 1 0 00-.894.553L7.382 4H4a1 1 0 000 2v10a2 2 0 002 2h8a2 2 0 002-2V6a1 1 0 100-2h-3.382l-.724-1.447A1 1 0 0011 2H9zM7 8a1 1 0 012 0v6a1 1 0 11-2 0V8zm5-1a1 1 0 00-1 1v6a1 1 0 102 0V8a1 1 0 00-1-1z"
+									fill-rule="evenodd"
 								></path></svg
 							>
 							{action.title}

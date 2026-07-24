@@ -74,7 +74,7 @@
 		<p class="text-dark-light-blue m-0 text-sm">Chargement…</p>
 	{:else if loadError}
 		<p class="m-0 mb-3 text-sm text-red-400">{loadError}</p>
-		<CtaButton variant="secondary" size="sm" fullWidth={false} onclick={() => void load()}>
+		<CtaButton fullWidth={false} onclick={() => void load()} size="sm" variant="secondary">
 			Réessayer
 		</CtaButton>
 	{:else}
@@ -93,10 +93,10 @@
 							</span>
 							{#if session.trusted_device}
 								<span
-									role="img"
-									aria-label="Appareil de confiance"
-									title="Appareil de confiance"
 									class="border-light-blue/30 text-dark-light-blue inline-flex size-5 shrink-0 items-center justify-center rounded-full border"
+									aria-label="Appareil de confiance"
+									role="img"
+									title="Appareil de confiance"
 								>
 									<ShieldCheck class="size-3" />
 								</span>
@@ -109,12 +109,12 @@
 					{#if !session.is_current}
 						<button
 							id={`session-revoke-${session.id}`}
-							type="button"
-							aria-label="Déconnecter cet appareil"
-							title="Déconnecter cet appareil"
 							class="shrink-0 cursor-pointer rounded-lg border-0 bg-transparent p-2 text-red-400 hover:bg-red-500/10 disabled:cursor-not-allowed disabled:opacity-50"
+							aria-label="Déconnecter cet appareil"
 							disabled={busy}
 							onclick={() => void handleRevoke(session)}
+							title="Déconnecter cet appareil"
+							type="button"
 						>
 							<LogOut class="size-4" />
 						</button>
@@ -126,10 +126,10 @@
 			<div class="mt-3 flex justify-end">
 				<button
 					id="sessions-revoke-all"
-					type="button"
 					class="cursor-pointer rounded-lg border-0 bg-transparent px-2 py-1 text-sm text-red-400 hover:bg-red-500/10 disabled:cursor-not-allowed disabled:opacity-50"
 					disabled={busy}
 					onclick={() => void handleRevokeAll()}
+					type="button"
 				>
 					Déconnecter tous les autres appareils
 				</button>

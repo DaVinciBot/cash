@@ -34,10 +34,10 @@
 			</p>
 		</div>
 		<div class="flex flex-col gap-3 sm:flex-row sm:flex-wrap">
-			<CTAButton type="button" variant="primary" size="sm" onclick={onAddSlot}>
+			<CTAButton onclick={onAddSlot} size="sm" type="button" variant="primary">
 				Nouvelle session
 			</CTAButton>
-			<CTAButton type="button" variant="secondary" size="sm" onclick={onAddTraining}>
+			<CTAButton onclick={onAddTraining} size="sm" type="button" variant="secondary">
 				Nouvelle formation
 			</CTAButton>
 		</div>

@@ -56,7 +56,7 @@
 		<p class="text-dark-light-blue m-0 text-sm">Chargement…</p>
 	{:else if loadError}
 		<p class="m-0 mb-3 text-sm text-red-400">{loadError}</p>
-		<CtaButton variant="secondary" size="sm" fullWidth={false} onclick={() => void load()}>
+		<CtaButton fullWidth={false} onclick={() => void load()} size="sm" variant="secondary">
 			Réessayer
 		</CtaButton>
 	{:else if connections.length === 0}
@@ -81,12 +81,12 @@
 					</div>
 					<button
 						id={`connection-revoke-${connection.client_id}`}
-						type="button"
-						aria-label="Révoquer l’accès de cette application"
-						title="Révoquer l’accès de cette application"
 						class="shrink-0 cursor-pointer rounded-lg border-0 bg-transparent p-2 text-red-400 hover:bg-red-500/10 disabled:cursor-not-allowed disabled:opacity-50"
+						aria-label="Révoquer l’accès de cette application"
 						disabled={busy}
 						onclick={() => void handleRevoke(connection)}
+						title="Révoquer l’accès de cette application"
+						type="button"
 					>
 						<Unlink class="size-4" />
 					</button>

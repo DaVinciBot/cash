@@ -601,23 +601,23 @@ DVBisous ! :robot:`;
 					<h2 class="text-base font-semibold text-white">Calendrier public</h2>
 					<p class="text-light-blue/60 text-xs">Consulter les formations publiées.</p>
 				</div>
-				<CTAButton href="/formation" variant="secondary" size="sm" fullWidth={false}>
+				<CTAButton fullWidth={false} href="/formation" size="sm" variant="secondary">
 					Voir le calendrier
 				</CTAButton>
 			</div>
 		</section>
 
 		<AdminHeader
-			trainingsCount={trainings.length}
-			upcomingCount={upcomingSlots.length}
 			draftCount={draftSlots.length}
-			{slotRangeDays}
-			onAddTraining={() => {
-				openTrainingModal();
-			}}
 			onAddSlot={() => {
 				openSlotModal();
 			}}
+			onAddTraining={() => {
+				openTrainingModal();
+			}}
+			{slotRangeDays}
+			trainingsCount={trainings.length}
+			upcomingCount={upcomingSlots.length}
 		/>
 
 		<section class="border-light-blue/10 bg-dark-blue/70 rounded-[22px] border p-4 sm:p-5">
@@ -628,12 +628,12 @@ DVBisous ! :robot:`;
 				</div>
 				<div class="flex flex-wrap gap-2">
 					<CTAButton
+						disabled={summarySending}
+						fullWidth={false}
+						onclick={openSummaryModal}
+						size="sm"
 						type="button"
 						variant={summarySending ? 'disabled' : 'primary'}
-						size="sm"
-						fullWidth={false}
-						disabled={summarySending}
-						onclick={openSummaryModal}
 					>
 						{summarySending ? 'Envoi...' : 'Configurer & envoyer'}
 					</CTAButton>
@@ -655,7 +655,7 @@ DVBisous ! :robot:`;
 				class="border-light-blue/20 bg-dark-blue/80 text-waiting flex flex-col items-center justify-center gap-3 rounded-[26px] border p-10"
 			>
 				<p class="text-sm">{error}</p>
-				<CTAButton type="button" variant="peps" size="sm" onclick={loadData}>Réessayer</CTAButton>
+				<CTAButton onclick={loadData} size="sm" type="button" variant="peps">Réessayer</CTAButton>
 			</div>
 		{:else}
 			{#if formError}
@@ -664,37 +664,37 @@ DVBisous ! :robot:`;
 
 			<div class="grid gap-8">
 				<AdminSlotSection
-					{slots}
-					{statusOptions}
-					{slotDbInfo}
-					{slotActions}
-					{slotFilters}
-					{slotTableTopic}
-					{parseSlotItems}
-					{formatSlotDate}
 					{findTrainingName}
-					{trainings}
+					{formatSlotDate}
 					onAddSlot={() => {
 						openSlotModal();
 					}}
 					onEditSlot={(slot: TrainingSlotListItem) => {
 						openSlotModal(slot);
 					}}
+					{parseSlotItems}
+					{slotActions}
+					{slotDbInfo}
+					{slotFilters}
+					{slotTableTopic}
+					{slots}
+					{statusOptions}
+					{trainings}
 				/>
 				<AdminTrainingSection
-					{trainings}
 					{categoryOptions}
-					{trainingDbInfo}
-					{trainingActions}
-					{trainingFilters}
-					{trainingTableTopic}
-					{parseTrainingItems}
 					onAddTraining={() => {
 						openTrainingModal();
 					}}
 					onEditTraining={(training: TrainingListItem) => {
 						openTrainingModal(training);
 					}}
+					{parseTrainingItems}
+					{trainingActions}
+					{trainingDbInfo}
+					{trainingFilters}
+					{trainingTableTopic}
+					{trainings}
 				/>
 			</div>
 		{/if}
@@ -704,38 +704,38 @@ DVBisous ! :robot:`;
 {#if showSlotModal}
 	<CrudForm
 		id="SlotModal"
-		type="session"
-		type_accord="une"
 		action={editingSlot ? 'Modifier' : 'Ajouter'}
 		fields={slotFields}
 		onClose={closeSlotModal}
 		onSubmit={handleSlotSubmit}
+		type="session"
+		type_accord="une"
 	/>
 {/if}
 
 {#if showTrainingModal}
 	<CrudForm
 		id="TrainingModal"
-		type="formation"
-		type_accord="une"
 		action={editingTraining ? 'Modifier' : 'Ajouter'}
 		fields={trainingFields}
 		onClose={closeTrainingModal}
 		onSubmit={handleTrainingSubmit}
+		type="formation"
+		type_accord="une"
 	/>
 {/if}
 
 {#if showSummaryModal}
 	<CrudForm
 		id="SummaryModal"
-		type="synthese"
-		type_accord="une"
 		action="Envoyer"
-		title="Envoyer la synthèse Discord"
-		submitting={summarySending}
-		submitLoadingLabel="Envoi..."
 		fields={summaryFields}
 		onClose={closeSummaryModal}
 		onSubmit={handleSummarySubmit}
+		submitLoadingLabel="Envoi..."
+		submitting={summarySending}
+		title="Envoyer la synthèse Discord"
+		type="synthese"
+		type_accord="une"
 	/>
 {/if}

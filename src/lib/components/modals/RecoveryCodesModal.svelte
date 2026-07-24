@@ -36,10 +36,10 @@
 
 <div
 	id="recovery-codes-modal"
-	role="dialog"
-	aria-modal="true"
-	aria-label="Codes de récupération"
 	class="fixed inset-0 z-50 flex items-center justify-center p-4"
+	aria-label="Codes de récupération"
+	aria-modal="true"
+	role="dialog"
 >
 	<OverlayBackdrop />
 	<div
@@ -64,22 +64,22 @@
 		</ul>
 		<div class="flex flex-wrap items-center justify-end gap-2">
 			<button
-				type="button"
 				class="text-dark-light-blue flex cursor-pointer items-center gap-1.5 rounded-lg border-0 bg-transparent px-2 py-1 text-sm hover:underline"
 				onclick={() => void handleCopy()}
+				type="button"
 			>
 				<Copy class="size-4" />
 				{copied ? 'Copiés !' : 'Copier'}
 			</button>
 			<button
-				type="button"
 				class="text-dark-light-blue flex cursor-pointer items-center gap-1.5 rounded-lg border-0 bg-transparent px-2 py-1 text-sm hover:underline"
 				onclick={handleDownload}
+				type="button"
 			>
 				<Download class="size-4" />
 				Télécharger (.txt)
 			</button>
-			<CtaButton variant="secondary" size="sm" fullWidth={false} onclick={onClose}>
+			<CtaButton fullWidth={false} onclick={onClose} size="sm" variant="secondary">
 				J'ai enregistré mes codes
 			</CtaButton>
 		</div>

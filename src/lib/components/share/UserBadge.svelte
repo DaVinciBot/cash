@@ -102,9 +102,8 @@
 </script>
 
 <button
-	type="button"
-	class="mx-3 flex rounded-full bg-gray-800 text-sm focus:ring-3 focus:ring-gray-700 md:mr-0"
 	id="user-menu-button"
+	class="mx-3 flex rounded-full bg-gray-800 text-sm focus:ring-3 focus:ring-gray-700 md:mr-0"
 	aria-expanded="false"
 	onclick={(e: MouseEvent) => {
 		const dropdown = getDropdown();
@@ -115,16 +114,17 @@
 		e.stopPropagation();
 		hideOnClickOutside(dropdown);
 	}}
+	type="button"
 >
 	<span class="sr-only">Open user menu</span>
-	<img class="h-8 w-8 rounded-full" src={displayUser.avatar} alt="user avatar" />
+	<img class="h-8 w-8 rounded-full" alt="user avatar" src={displayUser.avatar} />
 </button>
 <!-- Dropdown menu -->
 <div
+	id="dropdown"
 	class="{fixed
 		? 'fixed'
 		: 'absolute'} bg-opacity-20 z-50 my-4 hidden w-56 list-none divide-y divide-gray-700 overflow-hidden rounded-xl border border-gray-700 bg-gray-900 text-base shadow backdrop-blur-lg"
-	id="dropdown"
 >
 	<div class="px-4 py-3">
 		<span class="block text-sm font-semibold text-white">{displayUser.name}</span>
@@ -133,14 +133,14 @@
 	<ul class="py-1 text-gray-300" aria-labelledby="dropdown">
 		<li>
 			<button
-				type="button"
 				class="bg-opacity-80 block w-full px-4 py-2 text-left text-sm hover:cursor-pointer hover:bg-gray-700 hover:text-white"
 				onclick={() => {
 					// fermer le dropdown avant d'ouvrir le modal : il vit en fin de body
 					// et passerait au-dessus à z-index égal
 					getDropdown()?.classList.add('hidden');
 					openSettings();
-				}}>Paramètres</button
+				}}
+				type="button">Paramètres</button
 			>
 		</li>
 	</ul>

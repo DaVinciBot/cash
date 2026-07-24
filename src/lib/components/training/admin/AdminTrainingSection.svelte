@@ -44,7 +44,7 @@
 			<p class="text-light-blue/70 text-sm">Gérez les contenus de référence pour les sessions.</p>
 		</div>
 		<div class="flex flex-col sm:w-40 sm:flex-row sm:flex-wrap">
-			<CTAButton type="button" variant="secondary" size="sm" onclick={onAddTraining}>
+			<CTAButton onclick={onAddTraining} size="sm" type="button" variant="secondary">
 				Ajouter
 			</CTAButton>
 		</div>
@@ -53,14 +53,14 @@
 	<div class="border-light-blue/10 mt-6 overflow-hidden rounded-xl border">
 		<div class="hidden md:block">
 			<Table
-				headers={['Nom', 'Catégorie', 'Description', 'Actions']}
-				dbInfo={trainingDbInfo}
-				parseItems={parseTrainingItems}
 				actions={trainingActions}
-				refreshTopic={trainingTableTopic}
-				filters={trainingFilters}
-				searchable="name"
+				dbInfo={trainingDbInfo}
 				emptyMessage="Aucune formation"
+				filters={trainingFilters}
+				headers={['Nom', 'Catégorie', 'Description', 'Actions']}
+				parseItems={parseTrainingItems}
+				refreshTopic={trainingTableTopic}
+				searchable="name"
 				size={5}
 			/>
 		</div>

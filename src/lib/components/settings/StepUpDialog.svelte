@@ -175,10 +175,10 @@
 {#if request}
 	<div
 		id="step-up-dialog"
-		role="dialog"
-		aria-modal="true"
-		aria-label="Confirmation de sécurité"
 		class="fixed inset-0 z-50 flex items-center justify-center p-4"
+		aria-label="Confirmation de sécurité"
+		aria-modal="true"
+		role="dialog"
 	>
 		<OverlayBackdrop />
 		<div
@@ -194,14 +194,14 @@
 				</p>
 				<div class="mt-4 flex justify-end gap-2">
 					{#if errorMessage}
-						<CtaButton variant="secondary" size="sm" fullWidth={false} onclick={() => void open()}>
+						<CtaButton fullWidth={false} onclick={() => void open()} size="sm" variant="secondary">
 							Réessayer
 						</CtaButton>
 					{/if}
 					<button
-						type="button"
 						class="text-dark-light-blue cursor-pointer rounded-lg border-0 bg-transparent px-2 py-1 text-sm hover:underline"
 						onclick={cancel}
+						type="button"
 					>
 						Annuler
 					</button>
@@ -211,11 +211,11 @@
 				<div class="grid gap-2">
 					{#each otherModes as option (option.id)}
 						<button
-							type="button"
 							class="border-light-blue/30 text-light-blue hover:border-light-blue/70 w-full cursor-pointer rounded-xl border bg-transparent px-4 py-2.5 text-left text-sm font-medium"
 							onclick={() => {
 								chooseMode(option.id);
 							}}
+							type="button"
 						>
 							{option.label}
 						</button>
@@ -223,16 +223,16 @@
 				</div>
 				<div class="mt-4 flex items-center justify-between gap-2">
 					<button
-						type="button"
 						class="text-dark-light-blue cursor-pointer rounded-lg border-0 bg-transparent p-0 text-left text-sm hover:underline"
 						onclick={() => (chooserOpen = false)}
+						type="button"
 					>
 						Retour à la saisie
 					</button>
 					<button
-						type="button"
 						class="text-dark-light-blue cursor-pointer rounded-lg border-0 bg-transparent px-2 py-1 text-sm hover:underline"
 						onclick={cancel}
+						type="button"
 					>
 						Annuler
 					</button>
@@ -254,38 +254,38 @@
 				<form class="grid gap-4" onsubmit={handleSubmit}>
 					{#if mode === 'password'}
 						<input
-							type="password"
 							id="step-up-password"
+							class="border-light-blue/30 bg-dark-blue/60 text-light-blue placeholder:text-dark-light-blue/50 focus:border-light-blue/70 block w-full rounded-xl border p-2.5 text-sm focus:outline-none disabled:opacity-50"
 							aria-label="Mot de passe actuel"
 							autocomplete="current-password"
-							placeholder="********"
-							class="border-light-blue/30 bg-dark-blue/60 text-light-blue placeholder:text-dark-light-blue/50 focus:border-light-blue/70 block w-full rounded-xl border p-2.5 text-sm focus:outline-none disabled:opacity-50"
 							disabled={busy}
+							placeholder="********"
+							type="password"
 							bind:value={password}
 						/>
 					{:else if mode === 'webauthn'}
 						<!-- Pas de saisie : la cérémonie se joue dans le prompt du navigateur. -->
 					{:else if mode === 'recovery'}
 						<input
-							type="text"
 							id="step-up-recovery"
+							class="border-light-blue/30 bg-dark-blue/60 text-light-blue placeholder:text-dark-light-blue/50 focus:border-light-blue/70 block w-full rounded-xl border p-2.5 font-mono text-sm tracking-widest focus:outline-none disabled:opacity-50"
 							aria-label="Code de récupération"
 							autocomplete="off"
-							spellcheck="false"
-							placeholder="XXXXX-XXXXX"
-							class="border-light-blue/30 bg-dark-blue/60 text-light-blue placeholder:text-dark-light-blue/50 focus:border-light-blue/70 block w-full rounded-xl border p-2.5 font-mono text-sm tracking-widest focus:outline-none disabled:opacity-50"
 							disabled={busy}
+							placeholder="XXXXX-XXXXX"
+							spellcheck="false"
+							type="text"
 							bind:value={recoveryCode}
 						/>
 					{:else}
 						<div class="grid gap-2">
-							<CodeInput id="step-up-code" bind:value={code} disabled={busy} />
+							<CodeInput id="step-up-code" disabled={busy} bind:value={code} />
 							{#if mode === 'email'}
 								<button
-									type="button"
 									class="text-dark-light-blue cursor-pointer rounded-lg border-0 bg-transparent p-0 text-left text-xs hover:underline disabled:cursor-not-allowed disabled:no-underline disabled:opacity-50"
 									disabled={busy || resending || resendCooldown > 0}
 									onclick={() => void requestEmailChallenge()}
+									type="button"
 								>
 									{resending
 										? 'Envoi…'
@@ -304,31 +304,31 @@
 					<div class="flex flex-col gap-2 sm:flex-row sm:items-center">
 						{#if mode !== 'password'}
 							<button
-								type="button"
 								class="text-dark-light-blue cursor-pointer rounded-lg border-0 bg-transparent p-0 text-left text-sm hover:underline"
 								onclick={() => {
 									chooserOpen = true;
 									errorMessage = null;
 								}}
+								type="button"
 							>
 								Utiliser une autre méthode
 							</button>
 						{/if}
 						<div class="flex items-center justify-end gap-2 sm:ml-auto">
 							<button
-								type="button"
 								class="text-dark-light-blue cursor-pointer rounded-lg border-0 bg-transparent px-2 py-1 text-sm hover:underline"
 								onclick={cancel}
+								type="button"
 							>
 								Annuler
 							</button>
 							<CtaButton
-								type="submit"
 								id={mode === 'webauthn' ? 'step-up-passkey' : 'step-up-confirm'}
-								variant="secondary"
-								size="sm"
-								fullWidth={false}
 								disabled={busy}
+								fullWidth={false}
+								size="sm"
+								type="submit"
+								variant="secondary"
 							>
 								{busy
 									? 'Vérification…'
