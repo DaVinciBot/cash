@@ -1,5 +1,5 @@
-import { sidCookieName } from '@davincibot/lib/server';
 import { env } from '$env/dynamic/public';
+import { sidCookieName } from '@davincibot/lib/server';
 import { json } from '@sveltejs/kit';
 import type { RequestHandler } from './$types';
 

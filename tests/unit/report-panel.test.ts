@@ -16,10 +16,10 @@ vi.mock('@davincibot/lib/settings', async (importOriginal) => {
 	return { ...actual, submitReport: mocks.submitReport };
 });
 
-import type * as reportModule from '@davincibot/lib/settings';
 import ReportPanel from '$lib/components/settings/ReportPanel.svelte';
-import { userdata } from '@davincibot/lib';
 import type { UserProfile } from '@davincibot/lib';
+import { userdata } from '@davincibot/lib';
+import type * as reportModule from '@davincibot/lib/settings';
 
 const profile: UserProfile = {
 	email: 'alice@example.com',

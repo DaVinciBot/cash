@@ -1,12 +1,12 @@
-import { Badge } from '@davincibot/components';
-import { formatParisDateTimeShort } from '@davincibot/lib';
 import { categoryOptions, statusOptions } from '$lib/helpers/trainingOptions';
+import { Badge } from '@davincibot/components';
 import type {
 	SlotStatus,
 	TrainingCategory,
 	TrainingListItem,
 	TrainingSlotListItem
 } from '@davincibot/lib';
+import { formatParisDateTimeShort } from '@davincibot/lib';
 
 export function formatSlotDate(dateString: string) {
 	return formatParisDateTimeShort(dateString);

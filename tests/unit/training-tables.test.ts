@@ -4,13 +4,13 @@ vi.mock('@davincibot/lib', () => ({
 	formatParisDateTimeShort: vi.fn((value: string) => `short:${value}`)
 }));
 
+import type { TrainingListItem } from '@davincibot/lib';
 import {
 	createSlotTableItems,
 	createTrainingTableItems,
 	findTrainingName,
 	formatSlotDate
 } from '../../src/lib/helpers/trainingTables';
-import type { TrainingListItem } from '@davincibot/lib';
 
 describe('training table helpers', () => {
 	it('formatSlotDate uses paris short datetime formatter', () => {

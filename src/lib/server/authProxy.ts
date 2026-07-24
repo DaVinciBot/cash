@@ -1,6 +1,6 @@
 import { env } from '$env/dynamic/public';
-import type { Cookies } from '@sveltejs/kit';
 import { sidCookieName } from '@davincibot/lib/server';
+import type { Cookies } from '@sveltejs/kit';
 
 export interface AuthProxyResponse {
 	status: number;

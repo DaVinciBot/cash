@@ -14,10 +14,10 @@ vi.mock('$app/navigation', () => ({
 	replaceState: vi.fn()
 }));
 
-import Layout from '../../src/routes/+layout.svelte';
 import SettingsModal from '$lib/components/settings/SettingsModal.svelte';
-import { userdata } from '@davincibot/lib';
 import type { UserProfile } from '@davincibot/lib';
+import { userdata } from '@davincibot/lib';
+import Layout from '../../src/routes/+layout.svelte';
 
 const profile: UserProfile = {
 	email: 'alice@example.com',

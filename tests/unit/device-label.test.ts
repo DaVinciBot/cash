@@ -1,5 +1,5 @@
-import { describe, expect, it } from 'vitest';
 import { isMobileUserAgent, parseDeviceLabel } from '@davincibot/lib/settings';
+import { describe, expect, it } from 'vitest';
 
 const UA = {
 	chromeMac:

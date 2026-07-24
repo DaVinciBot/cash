@@ -2,6 +2,8 @@ import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 
 import { flushSync, mount, unmount } from 'svelte';
 
+import type * as SettingsModule from '@davincibot/lib/settings';
+
 vi.mock('$env/dynamic/public', () => ({ env: {} }));
 vi.mock('@davincibot/lib/supabase', () => ({
 	getSupabaseBrowserClient: () => ({})
@@ -32,7 +34,7 @@ const mfaMocks = vi.hoisted(() => ({
 // barrel réel (stepUpRequest, withStepUp, alertUnlessCancelled…) dont dépend le
 // StepUpDialog monté par le panneau.
 vi.mock('@davincibot/lib/settings', async (importOriginal) => ({
-	...(await importOriginal<typeof import('@davincibot/lib/settings')>()),
+	...(await importOriginal<typeof SettingsModule>()),
 	...mocks,
 	...mfaMocks
 }));

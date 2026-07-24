@@ -13,23 +13,18 @@ import {
 // observer la cible de la redirection.
 const stubLocationHref = () => {
 	const original = window.location;
-	let assignedHref = '';
+	const initialHref = original.href;
+	let assignedHref = initialHref;
 	Object.defineProperty(window, 'location', {
 		configurable: true,
-		value: new Proxy(original, {
-			get(target, prop) {
-				if (prop === 'href') {return assignedHref || target.href;}
-				const value = Reflect.get(target, prop);
-				return typeof value === 'function' ? value.bind(target) : value;
+		value: {
+			get href() {
+				return assignedHref;
 			},
-			set(target, prop, value) {
-				if (prop === 'href') {
-					assignedHref = value as string;
-					return true;
-				}
-				return Reflect.set(target, prop, value);
+			set href(value: string) {
+				assignedHref = value;
 			}
-		})
+		}
 	});
 	return {
 		get href() {

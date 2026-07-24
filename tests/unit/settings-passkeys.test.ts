@@ -10,14 +10,14 @@ const browserMocks = vi.hoisted(() => ({
 }));
 vi.mock('@simplewebauthn/browser', () => browserMocks);
 
-import { stepUpVerifyWebauthn } from '@davincibot/lib/settings';
 import {
 	deletePasskey,
+	ElevationRequiredError,
 	fetchPasskeys,
 	registerPasskey,
-	renamePasskey
+	renamePasskey,
+	stepUpVerifyWebauthn
 } from '@davincibot/lib/settings';
-import { ElevationRequiredError } from '@davincibot/lib/settings';
 
 const jsonResponse = (status: number, body: unknown) => ({
 	ok: status < 400,

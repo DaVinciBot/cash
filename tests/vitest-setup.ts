@@ -16,7 +16,12 @@ const publicEnv = {
 vi.mock('$env/dynamic/public', () => ({ env: publicEnv }));
 vi.mock('$env/static/public', () => publicEnv);
 
-vi.mock('$app/environment', () => ({ browser: true, dev: false, building: false, version: 'test' }));
+vi.mock('$app/environment', () => ({
+	browser: true,
+	dev: false,
+	building: false,
+	version: 'test'
+}));
 
 // $app/paths n'est PAS stub : le plugin SvelteKit le résout avec le vrai base
 // path (/admin), dont dépendent les endpoints (resolve('/api/...') →
