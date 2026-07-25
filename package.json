@@ -18,7 +18,7 @@
 		"ci": "pnpm check && pnpm lint && pnpm test:unit && pnpm build"
 	},
 	"devDependencies": {
-		"@davincibot/config": "^3.0.1",
+		"@davincibot/config": "^3.0.2",
 		"@eslint/js": "^10.0.1",
 		"@playwright/test": "^1.61.0",
 		"@sveltejs/adapter-auto": "^7.0.1",
@@ -49,9 +49,9 @@
 		"vitest": "^4.1.9"
 	},
 	"dependencies": {
-		"@davincibot/components": "^3.0.2",
+		"@davincibot/components": "^3.0.3",
 		"@davincibot/database-types": "^2.0.1",
-		"@davincibot/lib": "^1.4.2",
+		"@davincibot/lib": "^2.0.0",
 		"@lucide/svelte": "^1.17.0",
 		"@popperjs/core": "^2.11.8",
 		"@simplewebauthn/browser": "^13.3.0",
