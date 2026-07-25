@@ -4,8 +4,8 @@
 	import SessionsSection from '$lib/components/settings/SessionsSection.svelte';
 	import StepUpDialog from '$lib/components/settings/StepUpDialog.svelte';
 	import { CTAButton as CtaButton } from '@davincibot/components';
-	import { changePassword } from '@davincibot/lib/settings';
-	import { StepUpCancelledError, withStepUp } from '@davincibot/lib/settings';
+	import { changePassword } from '$lib/settings';
+	import { StepUpCancelledError, withStepUp } from '$lib/settings';
 
 	let password = $state('');
 	let confirmation = $state('');

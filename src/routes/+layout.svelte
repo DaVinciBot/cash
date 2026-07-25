@@ -2,14 +2,14 @@
 	import { afterNavigate, replaceState } from '$app/navigation';
 	import { resolve } from '$app/paths';
 	import { page } from '$app/state';
-	import { parseSettingsCategory } from '@davincibot/lib/settings';
 	import {
 		closeSettings,
 		openSettings,
+		parseSettingsCategory,
 		settingsModal,
-		userdata,
 		type SettingsModalState
-	} from '@davincibot/lib';
+	} from '$lib/settings';
+	import { userdata } from '@davincibot/lib';
 	import { onDestroy, untrack, type Snippet } from 'svelte';
 	import type { PageData } from './$types';
 
@@ -73,8 +73,8 @@
 		rel="stylesheet"
 	/>
 
-	<meta name="robots" content="noindex, nofollow" />
-	<meta name="googlebot" content="noindex, nofollow" />
+	<meta content="noindex, nofollow" name="robots" />
+	<meta content="noindex, nofollow" name="googlebot" />
 </svelte:head>
 
 <div class="bg-dark-blue min-h-screen min-w-screen font-['Almarai'] text-white antialiased">
@@ -85,8 +85,8 @@
 			<div class="flex flex-wrap items-center justify-between">
 				<div class="flex items-center justify-start">
 					<button
-						class="mr-2 cursor-pointer rounded-lg p-2 text-gray-400 hover:bg-gray-700 hover:text-white focus:bg-gray-700 focus:ring-2 focus:ring-gray-100 md:hidden"
 						aria-controls="drawer-navigation"
+						class="mr-2 cursor-pointer rounded-lg p-2 text-gray-400 hover:bg-gray-700 hover:text-white focus:bg-gray-700 focus:ring-2 focus:ring-gray-100 md:hidden"
 						data-drawer-target="drawer-navigation"
 						data-drawer-toggle="drawer-navigation"
 						onclick={() => {
@@ -94,8 +94,8 @@
 						}}
 					>
 						<svg
-							class="h-6 w-6"
 							aria-hidden="true"
+							class="h-6 w-6"
 							fill="currentColor"
 							viewBox="0 0 20 20"
 							xmlns="http://www.w3.org/2000/svg"
@@ -107,8 +107,8 @@
 							></path>
 						</svg>
 						<svg
-							class="hidden h-6 w-6"
 							aria-hidden="true"
+							class="hidden h-6 w-6"
 							fill="currentColor"
 							viewBox="0 0 20 20"
 							xmlns="http://www.w3.org/2000/svg"
@@ -123,7 +123,7 @@
 					</button>
 					<!-- eslint-disable-next-line svelte/no-navigation-without-resolve -->
 					<a class="mr-4 flex items-center justify-between" href="/">
-						<img class="mr-3 h-8" alt="Davincibot Logo" src="/admin/white_logo_notext.webp" />
+						<img alt="Davincibot Logo" class="mr-3 h-8" src="/admin/white_logo_notext.webp" />
 						<span
 							class="hidden self-center text-2xl font-semibold whitespace-nowrap text-white sm:block"
 							>DaVinciBot</span

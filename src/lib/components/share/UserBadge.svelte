@@ -1,7 +1,8 @@
 <script lang="ts">
 	import type { EffectivePermission, GlobalPermission } from '@davincibot/lib';
 	import { GLOBAL_PERMISSIONS } from '@davincibot/lib';
-	import { openSettings, userdata, type UserData } from '@davincibot/lib';
+	import { openSettings } from '$lib/settings';
+	import { userdata, type UserData } from '@davincibot/lib';
 	import { hideOnClickOutside } from '@davincibot/lib';
 	import { onDestroy, onMount } from 'svelte';
 

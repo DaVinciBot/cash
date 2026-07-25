@@ -1,10 +1,10 @@
 <script lang="ts">
 	import { CTAButton as CtaButton } from '@davincibot/components';
 	import { formatParisDateTimeShort } from '@davincibot/lib';
-	import { isMobileUserAgent, parseDeviceLabel } from '@davincibot/lib/settings';
-	import { fetchSessions, revokeAllSessions, revokeSession } from '@davincibot/lib/settings';
-	import type { SessionInfo } from '@davincibot/lib/settings';
-	import { alertUnlessCancelled, withStepUp } from '@davincibot/lib/settings';
+	import { isMobileUserAgent, parseDeviceLabel } from '$lib/settings';
+	import { fetchSessions, revokeAllSessions, revokeSession } from '$lib/settings';
+	import type { SessionInfo } from '$lib/settings';
+	import { alertUnlessCancelled, withStepUp } from '$lib/settings';
 	import { LogOut, Monitor, ShieldCheck, Smartphone } from '@lucide/svelte';
 	import { onMount } from 'svelte';
 

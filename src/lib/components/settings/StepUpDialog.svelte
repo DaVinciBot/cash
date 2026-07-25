@@ -2,8 +2,8 @@
 	import { OverlayBackdrop } from '@davincibot/components';
 	import { CodeInput } from '@davincibot/components';
 	import { CTAButton as CtaButton } from '@davincibot/components';
-	import { stepUpChallenge, stepUpVerify, stepUpVerifyWebauthn } from '@davincibot/lib/settings';
-	import { stepUpRequest, type StepUpRequest } from '@davincibot/lib/settings';
+	import { stepUpChallenge, stepUpVerify, stepUpVerifyWebauthn } from '$lib/settings';
+	import { stepUpRequest, type StepUpRequest } from '$lib/settings';
 	import { onDestroy } from 'svelte';
 
 	type DialogMode = 'password' | 'email' | 'totp' | 'recovery' | 'webauthn';

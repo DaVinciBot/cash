@@ -13,9 +13,9 @@
 		startTotpEnrollment,
 		type MfaState,
 		type TotpEnrollmentInfo
-	} from '@davincibot/lib/settings';
-	import { registerPasskey } from '@davincibot/lib/settings';
-	import { alertUnlessCancelled, withStepUp } from '@davincibot/lib/settings';
+	} from '$lib/settings';
+	import { registerPasskey } from '$lib/settings';
+	import { alertUnlessCancelled, withStepUp } from '$lib/settings';
 	import { FingerprintPattern, KeyRound, Mail, Smartphone } from '@lucide/svelte';
 	import { onMount } from 'svelte';
 

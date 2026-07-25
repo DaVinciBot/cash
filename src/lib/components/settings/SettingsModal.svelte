@@ -5,7 +5,7 @@
 		REPORT_CATEGORY,
 		SETTINGS_CATEGORIES,
 		type SettingsCategory
-	} from '@davincibot/lib/settings';
+	} from '$lib/settings';
 	import { ChevronLeft, ChevronRight, Flag, Lock, LogOut, UserRound, X } from '@lucide/svelte';
 	import ProfilePanel from './ProfilePanel.svelte';
 	import ReportPanel from './ReportPanel.svelte';

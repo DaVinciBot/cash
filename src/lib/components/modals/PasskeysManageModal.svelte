@@ -10,8 +10,8 @@
 		registerPasskey,
 		renamePasskey,
 		type PasskeyInfo
-	} from '@davincibot/lib/settings';
-	import { alertUnlessCancelled, withStepUp } from '@davincibot/lib/settings';
+	} from '$lib/settings';
+	import { alertUnlessCancelled, withStepUp } from '$lib/settings';
 	import { FingerprintPattern, Pencil, Trash2 } from '@lucide/svelte';
 	import { onMount } from 'svelte';
 

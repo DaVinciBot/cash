@@ -2,8 +2,8 @@
 	import { OverlayBackdrop } from '@davincibot/components';
 	import { CodeInput } from '@davincibot/components';
 	import { CTAButton as CtaButton } from '@davincibot/components';
-	import { verifyTotpEnrollment, type TotpEnrollmentInfo } from '@davincibot/lib/settings';
-	import { StepUpCancelledError, withStepUp } from '@davincibot/lib/settings';
+	import { verifyTotpEnrollment, type TotpEnrollmentInfo } from '$lib/settings';
+	import { StepUpCancelledError, withStepUp } from '$lib/settings';
 	import { Copy } from '@lucide/svelte';
 	import QRCode from 'qrcode';
 	import { onMount } from 'svelte';
