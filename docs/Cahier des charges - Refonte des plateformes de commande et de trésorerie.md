@@ -75,15 +75,15 @@ Une première version saine et utilisable est attendue **pour la rentrée**, ave
 
 ## 3. Glossaire métier
 
-| Terme                  | Définition                                                                                                                                                                                                        |
-|------------------------|-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
-| **Item**               | Un composant à acheter : nom, lien, prix unitaire TTC, quantité, projet, et un **état** couvrant tout son cycle de vie — de la revue CDP jusqu'à la réception (§7.1). Créé par un membre. (campus via fk projets) |
-| **Commande**           | Un regroupement d'items, généralement passé auprès d'un même fournisseur/partenaire, avec des frais de port. Créée par le trésorier. (possibilité de pré-regroupement en fonction des liens fournisseur)          |
-| **Projet**             | Une activité de l'association disposant d'un budget.                                                                                                                                                              |
-| **Partenaire (parte)** | Un fournisseur/sponsor associé à un budget.                                                                                                                                                                       |
-| **Flux financier**     | Une dépense (débit) ou une recette (crédit) de la trésorerie.                                                                                                                                                     |
-| **Année scolaire**     | Période de référence servant à délimiter et archiver commandes et flux.                                                                                                                                           |
-| **Frais de port**      | Coût d'expédition d'une commande, réparti entre les projets concernés.                                                                                                                                            |
+| Terme                  | Définition                                                                                                                                                                                                                                                                                                                                           |
+|------------------------|------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
+| **Item**               | Un composant à acheter : nom, lien, prix unitaire TTC, quantité, projet, et un **état** couvrant tout son cycle de vie — de la revue CDP jusqu'à la réception (§7.1). Créé par un membre. (campus via fk projets)                                                                                                                                    |
+| **Commande**           | Un regroupement d'items, généralement passé auprès d'un même fournisseur/partenaire, avec des frais de port. Créée par le trésorier. (possibilité de pré-regroupement en fonction des liens fournisseur)                                                                                                                                             |
+| **Projet**             | Une activité de l'association disposant d'un budget.                                                                                                                                                                                                                                                                                                 |
+| **Partenaire (parte)** | Une entité avec laquelle l'association a un accord : remise, enveloppe de crédit ou don. Reconnue dans les liens par ses **domaines**. Seules les enveloppes sont modélisées, sous forme de compte (§6.2). À ne pas confondre avec le **fournisseur**, qui est simplement le marchand chez qui on achète et qui ne fait l'objet d'aucun référentiel. |
+| **Flux financier**     | Une dépense (débit) ou une recette (crédit) de la trésorerie.                                                                                                                                                                                                                                                                                        |
+| **Année scolaire**     | Période de référence servant à délimiter et archiver commandes et flux.                                                                                                                                                                                                                                                                              |
+| **Frais de port**      | Coût d'expédition d'une commande, réparti entre les projets concernés.                                                                                                                                                                                                                                                                               |
 
 ---
 
@@ -130,44 +130,61 @@ Synthèse des dysfonctionnements relevés dans les CR. Ils constituent le point 
 
 ### 5.2 Constitution des commandes (trésorier)
 
-| ID       | Exigence                                                                                                                                                                                                                | Prio |
-|----------|-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|------|
-| CMD-F-10 | Le trésorier regroupe des items (validés) en une commande, par sélection multiple (cases à cocher).                                                                                                                     | M    |
-| CMD-F-11 | Une commande porte un ou plusieurs items pouvant relever de projets différents.                                                                                                                                         | M    |
-| CMD-F-12 | Les frais de port d'une commande sont répartis entre les projets concernés selon une règle définie (voir §7.3).                                                                                                         | M    |
-| CMD-F-13 | Le trésorier peut indiquer un délai de livraison estimé par article.                                                                                                                                                    | W    |
-| CMD-F-14 | Une commande porte un **nom de fournisseur libre** (`supplier_name`) et, si ce fournisseur est référencé, une **liaison optionnelle vers un partenaire** (`partner_id`). Aucun référentiel n'est imposé pour commander. | M    |
-| CMD-F-15 | Pré-regroupement automatique des items par fournisseur, déduit du domaine de leur lien.                                                                                                                                 | C    |
+| ID       | Exigence                                                                                                                                                                                                                                                                                         | Prio |
+|----------|--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|------|
+| CMD-F-10 | Le trésorier regroupe des items (validés) en une commande, par sélection multiple (cases à cocher).                                                                                                                                                                                              | M    |
+| CMD-F-11 | Une commande porte un ou plusieurs items pouvant relever de projets différents.                                                                                                                                                                                                                  | M    |
+| CMD-F-12 | Les frais de port d'une commande sont répartis entre les projets concernés selon une règle définie (voir §7.3).                                                                                                                                                                                  | M    |
+| CMD-F-13 | Le trésorier peut indiquer un délai de livraison estimé par article.                                                                                                                                                                                                                             | W    |
+| CMD-F-14 | Une commande porte un **nom de fournisseur libre** (`supplier_name`) et, si ce fournisseur est référencé, une **liaison optionnelle vers un partenaire** (`partner_id`). Aucun référentiel n'est imposé pour commander.                                                                          | M    |
+| CMD-F-15 | Pré-regroupement automatique des items par fournisseur, déduit du domaine de leur lien.                                                                                                                                                                                                          | C    |
+| CMD-F-16 | Chaque item porte un **domaine** déduit de son lien (`mouser.fr`), stocké à la saisie. C'est lui qui sert au pré-regroupement (CMD-F-15), à la reconnaissance des partenariats (TRESO-F-12) et aux **statistiques par marchand** — aucun référentiel de fournisseurs n'est nécessaire pour cela. | C    |
 
 ### 5.3 Cycle de vie et statuts
 
-| ID       | Exigence                                                                                                                                                                                                                                                                                             | Prio |
-|----------|------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|------|
-| CMD-F-20 | Les statuts sont un ensemble **fermé et unique**, identique dans les tables, les filtres et l'affichage détail.                                                                                                                                                                                      | M    |
-| CMD-F-21 | Statuts d'**item** : **En revue par le CDP** (`pending_cdp`) → **Validé** (`pending_bundled`) → **Regroupé** (`bundled`) → **Reçu** (`received`), plus **Refusé** (`refused`). Statuts de **commande** : **En attente du trésorier** → **En attente de livraison** → **Terminée**, plus **Annulée**. | M    |
-| CMD-F-22 | Chaque statut dispose d'un repère visuel (badge coloré et/ou emoji) dans toutes les tables.                                                                                                                                                                                                          | M    |
-| CMD-F-23 | Les transitions de statut sont contrôlées par les permissions (voir §8 et §9).                                                                                                                                                                                                                       | M    |
-| CMD-F-24 | Si une commande qui pendant plus d'un mois est "en attente de livraison", un mail est envoyé à la tréso avec un bouton pour valider en un clic.                                                                                                                                                      | C    |
-| CMD-F-25 | Le trésorier peut marquer **item par item** sa réception, ce qui autorise les **réceptions partielles** : une commande peut contenir simultanément des items `bundled` et des items `received`.                                                                                                      | M    |
-| CMD-F-26 | Une commande passe à **Terminée** lorsque **tous** ses items sont `received` ; tant qu'il en reste au moins un en `bundled`, elle demeure **En attente de livraison**.                                                                                                                               | M    |
-| CMD-F-27 | Le détail d'une commande affiche l'avancement de la réception (ex. « 7 / 12 reçus »), et la liste des commandes le signale sur la ligne.                                                                                                                                                             | S    |
-| CMD-F-28 | Le membre voit passer ses propres items à **Reçu** sans avoir à consulter la commande qui les porte.                                                                                                                                                                                                 | S    |
+| ID       | Exigence                                                                                                                                                                                                                                                                                                                                                                                    | Prio |
+|----------|---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|------|
+| CMD-F-20 | Les statuts sont un ensemble **fermé et unique**, identique dans les tables, les filtres et l'affichage détail.                                                                                                                                                                                                                                                                             | M    |
+| CMD-F-21 | Statuts d'**item** : **En revue par le CDP** (`pending_cdp`) → **Validé** (`pending_bundled`) → **Regroupé** (`bundled`) → **Reçu** (`received`), plus deux refus terminaux : **Refusé par le CDP** (`refused_cdp`) et **Refusé par le trésorier** (`refused_treso`). Statuts de **commande** : **En attente du trésorier** → **En attente de livraison** → **Terminée**, plus **Annulée**. | M    |
+| CMD-F-22 | Chaque statut dispose d'un repère visuel (badge coloré et/ou emoji) dans toutes les tables.                                                                                                                                                                                                                                                                                                 | M    |
+| CMD-F-23 | Les transitions de statut sont contrôlées par les permissions (voir §8 et §9).                                                                                                                                                                                                                                                                                                              | M    |
+| CMD-F-24 | Si une commande qui pendant plus d'un mois est "en attente de livraison", un mail est envoyé à la tréso avec un bouton pour valider en un clic.                                                                                                                                                                                                                                             | C    |
+| CMD-F-25 | Le trésorier peut marquer **item par item** sa réception, ce qui autorise les **réceptions partielles** : une commande peut contenir simultanément des items `bundled` et des items `received`.                                                                                                                                                                                             | M    |
+| CMD-F-26 | Une commande passe à **Terminée** lorsque **tous** ses items sont `received` ; tant qu'il en reste au moins un en `bundled`, elle demeure **En attente de livraison**.                                                                                                                                                                                                                      | M    |
+| CMD-F-27 | Le détail d'une commande affiche l'avancement de la réception (ex. « 7 / 12 reçus »), et la liste des commandes le signale sur la ligne.                                                                                                                                                                                                                                                    | S    |
+| CMD-F-28 | Le membre voit passer ses propres items à **Reçu** sans avoir à consulter la commande qui les porte.                                                                                                                                                                                                                                                                                        | S    |
+| CMD-F-29 | Le trésorier peut **refuser** un item validé par le CDP (`pending_bundled → refused_treso`), avec motif obligatoire. Le refus est terminal et distinct de celui du CDP : l'auteur du refus se lit dans l'état lui-même.                                                                                                                                                                     | M    |
+| CMD-F-2A | Un item **regroupé** ne se refuse pas directement : il faut d'abord annuler la commande qui le porte, ce qui le ramène à **Validé** où le refus redevient possible. Un item **reçu** ne se refuse jamais.                                                                                                                                                                                   | M    |
 
 > **[Tranché]** La **revue du CDP porte sur les items**, pas sur la commande. Un item passe de _En revue par le CDP_ à
-> _Validé_ avant de pouvoir être intégré à une commande ; la commande ne connaît que _En attente du trésorier → En attente
-de livraison → Terminée / Annulée_.
+> _Validé_ avant de pouvoir être intégré à une commande ; la commande ne connaît que _En attente du trésorier → En
+attente de livraison → Terminée / Annulée_.
 >
 > Il n'y a **qu'une seule validation**, celle du CDP. Le trésorier ne valide pas les items : c'est l'acte de
 > regroupement qui fait passer l'item de _Validé_ à _Regroupé_. L'état intermédiaire `pending_treso` au niveau item est
 > donc supprimé.
 >
+> **[Tranché]** Le trésorier dispose en revanche d'un **droit de refus**, et le refus porte donc **deux états
+> terminaux distincts** : `refused_cdp` et `refused_treso`. L'asymétrie est volontaire — le trésorier ne valide pas,
+> mais il peut opposer un veto : c'est lui qui engage l'argent, et un item techniquement légitime peut être refusé pour
+> un motif purement financier (budget épuisé, fournisseur à éviter, dépense à reporter).
+>
+> Deux états plutôt qu'un seul `refused` porteur d'un champ « refusé par » : la nature du refus n'est pas un détail
+> d'affichage, elle change ce que le membre doit faire. Un refus CDP se rediscute avec son chef de projet et porte
+> souvent sur la pertinence technique ; un refus trésorier se rediscute avec la trésorerie et porte sur l'opportunité de
+> la dépense. Les deux motifs alimentent aussi des statistiques différentes. Un état unique obligerait chaque filtre,
+> chaque badge et chaque agrégat à joindre un champ annexe pour retrouver l'information — exactement le genre de
+> distinction qui se perd en route et reproduit le défaut n° 10.
+>
+
 > **[Tranché]** La **réception se suit au niveau item**, pas au niveau commande. L'item porte donc un état terminal
 > `received` après `bundled`. C'est ce qui rend les **réceptions partielles** représentables — cas fréquent quand un
 > fournisseur expédie en plusieurs colis ou met un composant en rupture — et c'est aussi ce qui permet à un membre de
 > savoir que *son* composant est arrivé sans dépendre de l'état global de la commande.
 >
 > Le statut de la commande devient dès lors **dérivé** de celui de ses items pour la transition finale (CMD-F-26) :
-> `completed` n'est pas un statut que le trésorier pose à la main, c'est la conséquence du fait que plus aucun item n'est
+> `completed` n'est pas un statut que le trésorier pose à la main, c'est la conséquence du fait que plus aucun item
+> n'est
 > en attente. Les autres transitions de commande (`pending_treso → pending_delivery`, `canceled`) restent, elles, des
 > actes explicites du trésorier.
 
@@ -202,7 +219,8 @@ Répond au problème n° 13 (« prix ambigu : unitaire ou total ? »), qui n'ét
 > ventilation à saisir ni à vérifier, et le rapprochement avec le relevé bancaire est direct.
 >
 > Si un besoin comptable de décomposition apparaît un jour, il sera traité au moment de la génération du document
-> concerné (§6.5), à partir du montant TTC — et non par un ajout de colonnes au modèle, ce qui réintroduirait l'ambiguïté
+> concerné (§6.5), à partir du montant TTC — et non par un ajout de colonnes au modèle, ce qui réintroduirait
+> l'ambiguïté
 > que la présente section supprime.
 
 ### 5.5 Campus et adresses de livraison (Nantes / Paris)
@@ -272,20 +290,32 @@ Répond au problème n° 13 (« prix ambigu : unitaire ou total ? »), qui n'ét
 
 ### 6.2 Partenariats et budgets
 
-| ID         | Exigence                                                                  | Prio |
-|------------|---------------------------------------------------------------------------|------|
-| TRESO-F-10 | Le trésorier peut ajouter, modifier et supprimer des partenariats.        | M    |
-| TRESO-F-11 | Le trésorier peut définir et modifier le budget associé à un partenariat. | M    |
+| ID         | Exigence                                                                                                                                                                                                          | Prio |
+|------------|-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|------|
+| TRESO-F-10 | Le trésorier peut ajouter, modifier et supprimer des partenariats.                                                                                                                                                | M    |
+| TRESO-F-11 | Lorsqu'un partenariat donne droit à une **enveloppe à consommer chez le partenaire**, celle-ci est matérialisée par un **compte dédié** dont le solde décroît à chaque commande réglée dessus.                    | M    |
+| TRESO-F-12 | Un partenariat porte une liste optionnelle de **domaines** (`mouser.fr`, `mouser.com`) permettant de le reconnaître automatiquement dans le lien d'un item.                                                       | M    |
+| TRESO-F-13 | À la création d'une commande, le compte de règlement est **pré-sélectionné** à partir des domaines des items regroupés, lorsque le partenariat correspondant dispose d'une enveloppe suffisamment approvisionnée. | W    |
+| TRESO-F-14 | Si l'enveloppe ne couvre pas le total, la commande peut être réglée sur **deux comptes** : l'enveloppe à hauteur de son solde, le complément sur un autre compte.                                                 | M    |
+| TRESO-F-15 | Les enveloppes de partenariat n'entrent **jamais** dans le solde de trésorerie de l'association : ce sont des avoirs chez un tiers, pas de l'argent en banque.                                                    | M    |
+
+> **[Tranché]** Des trois formes que prend un partenariat — **remise en pourcentage**, **enveloppe de crédit**, **don
+d'argent** — seule l' **enveloppe** est modélisée, sous forme de compte.
+>
+> La remise en pourcentage ne se décompte pas : elle n'a pas de solde, et son seul effet utile dans l'outil est
+> d'inciter à commander chez ce partenaire, ce que la liste de domaines suffit à produire (CMD-F-05, CMD-F-71). Le don
+> d'argent, lui, est déjà couvert : c'est un flux de crédit sur un compte réel. Représenter ces deux cas comme des budgets
+> à consommer produirait des soldes qui ne veulent rien dire.
 
 ### 6.3 Flux financiers (dépenses / recettes)
 
-| ID         | Exigence                                                                                                                                                                                                      | Prio |
-|------------|---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|------|
-| TRESO-F-20 | Le trésorier peut ajouter, modifier et supprimer des dépenses (débits) et des recettes (crédits).                                                                                                             | M    |
-| TRESO-F-21 | Un flux peut être rattaché à un projet et/ou à un partenariat.                                                                                                                                                | M    |
-| TRESO-F-22 | Le passage d'une commande à **En attente de livraison** crée **automatiquement** un flux de type débit rattaché à cette commande (`order_id`), d'un montant égal au total des items majoré des frais de port. | M    |
-| TRESO-F-23 | Un flux issu d'une commande reste modifiable et supprimable par le trésorier ; l'annulation de la commande propose la contrepassation du flux.                                                                | S    |
-| TRESO-F-24 | Un flux issu d'une commande est ventilé sur les projets concernés selon `ORDER_PROJECT_SHARE` (§7.2), afin que budget consommé et solde se recoupent.                                                         | M    |
+| ID         | Exigence                                                                                                                                                                                                                                                                                                   | Prio |
+|------------|------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|------|
+| TRESO-F-20 | Le trésorier peut ajouter, modifier et supprimer des dépenses (débits) et des recettes (crédits).                                                                                                                                                                                                          | M    |
+| TRESO-F-21 | Un flux peut être rattaché à un projet et/ou à un partenariat.                                                                                                                                                                                                                                             | M    |
+| TRESO-F-22 | Le passage d'une commande à **En attente de livraison** crée **automatiquement** le ou les flux de débit rattachés à cette commande (`order_id`), dont la **somme** égale le total des items majoré des frais de port. Une commande réglée sur deux comptes (TRESO-F-14) produit deux flux, un par compte. | M    |
+| TRESO-F-23 | Un flux issu d'une commande reste modifiable et supprimable par le trésorier ; l'annulation de la commande propose la contrepassation du flux.                                                                                                                                                             | S    |
+| TRESO-F-24 | Un flux issu d'une commande est ventilé sur les projets concernés selon `ORDER_PROJECT_SHARE` (§7.2), afin que budget consommé et solde se recoupent.                                                                                                                                                      | M    |
 
 ### 6.4 Justificatifs
 
@@ -328,7 +358,8 @@ Répond au problème n° 13 (« prix ambigu : unitaire ou total ? »), qui n'ét
 
 ### 7.1 États (enums)
 
-- **Item** `state` : `pending_cdp` → `pending_bundled` → `bundled` → `received` (terminal), plus `refused` (terminal).
+- **Item** `state` : `pending_cdp` → `pending_bundled` → `bundled` → `received` (terminal), plus deux refus terminaux :
+  `refused_cdp` (depuis `pending_cdp`) et `refused_treso` (depuis `pending_bundled`).
 - **Commande** `state` : `pending_treso` → `pending_delivery` → `completed`, plus `canceled` (atteignable depuis les
   deux premiers).
 
@@ -340,6 +371,11 @@ d'écriture ne puisse laisser une commande entièrement reçue affichée comme e
 L'annulation d'une commande renvoie ses items non reçus à `pending_bundled` (ils redeviennent regroupables dans une
 autre commande) et laisse intacts ceux déjà `received`.
 
+Les deux états de refus sont **terminaux et exclusifs** : `refused_cdp` n'est atteignable que depuis `pending_cdp`,
+`refused_treso` que depuis `pending_bundled` (CMD-F-29, CMD-F-2A). Un item déjà regroupé ou reçu ne peut pas être
+refusé — le seul chemin de sortie d'un item regroupé est l'annulation de sa commande, qui le ramène à `pending_bundled`.
+L'auteur du refus étant porté par l'état lui-même, seul le **motif** est stocké à part.
+
 ### 7.1bis Périodes de référence
 
 Deux découpages **distincts** coexistent, et c'est volontaire :
@@ -349,7 +385,7 @@ Deux découpages **distincts** coexistent, et c'est volontaire :
 | **Année scolaire** | 1er septembre → 31 août             | items, commandes, budgets de projet            |
 | **Année fiscale**  | exercice comptable de l'association | flux financiers, soldes, rapports trimestriels |
 
-> **[Tranché]** L'exercice fiscal retenu est l'**année civile** (1er janvier → 31 décembre). 
+> **[Tranché]** L'exercice fiscal retenu est l'**année civile** (1er janvier → 31 décembre).
 >
 > Conséquence assumée : un flux généré par une commande (TRESO-F-22) peut tomber dans un exercice fiscal différent de
 > l'année scolaire de sa commande. Une commande de décembre 2026 appartient à l'année scolaire 2027 mais à l'exercice
@@ -390,15 +426,16 @@ stateDiagram-v2
         pending_delivery --> canceled
     }
 
+    pending_cdp --> refused_cdp: CDP refuse
     pending_cdp --> pending_bundled: CDP valide
-    pending_cdp --> refused: CDP refuse
+    pending_bundled --> refused_treso: trésorier refuse (motif)
     pending_bundled --> bundled: trésorier regroupe
     bundled --> received: trésorier marque l'item reçu
     bundled --> pending_bundled: commande annulée (item non reçu)
-    
     bundled --> Commande
     received --> [*]
-    refused --> [*]
+    refused_cdp --> [*]
+    refused_treso --> [*]
 ```
 
 Le lien entre les deux niveaux se lit ainsi : le trésorier n'agit que sur les items (`received`), et la transition
@@ -429,7 +466,7 @@ Le lien entre les deux niveaux se lit ainsi : le trésorier n'agit que sur les i
 |-------------|---------------------------------------------------------------------------------------------|------|
 | TRANS-NF-20 | Repenser la stratégie de cache (invalidation claire, cohérence des données après écriture). | S    |
 
-### 9.4 Données et archivagef
+### 9.4 Données et archivage
 
 | ID          | Exigence                                                                                                                                           | Prio |
 |-------------|----------------------------------------------------------------------------------------------------------------------------------------------------|------|
@@ -478,9 +515,11 @@ Le seul jalon où la qualité prime sur la vitesse. Aucune interface produite ic
 `ITEM`, `ORDER`, `ORDER_PROJECT_SHARE`, `FLUX`, `PROOF`, plus les deux tables de périodes (§7.1bis). Enums d'états
 définitifs (§7.1). Convention **full TTC** en dur dans le schéma : `unit_price_ttc` + `quantity` sur l'item,
 `amount_ttc` seul sur commande et flux — un unique montant par entité, aucune colonne de décomposition
-(CMD-F-37/38/39/3A). `supplier_name` + `partner_id` nullable sur la commande (CMD-F-14). Dérivation de `completed` par
-trigger sur `ITEM` (CMD-F-26). RLS sur toutes les tables. **Journal d'audit générique** (trigger unique : table, ligne,
-champ, ancienne valeur, nouvelle valeur, auteur, date) — la capture se fait ici, l'affichage attendra J8.
+(CMD-F-37/38/39/3A). `supplier_name` libre + `partnership_id` nullable sur la commande (CMD-F-14), `domain` déduit du
+lien sur l'item (CMD-F-16), `PARTNERSHIP` portant ses domaines et son compte d'enveloppe optionnel (TRESO-F-11/12).
+Dérivation de `completed` par trigger sur `ITEM` (CMD-F-26). RLS sur toutes les tables. **Journal d'audit générique**
+(trigger unique : table, ligne, champ, ancienne valeur, nouvelle valeur, auteur, date) — la capture se fait ici,
+l'affichage attendra J8.
 
 **Couvre** : TRANS-NF-30/31/32/33, CMD-F-37/38/39, CMD-F-26 (mécanique), TRESO-F-02 (structure), socle de CMD-F-60/61.
 
@@ -494,8 +533,9 @@ La priorité n° 1. Écrans volontairement bruts.
 
 **Périmètre** — Panier multi-lignes → items persistés individuellement (CMD-F-09, CMD-F-01), édition/suppression tant
 que non validé (CMD-F-02), réinitialisation de la dernière ligne (CMD-F-03), vue « mes items » avec badges couvrant
-**les cinq états** (CMD-F-22, CMD-F-28, TRANS-NF-40), badge campus (CMD-F-40, TRANS-NF-41), indicateur de dépassement de
-budget à la saisie (CMD-F-06, CMD-F-50), message d'incitation partenaires (CMD-F-05).
+**les six états**, les deux refus étant visuellement distincts (CMD-F-21, CMD-F-22, CMD-F-28, TRANS-NF-40), badge campus
+(CMD-F-40, TRANS-NF-41), indicateur de dépassement de budget à la saisie (CMD-F-06, CMD-F-50), message d'incitation
+partenaires (CMD-F-05).
 
 **Critère de sortie** — Un membre soumet une liste de composants sans explication préalable et sait en un coup d'œil où
 en est chacun de ses items, jusqu'à la réception. Les badges sont posés dès ce jalon même si rien ne peut encore
@@ -506,11 +546,12 @@ atteindre `received` avant J5.
 Petit jalon, mais il débloque la file du trésorier.
 
 **Périmètre** — File des items en attente pour les projets dont on est CDP, validation et refus unitaires ou en lot,
-motif de refus, horodatage de la validation (nécessaire au tri CMD-F-80), transitions contrôlées par permissions
-(CMD-F-23).
+motif de refus obligatoire, horodatage de la validation (nécessaire au tri CMD-F-80), transitions contrôlées par
+permissions (CMD-F-23). Le refus posé ici est `refused_cdp` ; le mécanisme de motif construit à ce jalon est celui que
+J5 réutilisera pour `refused_treso`.
 
 **Critère de sortie** — Un item validé apparaît immédiatement dans la file du trésorier ; un item refusé sort du circuit
-avec un motif visible par son auteur.
+avec un motif visible par son auteur, et le badge indique **qui** l'a refusé sans consultation supplémentaire.
 
 ### 10.5 Jalon 5 — Parcours trésorier : commandes 🚩 **1ʳᵉ mise en service**
 
@@ -518,9 +559,10 @@ avec un motif visible par son auteur.
 commande, fournisseur et partenaire optionnel (CMD-F-14), adresse de livraison choisie ou créée avec pré-sélection par
 campus (CMD-F-43/44, CMD-F-41/42), frais de port et répartition sélectionnable — égale par défaut (CMD-F-12, §7.2),
 édition plein écran des prix/quantités/noms/liens en unitaire **ou** total (CMD-F-30/31/33/34/35), commande déjà passée
-restant modifiable (CMD-F-32), transitions de statut (CMD-F-20/21/23), **réception item par item et réceptions
-partielles** (CMD-F-25/26/27), tri par date de validation CDP (CMD-F-80), regroupement par année scolaire (CMD-F-81),
-colonnes de table revues (CMD-F-83), quote-part de port dans le budget consommé (CMD-F-51, TRESO-F-04).
+restant modifiable (CMD-F-32), transitions de statut (CMD-F-20/21/23), **refus trésorier avec motif** depuis la file des
+items validés (CMD-F-29/2A), **réception item par item et réceptions partielles** (CMD-F-25/26/27), tri par date de
+validation CDP (CMD-F-80), regroupement par année scolaire (CMD-F-81), colonnes de table revues (CMD-F-83), quote-part
+de port dans le budget consommé (CMD-F-51, TRESO-F-04).
 
 **Critère de sortie** — Une commande réelle est passée de bout en bout depuis l'outil, sans recours à l'ancien site, **y
 compris un colis arrivé en deux fois** : la commande reste en attente tant qu'il manque un composant, puis bascule seule
