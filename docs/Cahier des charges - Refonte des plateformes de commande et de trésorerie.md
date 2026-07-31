@@ -68,22 +68,23 @@ Une première version saine et utilisable est attendue **pour la rentrée**, ave
 | **Administrateur**       | Gestion de l'outil      | Gère les comptes, les rôles et la configuration                                                 |
 
 > **[Tranché]** Le rôle n'est qu'un ensemble de permissions préconfiguré (voir §9). Un même utilisateur peut cumuler
-> plusieurs casquettes (ex. membre d'un projet et CDP d'un autre). La notion de **campus** (Nantes / Paris) est par le
-> projet auquel le membre est rattaché.
+> plusieurs casquettes (ex. membre d'un projet et CDP d'un autre). Le **campus** (Nantes / Paris) est porté à la fois
+> par le membre et par le projet ; chaque item en dérive son campus de destination à sa création, et c'est le membre qui
+> tranche si les deux divergent (§5.5).
 
 ---
 
 ## 3. Glossaire métier
 
-| Terme                  | Définition                                                                                                                                                                                                                                                                                                                                           |
-|------------------------|------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
-| **Item**               | Un composant à acheter : nom, lien, prix unitaire TTC, quantité, projet, et un **état** couvrant tout son cycle de vie — de la revue CDP jusqu'à la réception (§7.1). Créé par un membre. (campus via fk projets)                                                                                                                                    |
-| **Commande**           | Un regroupement d'items, généralement passé auprès d'un même fournisseur/partenaire, avec des frais de port. Créée par le trésorier. (possibilité de pré-regroupement en fonction des liens fournisseur)                                                                                                                                             |
-| **Projet**             | Une activité de l'association disposant d'un budget.                                                                                                                                                                                                                                                                                                 |
-| **Partenaire (parte)** | Une entité avec laquelle l'association a un accord : remise, enveloppe de crédit ou don. Reconnue dans les liens par ses **domaines**. Seules les enveloppes sont modélisées, sous forme de compte (§6.2). À ne pas confondre avec le **fournisseur**, qui est simplement le marchand chez qui on achète et qui ne fait l'objet d'aucun référentiel. |
-| **Flux financier**     | Une dépense (débit) ou une recette (crédit) de la trésorerie.                                                                                                                                                                                                                                                                                        |
-| **Année scolaire**     | Période de référence servant à délimiter et archiver commandes et flux.                                                                                                                                                                                                                                                                              |
-| **Frais de port**      | Coût d'expédition d'une commande, réparti entre les projets concernés.                                                                                                                                                                                                                                                                               |
+| Terme                  | Définition                                                                                                                                                                                                                                                                                                                                                            |
+|------------------------|-----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
+| **Item**               | Un composant à acheter : nom, lien, prix unitaire TTC, quantité, projet, et un **état** couvrant tout son cycle de vie — de la revue CDP jusqu'à la réception (§7.1). Créé par un membre. Porte son **campus de destination**, calculé à la création (§5.5).                                                                                                          |
+| **Commande**           | Un regroupement d'items, généralement passé auprès d'un même fournisseur/partenaire, avec des frais de port. Créée par le trésorier. (possibilité de pré-regroupement en fonction des liens fournisseur)                                                                                                                                                              |
+| **Projet**             | Une activité de l'association disposant d'un budget.                                                                                                                                                                                                                                                                                                                  |
+| **Partenaire (parte)** | Une entité avec laquelle l'association a un accord : remise, enveloppe de crédit ou don. Reconnue dans les liens par ses **domaines**. Seules les enveloppes sont modélisées, sous forme de compte (§6.2). À ne pas confondre avec le **fournisseur**, qui est simplement le marchand chez qui on achète et qui ne fait l'objet d'aucun référentiel en v1 (CMD-F-17). |
+| **Flux financier**     | Une dépense (débit) ou une recette (crédit) de la trésorerie.                                                                                                                                                                                                                                                                                                         |
+| **Année scolaire**     | Période de référence servant à délimiter et archiver commandes et flux.                                                                                                                                                                                                                                                                                               |
+| **Frais de port**      | Coût d'expédition d'une commande, réparti entre les projets concernés.                                                                                                                                                                                                                                                                                                |
 
 ---
 
@@ -115,18 +116,19 @@ Synthèse des dysfonctionnements relevés dans les CR. Ils constituent le point 
 
 ### 5.1 Gestion des items (membres)
 
-| ID       | Exigence                                                                                                                                                                                                                                                                                              | Prio |
-|----------|-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|------|
-| CMD-F-01 | Un membre peut créer un item rattaché à un projet, avec : nom, lien, prix unitaire, quantité, tags (si plusieurs tags séléctionnés, demandé à choisir par article).                                                                                                                                   | M    |
-| CMD-F-02 | Un membre peut modifier et supprimer ses items tant qu'ils ne sont pas rattachés à une commande passée et qu'ils n'ont pas été validé par le CDP.                                                                                                                                                     | M    |
-| CMD-F-03 | Dans le formulaire de création/édition, le retrait du dernier item doit réinitialiser sa ligne.                                                                                                                                                                                                       | S    |
-| CMD-F-09 | La saisie se fait via un **panier multi-lignes** : le membre choisit un projet, ajoute N lignes et soumet le tout en une fois. Le panier est un écran de saisie, **pas une entité** : chaque ligne est persistée comme un item indépendant, et la vue « mes items » liste des items, pas des paniers. | M    |
-| CMD-F-0A | Persistance des paniers en brouillon (le membre quitte et retrouve sa saisie en cours).                                                                                                                                                                                                               | W    |
-| CMD-F-04 | La sélection de plusieurs tags se fait facilement (cases à cocher / multi-sélection).                                                                                                                                                                                                                 | C    |
-| CMD-F-05 | Un message recommande aux membres de passer en priorité par les partenaires de l'association.                                                                                                                                                                                                         | S    |
-| CMD-F-06 | Un indicateur signale au membre, au moment de la saisie, un dépassement du budget du projet concerné.                                                                                                                                                                                                 | S    |
-| CMD-F-07 | Lors des commandes, proposer des composants des sites partenaires ou potentiellement moins chères avec avertissements.                                                                                                                                                                                | W    |
-| CMD-F-08 | Pouvoir lier des fichiers aux items (kicad, excel mouser, ...)                                                                                                                                                                                                                                        | C    |
+| ID       | Exigence                                                                                                                                                                                                                                                                                                                              | Prio |
+|----------|---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|------|
+| CMD-F-01 | Un membre peut créer un item rattaché à un projet, avec : nom, lien, prix unitaire, quantité, tags (si plusieurs tags séléctionnés, demandé à choisir par article).                                                                                                                                                                   | M    |
+| CMD-F-02 | Un membre peut modifier et supprimer ses items tant qu'ils ne sont pas rattachés à une commande passée et qu'ils n'ont pas été validé par le CDP.                                                                                                                                                                                     | M    |
+| CMD-F-03 | Dans le formulaire de création/édition, le retrait du dernier item doit réinitialiser sa ligne.                                                                                                                                                                                                                                       | S    |
+| CMD-F-09 | La saisie se fait via un **panier multi-lignes** : le membre choisit un projet, ajoute N lignes et soumet le tout en une fois. Le panier est un écran de saisie, **pas une entité** : chaque ligne est persistée comme un item indépendant, et la vue « mes items » liste des items, pas des paniers.                                 | M    |
+| CMD-F-04 | La sélection de plusieurs tags se fait facilement (cases à cocher / multi-sélection).                                                                                                                                                                                                                                                 | C    |
+| CMD-F-05 | Un message recommande aux membres de passer en priorité par les partenaires de l'association.                                                                                                                                                                                                                                         | S    |
+| CMD-F-06 | Un indicateur signale au membre, au moment de la saisie, un dépassement du budget du projet concerné.                                                                                                                                                                                                                                 | S    |
+| CMD-F-07 | Lors des commandes, proposer des composants des sites partenaires ou potentiellement moins chères avec avertissements.                                                                                                                                                                                                                | W    |
+| CMD-F-08 | Pouvoir lier des fichiers aux items (kicad, excel mouser, ...)                                                                                                                                                                                                                                                                        | C    |
+| CMD-F-0A | Persistance des paniers en brouillon (le membre quitte et retrouve sa saisie en cours).                                                                                                                                                                                                                                               | W    |
+| CMD-F-0B | Un item porte une **note libre** saisie par le membre (référence exacte, urgence, variante acceptable). C'est aussi par elle que passe une demande de **livraison à une autre adresse** que celle du campus (§5.5). La note est visible du CDP à la revue et du trésorier au regroupement, sans avoir à déplier un panneau de détail. | M    |
 
 ### 5.2 Constitution des commandes (trésorier)
 
@@ -139,6 +141,7 @@ Synthèse des dysfonctionnements relevés dans les CR. Ils constituent le point 
 | CMD-F-14 | Une commande porte un **nom de fournisseur libre** (`supplier_name`) et, si ce fournisseur est référencé, une **liaison optionnelle vers un partenaire** (`partner_id`). Aucun référentiel n'est imposé pour commander.                                                                          | M    |
 | CMD-F-15 | Pré-regroupement automatique des items par fournisseur, déduit du domaine de leur lien.                                                                                                                                                                                                          | C    |
 | CMD-F-16 | Chaque item porte un **domaine** déduit de son lien (`mouser.fr`), stocké à la saisie. C'est lui qui sert au pré-regroupement (CMD-F-15), à la reconnaissance des partenariats (TRESO-F-12) et aux **statistiques par marchand** — aucun référentiel de fournisseurs n'est nécessaire pour cela. | C    |
+| CMD-F-17 | Constituer un **référentiel de fournisseurs** (fiche marchand rattachant ses domaines, son partenariat éventuel et ses commandes) pour produire des **statistiques par fournisseur** : volume d'achat, dépense par année scolaire, délais, part des partenaires.                                 | W    |
 
 ### 5.3 Cycle de vie et statuts
 
@@ -225,20 +228,36 @@ Répond au problème n° 13 (« prix ambigu : unitaire ou total ? »), qui n'ét
 
 ### 5.5 Campus et adresses de livraison (Nantes / Paris)
 
-| ID       | Exigence                                                                                                                                                                                       | Prio |
-|----------|------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|------|
-| CMD-F-40 | Le détail d'une commande distingue clairement si elle est destinée à Nantes ou à Paris (couleur, badge Ker Juliette).                                                                          | M    |
-| CMD-F-41 | Le détail rappelle l'adresse de livraison correspondant au campus, pour éviter les erreurs.                                                                                                    | M    |
-| CMD-F-42 | Pour la trésorerie, la distinction Nantes / Paris est rendue visible au moment de commander.                                                                                                   | M    |
-| CMD-F-43 | À la création d'une commande, l'adresse de livraison se **choisit parmi les adresses existantes** — celle du campus concerné étant pré-sélectionnée — **ou se saisit comme nouvelle adresse**. | M    |
-| CMD-F-44 | Une adresse saisie à cette occasion est conservée et devient réutilisable pour les commandes suivantes.                                                                                        | M    |
-| CMD-F-45 | Une adresse déjà utilisée peut être retirée des choix proposés sans altérer les commandes passées qui la référencent.                                                                          | S    |
+| ID       | Exigence                                                                                                                                                                                                                                          | Prio |
+|----------|---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|------|
+| CMD-F-40 | Le détail d'une commande distingue clairement si elle est destinée à Nantes ou à Paris (couleur, badge Ker Juliette).                                                                                                                             | M    |
+| CMD-F-41 | Dans la vue trésorier, **un clic sur le badge campus copie l'adresse complète** dans le presse-papier : destinataire, adresse, code postal, ville — prête à coller chez le marchand.                                                              | M    |
+| CMD-F-42 | La distinction Nantes / Paris est visible au moment de commander, dans la liste des items à regrouper comme dans le détail de la commande.                                                                                                        | M    |
+| CMD-F-43 | Chaque item porte un **campus de destination calculé automatiquement à sa création**, à partir du campus de son projet et de celui du membre qui le demande.                                                                                      | M    |
+| CMD-F-44 | Les deux adresses de campus sont modifiables par le trésorier sans intervention technique, et un changement n'altère aucune commande passée.                                                                                                      | S    |
+| CMD-F-45 | Une commande ne regroupe que des items d'un même campus : elle n'a qu'une destination.                                                                                                                                                            | M    |
+| CMD-F-46 | Si le campus du projet et celui du membre diffèrent, l'interface **demande au membre dans quel campus il souhaite être livré** ; l'item ne peut pas être créé tant qu'il n'a pas tranché. Quand les deux concordent, aucune question n'est posée. | M    |
 
-> **[Tranché]** Le **campus** (Nantes / Paris) et l' **adresse de livraison** sont deux notions distinctes. Le
-> campus est un attribut du membre et du projet : il sert de repère visuel (badge, couleur) et détermine l'adresse
-> proposée par défaut. L'adresse de livraison, elle, appartient à la commande : une commande nantaise peut légitimement
-> partir ailleurs qu'à Ker Juliette (livraison chez un partenaire, chez un membre pour un colis encombrant). Traiter
-> l'adresse comme un simple libellé dérivé du campus reproduirait le défaut n° 11 au lieu de le corriger.
+> **[Tranché]** L'adresse de livraison **n'est pas stockée sur la commande** : elle est déduite du campus. Ce qu'il faut
+> garantir, c'est qu'au moment de commander le trésorier lise le bon pavé — adresse, code postal, ville — pas qu'un
+> référentiel d'adresses réutilisables soit tenu à jour. Il n'existe donc que deux destinations, une par campus, et le
+> badge de la commande sert à la fois de repère visuel (CMD-F-40) et de bouton de copie (CMD-F-41).
+>
+> Le **campus** cesse pour autant d'être un simple attribut d'affichage : il devient une propriété de l'item, figée à sa
+> création (CMD-F-43). Le figer est ce qui corrige le défaut n° 11 — un membre qui change de campus ne déplace pas
+> rétroactivement des colis déjà livrés — et ce qui permet à une commande de n'avoir qu'une destination (CMD-F-45).
+>
+> **La divergence projet / membre n'est pas arbitrée par une règle** (CMD-F-46). Les deux lectures se défendent — le
+> matériel rejoint le stock du projet, mais c'est une personne qui réceptionne le colis — et aucune n'est vraie plus
+> souvent que l'autre : un composant du robot nantais part à Nantes, un fer à souder demandé par le même membre pour sa
+> paillasse parisienne part à Paris. Rien dans les données ne permet de distinguer les deux cas, donc la question est
+> posée à la seule personne qui connaît la réponse. C'est aussi ce qui évite d'avoir à signaler au trésorier une
+> destination « peut-être devinée de travers ».
+>
+> **La livraison exceptionnelle passe par la note de l'item** (CMD-F-0B). Livrer chez un partenaire ou chez un membre
+> pour un colis encombrant ne crée pas de destination structurée : le membre l'écrit dans sa note, le trésorier la lit
+> au regroupement et saisit l'adresse chez le marchand. Une destination utilisée une seule fois, qui ne se rapproche
+> d'aucune autre et ne sert à aucune statistique, n'a rien à gagner à être structurée.
 
 ### 5.6 Budgets et alertes
 
@@ -304,8 +323,8 @@ d'argent** — seule l' **enveloppe** est modélisée, sous forme de compte.
 >
 > La remise en pourcentage ne se décompte pas : elle n'a pas de solde, et son seul effet utile dans l'outil est
 > d'inciter à commander chez ce partenaire, ce que la liste de domaines suffit à produire (CMD-F-05, CMD-F-71). Le don
-> d'argent, lui, est déjà couvert : c'est un flux de crédit sur un compte réel. Représenter ces deux cas comme des budgets
-> à consommer produirait des soldes qui ne veulent rien dire.
+> d'argent, lui, est déjà couvert : c'est un flux de crédit sur un compte réel. Représenter ces deux cas comme des
+> budgets à consommer produirait des soldes qui ne veulent rien dire.
 
 ### 6.3 Flux financiers (dépenses / recettes)
 
@@ -511,13 +530,16 @@ Authentification/sessions fiables (TRANS-NF-01/02), refonte RBAC (TRANS-PERM-01/
 
 Le seul jalon où la qualité prime sur la vitesse. Aucune interface produite ici.
 
-**Périmètre** — Modélisation intégrale de §7 : `PROJECT`, `PROJECT_BUDGET` (par année scolaire), `PARTNER`, `ADDRESS`,
-`ITEM`, `ORDER`, `ORDER_PROJECT_SHARE`, `FLUX`, `PROOF`, plus les deux tables de périodes (§7.1bis). Enums d'états
-définitifs (§7.1). Convention **full TTC** en dur dans le schéma : `unit_price_ttc` + `quantity` sur l'item,
-`amount_ttc` seul sur commande et flux — un unique montant par entité, aucune colonne de décomposition
-(CMD-F-37/38/39/3A). `supplier_name` libre + `partnership_id` nullable sur la commande (CMD-F-14), `domain` déduit du
-lien sur l'item (CMD-F-16), `PARTNERSHIP` portant ses domaines et son compte d'enveloppe optionnel (TRESO-F-11/12).
-Dérivation de `completed` par trigger sur `ITEM` (CMD-F-26). RLS sur toutes les tables. **Journal d'audit générique**
+**Périmètre** — Modélisation intégrale de §7 : `PROJECT`, `PROJECT_BUDGET` (par année scolaire), `PARTNERSHIP`,
+`CAMPUS_ADDRESS`, `ITEM`, `ORDER`, `ORDER_PROJECT_SHARE`, `FLUX`, `PROOF`, plus les deux tables de périodes (§7.1bis).
+`CAMPUS_ADDRESS` a le campus pour clé et ne compte que deux lignes, à charger dès ce jalon (CMD-F-44). Campus de
+destination résolu par trigger sur l'item et unicité du campus par commande garantie par clé étrangère composite
+(CMD-F-43/45/46). Enums d'états définitifs (§7.1). Convention **full TTC** en dur dans le schéma : `unit_price_ttc` +
+`quantity` sur l'item, `amount_ttc` seul sur commande et flux — un unique montant par entité, aucune colonne de
+décomposition (CMD-F-37/38/39/3A). `supplier_name` libre + `partnership_id` nullable sur la commande (CMD-F-14),
+`domain` déduit du lien sur l'item (CMD-F-16), `PARTNERSHIP` portant ses domaines et son compte d'enveloppe optionnel
+(TRESO-F-11/12). Dérivation de `completed` par trigger sur `ITEM` (CMD-F-26). RLS sur toutes les tables. **Journal
+d'audit générique**
 (trigger unique : table, ligne, champ, ancienne valeur, nouvelle valeur, auteur, date) — la capture se fait ici,
 l'affichage attendra J8.
 
@@ -534,8 +556,9 @@ La priorité n° 1. Écrans volontairement bruts.
 **Périmètre** — Panier multi-lignes → items persistés individuellement (CMD-F-09, CMD-F-01), édition/suppression tant
 que non validé (CMD-F-02), réinitialisation de la dernière ligne (CMD-F-03), vue « mes items » avec badges couvrant
 **les six états**, les deux refus étant visuellement distincts (CMD-F-21, CMD-F-22, CMD-F-28, TRANS-NF-40), badge campus
-(CMD-F-40, TRANS-NF-41), indicateur de dépassement de budget à la saisie (CMD-F-06, CMD-F-50), message d'incitation
-partenaires (CMD-F-05).
+(CMD-F-40, TRANS-NF-41), résolution automatique du campus de destination — avec question posée au membre en cas de
+divergence projet / membre (CMD-F-43, CMD-F-46), note libre par item (CMD-F-0B), indicateur de dépassement de budget à
+la saisie (CMD-F-06, CMD-F-50), message d'incitation partenaires (CMD-F-05).
 
 **Critère de sortie** — Un membre soumet une liste de composants sans explication préalable et sait en un coup d'œil où
 en est chacun de ses items, jusqu'à la réception. Les badges sont posés dès ce jalon même si rien ne peut encore
@@ -555,14 +578,15 @@ avec un motif visible par son auteur, et le badge indique **qui** l'a refusé sa
 
 ### 10.5 Jalon 5 — Parcours trésorier : commandes 🚩 **1ʳᵉ mise en service**
 
-**Périmètre** — Regroupement manuel par cases à cocher (CMD-F-10/11), items de projets différents dans une même
-commande, fournisseur et partenaire optionnel (CMD-F-14), adresse de livraison choisie ou créée avec pré-sélection par
-campus (CMD-F-43/44, CMD-F-41/42), frais de port et répartition sélectionnable — égale par défaut (CMD-F-12, §7.2),
-édition plein écran des prix/quantités/noms/liens en unitaire **ou** total (CMD-F-30/31/33/34/35), commande déjà passée
-restant modifiable (CMD-F-32), transitions de statut (CMD-F-20/21/23), **refus trésorier avec motif** depuis la file des
-items validés (CMD-F-29/2A), **réception item par item et réceptions partielles** (CMD-F-25/26/27), tri par date de
-validation CDP (CMD-F-80), regroupement par année scolaire (CMD-F-81), colonnes de table revues (CMD-F-83), quote-part
-de port dans le budget consommé (CMD-F-51, TRESO-F-04).
+**Périmètre** — Regroupement manuel par cases à cocher (CMD-F-10/11), items de projets différents dans une même commande
+**d'un même campus** (CMD-F-45), fournisseur et partenaire optionnel (CMD-F-14), badge campus cliquable copiant
+l'adresse à recopier chez le marchand (CMD-F-41/42), **notes des items visibles sans déplier** — c'est par elles que
+passe une demande de livraison exceptionnelle (CMD-F-0B), frais de port et répartition sélectionnable — égale par défaut
+(CMD-F-12, §7.2), édition plein écran des prix/quantités/noms/liens en unitaire **ou** total (CMD-F-30/31/33/34/35),
+commande déjà passée restant modifiable (CMD-F-32), transitions de statut (CMD-F-20/21/23), **refus trésorier avec
+motif** depuis la file des items validés (CMD-F-29/2A), **réception item par item et réceptions partielles**
+(CMD-F-25/26/27), tri par date de validation CDP (CMD-F-80), regroupement par année scolaire (CMD-F-81), colonnes de
+table revues (CMD-F-83), quote-part de port dans le budget consommé (CMD-F-51, TRESO-F-04).
 
 **Critère de sortie** — Une commande réelle est passée de bout en bout depuis l'outil, sans recours à l'ancien site, **y
 compris un colis arrivé en deux fois** : la commande reste en attente tant qu'il manque un composant, puis bascule seule
@@ -606,7 +630,8 @@ partenaires (CMD-F-07, CMD-F-71).
 Relances par mail sur commande dormante (CMD-F-24), notifications Discord/mail (CMD-F-85), brouillons de panier
 persistants (CMD-F-0A), double budget normal/parte (TRESO-F-03), conversion d'images en PDF et fusion via API
 (TRESO-F-32/33), budget prévisionnel (TRESO-F-60), rapprochement bancaire automatique (TRESO-F-61), suivi des
-cotisations (TRESO-F-63), recherche et comparaison de composants via API partenaires (CMD-F-72/73).
+cotisations (TRESO-F-63), recherche et comparaison de composants via API partenaires (CMD-F-72/73), référentiel de
+fournisseurs pour statistiques (CMD-F-17).
 
 ### 10.11 Chemin critique
 
