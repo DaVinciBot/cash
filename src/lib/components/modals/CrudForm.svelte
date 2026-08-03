@@ -11,7 +11,7 @@
 	type SubmitEventHandler = (event: MouseEvent) => void | Promise<void>;
 	type CloseEventHandler = (event: MouseEvent) => void | Promise<void>;
 
-	interface CrudFormProps {
+	interface Props {
 		type?: string;
 		type_accord?: string;
 		action?: string;
@@ -40,7 +40,7 @@
 		submitting = false,
 		onSubmit = noop,
 		onClose = noop
-	}: CrudFormProps = $props();
+	}: Props = $props();
 	/* eslint-enable prefer-const */
 
 	let autocompleteValues: Record<string, string> = $state({});

@@ -178,7 +178,7 @@
 
 	type DrawerAction = SelectorAction | ButtonAction;
 
-	interface ReadDrawerProps {
+	interface Props {
 		values?: DrawerValues;
 		files?: string[];
 		actions?: DrawerAction[];
@@ -206,7 +206,7 @@
 		id = 'readDrawer',
 		onSubmit = noop,
 		onClose = noop
-	}: ReadDrawerProps = $props();
+	}: Props = $props();
 	/* eslint-enable prefer-const */
 
 	let isEditing = $state<boolean>(false);
@@ -474,11 +474,7 @@
 
 	onMount(async () => {
 		// check if mobile
-		if (window.innerWidth < 768) {
-			isMobile = true;
-		} else {
-			isMobile = false;
-		}
+		isMobile = window.innerWidth < 768;
 		if (files.length > 0) {
 			// get the all signed url from supabase
 			const { data: urls } = await getSupabase().storage.from('proof').createSignedUrls(files, 600);
@@ -732,7 +728,6 @@
 														data-view-component="true"
 														fill="white"
 														height="16"
-														version="1.1"
 														viewBox="0 0 16 16"
 														width="16"
 													>
@@ -1456,17 +1451,16 @@
 													>
 														{#if listItem.link}
 															<svg
-																id="Capa_1"
-																style="enable-background:new 0 0 511.904 511.904;"
-																class="ml-1 inline h-4 w-4 transition-all"
-																height="16"
-																viewBox="0 0 511.904 511.904"
-																width="16"
-																x="0px"
-																xmlns="http://www.w3.org/2000/svg"
-																xmlns:xlink="http://www.w3.org/1999/xlink"
-																y="0px"
-																xml:space="preserve"
+																	id="Capa_1"
+																	style="enable-background:new 0 0 511.904 511.904;"
+																	class="ml-1 inline h-4 w-4 transition-all"
+																	height="16"
+																	viewBox="0 0 511.904 511.904"
+																	width="16"
+																	x="0px"
+																	xmlns="http://www.w3.org/2000/svg"
+																	y="0px"
+																	xml:space="preserve"
 															>
 																<g>
 																	<path

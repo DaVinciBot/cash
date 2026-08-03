@@ -3,3 +3,7 @@ allowBuilds:
   svelte-preprocess: true
 minimumReleaseAgeExclude:
   - '@davincibot/*'
+overrides:
+  '@davincibot/components': link:../packages/components
+  '@davincibot/database-types': link:../Supabased/packages/database-types
+  '@davincibot/lib': link:../packages/lib

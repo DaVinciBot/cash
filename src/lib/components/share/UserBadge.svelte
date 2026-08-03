@@ -14,7 +14,7 @@
 		[key: string]: unknown;
 	}
 
-	interface UserBadgeProps {
+	interface Props {
 		user?: UserBadgeUser | null;
 		fixed?: boolean;
 	}
@@ -26,7 +26,7 @@
 	};
 
 	/* eslint-disable prefer-const */
-	let { user = $bindable(fallbackUser), fixed = true }: UserBadgeProps = $props();
+	let { user = $bindable(fallbackUser), fixed = true }: Props = $props();
 	/* eslint-enable prefer-const */
 
 	let skip = false;

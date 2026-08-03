@@ -11,7 +11,7 @@
 		callback?: (event: MouseEvent) => void;
 	}
 
-	interface InfoModalProps {
+	interface Props {
 		message?: string;
 		type?: InfoType;
 		onClose?: (event: Event | Element | null) => void;
@@ -33,7 +33,7 @@
 				is_main: true
 			}
 		])
-	}: InfoModalProps = $props();
+	}: Props = $props();
 	/* eslint-enable prefer-const */
 
 	const popupSuffix = Math.random().toString(36).substring(7);

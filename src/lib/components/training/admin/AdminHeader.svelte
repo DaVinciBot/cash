@@ -3,7 +3,7 @@
 
 	const noop = () => undefined;
 
-	interface AdminHeaderProps {
+	interface Props {
 		trainingsCount?: number;
 		upcomingCount?: number;
 		draftCount?: number;
@@ -19,7 +19,7 @@
 		slotRangeDays = 0,
 		onAddTraining = noop,
 		onAddSlot = noop
-	}: AdminHeaderProps = $props();
+	}: Props = $props();
 </script>
 
 <header
