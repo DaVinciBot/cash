@@ -15,7 +15,7 @@
 		"test:unit": "vitest run --coverage",
 		"test:e2e": "playwright test",
 		"test": "pnpm test:unit && pnpm test:e2e",
-		"ci": "pnpm check && pnpm lint && pnpm test:unit && pnpm build"
+		"ci-workflow": "pnpm check && pnpm lint && pnpm test:unit && pnpm build"
 	},
 	"devDependencies": {
 		"@davincibot/config": "^3.0.2",
