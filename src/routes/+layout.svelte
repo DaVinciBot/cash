@@ -18,7 +18,7 @@
 	import UserBadge from '$lib/components/share/UserBadge.svelte';
 	import '../app.css';
 
-	const { data, children }: { data: PageData; children?: Snippet } = $props();
+	let { data, children }: { data: PageData; children?: Snippet } = $props();
 
 	const userProfile = $derived(data.userProfile);
 	const canCreateOrder = $derived(data.canCreateOrder);

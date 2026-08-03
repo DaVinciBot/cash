@@ -27,7 +27,7 @@
 		trainings?: TrainingListItem[];
 	}
 
-	const {
+	let {
 		slots = [],
 		statusOptions = [],
 		slotDbInfo,

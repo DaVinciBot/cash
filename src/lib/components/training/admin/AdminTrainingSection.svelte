@@ -24,7 +24,7 @@
 		onEditTraining?: (training: TrainingListItem) => void;
 	}
 
-	const {
+	let {
 		trainings = [],
 		categoryOptions = [],
 		trainingDbInfo,

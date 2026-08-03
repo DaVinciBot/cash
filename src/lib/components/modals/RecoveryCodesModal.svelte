@@ -8,7 +8,7 @@
 		onClose: () => void;
 	}
 
-	const { codes, onClose }: Props = $props();
+	let { codes, onClose }: Props = $props();
 
 	let copied = $state<boolean>(false);
 

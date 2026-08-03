@@ -12,7 +12,7 @@
 		onAddSlot?: () => void;
 	}
 
-	const {
+	let {
 		trainingsCount = 0,
 		upcomingCount = 0,
 		draftCount = 0,

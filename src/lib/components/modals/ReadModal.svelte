@@ -69,7 +69,7 @@
 
 	const noop = () => undefined;
 
-	const {
+	let {
 		values = {
 			header: {
 				title: 'Pas de détails',

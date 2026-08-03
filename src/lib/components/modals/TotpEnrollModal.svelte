@@ -14,7 +14,7 @@
 		onVerified: (recoveryCodes: string[] | null) => void;
 	}
 
-	const { enrollment, onClose, onVerified }: Props = $props();
+	let { enrollment, onClose, onVerified }: Props = $props();
 
 	let qrDataUrl = $state<string | null>(null);
 	let code = $state('');

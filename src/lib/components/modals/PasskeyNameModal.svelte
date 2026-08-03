@@ -11,7 +11,7 @@
 		onCancel: () => void;
 	}
 
-	const {
+	let {
 		title,
 		description = null,
 		initialName = '',
