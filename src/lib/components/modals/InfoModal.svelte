@@ -11,7 +11,7 @@
 		callback?: (event: MouseEvent) => void;
 	}
 
-	interface InfoModalProps {
+	interface Props {
 		message?: string;
 		type?: InfoType;
 		onClose?: (event: Event | Element | null) => void;
@@ -22,7 +22,6 @@
 		window.location.reload();
 	};
 
-	/* eslint-disable prefer-const */
 	let {
 		message = 'La commande a été passée avec succès.',
 		type = 'success',
@@ -33,8 +32,7 @@
 				is_main: true
 			}
 		])
-	}: InfoModalProps = $props();
-	/* eslint-enable prefer-const */
+	}: Props = $props();
 
 	const popupSuffix = Math.random().toString(36).substring(7);
 	const id = $derived(`${type}Popup-${popupSuffix}`);

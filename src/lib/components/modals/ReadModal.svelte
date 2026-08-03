@@ -53,7 +53,7 @@
 
 	type ReadAction = SelectorAction | ButtonAction;
 
-	interface ReadModalProps {
+	interface Props {
 		values?: ReadValues;
 		files?: string[] | null;
 		actions?: ReadAction[];
@@ -69,7 +69,7 @@
 
 	const noop = () => undefined;
 
-	const {
+	let {
 		values = {
 			header: {
 				title: 'Pas de détails',
@@ -110,7 +110,7 @@
 		actions = [],
 		id = 'readModal',
 		onClose = noop
-	}: ReadModalProps = $props();
+	}: Props = $props();
 
 	let current_file = $state('');
 	let current_file_index = $state(0);
@@ -196,11 +196,7 @@
 			hideOnClickOutside(popup, __onClose);
 		}
 		// check if mobile
-		if (window.innerWidth < 768) {
-			isMobile = true;
-		} else {
-			isMobile = false;
-		}
+		isMobile = window.innerWidth < 768;
 		const paths = attachmentPaths();
 		if (paths.length > 0) {
 			// get the all signed url from supabase

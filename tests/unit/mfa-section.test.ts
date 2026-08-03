@@ -2,7 +2,7 @@ import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 
 import { flushSync, mount, unmount } from 'svelte';
 
-import type * as SettingsModule from '@davincibot/lib/settings';
+import type * as SettingsModule from '$lib/settings';
 
 vi.mock('$env/dynamic/public', () => ({ env: {} }));
 
@@ -25,11 +25,11 @@ const passkeyMocks = vi.hoisted(() => ({
 	deletePasskey: vi.fn()
 }));
 
-// mfa et passkeys sont réexportés par le même barrel @davincibot/lib/settings :
+// mfa et passkeys sont réexportés par le même barrel $lib/settings :
 // un seul vi.mock, sinon le second écraserait le premier. On garde le reste du
 // barrel réel (stepUpRequest, withStepUp, alertUnlessCancelled…) dont dépend la
 // section.
-vi.mock('@davincibot/lib/settings', async (importOriginal) => ({
+vi.mock('$lib/settings', async (importOriginal) => ({
 	...(await importOriginal<typeof SettingsModule>()),
 	...mocks,
 	...passkeyMocks

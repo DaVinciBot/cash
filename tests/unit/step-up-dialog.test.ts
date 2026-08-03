@@ -3,7 +3,7 @@ import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import { flushSync, mount, unmount } from 'svelte';
 import { get } from 'svelte/store';
 
-import type * as SettingsModule from '@davincibot/lib/settings';
+import type * as SettingsModule from '$lib/settings';
 
 const mocks = vi.hoisted(() => ({
 	fetchMfaState: vi.fn(),
@@ -20,13 +20,13 @@ const mocks = vi.hoisted(() => ({
 
 // On garde le vrai store stepUpRequest / requestStepUp / withStepUp / helpers
 // d'erreur (le dialogue s'y abonne) et on ne remplace que les appels réseau.
-vi.mock('@davincibot/lib/settings', async (importOriginal) => ({
+vi.mock('$lib/settings', async (importOriginal) => ({
 	...(await importOriginal<typeof SettingsModule>()),
 	...mocks
 }));
 
 import StepUpDialog from '$lib/components/settings/StepUpDialog.svelte';
-import { requestStepUp, stepUpRequest } from '@davincibot/lib/settings';
+import { requestStepUp, stepUpRequest } from '$lib/settings';
 
 let cleanup: (() => void) | null = null;
 

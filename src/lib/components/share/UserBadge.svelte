@@ -14,7 +14,7 @@
 		[key: string]: unknown;
 	}
 
-	interface UserBadgeProps {
+	interface Props {
 		user?: UserBadgeUser | null;
 		fixed?: boolean;
 	}
@@ -25,9 +25,7 @@
 		avatar: 'https://flowbite.s3.amazonaws.com/blocks/marketing-ui/avatars/michael-gough.png'
 	};
 
-	/* eslint-disable prefer-const */
-	let { user = $bindable(fallbackUser), fixed = true }: UserBadgeProps = $props();
-	/* eslint-enable prefer-const */
+	let { user = $bindable(fallbackUser), fixed = true }: Props = $props();
 
 	let skip = false;
 	let resizeHandler: (() => void) | null = null;

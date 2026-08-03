@@ -19,7 +19,7 @@
 		onClose: () => void;
 	}
 
-	const { onClose }: Props = $props();
+	let { onClose }: Props = $props();
 
 	let passkeys = $state<PasskeyInfo[]>([]);
 	let loading = $state<boolean>(true);

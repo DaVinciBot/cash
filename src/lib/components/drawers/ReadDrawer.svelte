@@ -178,7 +178,7 @@
 
 	type DrawerAction = SelectorAction | ButtonAction;
 
-	interface ReadDrawerProps {
+	interface Props {
 		values?: DrawerValues;
 		files?: string[];
 		actions?: DrawerAction[];
@@ -194,7 +194,6 @@
 
 	const noop = () => undefined;
 
-	/* eslint-disable prefer-const */
 	let {
 		values = {
 			header: { title: 'Pas de détails', sub: '-', stepper: [] },
@@ -206,8 +205,7 @@
 		id = 'readDrawer',
 		onSubmit = noop,
 		onClose = noop
-	}: ReadDrawerProps = $props();
-	/* eslint-enable prefer-const */
+	}: Props = $props();
 
 	let isEditing = $state<boolean>(false);
 	function handleSave(e: SubmitEvent) {
@@ -474,11 +472,7 @@
 
 	onMount(async () => {
 		// check if mobile
-		if (window.innerWidth < 768) {
-			isMobile = true;
-		} else {
-			isMobile = false;
-		}
+		isMobile = window.innerWidth < 768;
 		if (files.length > 0) {
 			// get the all signed url from supabase
 			const { data: urls } = await getSupabase().storage.from('proof').createSignedUrls(files, 600);
@@ -732,7 +726,6 @@
 														data-view-component="true"
 														fill="white"
 														height="16"
-														version="1.1"
 														viewBox="0 0 16 16"
 														width="16"
 													>
@@ -1464,7 +1457,6 @@
 																width="16"
 																x="0px"
 																xmlns="http://www.w3.org/2000/svg"
-																xmlns:xlink="http://www.w3.org/1999/xlink"
 																y="0px"
 																xml:space="preserve"
 															>

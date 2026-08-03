@@ -8,9 +8,9 @@ vi.mock('@davincibot/lib/supabase', () => ({
 }));
 
 import SettingsModal from '$lib/components/settings/SettingsModal.svelte';
+import type { SettingsCategory } from '$lib/settings';
 import type { UserProfile } from '@davincibot/lib';
 import { userdata } from '@davincibot/lib';
-import type { SettingsCategory } from '@davincibot/lib/settings';
 
 const profile: UserProfile = {
 	email: 'alice@example.com',

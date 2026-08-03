@@ -7,7 +7,7 @@ import {
 	requestStepUp,
 	stepUpRequest,
 	withStepUp
-} from '@davincibot/lib/settings';
+} from '$lib/settings';
 
 describe('withStepUp', () => {
 	it("passe l'action telle quelle quand aucune élévation n'est requise", async () => {

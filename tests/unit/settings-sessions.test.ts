@@ -6,7 +6,7 @@ import {
 	revokeAllSessions,
 	revokeConnection,
 	revokeSession
-} from '@davincibot/lib/settings';
+} from '$lib/settings';
 
 // Sur 401, la lib affecte window.location.href = buildLoginUrl(...). jsdom ne
 // navigue pas vers un autre domaine : on remplace location par un espion pour

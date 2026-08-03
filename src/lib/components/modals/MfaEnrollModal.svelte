@@ -12,7 +12,7 @@
 		onVerified: (recoveryCodes: string[] | null) => void;
 	}
 
-	const { email: initialEmail, onClose, onVerified }: Props = $props();
+	let { email: initialEmail, onClose, onVerified }: Props = $props();
 
 	let email = $state<string | null>(null);
 	let code = $state('');

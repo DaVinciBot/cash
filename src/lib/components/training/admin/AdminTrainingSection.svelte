@@ -12,7 +12,7 @@
 	const noop = () => undefined;
 	const noopTraining: (training: TrainingListItem) => void = () => undefined;
 
-	interface AdminTrainingSectionProps {
+	interface Props {
 		trainings?: TrainingListItem[];
 		categoryOptions?: { value: string; text: string; selected?: boolean }[];
 		trainingDbInfo: DBInfo;
@@ -24,7 +24,7 @@
 		onEditTraining?: (training: TrainingListItem) => void;
 	}
 
-	const {
+	let {
 		trainings = [],
 		categoryOptions = [],
 		trainingDbInfo,
@@ -34,7 +34,7 @@
 		parseTrainingItems,
 		onAddTraining = noop,
 		onEditTraining = noopTraining
-	}: AdminTrainingSectionProps = $props();
+	}: Props = $props();
 </script>
 
 <section class="border-light-blue/10 bg-dark-blue/80 rounded-[28px] border p-5 sm:p-6">

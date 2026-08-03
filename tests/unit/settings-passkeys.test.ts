@@ -17,7 +17,7 @@ import {
 	registerPasskey,
 	renamePasskey,
 	stepUpVerifyWebauthn
-} from '@davincibot/lib/settings';
+} from '$lib/settings';
 
 const jsonResponse = (status: number, body: unknown) => ({
 	ok: status < 400,

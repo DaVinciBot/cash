@@ -12,7 +12,7 @@
 	const noop = () => undefined;
 	const noopSlot: (slot: TrainingSlotListItem) => void = () => undefined;
 
-	interface AdminSlotSectionProps {
+	interface Props {
 		slots?: TrainingSlotListItem[];
 		statusOptions?: { value: string; text: string }[];
 		slotDbInfo: DBInfo;
@@ -27,7 +27,7 @@
 		trainings?: TrainingListItem[];
 	}
 
-	const {
+	let {
 		slots = [],
 		statusOptions = [],
 		slotDbInfo,
@@ -40,7 +40,7 @@
 		formatSlotDate,
 		findTrainingName,
 		trainings = []
-	}: AdminSlotSectionProps = $props();
+	}: Props = $props();
 </script>
 
 <section class="border-light-blue/10 bg-dark-blue/80 rounded-[28px] border p-5 sm:p-6">

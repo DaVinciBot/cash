@@ -11,12 +11,12 @@
 	import ReportPanel from './ReportPanel.svelte';
 	import SecurityPanel from './SecurityPanel.svelte';
 
-	interface SettingsModalProps {
+	interface Props {
 		initialCategory?: SettingsCategory | null;
 		onClose: () => void;
 	}
 
-	const { initialCategory = null, onClose }: SettingsModalProps = $props();
+	let { initialCategory = null, onClose }: Props = $props();
 
 	// capture initiale voulue : le modal est remonté à chaque ouverture via {#if}
 	// svelte-ignore state_referenced_locally
