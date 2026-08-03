@@ -25,9 +25,7 @@
 		avatar: 'https://flowbite.s3.amazonaws.com/blocks/marketing-ui/avatars/michael-gough.png'
 	};
 
-	/* eslint-disable prefer-const */
 	let { user = $bindable(fallbackUser), fixed = true }: Props = $props();
-	/* eslint-enable prefer-const */
 
 	let skip = false;
 	let resizeHandler: (() => void) | null = null;

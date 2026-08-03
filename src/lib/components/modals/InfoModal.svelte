@@ -22,7 +22,6 @@
 		window.location.reload();
 	};
 
-	/* eslint-disable prefer-const */
 	let {
 		message = 'La commande a été passée avec succès.',
 		type = 'success',
@@ -34,7 +33,6 @@
 			}
 		])
 	}: Props = $props();
-	/* eslint-enable prefer-const */
 
 	const popupSuffix = Math.random().toString(36).substring(7);
 	const id = $derived(`${type}Popup-${popupSuffix}`);

@@ -2,7 +2,7 @@ import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 
 import { flushSync, mount, unmount } from 'svelte';
 
-import type * as SettingsModule from '@davincibot/lib/settings';
+import type * as SettingsModule from '$lib/settings';
 
 vi.mock('$env/dynamic/public', () => ({ env: {} }));
 
@@ -15,7 +15,7 @@ const mocks = vi.hoisted(() => ({
 
 // On garde le reste du barrel réel (withStepUp, alertUnlessCancelled…) dont
 // dépend la modale, et on ne remplace que les appels réseau passkeys.
-vi.mock('@davincibot/lib/settings', async (importOriginal) => ({
+vi.mock('$lib/settings', async (importOriginal) => ({
 	...(await importOriginal<typeof SettingsModule>()),
 	...mocks
 }));

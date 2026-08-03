@@ -1,4 +1,4 @@
-import { isMobileUserAgent, parseDeviceLabel } from '@davincibot/lib/settings';
+import { isMobileUserAgent, parseDeviceLabel } from '$lib/settings';
 import { describe, expect, it } from 'vitest';
 
 const UA = {

@@ -17,14 +17,9 @@ vi.mock('@davincibot/lib/supabase', () => ({
 	})
 }));
 
+import { changePassword, parseSettingsCategory, updateUsername, uploadAvatar } from '$lib/settings';
 import type { UserProfile } from '@davincibot/lib';
 import { userdata } from '@davincibot/lib';
-import {
-	changePassword,
-	parseSettingsCategory,
-	updateUsername,
-	uploadAvatar
-} from '@davincibot/lib/settings';
 
 const profile: UserProfile = {
 	email: 'alice@example.com',

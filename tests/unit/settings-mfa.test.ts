@@ -11,7 +11,7 @@ import {
 	stepUpVerify,
 	verifyEmailEnrollment,
 	verifyTotpEnrollment
-} from '@davincibot/lib/settings';
+} from '$lib/settings';
 
 const jsonResponse = (status: number, body: unknown) => ({
 	ok: status < 400,

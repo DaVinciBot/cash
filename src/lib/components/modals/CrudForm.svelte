@@ -27,7 +27,6 @@
 
 	const noop = () => undefined;
 
-	/* eslint-disable prefer-const */
 	let {
 		type = 'Utilisateur',
 		type_accord = 'un',
@@ -41,7 +40,6 @@
 		onSubmit = noop,
 		onClose = noop
 	}: Props = $props();
-	/* eslint-enable prefer-const */
 
 	let autocompleteValues: Record<string, string> = $state({});
 	let autocompleteCompletions: Record<string, AutocompleteCompletion[]> = $state({});

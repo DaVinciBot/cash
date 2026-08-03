@@ -194,7 +194,6 @@
 
 	const noop = () => undefined;
 
-	/* eslint-disable prefer-const */
 	let {
 		values = {
 			header: { title: 'Pas de détails', sub: '-', stepper: [] },
@@ -207,7 +206,6 @@
 		onSubmit = noop,
 		onClose = noop
 	}: Props = $props();
-	/* eslint-enable prefer-const */
 
 	let isEditing = $state<boolean>(false);
 	function handleSave(e: SubmitEvent) {
@@ -1451,16 +1449,16 @@
 													>
 														{#if listItem.link}
 															<svg
-																	id="Capa_1"
-																	style="enable-background:new 0 0 511.904 511.904;"
-																	class="ml-1 inline h-4 w-4 transition-all"
-																	height="16"
-																	viewBox="0 0 511.904 511.904"
-																	width="16"
-																	x="0px"
-																	xmlns="http://www.w3.org/2000/svg"
-																	y="0px"
-																	xml:space="preserve"
+																id="Capa_1"
+																style="enable-background:new 0 0 511.904 511.904;"
+																class="ml-1 inline h-4 w-4 transition-all"
+																height="16"
+																viewBox="0 0 511.904 511.904"
+																width="16"
+																x="0px"
+																xmlns="http://www.w3.org/2000/svg"
+																y="0px"
+																xml:space="preserve"
 															>
 																<g>
 																	<path
