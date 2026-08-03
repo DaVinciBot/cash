@@ -76,21 +76,22 @@ Une première version saine et utilisable est attendue **pour la rentrée**, ave
 
 ## 3. Glossaire métier
 
-| Terme                  | Définition                                                                                                                                                                                                                                                                                                                                                            |
-|------------------------|-----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
-| **Item**               | Un composant à acheter : nom, lien, prix unitaire TTC, quantité, projet, et un **état** couvrant tout son cycle de vie — de la revue CDP jusqu'à la réception (§7.1). Créé par un membre. Porte son **campus de destination**, calculé à la création (§5.5).                                                                                                          |
-| **Commande**           | Un regroupement d'items, généralement passé auprès d'un même fournisseur/partenaire, avec des frais de port. Créée par le trésorier. (possibilité de pré-regroupement en fonction des liens fournisseur)                                                                                                                                                              |
-| **Projet**             | Une activité de l'association disposant d'un budget.                                                                                                                                                                                                                                                                                                                  |
-| **Partenaire (parte)** | Une entité avec laquelle l'association a un accord : remise, enveloppe de crédit ou don. Reconnue dans les liens par ses **domaines**. Seules les enveloppes sont modélisées, sous forme de compte (§6.2). À ne pas confondre avec le **fournisseur**, qui est simplement le marchand chez qui on achète et qui ne fait l'objet d'aucun référentiel en v1 (CMD-F-17). |
-| **Flux financier**     | Une dépense (débit) ou une recette (crédit) de la trésorerie.                                                                                                                                                                                                                                                                                                         |
-| **Année scolaire**     | Période de référence servant à délimiter et archiver commandes et flux.                                                                                                                                                                                                                                                                                               |
-| **Frais de port**      | Coût d'expédition d'une commande, réparti entre les projets concernés.                                                                                                                                                                                                                                                                                                |
+| Terme                  | Définition                                                                                                                                                                                                                                                                                                                                                                                           |
+|------------------------|------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
+| **Item**               | Un composant à acheter : nom, lien, prix unitaire TTC, quantité, projet, et un **état** couvrant tout son cycle de vie — de la revue CDP jusqu'à la réception (§7.1). Créé par un membre. Porte son **campus de destination**, calculé à la création (§5.5).                                                                                                                                         |
+| **Commande**           | Un regroupement d'items, généralement passé auprès d'un même fournisseur/partenaire, avec des frais de port. Créée par le trésorier. (possibilité de pré-regroupement en fonction des liens fournisseur)                                                                                                                                                                                             |
+| **Projet**             | Une activité de l'association, à laquelle un membre rattache ses items. Chaque projet **désigne un budget** de l'arbre, à n'importe quelle profondeur (§6.1).                                                                                                                                                                                                                                        |
+| **Budget**             | Une enveloppe de dépense, nœud d'un **arbre autonome** — l'arbre existe indépendamment des projets, qui viennent y pointer. Seules les **feuilles** portent un montant et reçoivent des imputations ; un nœud intermédiaire vaut la somme de ses descendants. Porte ses propres dates. À ne pas confondre avec le **compte** qui règle la dépense : imputation et paiement sont deux axes distincts. |
+| **Partenaire (parte)** | Une entité avec laquelle l'association a un accord : remise, enveloppe de crédit ou don. Reconnue dans les liens par ses **domaines**. Seules les enveloppes sont modélisées, sous forme de compte (§6.2). À ne pas confondre avec le **fournisseur**, qui est simplement le marchand chez qui on achète et qui ne fait l'objet d'aucun référentiel en v1 (CMD-F-17).                                |
+| **Flux financier**     | Une dépense (débit) ou une recette (crédit) de la trésorerie.                                                                                                                                                                                                                                                                                                                                        |
+| **Année scolaire**     | Période de référence servant à délimiter et archiver commandes et flux.                                                                                                                                                                                                                                                                                                                              |
+| **Frais de port**      | Coût d'expédition d'une commande, réparti entre les projets concernés.                                                                                                                                                                                                                                                                                                                               |
 
 ---
 
 ## 4. État des lieux — problèmes constatés à corriger
 
-Synthèse des dysfonctionnements relevés dans les CR. Ils constituent le point de départ des exigences des sections 5 à 10.
+Synthèse des dysfonctionnements relevés. Ils constituent le point de départ des exigences des sections 5 à 10.
 
 1. Les commandes ne s'affichent pas systématiquement (affichage non fiable).
 2. Déconnexion pendant le traitement d'une commande, le tableau disparaît (gestion des tokens / sessions, cause non
@@ -132,16 +133,18 @@ Synthèse des dysfonctionnements relevés dans les CR. Ils constituent le point 
 
 ### 5.2 Constitution des commandes (trésorier)
 
-| ID       | Exigence                                                                                                                                                                                                                                                                                         | Prio |
-|----------|--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|------|
-| CMD-F-10 | Le trésorier regroupe des items (validés) en une commande, par sélection multiple (cases à cocher).                                                                                                                                                                                              | M    |
-| CMD-F-11 | Une commande porte un ou plusieurs items pouvant relever de projets différents.                                                                                                                                                                                                                  | M    |
-| CMD-F-12 | Les frais de port d'une commande sont répartis entre les projets concernés selon une règle définie (voir §7.3).                                                                                                                                                                                  | M    |
-| CMD-F-13 | Le trésorier peut indiquer un délai de livraison estimé par article.                                                                                                                                                                                                                             | W    |
-| CMD-F-14 | Une commande porte un **nom de fournisseur libre** (`supplier_name`) et, si ce fournisseur est référencé, une **liaison optionnelle vers un partenaire** (`partner_id`). Aucun référentiel n'est imposé pour commander.                                                                          | M    |
-| CMD-F-15 | Pré-regroupement automatique des items par fournisseur, déduit du domaine de leur lien.                                                                                                                                                                                                          | C    |
-| CMD-F-16 | Chaque item porte un **domaine** déduit de son lien (`mouser.fr`), stocké à la saisie. C'est lui qui sert au pré-regroupement (CMD-F-15), à la reconnaissance des partenariats (TRESO-F-12) et aux **statistiques par marchand** — aucun référentiel de fournisseurs n'est nécessaire pour cela. | C    |
-| CMD-F-17 | Constituer un **référentiel de fournisseurs** (fiche marchand rattachant ses domaines, son partenariat éventuel et ses commandes) pour produire des **statistiques par fournisseur** : volume d'achat, dépense par année scolaire, délais, part des partenaires.                                 | W    |
+| ID       | Exigence                                                                                                                                                                                                                                                                                                                    | Prio |
+|----------|-----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|------|
+| CMD-F-10 | Le trésorier regroupe des items (validés) en une commande, par sélection multiple (cases à cocher).                                                                                                                                                                                                                         | M    |
+| CMD-F-11 | Une commande porte un ou plusieurs items pouvant relever de projets différents.                                                                                                                                                                                                                                             | M    |
+| CMD-F-12 | Les frais de port d'une commande sont répartis entre les projets concernés selon une règle définie (voir §7.3).                                                                                                                                                                                                             | M    |
+| CMD-F-13 | Le trésorier peut indiquer un délai de livraison estimé par article.                                                                                                                                                                                                                                                        | W    |
+| CMD-F-14 | Une commande porte un **nom de fournisseur libre** (`supplier_name`) et, si ce fournisseur est référencé, une **liaison optionnelle vers un partenaire** (`partner_id`). Aucun référentiel n'est imposé pour commander.                                                                                                     | M    |
+| CMD-F-15 | Pré-regroupement automatique des items par fournisseur, déduit du domaine de leur lien.                                                                                                                                                                                                                                     | C    |
+| CMD-F-16 | Chaque item porte un **domaine** déduit de son lien (`mouser.fr`), stocké à la saisie. C'est lui qui sert au pré-regroupement (CMD-F-15), à la reconnaissance des partenariats (TRESO-F-12) et aux **statistiques par marchand** — aucun référentiel de fournisseurs n'est nécessaire pour cela.                            | C    |
+| CMD-F-17 | Constituer un **référentiel de fournisseurs** (fiche marchand rattachant ses domaines, son partenariat éventuel et ses commandes) pour produire des **statistiques par fournisseur** : volume d'achat, dépense par année scolaire, délais, part des partenaires.                                                            | W    |
+| CMD-F-18 | Au moment de constituer la commande, le trésorier choisit **pour chaque item** le budget sur lequel il est imputé. La **feuille par défaut du budget visé par le projet de l'item est présélectionnée** (TRESO-F-02c) ; seuls les budgets feuilles actifs à la date de la commande sont proposés (TRESO-F-02b, TRESO-F-07). | M    |
+| CMD-F-19 | Un item peut être **réparti sur plusieurs budgets**, chacun recevant une part du montant. La somme des parts égale toujours le total de l'item.                                                                                                                                                                             | M    |
 
 ### 5.3 Cycle de vie et statuts
 
@@ -261,10 +264,32 @@ Répond au problème n° 13 (« prix ambigu : unitaire ou total ? »), qui n'ét
 
 ### 5.6 Budgets et alertes
 
-| ID       | Exigence                                                                                 | Prio |
-|----------|------------------------------------------------------------------------------------------|------|
-| CMD-F-50 | Un indicateur de dépassement de budget est affiché côté membre et côté trésorier.        | M    |
-| CMD-F-51 | Le budget consommé par un projet tient compte de la quote-part des frais de port (§7.3). | S    |
+| ID       | Exigence                                                                                                                                                                                                                                                                              | Prio |
+|----------|---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|------|
+| CMD-F-50 | Un indicateur de dépassement de budget est affiché côté membre et côté trésorier.                                                                                                                                                                                                     | M    |
+| CMD-F-51 | Le budget consommé tient compte de la quote-part des frais de port (§7.2).                                                                                                                                                                                                            | S    |
+| CMD-F-52 | Côté **membre**, un budget insuffisant **ne bloque jamais** la demande : l'item est créé, une alerte signale le dépassement au membre et le notifie au trésorier.                                                                                                                     | M    |
+| CMD-F-53 | Côté **trésorier**, une commande **ne peut pas être validée** si l'un de ses budgets d'imputation ne couvre pas le montant qui lui est affecté. L'écran propose trois issues : imputer sur un autre budget, répartir l'item sur plusieurs budgets (CMD-F-19), ou augmenter le budget. | M    |
+| CMD-F-54 | Le dépassement apparu **après coup** (correction de prix a posteriori, frais de port, réallocation d'un budget) ne bloque rien mais reste signalé : une vue liste au trésorier tous les budgets en dépassement.                                                                       | S    |
+
+> **[Tranché]** Le blocage est **asymétrique**, et c'est délibéré. Un membre qui demande un composant ne décide pas de
+> la
+> dépense : lui interdire de soumettre reviendrait à lui faire arbitrer un budget qu'il ne maîtrise pas, et le
+> pousserait
+> à demander par un autre canal — c'est ainsi qu'on perd la trace d'une dépense. Sa demande passe donc toujours, avec
+> une alerte qui remonte à la trésorerie.
+>
+> Le point de contrôle est placé là où la décision se prend réellement : **au moment où le trésorier engage l'argent**.
+> C'est le dernier instant où le dépassement est encore évitable, et les trois issues offertes (CMD-F-53) couvrent les
+> trois arbitrages possibles — la dépense relève d'un autre poste, elle se partage entre plusieurs postes, ou
+> l'enveloppe
+> était sous-évaluée. Le refus pur et simple d'un item reste par ailleurs disponible (CMD-F-29).
+>
+> Une fois la commande passée, plus rien ne bloque : une dépense déjà engagée doit pouvoir être enregistrée telle
+> qu'elle
+> est, même si elle creuse le budget. Un outil qui refuse d'enregistrer la réalité est un outil qu'on double d'un
+> tableur
+> — exactement le critère de sortie du jalon 6.
 
 ### 5.7 Historique et traçabilité
 
@@ -285,14 +310,21 @@ Répond au problème n° 13 (« prix ambigu : unitaire ou total ? »), qui n'ét
 
 ### 5.9 Affichage, tri et ergonomie des listes
 
-| ID       | Exigence                                                                                                            | Prio |
-|----------|---------------------------------------------------------------------------------------------------------------------|------|
-| CMD-F-80 | Tri des commandes par **date de validation par le CDP** (et non par date de dernière mise à jour).                  | M    |
-| CMD-F-81 | Les commandes sont organisées par **année scolaire**, avec une délimitation claire dans la liste.                   | M    |
-| CMD-F-82 | La trésorerie est organisée par **année fiscale**, avec une délimitation claire dans la liste.                      | M    |
-| CMD-F-83 | La table des commandes retire les tags et la date de dernière mise à jour, et ajoute la **date de validation CDP**. | S    |
-| CMD-F-84 | Les tags et informations secondaires migrent vers la description / le détail de la commande.                        | C    |
-| CMD-F-85 | Système de notifications (changement de statut, livraison, etc.). Via bot ou webhook discord ou par mail (boring)   | W    |
+| ID       | Exigence                                                                                                                                                                                                                   | Prio |
+|----------|----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|------|
+| CMD-F-80 | La **file des items à regrouper** (vue trésorier) est triée par **date de validation CDP**, du plus ancien au plus récent : l'item validé en premier est regroupé en premier.                                              | M    |
+| CMD-F-86 | La **liste des commandes** est triée par **date de passation** pour les commandes déjà passées, et par **date de création** pour celles qui ne le sont pas encore — jamais par date de dernière mise à jour (défaut n° 9). | M    |
+| CMD-F-81 | Les commandes sont organisées par **année scolaire**, avec une délimitation claire dans la liste.                                                                                                                          | M    |
+| CMD-F-82 | La trésorerie est organisée par **année fiscale**, avec une délimitation claire dans la liste.                                                                                                                             | M    |
+| CMD-F-83 | La table des commandes retire les tags et la date de dernière mise à jour, et ajoute la **date de validation CDP**.                                                                                                        | S    |
+| CMD-F-84 | Les tags et informations secondaires migrent vers la description / le détail de la commande.                                                                                                                               | C    |
+| CMD-F-85 | Système de notifications (changement de statut, livraison, etc.). Via bot ou webhook discord ou par mail (boring)                                                                                                          | W    |
+
+> **[Tranché]** CMD-F-80 et CMD-F-86 portent sur **deux écrans différents**, et les confondre est un reste de l'ancien
+> modèle où le CDP validait des commandes. Dans le modèle retenu, **le CDP valide des items** : une commande n'a donc
+> pas de date de validation CDP, et n'en dérive pas non plus. La date de validation CDP trie la file où le trésorier
+> choisit quoi regrouper ; la liste des commandes, elle, est postérieure à tout arbitrage CDP et se trie sur ses propres
+> dates.
 
 ---
 
@@ -300,12 +332,71 @@ Répond au problème n° 13 (« prix ambigu : unitaire ou total ? »), qui n'ét
 
 ### 6.1 Projets et budgets
 
-| ID         | Exigence                                                                                                                                                                                                    | Prio |
-|------------|-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|------|
-| TRESO-F-01 | Le trésorier peut ajouter, modifier et supprimer des projets.                                                                                                                                               | M    |
-| TRESO-F-02 | Le trésorier peut définir et modifier le budget d'un projet, **par année scolaire** : le budget est une enveloppe annuelle, stockée par couple (projet, année scolaire) et non comme un attribut du projet. | M    |
-| TRESO-F-03 | Un projet a un budget normal et un budget parte                                                                                                                                                             | W    |
-| TRESO-F-04 | Le budget consommé d'un projet sur une année est calculé à partir des items regroupés et de la quote-part de frais de port (§7.2).                                                                          | M    |
+| ID          | Exigence                                                                                                                                                                                                                                                                            | Prio |
+|-------------|-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|------|
+| TRESO-F-01  | Le trésorier peut ajouter, modifier et supprimer des projets.                                                                                                                                                                                                                       | M    |
+| TRESO-F-02  | Les budgets forment un **arbre autonome** : tout budget peut porter des sous-budgets sur une profondeur libre. Un **projet désigne un budget** de cet arbre — racine, nœud intermédiaire ou feuille indifféremment — et plusieurs projets peuvent viser des nœuds du même arbre.    | M    |
+| TRESO-F-02c | Chaque sous-arbre désigne une **feuille par défaut**, celle que l'outil présélectionne à l'imputation (CMD-F-18). Elle est marquée explicitement par le trésorier, jamais devinée.                                                                                                  | M    |
+| TRESO-F-02b | **Seuls les budgets feuilles portent un montant.** Le montant d'un budget intermédiaire est la somme de ses descendants et n'est jamais saisi. L'imputation d'un item ne se fait que sur une feuille.                                                                               | M    |
+| TRESO-F-03  | Chaque budget porte une **date de début et une date de fin** qui lui sont propres. Un budget n'est pas rattaché à une année scolaire : sa période est libre et peut ne couvrir que quelques mois.                                                                                   | M    |
+| TRESO-F-04  | Le budget consommé se calcule à partir des items imputés et de la quote-part de frais de port (§7.2). Le montant **et** le consommé d'un budget intermédiaire sont les sommes de ceux de ses descendants.                                                                           | M    |
+| TRESO-F-05  | Le trésorier peut **créer, renommer, modifier et réorganiser** les budgets sans intervention technique, y compris changer le parent d'un budget existant.                                                                                                                           | M    |
+| TRESO-F-06  | Un budget qui porte des dépenses ou des sous-budgets est **archivé** et non supprimé : il disparaît des sélecteurs, l'historique et les totaux passés restent intacts. La suppression définitive n'est possible que sur un budget vide. Archiver un budget archive ses descendants. | M    |
+| TRESO-F-07  | Un item ne peut être imputé que sur un budget dont la **période couvre la date de la commande**. Un budget clos ou pas encore ouvert n'apparaît pas dans le sélecteur.                                                                                                              | M    |
+
+> **[Tranché]** Le budget n'est pas un montant posé sur un projet : c'est un **arbre autonome**, qui existe
+> indépendamment du découpage en projets. Ce sont les **projets qui viennent y pointer**, à la profondeur qui leur
+> convient — racine, nœud intermédiaire ou feuille :
+>
+> ```
+> Pôle Event  (5 000 € = somme)          ← projet « Pôle Event »
+>   ├── Gîte WEI      …  €
+>   ├── WEI         1 000 €              ← projet « WEI » (vise une feuille)
+>   ├── PréCoupe    3 000 €
+>   ├── Gîte WED        …  €
+>   ├── WED             …  €
+>   └── Divers      1 000 €   [défaut]
+>
+> Pôle Projet                            ← projet « Pôle Projet »
+>   ├── CDR_Paris ──┬── CDR_Paris_Mouser        ← projet « CDR Paris » (vise un nœud)
+>   │               ├── CDR_Paris_Aisler
+>   │               └── CDR_Paris_GoTronic
+>   ├── CDR_Nantes ─┬── …
+>   └── Exodus
+> ```
+>
+> Deux projets peuvent viser des nœuds du même arbre, et un nœud peut n'être visé par aucun projet — une enveloppe
+> transverse n'a pas besoin d'un projet dédié pour exister. Structure budgétaire et découpage en projets sont deux vues
+> sur la même activité, sans obligation de se recouvrir.
+>
+> **Seules les feuilles portent un montant.** Le budget d'un nœud intermédiaire n'est pas saisi : c'est la **somme de
+ses
+> descendants**. `Pôle Event` vaut 5 000 € parce que ses feuilles totalisent 5 000 €, et cette valeur bouge d'elle-même
+> quand le trésorier réalloue entre WEI et PréCoupe. Un montant saisi sur le parent en plus de ceux des enfants poserait
+> une question sans réponse — le pôle vaut-il 5 000 € ou 5 000 € *plus* ses enfants ? — et se mettrait à diverger dès la
+> première réallocation.
+>
+> **Conséquence : on n'impute pas sur un nœud intermédiaire.** Une dépense de pôle qui ne relève d'aucune activité
+> précise passe par une feuille dédiée (`Divers`, `Autres`), ce qui la rend visible et chiffrable au lieu de la diluer
+> dans un total. Le sélecteur d'imputation du trésorier ne propose donc que des feuilles.
+>
+> **La feuille présélectionnée est marquée, pas devinée** (TRESO-F-02c). Un projet visant un nœud intermédiaire, il faut
+> désigner laquelle de ses feuilles reçoit l'imputation par défaut — et ce choix ne se déduit d'aucune règle : « la
+> première » supposerait un ordre arbitraire, qui produirait des imputations par défaut fausses et silencieuses. Le
+> trésorier marque donc explicitement une feuille par sous-arbre. À défaut, le sélecteur s'ouvre sans choix imposé,
+> filtré sur le sous-arbre du projet.
+>
+> **Budget et compte de règlement sont deux axes indépendants.** `CDR_Paris_Mouser` est une enveloppe *décidée à
+> l'avance* — le trésorier alloue 300 € d'achats Mouser au CDR Paris — et n'a rien à voir avec l'**enveloppe de crédit**
+> du partenariat Mouser (§6.2), qui est un compte. Un item peut être imputé sur `CDR_Paris_Mouser` tout en étant réglé
+> depuis le compte courant, et un item réglé sur l'enveloppe partenaire peut être imputé ailleurs. Confondre les deux
+> ferait suivre la même dépense à deux endroits.
+>
+> **La structure ne se resaisit pas chaque année.** Un budget porte ses propres dates (TRESO-F-03) plutôt qu'un
+> rattachement à l'année scolaire : une enveloppe WEI court sur les quatre mois qui précèdent l'événement, pas sur
+> douze.
+> Deux budgets frères peuvent se chevaucher dans le temps — rien n'interdit d'ouvrir une enveloppe exceptionnelle en
+> cours d'année.
 
 ### 6.2 Partenariats et budgets
 
@@ -334,7 +425,7 @@ d'argent** — seule l' **enveloppe** est modélisée, sous forme de compte.
 | TRESO-F-21 | Un flux peut être rattaché à un projet et/ou à un partenariat.                                                                                                                                                                                                                                             | M    |
 | TRESO-F-22 | Le passage d'une commande à **En attente de livraison** crée **automatiquement** le ou les flux de débit rattachés à cette commande (`order_id`), dont la **somme** égale le total des items majoré des frais de port. Une commande réglée sur deux comptes (TRESO-F-14) produit deux flux, un par compte. | M    |
 | TRESO-F-23 | Un flux issu d'une commande reste modifiable et supprimable par le trésorier ; l'annulation de la commande propose la contrepassation du flux.                                                                                                                                                             | S    |
-| TRESO-F-24 | Un flux issu d'une commande est ventilé sur les projets concernés selon `ORDER_PROJECT_SHARE` (§7.2), afin que budget consommé et solde se recoupent.                                                                                                                                                      | M    |
+| TRESO-F-24 | Un flux issu d'une commande est ventilé sur les budgets concernés selon `ORDER_BUDGET_SHARE` (§7.2), afin que budget consommé et solde se recoupent.                                                                                                                                                       | M    |
 
 ### 6.4 Justificatifs
 
@@ -412,19 +503,23 @@ Deux découpages **distincts** coexistent, et c'est volontaire :
 
 ### 7.2 Règle de répartition des frais de port
 
-Les frais de port d'une commande sont répartis entre les projets représentés dans cette commande. L'entité
-`ORDER_PROJECT_SHARE` matérialise la quote-part de chaque projet.
+Les frais de port d'une commande sont répartis entre les **budgets** sur lesquels ses items sont imputés. L'entité
+`ORDER_BUDGET_SHARE` matérialise la quote-part de chaque budget. La ventilation suit l'imputation (CMD-F-18) et non le
+projet : sans cela, le consommé d'un budget serait faux de sa part de frais de port.
 
 > **[Tranché]** « Division équitable » peut signifier :
 >
-> - **Répartition égale** : `frais_port / nombre_de_projets_distincts`.
-> - **Répartition proportionnelle** : au poids financier de chaque projet dans la commande
-    (`montant_items_du_projet / montant_total_commande`).
+> - **Répartition égale** : `frais_port / nombre_de_budgets_distincts`.
+> - **Répartition proportionnelle** : au poids financier de chaque budget dans la commande
+    (`montant_items_du_budget / montant_total_commande`).
 >
 > Par défaut, c'est la **répartition proportionnelle** (plus juste quand les volumes diffèrent), avec la répartition
-> égale comme variante possible. La quote-part calculée alimente le budget consommé du projet (CMD-F-51).
-
-Le trésorier peut sélectionner quel type de répartition. Par défaut : Répartition égale.
+> égale comme variante possible sélectionnable par le trésorier. La quote-part calculée alimente le budget consommé
+> (CMD-F-51).
+>
+> L'arrondi suit la **méthode du plus fort reste** : répartition à `0,01 €` près, puis attribution des centimes
+> résiduels aux projets ayant la plus grande partie fractionnaire. La somme des quotes-parts est ainsi *exactement*
+> égale aux frais de port, quel que soit le mode retenu.
 
 ---
 
@@ -487,12 +582,12 @@ Le lien entre les deux niveaux se lit ainsi : le trésorier n'agit que sur les i
 
 ### 9.4 Données et archivage
 
-| ID          | Exigence                                                                                                                                           | Prio |
-|-------------|----------------------------------------------------------------------------------------------------------------------------------------------------|------|
-| TRANS-NF-30 | Démarrage sur une base de données neuve à la rentrée ; pas de reprise de l'ancienne BDD.                                                           | M    |
-| TRANS-NF-31 | Délimitation et archivage par année scolaire (items, commandes, budgets de projet) — voir §7.1bis.                                                 | M    |
-| TRANS-NF-32 | Délimitation et archivage par année fiscale (flux, soldes, rapports) — voir §7.1bis.                                                               | M    |
-| TRANS-NF-33 | Les deux périodes sont **stockées explicitement** sur les entités concernées et ne sont jamais dérivées l'une de l'autre au moment de l'affichage. | M    |
+| ID          | Exigence                                                                                                                                                                          | Prio |
+|-------------|-----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|------|
+| TRANS-NF-30 | Démarrage sur une base de données neuve à la rentrée ; pas de reprise de l'ancienne BDD.                                                                                          | M    |
+| TRANS-NF-31 | Délimitation et archivage par année scolaire (items, commandes, attributions des membres aux projets) — voir §7.1bis. Les budgets, eux, portent leurs propres dates (TRESO-F-03). | M    |
+| TRANS-NF-32 | Délimitation et archivage par année fiscale (flux, soldes, rapports) — voir §7.1bis.                                                                                              | M    |
+| TRANS-NF-33 | Les deux périodes sont **stockées explicitement** sur les entités concernées et ne sont jamais dérivées l'une de l'autre au moment de l'affichage.                                | M    |
 
 ### 9.5 Ergonomie et accessibilité
 
@@ -530,8 +625,9 @@ Authentification/sessions fiables (TRANS-NF-01/02), refonte RBAC (TRANS-PERM-01/
 
 Le seul jalon où la qualité prime sur la vitesse. Aucune interface produite ici.
 
-**Périmètre** — Modélisation intégrale de §7 : `PROJECT`, `PROJECT_BUDGET` (par année scolaire), `PARTNERSHIP`,
-`CAMPUS_ADDRESS`, `ITEM`, `ORDER`, `ORDER_PROJECT_SHARE`, `FLUX`, `PROOF`, plus les deux tables de périodes (§7.1bis).
+**Périmètre** — Modélisation intégrale de §7 : `PROJECT`, `BUDGET` (arbre, `parent_id` récursif, dates propres),
+`ITEM_BUDGET_ALLOCATION` (imputation par item, CMD-F-18/19), `PARTNERSHIP`, `CAMPUS_ADDRESS`, `ITEM`, `ORDER`,
+`ORDER_BUDGET_SHARE`, `FLUX`, `PROOF`, plus les deux tables de périodes (§7.1bis).
 `CAMPUS_ADDRESS` a le campus pour clé et ne compte que deux lignes, à charger dès ce jalon (CMD-F-44). Campus de
 destination résolu par trigger sur l'item et unicité du campus par commande garantie par clé étrangère composite
 (CMD-F-43/45/46). Enums d'états définitifs (§7.1). Convention **full TTC** en dur dans le schéma : `unit_price_ttc` +
@@ -558,7 +654,8 @@ que non validé (CMD-F-02), réinitialisation de la dernière ligne (CMD-F-03), 
 **les six états**, les deux refus étant visuellement distincts (CMD-F-21, CMD-F-22, CMD-F-28, TRANS-NF-40), badge campus
 (CMD-F-40, TRANS-NF-41), résolution automatique du campus de destination — avec question posée au membre en cas de
 divergence projet / membre (CMD-F-43, CMD-F-46), note libre par item (CMD-F-0B), indicateur de dépassement de budget à
-la saisie (CMD-F-06, CMD-F-50), message d'incitation partenaires (CMD-F-05).
+la saisie — **signalé mais jamais bloquant** (CMD-F-06, CMD-F-50, CMD-F-52), message d'incitation partenaires
+(CMD-F-05).
 
 **Critère de sortie** — Un membre soumet une liste de composants sans explication préalable et sait en un coup d'œil où
 en est chacun de ses items, jusqu'à la réception. Les badges sont posés dès ce jalon même si rien ne peut encore
@@ -581,12 +678,15 @@ avec un motif visible par son auteur, et le badge indique **qui** l'a refusé sa
 **Périmètre** — Regroupement manuel par cases à cocher (CMD-F-10/11), items de projets différents dans une même commande
 **d'un même campus** (CMD-F-45), fournisseur et partenaire optionnel (CMD-F-14), badge campus cliquable copiant
 l'adresse à recopier chez le marchand (CMD-F-41/42), **notes des items visibles sans déplier** — c'est par elles que
-passe une demande de livraison exceptionnelle (CMD-F-0B), frais de port et répartition sélectionnable — égale par défaut
-(CMD-F-12, §7.2), édition plein écran des prix/quantités/noms/liens en unitaire **ou** total (CMD-F-30/31/33/34/35),
-commande déjà passée restant modifiable (CMD-F-32), transitions de statut (CMD-F-20/21/23), **refus trésorier avec
-motif** depuis la file des items validés (CMD-F-29/2A), **réception item par item et réceptions partielles**
-(CMD-F-25/26/27), tri par date de validation CDP (CMD-F-80), regroupement par année scolaire (CMD-F-81), colonnes de
-table revues (CMD-F-83), quote-part de port dans le budget consommé (CMD-F-51, TRESO-F-04).
+passe une demande de livraison exceptionnelle (CMD-F-0B), frais de port et répartition sélectionnable —
+**proportionnelle par défaut** (CMD-F-12, §7.2), édition plein écran des prix/quantités/noms/liens en unitaire **ou**
+total (CMD-F-30/31/33/34/35), commande déjà passée restant modifiable (CMD-F-32), transitions de statut
+(CMD-F-20/21/23), **refus trésorier avec motif** depuis la file des items validés (CMD-F-29/2A), **réception item par
+item et réceptions partielles** (CMD-F-25/26/27), file des items triée par date de validation CDP (CMD-F-80) et liste
+des commandes triée par date de passation ou de création (CMD-F-86), **imputation budgétaire item par item avec
+présélection de la feuille par défaut** et répartition possible sur plusieurs budgets (CMD-F-18/19), **blocage de la
+validation sur budget insuffisant, avec les trois issues** (CMD-F-53), regroupement par année scolaire (CMD-F-81),
+colonnes de table revues (CMD-F-83), quote-part de port dans le budget consommé (CMD-F-51, TRESO-F-04).
 
 **Critère de sortie** — Une commande réelle est passée de bout en bout depuis l'outil, sans recours à l'ancien site, **y
 compris un colis arrivé en deux fois** : la commande reste en attente tant qu'il manque un composant, puis bascule seule
@@ -596,11 +696,13 @@ en Terminée.
 
 Complète le « parcours trésorier » prioritaire. Les tables existent depuis J2 ; ce jalon ne fait qu'ouvrir les écrans.
 
-**Périmètre** — CRUD projets et budgets annuels (TRESO-F-01/02), CRUD partenariats et budgets (TRESO-F-10/11), CRUD flux
-débit/crédit rattachables projet et/ou partenaire (TRESO-F-20/21), **génération automatique du flux au passage de
-commande** avec ventilation par projet (TRESO-F-22/24), contrepassation à l'annulation (TRESO-F-23), justificatifs
-PNG/JPEG/PDF avec visionneuse (TRESO-F-30/31), solde à un instant donné (TRESO-F-51), crédits/débits entre deux dates
-(TRESO-F-52), découpage par année fiscale (CMD-F-82, TRANS-NF-32).
+**Périmètre** — CRUD projets (TRESO-F-01), **gestion de l'arbre des budgets** — création, renommage, réorganisation,
+archivage, rattachement des projets à l'arbre et marquage des feuilles par défaut (TRESO-F-02/02b/02c/03/05/06/07), vue
+des budgets en dépassement (CMD-F-54), CRUD partenariats et budgets (TRESO-F-10/11), CRUD flux débit/crédit rattachables
+projet et/ou partenaire (TRESO-F-20/21), **génération automatique du flux au passage de commande** avec ventilation par
+projet (TRESO-F-22/24), contrepassation à l'annulation (TRESO-F-23), justificatifs PNG/JPEG/PDF avec visionneuse
+(TRESO-F-30/31), solde à un instant donné (TRESO-F-51), crédits/débits entre deux dates (TRESO-F-52), découpage par
+année fiscale (CMD-F-82, TRANS-NF-32).
 
 **Critère de sortie** — Le solde affiché par l'outil est égal au solde bancaire réel sur un mois test, et le trésorier
 n'ouvre plus son Excel pour le suivi courant.
@@ -628,10 +730,9 @@ partenaires (CMD-F-07, CMD-F-71).
 ### 10.10 Hors périmètre — reste en **W**
 
 Relances par mail sur commande dormante (CMD-F-24), notifications Discord/mail (CMD-F-85), brouillons de panier
-persistants (CMD-F-0A), double budget normal/parte (TRESO-F-03), conversion d'images en PDF et fusion via API
-(TRESO-F-32/33), budget prévisionnel (TRESO-F-60), rapprochement bancaire automatique (TRESO-F-61), suivi des
-cotisations (TRESO-F-63), recherche et comparaison de composants via API partenaires (CMD-F-72/73), référentiel de
-fournisseurs pour statistiques (CMD-F-17).
+persistants (CMD-F-0A), conversion d'images en PDF et fusion via API (TRESO-F-32/33), budget prévisionnel (TRESO-F-60),
+rapprochement bancaire automatique (TRESO-F-61), suivi des cotisations (TRESO-F-63), recherche et comparaison de
+composants via API partenaires (CMD-F-72/73), référentiel de fournisseurs pour statistiques (CMD-F-17).
 
 ### 10.11 Chemin critique
 
