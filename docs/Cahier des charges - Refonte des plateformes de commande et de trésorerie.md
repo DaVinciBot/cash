@@ -594,6 +594,14 @@ Le lien entre les deux niveaux se lit ainsi : le trésorier n'agit que sur les i
 | TRANS-NF-41 | Lisibilité immédiate de la distinction Nantes / Paris.                                 | M    |
 | TRANS-NF-42 | Préférer des formulaires CRUD lisibles aux drawers exigus.                             | S    |
 
+### 9.6 Journalisation et audit
+
+| ID          | Exigence                                                                                                                                                                                                                  | Prio |
+|-------------|---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|------|
+| TRANS-NF-50 | L'auteur et la date de chaque changement sont portés par le **journal**, pas par des colonnes d'attribution sur les tables métier. Une colonne n'est conservée que si une règle déclarative, un tri ou un filtre la lit.  | M    |
+| TRANS-NF-51 | Les changements portant sur le **socle** sont journalisés à part du journal métier : permissions (rôles globaux, overrides individuels, rattachements aux projets, permissions de rôle) et **contenu éditorial du site**. | M    |
+| TRANS-NF-52 | Les écritures **rejetées** par un contrôle métier sont enregistrées avec leur code d'erreur, l'auteur et l'entité visée — notamment les tentatives d'écriture sur une période close.                                      | S    |
+
 ---
 
 ## 10. Priorisation et jalons
@@ -631,12 +639,26 @@ destination résolu par trigger sur l'item et unicité du campus par commande ga
 `quantity` sur l'item, `amount_ttc` seul sur commande et flux — un unique montant par entité, aucune colonne de
 décomposition (CMD-F-37/38/39/3A).
 `domain` déduit du lien sur l'item (CMD-F-16), `PARTNERSHIP` portant ses domaines et son compte d'enveloppe optionnel
-(TRESO-F-11/12). Dérivation de `completed` par trigger sur `ITEM` (CMD-F-26). RLS sur toutes les tables. **Journal
-d'audit générique**
-(trigger unique : table, ligne, champ, ancienne valeur, nouvelle valeur, auteur, date) — la capture se fait ici,
-l'affichage attendra J8.
+(TRESO-F-11/12). Le partenariat se reconnaît **par rapprochement de domaines**, sans clé étrangère depuis la commande ni
+depuis le flux. Dérivation de `completed` par trigger sur `ITEM` (CMD-F-26). RLS sur toutes les tables.
 
-**Couvre** : TRANS-NF-30/31/32/33, CMD-F-37/38/39, CMD-F-26 (mécanique), TRESO-F-02 (structure), socle de CMD-F-60/61.
+**Trois journaux, tous captés ici, tous affichés en J8** (TRANS-NF-50/51/52) :
+
+- **journal métier** — trigger générique unique (table, ligne, champ, ancienne valeur, nouvelle valeur, auteur, date)
+  sur les tables de commande et de trésorerie. `ORDER_BUDGET_SHARE` en est **exclue** : recalculée en suppression +
+  réinsertion intégrale à chaque changement d'item, elle noierait la ligne de temps ;
+- **journal du socle** — deux tables jumelles dans `public`, couvrant rôles globaux, overrides individuels,
+  rattachements aux projets, permissions de rôle et **articles du blog** ;
+- **journal des écritures rejetées** — code d'erreur, auteur et entité visée, notamment les tentatives d'écriture sur
+  une période close. Alimenté par la **couche applicative** et non par un trigger : l'exception qui porte le code annule
+  la transaction, et avec elle tout ce qu'on y aurait inséré.
+
+C'est ce dispositif qui permet de **ne pas porter l'attribution en colonnes** sur les tables métier (TRANS-NF-50) :
+`created_by`, `updated_at` et les paires `X_at`/`X_by` n'existent que là où une règle déclarative, un tri ou un filtre
+les lit.
+
+**Couvre** : TRANS-NF-30/31/32/33, TRANS-NF-50/51/52, CMD-F-37/38/39, CMD-F-26 (mécanique), TRESO-F-02 (structure),
+socle de CMD-F-60/61.
 
 **Critère de sortie** — Les types TypeScript sont générés, les migrations rejouables sur base vierge, et un jeu de
 données de test traverse le cycle complet item → commande → réception partielle → réception totale → flux en SQL pur,
@@ -695,9 +717,9 @@ Complète le « parcours trésorier » prioritaire. Les tables existent depuis J
 
 **Périmètre** — CRUD projets (TRESO-F-01), **gestion de l'arbre des budgets** — création, renommage, réorganisation,
 archivage, rattachement des projets à l'arbre et marquage des feuilles par défaut (TRESO-F-02/02b/02c/03/05/06/07), vue
-des budgets en dépassement (CMD-F-54), CRUD partenariats et budgets (TRESO-F-10/11), CRUD flux débit/crédit rattachables
-projet et/ou partenaire (TRESO-F-20/21), **génération automatique du flux au passage de commande** avec ventilation par
-projet (TRESO-F-22/24), contrepassation à l'annulation (TRESO-F-23), justificatifs PNG/JPEG/PDF avec visionneuse
+des budgets en dépassement (CMD-F-54), CRUD partenariats et budgets (TRESO-F-10/11), CRUD flux débit/crédit imputables
+sur un budget (TRESO-F-20), **génération automatique du flux au passage de commande** avec ventilation par budget
+(TRESO-F-22/24), contrepassation à l'annulation (TRESO-F-23), justificatifs PNG/JPEG/PDF avec visionneuse
 (TRESO-F-30/31), solde à un instant donné (TRESO-F-51), crédits/débits entre deux dates (TRESO-F-52), découpage par
 année fiscale (CMD-F-82, TRANS-NF-32).
 
@@ -711,11 +733,17 @@ n'ouvre plus son Excel pour le suivi courant.
 
 ### 10.8 Jalon 8 — Traçabilité et recherche
 
-L'audit est capté depuis J2 ; ce jalon l'expose et le rend exploitable.
+Les trois journaux sont captés depuis J2 ; ce jalon les expose et les rend exploitables.
 
 **Périmètre** — Historique qui/quoi/avant/après (CMD-F-60), historique des changements de statut (CMD-F-61),
-présentation linéaire avec détail au survol (CMD-F-62), moteur de recherche commandes/items pour trésorier et membres
-(CMD-F-70), stratégie de cache et invalidation (TRANS-NF-20).
+présentation linéaire avec détail au survol (CMD-F-62). L'attribution affichée — « modifié par X le Y » — se lit dans le
+journal et non sur la ligne : elle suppose une jointure, et c'est ce jalon qui la met en place partout où elle est
+attendue (TRANS-NF-50). Écran d'audit du socle — permissions et historique des articles du blog (TRANS-NF-51) —, et
+consultation des écritures rejetées, au premier chef les tentatives sur une période close (TRANS-NF-52).
+
+Moteur de recherche commandes/items pour trésorier et membres (CMD-F-70) : la commande n'ayant aucun champ textuel
+propre, elle se cherche **par ses items**. Stratégie de cache et invalidation (TRANS-NF-20) — à traiter ici puisque
+aucune colonne `updated_at` ne subsiste pour servir de jeton d'invalidation.
 
 ### 10.9 Jalon 9 — Confort et automatisations
 
