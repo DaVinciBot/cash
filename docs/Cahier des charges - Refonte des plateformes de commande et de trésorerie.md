@@ -138,7 +138,7 @@ Synthèse des dysfonctionnements relevés. Ils constituent le point de départ d
 | CMD-F-10 | Le trésorier regroupe des items (validés) en une commande, par sélection multiple (cases à cocher).                                                                                                                                                                                                                         | M    |
 | CMD-F-11 | Une commande porte un ou plusieurs items pouvant relever de projets différents.                                                                                                                                                                                                                                             | M    |
 | CMD-F-12 | Les frais de port d'une commande sont répartis entre les projets concernés selon une règle définie (voir §7.3).                                                                                                                                                                                                             | M    |
-| CMD-F-13 | Le trésorier peut indiquer un délai de livraison estimé par article.                                                                                                                                                                                                                                                        | W    |
+| CMD-F-13 | Le trésorier peut indiquer une date de livraison estimée par article.                                                                                                                                                                                                                                                       | W    |
 | CMD-F-15 | Pré-regroupement automatique des items par fournisseur, déduit du domaine de leur lien.                                                                                                                                                                                                                                     | C    |
 | CMD-F-16 | Chaque item porte un **domaine** déduit de son lien (`mouser.fr`), stocké à la saisie. C'est lui qui sert au pré-regroupement (CMD-F-15), à la reconnaissance des partenariats (TRESO-F-12) et aux **statistiques par marchand** — aucun référentiel de fournisseurs n'est nécessaire pour cela.                            | C    |
 | CMD-F-17 | Constituer un **référentiel de fournisseurs** (fiche marchand rattachant ses domaines, son partenariat éventuel et ses commandes) pour produire des **statistiques par fournisseur** : volume d'achat, dépense par année scolaire, délais, part des partenaires.                                                            | W    |
@@ -638,7 +638,7 @@ scolaire),
 `ITEM_BUDGET_ALLOCATION` (imputation par item, CMD-F-18/19), `PARTNERSHIP`, `CAMPUS_ADDRESS`, `ITEM`, `ORDER`,
 `ORDER_BUDGET_SHARE`, `FLUX`, `PROOF`, plus les deux tables de périodes (§7.1bis).
 `CAMPUS_ADDRESS` a le campus pour clé et ne compte que deux lignes, à charger dès ce jalon (CMD-F-44). Campus de
-destination résolu par trigger sur l'item et unicité du campus par commande garantie par clé étrangère composite
+destination résolu par trigger sur l'item, unicité du campus par commande également garantie par trigger
 (CMD-F-43/45/46). Enums d'états définitifs (§7.1). Convention **full TTC** en dur dans le schéma : `unit_price_ttc` +
 `quantity` sur l'item, `amount_ttc` seul sur commande et flux — un unique montant par entité, aucune colonne de
 décomposition (CMD-F-37/38/39/3A).
@@ -752,8 +752,8 @@ aucune colonne `updated_at` ne subsiste pour servir de jeton d'invalidation.
 ### 10.9 Jalon 9 — Confort et automatisations
 
 **Périmètre** — Pré-regroupement automatique par domaine de fournisseur (CMD-F-15), édition inline type Notion
-(CMD-F-36, TRANS-NF-42), multi-sélection de tags (CMD-F-04), tags déplacés vers le détail (CMD-F-84), délai de livraison
-estimé par article (CMD-F-13), fichiers liés aux items — KiCad, BOM Mouser (CMD-F-08), suggestions de composants
+(CMD-F-36, TRANS-NF-42), multi-sélection de tags (CMD-F-04), tags déplacés vers le détail (CMD-F-84), date de livraison
+estimée par article (CMD-F-13), fichiers liés aux items — KiCad, BOM Mouser (CMD-F-08), suggestions de composants
 partenaires (CMD-F-07, CMD-F-71).
 
 ### 10.10 Hors périmètre — reste en **W**
