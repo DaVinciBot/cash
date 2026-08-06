@@ -76,16 +76,16 @@ Une première version saine et utilisable est attendue **pour la rentrée**, ave
 
 ## 3. Glossaire métier
 
-| Terme                  | Définition                                                                                                                                                                                                                                                                                                                                                                                           |
-|------------------------|------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
-| **Item**               | Un composant à acheter : nom, lien, prix unitaire TTC, quantité, projet, et un **état** couvrant tout son cycle de vie — de la revue CDP jusqu'à la réception (§7.1). Créé par un membre. Porte son **campus de destination**, calculé à la création (§5.5).                                                                                                                                         |
-| **Commande**           | Un regroupement d'items, généralement passé auprès d'un même fournisseur/partenaire, avec des frais de port. Créée par le trésorier. (possibilité de pré-regroupement en fonction des liens fournisseur)                                                                                                                                                                                             |
-| **Projet**             | Une activité de l'association, à laquelle un membre rattache ses items. Chaque projet **désigne un budget** de l'arbre, à n'importe quelle profondeur (§6.1).                                                                                                                                                                                                                                        |
-| **Budget**             | Une enveloppe de dépense, nœud d'un **arbre autonome** — l'arbre existe indépendamment des projets, qui viennent y pointer. Seules les **feuilles** portent un montant et reçoivent des imputations ; un nœud intermédiaire vaut la somme de ses descendants. Porte ses propres dates. À ne pas confondre avec le **compte** qui règle la dépense : imputation et paiement sont deux axes distincts. |
-| **Partenaire (parte)** | Une entité avec laquelle l'association a un accord : remise, enveloppe de crédit ou don. Reconnue dans les liens par ses **domaines**. Seules les enveloppes sont modélisées, sous forme de compte (§6.2). À ne pas confondre avec le **fournisseur**, qui est simplement le marchand chez qui on achète et qui ne fait l'objet d'aucun référentiel en v1 (CMD-F-17).                                |
-| **Flux financier**     | Une dépense (débit) ou une recette (crédit) de la trésorerie.                                                                                                                                                                                                                                                                                                                                        |
-| **Année scolaire**     | Période de référence servant à délimiter et archiver commandes et flux.                                                                                                                                                                                                                                                                                                                              |
-| **Frais de port**      | Coût d'expédition d'une commande, réparti entre les projets concernés.                                                                                                                                                                                                                                                                                                                               |
+| Terme                  | Définition                                                                                                                                                                                                                                                                                                                                                                                                                                              |
+|------------------------|---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
+| **Item**               | Un composant à acheter : nom, lien, prix unitaire TTC, quantité, projet, et un **état** couvrant tout son cycle de vie — de la revue CDP jusqu'à la réception (§7.1). Créé par un membre. Porte son **campus de destination**, calculé à la création (§5.5).                                                                                                                                                                                            |
+| **Commande**           | Un regroupement d'items, généralement passé auprès d'un même fournisseur/partenaire, avec des frais de port. Créée par le trésorier. (possibilité de pré-regroupement en fonction des liens fournisseur)                                                                                                                                                                                                                                                |
+| **Projet**             | Une activité de l'association, à laquelle un membre rattache ses items. Chaque projet **désigne un budget** de l'arbre, à n'importe quelle profondeur (§6.1).                                                                                                                                                                                                                                                                                           |
+| **Budget**             | Une enveloppe de dépense, nœud d'un **arbre autonome** — l'arbre existe indépendamment des projets, qui viennent y pointer. Seules les **feuilles** portent un montant et reçoivent des imputations ; un nœud intermédiaire vaut la somme de ses descendants. Rattaché à une **année scolaire**, comme tout l'arbre auquel il appartient. À ne pas confondre avec le **compte** qui règle la dépense : imputation et paiement sont deux axes distincts. |
+| **Partenaire (parte)** | Une entité avec laquelle l'association a un accord : remise, enveloppe de crédit ou don. Reconnue dans les liens par ses **domaines**. Seules les enveloppes sont modélisées, sous forme de compte (§6.2). À ne pas confondre avec le **fournisseur**, qui est simplement le marchand chez qui on achète et qui ne fait l'objet d'aucun référentiel en v1 (CMD-F-17).                                                                                   |
+| **Flux financier**     | Une dépense (débit) ou une recette (crédit) de la trésorerie.                                                                                                                                                                                                                                                                                                                                                                                           |
+| **Année scolaire**     | Période de référence servant à délimiter et archiver commandes et flux.                                                                                                                                                                                                                                                                                                                                                                                 |
+| **Frais de port**      | Coût d'expédition d'une commande, réparti entre les projets concernés.                                                                                                                                                                                                                                                                                                                                                                                  |
 
 ---
 
@@ -336,11 +336,11 @@ Répond au problème n° 13 (« prix ambigu : unitaire ou total ? »), qui n'ét
 | TRESO-F-02  | Les budgets forment un **arbre autonome** : tout budget peut porter des sous-budgets sur une profondeur libre. Un **projet désigne un budget** de cet arbre — racine, nœud intermédiaire ou feuille indifféremment — et plusieurs projets peuvent viser des nœuds du même arbre.    | M    |
 | TRESO-F-02c | Chaque sous-arbre désigne une **feuille par défaut**, celle que l'outil présélectionne à l'imputation (CMD-F-18). Elle est marquée explicitement par le trésorier, jamais devinée.                                                                                                  | M    |
 | TRESO-F-02b | **Seuls les budgets feuilles portent un montant.** Le montant d'un budget intermédiaire est la somme de ses descendants et n'est jamais saisi. L'imputation d'un item ne se fait que sur une feuille.                                                                               | M    |
-| TRESO-F-03  | Chaque budget porte une **date de début et une date de fin** qui lui sont propres. Un budget n'est pas rattaché à une année scolaire : sa période est libre et peut ne couvrir que quelques mois.                                                                                   | M    |
+| TRESO-F-03  | Chaque budget est rattaché à une **année scolaire**. L'arbre appartient à une année et se rejoue d'une année sur l'autre ; un budget et son parent relèvent toujours de la même année.                                                                                              | M    |
 | TRESO-F-04  | Le budget consommé se calcule à partir des items imputés et de la quote-part de frais de port (§7.2). Le montant **et** le consommé d'un budget intermédiaire sont les sommes de ceux de ses descendants.                                                                           | M    |
 | TRESO-F-05  | Le trésorier peut **créer, renommer, modifier et réorganiser** les budgets sans intervention technique, y compris changer le parent d'un budget existant.                                                                                                                           | M    |
 | TRESO-F-06  | Un budget qui porte des dépenses ou des sous-budgets est **archivé** et non supprimé : il disparaît des sélecteurs, l'historique et les totaux passés restent intacts. La suppression définitive n'est possible que sur un budget vide. Archiver un budget archive ses descendants. | M    |
-| TRESO-F-07  | Un item ne peut être imputé que sur un budget dont la **période couvre la date de la commande**. Un budget clos ou pas encore ouvert n'apparaît pas dans le sélecteur.                                                                                                              | M    |
+| TRESO-F-07  | Un item ne peut être imputé que sur un budget de **sa propre année scolaire**. Les budgets des autres années n'apparaissent pas dans le sélecteur.                                                                                                                                  | M    |
 
 > **[Tranché]** Le budget n'est pas un montant posé sur un projet : c'est un **arbre autonome**, qui existe
 > indépendamment du découpage en projets. Ce sont les **projets qui viennent y pointer**, à la profondeur qui leur
@@ -390,11 +390,14 @@ ses
 > depuis le compte courant, et un item réglé sur l'enveloppe partenaire peut être imputé ailleurs. Confondre les deux
 > ferait suivre la même dépense à deux endroits.
 >
-> **La structure ne se resaisit pas chaque année.** Un budget porte ses propres dates (TRESO-F-03) plutôt qu'un
-> rattachement à l'année scolaire : une enveloppe WEI court sur les quatre mois qui précèdent l'événement, pas sur
-> douze.
-> Deux budgets frères peuvent se chevaucher dans le temps — rien n'interdit d'ouvrir une enveloppe exceptionnelle en
-> cours d'année.
+> **L'arbre appartient à une année scolaire** (TRESO-F-03) et se rejoue d'une année sur l'autre. Un budget et son parent
+> relèvent toujours de la même année ; le consommé, les totaux et les dépassements se lisent donc dans une seule année,
+> sans arbitrage de dates. Ouvrir une enveloppe exceptionnelle en cours d'année reste possible : c'est un nœud de plus
+> dans l'arbre de l'année courante.
+>
+> Corollaire à ne pas perdre de vue : **le budget visé par un projet doit être redésigné à chaque rentrée**
+> (`projects.budget_id` pointe vers un nœud d'une année donnée), et l'arbre de la nouvelle année doit être créé avant
+> que le premier item de septembre puisse être imputé.
 
 ### 6.2 Partenariats et budgets
 
@@ -579,12 +582,12 @@ Le lien entre les deux niveaux se lit ainsi : le trésorier n'agit que sur les i
 
 ### 9.4 Données et archivage
 
-| ID          | Exigence                                                                                                                                                                          | Prio |
-|-------------|-----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|------|
-| TRANS-NF-30 | Démarrage sur une base de données neuve à la rentrée ; pas de reprise de l'ancienne BDD.                                                                                          | M    |
-| TRANS-NF-31 | Délimitation et archivage par année scolaire (items, commandes, attributions des membres aux projets) — voir §7.1bis. Les budgets, eux, portent leurs propres dates (TRESO-F-03). | M    |
-| TRANS-NF-32 | Délimitation et archivage par année fiscale (flux, soldes, rapports) — voir §7.1bis.                                                                                              | M    |
-| TRANS-NF-33 | Les deux périodes sont **stockées explicitement** sur les entités concernées et ne sont jamais dérivées l'une de l'autre au moment de l'affichage.                                | M    |
+| ID          | Exigence                                                                                                                                           | Prio |
+|-------------|----------------------------------------------------------------------------------------------------------------------------------------------------|------|
+| TRANS-NF-30 | Démarrage sur une base de données neuve à la rentrée ; pas de reprise de l'ancienne BDD.                                                           | M    |
+| TRANS-NF-31 | Délimitation et archivage par année scolaire (items, commandes, budgets, attributions des membres aux projets) — voir §7.1bis.                     | M    |
+| TRANS-NF-32 | Délimitation et archivage par année fiscale (flux, soldes, rapports) — voir §7.1bis.                                                               | M    |
+| TRANS-NF-33 | Les deux périodes sont **stockées explicitement** sur les entités concernées et ne sont jamais dérivées l'une de l'autre au moment de l'affichage. | M    |
 
 ### 9.5 Ergonomie et accessibilité
 
@@ -630,7 +633,8 @@ Authentification/sessions fiables (TRANS-NF-01/02), refonte RBAC (TRANS-PERM-01/
 
 Le seul jalon où la qualité prime sur la vitesse. Aucune interface produite ici.
 
-**Périmètre** — Modélisation intégrale de §7 : `PROJECT`, `BUDGET` (arbre, `parent_id` récursif, dates propres),
+**Périmètre** — Modélisation intégrale de §7 : `PROJECT`, `BUDGET` (arbre, `parent_id` récursif, rattaché à une année
+scolaire),
 `ITEM_BUDGET_ALLOCATION` (imputation par item, CMD-F-18/19), `PARTNERSHIP`, `CAMPUS_ADDRESS`, `ITEM`, `ORDER`,
 `ORDER_BUDGET_SHARE`, `FLUX`, `PROOF`, plus les deux tables de périodes (§7.1bis).
 `CAMPUS_ADDRESS` a le campus pour clé et ne compte que deux lignes, à charger dès ce jalon (CMD-F-44). Campus de
