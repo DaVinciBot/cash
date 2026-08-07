@@ -81,11 +81,13 @@ DVBisous ! :robot:`;
 	const trainingTableTopic = 'admin-trainings';
 	const slotTableTopic = 'admin-slots';
 	const trainingDbInfo = {
+		schema: 'formation',
 		table: 'training' as const,
 		key: 'id,name,category,description,prerequisites',
 		ordering: 'name:asc'
 	};
 	const slotDbInfo = {
+		schema: 'formation',
 		table: 'training_slot',
 		key: 'id,training_id,custom_name,custom_description,custom_prerequisites,start,duration_hours,on_site_seats,remote_seats,location,video_conference_link,excusable,status,trainer_id,training!inner(name,description,prerequisites,category),profiles!slot_trainer_id_fkey(username,avatar_url)',
 		ordering: 'start:desc'
@@ -118,6 +120,7 @@ DVBisous ! :robot:`;
 	async function searchTrainings(search: string) {
 		const supabaseClient = getSupabaseBrowserClient();
 		const { data, error } = await supabaseClient
+			.schema('formation')
 			.from(trainingDbInfo.table)
 			.select('id, name')
 			.ilike('name', `%${search}%`)
