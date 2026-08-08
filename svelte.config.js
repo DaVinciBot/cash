@@ -9,15 +9,7 @@ const config = {
 		// See https://kit.svelte.dev/docs/adapters for more information about adapters.
 		adapter: adapter(),
 		prerender: {
-			entries: [
-				'/admin/projects',
-				'/admin/orders',
-				'/admin/screen-share',
-				'/admin/treso',
-				'/admin/orders/new',
-				'/admin/users/',
-				'/admin/wip'
-			]
+			entries: ['/admin/screen-share', '/admin/users/', '/admin/wip']
 		},
 		paths: {
 			base: '/admin',
