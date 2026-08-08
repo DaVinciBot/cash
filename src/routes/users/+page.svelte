@@ -4,11 +4,13 @@
 	import SucessModal from '$lib/components/modals/InfoModal.svelte';
 	import { Table, UserImportModal } from '@davincibot/components';
 	import {
+		CAMPUS_BADGES,
 		GLOBAL_ROLE_LABELS_FR,
 		hasAnyPermission,
 		mountClosable,
 		PROJECT_ROLE_LABELS_FR,
 		userdata,
+		type Campus,
 		type GlobalPermission,
 		type GlobalRole,
 		type ProjectRole
@@ -589,18 +591,22 @@
 				{ label: 'Recevoir récap formation (email)', value: 'training.summary_email.receive' },
 				{ label: 'Envoyer récap formation (Discord)', value: 'training.summary.discord.send' },
 				{ label: 'Envoyer story formation (Discord)', value: 'training.story.discord.send' },
-				{ label: 'Gérer sa propre commande', value: 'orders.manage.self' },
+				{ label: 'Gérer ses propres items', value: 'orders.items.manage.self' },
 				{ label: 'Voir toutes commandes', value: 'orders.read.all' },
 				{ label: 'Créer commande globale', value: 'orders.create.all' },
 				{ label: 'Gérer le workflow commandes', value: 'orders.lifecycle.update.all' },
+				{ label: 'Regrouper des items en commande', value: 'orders.bundle.manage' },
+				{ label: 'Refuser un item (trésorier)', value: 'orders.items.refuse' },
+				{ label: 'Marquer un item reçu', value: 'orders.items.receive' },
 				{ label: 'Voir stats globales', value: 'stats.read.all' },
 				{ label: 'Voir la trésorerie', value: 'finance.read' },
 				{ label: 'Éditer la trésorerie', value: 'finance.write' },
+				{ label: 'Clore une période', value: 'finance.periods.close' },
+				{ label: 'Générer des documents', value: 'finance.documents.generate' },
 				{ label: 'Éditer brouillons blog', value: 'blog.draft.write' },
 				{ label: 'Publier blog', value: 'blog.publish' },
 				{ label: 'Caster SmartShare', value: 'integration.smartshare.cast' },
 				{ label: 'Voir logs', value: 'audit.logs.read' },
-				{ label: 'Voir logs sécurité', value: 'audit.logs.read.security' },
 				{ label: 'Exporter logs', value: 'audit.events.export' },
 				{ label: 'Accès environnements (infra)', value: 'infra.environments.access' }
 			]
@@ -664,12 +670,13 @@
 		const { data, error } = (await supabase
 			.from('profiles')
 			.select(
-				'id, username, permissions, status, profile_global_roles!profile_global_roles_profile_fkey(role, revoked_at), member_of!membre_projet_profile_fkey(role, revoked_at, project(id,name)), avatar_url'
+				'id, username, campus, permissions, status, profile_global_roles!profile_global_roles_profile_fkey(role, revoked_at), member_of!membre_projet_profile_fkey(role, revoked_at, project(id,name)), avatar_url'
 			)
 			.eq('id', id)
 			.single()) as {
 			data:
 				| (ProfileRow & {
+						campus: Campus | null;
 						permissions: string[];
 						status: string;
 						profile_global_roles: { role: string; revoked_at: string | null }[];
@@ -729,6 +736,7 @@
 			},
 			body: [
 				{ label: 'Nom', value: data.username, avatar: data.avatar_url },
+				{ label: 'Campus', value: data.campus ?? 'NULL' },
 				{
 					label: 'Rôles globaux',
 					value: { type: 'badges', list: roleBadges },
@@ -757,6 +765,14 @@
 				placeholder: 'Rob, aka Robert',
 				required: true,
 				wide: true
+			},
+			{
+				name: 'Campus',
+				type: 'select',
+				options: (Object.keys(CAMPUS_BADGES) as Campus[]).map((value) => ({
+					value,
+					text: CAMPUS_BADGES[value].label
+				}))
 			},
 			{
 				name: 'Rôles globaux',
@@ -825,11 +841,21 @@
 						? (projectsField.value as ProjectRoleEntry[])
 						: [];
 
-					// update the profile (nom + override permissions)
+					// Le sélecteur renvoie 'undefined' quand rien n'est choisi ; la RPC traite
+					// NULL comme « ne pas toucher », ce qui évite d'effacer un campus déjà
+					// posé en rouvrant simplement la fiche.
+					const campusVal = formData.get('Campus');
+					const campus =
+						typeof campusVal === 'string' && campusVal !== 'NULL'
+							? (campusVal as Campus)
+							: undefined;
+
+					// update the profile (nom + override permissions + campus)
 					const { error: profileError } = await supabase.rpc('admin_update_profile', {
 						p_profile: id,
 						p_username: nom,
-						p_permissions: extractedPermissions
+						p_permissions: extractedPermissions,
+						p_campus: campus
 					});
 					if (profileError) {
 						alert(

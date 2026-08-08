@@ -21,7 +21,7 @@
 	let { data, children }: { data: PageData; children?: Snippet } = $props();
 
 	const userProfile = $derived(data.userProfile);
-	const canCreateOrder = $derived(data.canCreateOrder);
+	const canRequestItems = $derived(data.canRequestItems);
 	const __menu = $derived(data.menu);
 
 	let open = $state(false);
@@ -132,10 +132,10 @@
 				</div>
 
 				<div class="flex items-center lg:order-2">
-					{#if canCreateOrder}
+					{#if canRequestItems}
 						<a
 							class="bg-primary-600 hover:bg-primary-800 focus:ring-primary-800 mr-2 flex items-center justify-center rounded-lg p-2 py-2 text-sm font-medium text-white focus:ring-4 focus:outline-none sm:px-4"
-							href={resolve('/orders/new' as '/')}
+							href={resolve('/items/new' as '/')}
 							type="button"
 						>
 							<svg

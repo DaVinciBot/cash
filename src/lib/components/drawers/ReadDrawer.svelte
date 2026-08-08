@@ -1510,6 +1510,7 @@
 																	return;
 																}
 																const { error } = await getSupabase()
+																	.schema('cash')
 																	.from('items')
 																	.delete()
 																	.match({ id: listItem.id })

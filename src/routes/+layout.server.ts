@@ -1,5 +1,4 @@
-import type { ProjectRow } from '@davincibot/database-types';
-import type { UserProfile, UserProject } from '@davincibot/lib';
+import type { Campus, UserProfile, UserProject } from '@davincibot/lib';
 import {
 	ADMIN_MENU,
 	buildLoginUrl,
@@ -14,6 +13,7 @@ import type { LayoutServerLoad } from './$types';
 interface ProfileRow {
 	username: string | null;
 	avatar_url: string | null;
+	campus: Campus | null;
 	permissions: GlobalPermission[] | null;
 	profile_global_roles: {
 		role: string;
@@ -22,10 +22,11 @@ interface ProfileRow {
 	}[];
 	member_of: {
 		role: string;
+		revoked_at: string | null;
 		project: {
 			id: number;
 			name: string | null;
-			debut: string | null;
+			campus: Campus | null;
 		} | null;
 	}[];
 }
@@ -56,14 +57,13 @@ export const load: LayoutServerLoad = async ({ locals, cookies, url }) => {
 
 	let userProfile: UserProfile | null = null;
 	let permissions: EffectivePermission[] = [];
-	let canCreateOrder = false;
+	let canRequestItems = false;
 	let menu = filterMenuByPermissions(ADMIN_MENU, []);
 
 	if (user?.id) {
 		const [
 			profileResult,
-			{ data: canCreate },
-			{ data: canManage },
+			{ data: canManageOwnItems },
 			{ data: canReadOrders },
 			{ data: canReadFinance },
 			{ data: canReadProfiles },
@@ -74,12 +74,11 @@ export const load: LayoutServerLoad = async ({ locals, cookies, url }) => {
 			supabase
 				.from('profiles')
 				.select(
-					'username,avatar_url,permissions, profile_global_roles!profile_global_roles_profile_fkey(role, revoked_at, global_roles(permissions)), member_of!membre_projet_profile_fkey(role, project(id, name, debut))'
+					'username,avatar_url,campus,permissions, profile_global_roles!profile_global_roles_profile_fkey(role, revoked_at, global_roles(permissions)), member_of!membre_projet_profile_fkey(role, revoked_at, project(id, name, campus))'
 				)
 				.eq('id', user.id)
-				.single(),
-			supabase.rpc('has_permission', { p_permission: 'orders.create.all' }),
-			supabase.rpc('has_permission', { p_permission: 'orders.manage.self' }),
+				.single<ProfileRow>(),
+			supabase.rpc('has_permission', { p_permission: 'orders.items.manage.self' }),
 			supabase.rpc('has_permission', { p_permission: 'orders.read.all' }),
 			supabase.rpc('has_permission', { p_permission: 'finance.read' }),
 			supabase.rpc('has_permission', { p_permission: 'members.profile.read.all' }),
@@ -88,24 +87,31 @@ export const load: LayoutServerLoad = async ({ locals, cookies, url }) => {
 			supabase.rpc('has_permission', { p_permission: 'stats.read.all' })
 		]);
 
-		canCreateOrder = canCreate === true || canManage === true;
+		canRequestItems = canManageOwnItems === true;
 
 		const { data, error } = profileResult;
 		if (!error) {
 			permissions = resolveEffectivePermissions(data);
 
-			const projects: UserProject[] = data.member_of.map((m) => ({
-				id: m.project.id,
-				name: m.project.name ?? '',
-				debut: m.project.debut ?? '0000-00-00',
-				role: m.role
-			}));
+			// Un rattachement se révoque, il ne se supprime pas : sans ce filtre un
+			// ancien membre continuerait de voir le projet qu'il a quitté.
+			const projects: UserProject[] = data.member_of
+				.filter((m): m is typeof m & { project: NonNullable<typeof m.project> } =>
+					Boolean(!m.revoked_at && m.project)
+				)
+				.map((m) => ({
+					id: m.project.id,
+					name: m.project.name ?? '',
+					campus: m.project.campus,
+					role: m.role
+				}));
 
 			userProfile = {
 				email: user.email ?? '',
 				name: data.username ?? (user.email ? (user.email.split('@').at(0) ?? '') : ''),
 				avatar: data.avatar_url ?? 'https://avatar.iran.liara.run/public/boy',
 				id: user.id,
+				campus: data.campus,
 				projects,
 				permissions,
 				allProjects: null
@@ -119,21 +125,16 @@ export const load: LayoutServerLoad = async ({ locals, cookies, url }) => {
 				canUpdateProfiles ||
 				canReadStats
 			) {
-				userProfile.projects.push({
-					id: 0,
-					name: 'Association',
-					debut: '2014-09-01',
-					role: 'association'
-				}); //TODO: review
-
-				const { data: projects, error: projectsError } = (await supabase
+				const { data: allProjects, error: projectsError } = await supabase
 					.from('projects')
-					.select('id, name, debut')) as { data: ProjectRow[] | null; error: unknown };
+					.select('id, name, campus')
+					.is('archived_at', null)
+					.order('name');
 				if (!projectsError) {
-					userProfile.allProjects = (projects ?? []).map((p) => ({
+					userProfile.allProjects = allProjects.map((p) => ({
 						value: p.id,
 						name: p.name ?? '',
-						debut: p.debut ?? ''
+						campus: p.campus
 					}));
 				}
 			}
@@ -160,7 +161,7 @@ export const load: LayoutServerLoad = async ({ locals, cookies, url }) => {
 		cookies: cookies.getAll(),
 		userProfile,
 		permissions,
-		canCreateOrder,
+		canRequestItems,
 		menu
 	};
 };

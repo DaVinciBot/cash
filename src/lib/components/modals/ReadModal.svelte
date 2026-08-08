@@ -152,6 +152,7 @@
 			return;
 		}
 		const { error } = await getSupabaseBrowserClient()
+			.schema('cash')
 			.from('items')
 			.delete()
 			.match({ id: item.id })
