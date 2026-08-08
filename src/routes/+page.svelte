@@ -1,307 +1,174 @@
 <script lang="ts">
-	import type { ItemRow, OrderRow } from '@davincibot/database-types';
-	import type { UserData } from '@davincibot/lib';
-	import { loadUserdata, mountClosable, statusText, userdata } from '@davincibot/lib';
-	import { getSupabaseBrowserClient } from '@davincibot/lib/supabase';
-	import { onMount } from 'svelte';
+	import { enhance } from '$app/forms';
+	import { resolve } from '$app/paths';
+	import CampusBadge from '$lib/components/cash/CampusBadge.svelte';
+	import ItemStateBadge from '$lib/components/cash/ItemStateBadge.svelte';
+	import {
+		ITEM_STATE_BADGES,
+		ITEM_STATES,
+		isItemDeletableByMember,
+		isItemEditableByMember,
+		type ItemState
+	} from '@davincibot/lib';
+	import type { ActionData, PageData } from './$types';
 
-	import ReadDrawer from '$lib/components/drawers/ReadDrawer.svelte';
-	import { Table } from '@davincibot/components';
+	let { data, form }: { data: PageData; form: ActionData } = $props();
 
-	let skip = false;
-	let user = $state<UserData>(null);
+	const items = $derived(data.items);
 
-	userdata.subscribe((value) => {
-		if (value) {
-			user = value;
-			skip = true;
-		}
-	});
+	let stateFilter = $state<ItemState | 'all'>('all');
+	let search = $state('');
 
-	const headers = [
-		'Objets',
-		'Date de création',
-		'Dernière mise à jour',
-		'Prix',
-		'Status',
-		'Actions'
-	];
-
-	interface TableFilter {
-		category: string;
-		value: string;
-		wide?: boolean;
-		options: { name: string; value: string; active?: boolean }[];
-	}
-
-	const filters = $derived<TableFilter[]>([
-		{
-			category: 'Status',
-			value: 'status',
-			options: [
-				{ name: 'En revue CDP', value: 'pending_cdp' },
-				{ name: 'En revue Tréso', value: 'pending_treso' },
-				{ name: 'En attente livraison', value: 'pending_delivery' },
-				{ name: 'Terminé', value: 'completed' },
-				{ name: 'Refusé', value: 'refused_cdp","refused_treso' },
-				{ name: 'Annulé', value: 'canceled_user","canceled_ops' }
-			]
-		},
-		{
-			category: 'hidden',
-			value: 'requestedBy',
-			options: [{ name: 'current_user', value: user?.id ?? '', active: true }]
-		}
-	]);
-
-	$effect(() => {
-		const hiddenFilter = filters[1];
-		const hiddenOption = hiddenFilter?.options[0];
-		if (hiddenOption) {
-			hiddenOption.value = user?.id ?? '';
-		}
-	});
-
-	interface OrderDetail extends OrderRow {
-		items: ItemRow[];
-		comment: string | null;
-		status_reason: string | null;
-	}
-
-	interface UpdateRow {
-		id: number;
-		message: string | null;
-		date: string;
-		type: string | null;
-		author: { username: string | null } | null;
-	}
-
-	const actions = [
-		{
-			title: 'Voir',
-			type: 'view',
-			handler: async (e: Event) => {
-				const target = e.target as HTMLElement;
-				const id = Number(target.closest('tr')?.querySelector('th')?.dataset.utils ?? NaN);
-				if (Number.isNaN(id)) {
-					return;
-				}
-
-				const supabase = getSupabaseBrowserClient();
-				const { data, error } = (await supabase
-					.from('orders')
-					.select(
-						'id, creationDate, projectId, status, status_reason, lastUpdate, items(*), comment, price, name'
-					)
-					.eq('id', id)
-					.single()) as { data: OrderDetail | null; error: unknown };
-
-				if (error || !data) {
-					return;
-				}
-				const price = data.price?.toFixed(2) ?? '0.00';
-				const name = data.name;
-
-				const items: {
-					name: string;
-					quantity: number;
-					price: string;
-					id: number;
-					link: string | null;
-				}[] = [];
-				data.items.forEach((item) => {
-					const itemName = item.name ?? '';
-					items.push({
-						name: itemName.length > 30 ? itemName.slice(0, 30) + '...' : itemName,
-						quantity: item.quantity,
-						price: `${String(item.price)} €`,
-						id: item.id,
-						link: item.link
-					});
-				});
-
-				// Stepper logic based on order status
-				const stepper = [
-					{
-						done: true,
-						icon: 'link'
-					},
-					{
-						done: data.status !== 'pending_cdp',
-						icon: 'checked-document'
-					},
-					{
-						done: ['completed', 'refused_treso', 'canceled_user', 'canceled_ops'].includes(
-							data.status ?? ''
-						),
-						icon: 'processing'
-					},
-					{
-						done: data.status === 'pending_delivery' || data.status === 'completed',
-						icon: 'shipping'
-					},
-					{
-						done: data.status === 'completed',
-						icon: 'done'
-					}
-				];
-
-				if (data.status === 'refused_cdp') {
-					stepper.splice(2);
-					const s1 = stepper[1];
-					if (s1) {
-						s1.done = true;
-						s1.icon = 'cancel';
-					}
-				} else if (data.status === 'refused_treso') {
-					stepper.splice(3);
-					const s2 = stepper[2];
-					if (s2) {
-						s2.done = true;
-						s2.icon = 'cancel';
-					}
-				} else if (data.status === 'canceled_user' || data.status === 'canceled_ops') {
-					stepper.splice(4);
-					const s3 = stepper[3];
-					if (s3) {
-						s3.done = true;
-						s3.icon = 'cancel';
-					}
-				}
-
-				// fetch the updates for the order
-				const updates = (await supabase
-					.from('updates')
-					.select('id, message, date, author(username), type')
-					.eq('order_id', id)
-					.order('date', { ascending: false })) as { data: UpdateRow[] | null; error: unknown };
-
-				if (updates.error || !updates.data) {
-					return;
-				}
-				const updatesList: (UpdateRow & { date: string })[] = updates.data.map((u) => ({
-					...u,
-					date: new Date(u.date).toLocaleString()
-				}));
-
-				mountClosable(ReadDrawer, {
-					target: document.body,
-					props: {
-						values: {
-							header: {
-								title: name,
-								sub: price + ' €',
-								stepper
-							},
-							body: [
-								{
-									label: 'Objets',
-									value: { list: [...items], type: 'items' }
-								},
-								{
-									label: 'Détails',
-									value: data.comment ?? 'Pas de détails'
-								},
-								{
-									label: 'Raison statut',
-									value: data.status_reason?.trim() ?? 'Aucune'
-								},
-								{
-									label: 'Historique',
-									value: {
-										list: updatesList.map((update) => ({
-											message: update.message,
-											date: update.date,
-											type: update.type,
-											user: update.author?.username ?? 'Système'
-										})),
-										type: 'updates'
-									}
-								}
-							]
-						},
-						actions: [
-							{
-								title: 'Annuler',
-								type: 'delete',
-								handler: async (_e: Event) => {
-									const reason = prompt("Raison d'annulation (optionnelle)")?.trim() ?? null;
-									const supabaseClient = getSupabaseBrowserClient();
-									const { data: cancelData, error: cancelError } = (await supabaseClient
-										.from('orders')
-										.update({ status: 'canceled_user', status_reason: reason })
-										.eq('id', id)
-										.select()
-										.single()) as { data: OrderRow | null; error: unknown };
-									if (cancelError) {
-										return;
-									}
-									if (cancelData) {
-										window.location.reload();
-									}
-								}
-							}
-						],
-						id: 'readModal'
-					}
-				});
+	const visible = $derived(
+		items.filter((item) => {
+			if (stateFilter !== 'all' && item.state !== stateFilter) {
+				return false;
 			}
-		}
-	];
+			const needle = search.trim().toLowerCase();
+			if (!needle) {
+				return true;
+			}
+			return (
+				item.name.toLowerCase().includes(needle) ||
+				item.projectName.toLowerCase().includes(needle) ||
+				(item.note ?? '').toLowerCase().includes(needle)
+			);
+		})
+	);
 
-	const dbInfo = {
-		table: 'orders',
-		key: 'id, creationDate, projectId, status, lastUpdate, items(*), name, price, shipping_cost',
-		ordering: 'lastUpdate:desc'
-	};
+	const counts = $derived(
+		ITEM_STATES.reduce<Record<string, number>>(
+			(acc, state) => {
+				acc[state] = items.filter((i) => i.state === state).length;
+				return acc;
+			},
+			{ all: items.length }
+		)
+	);
 
-	interface OrderListRow {
-		id: number;
-		price: number | null;
-		shipping_cost: number | null;
-		name: string | null;
-		creationDate: string;
-		lastUpdate: string;
-		status: string;
-	}
-
-	function parseItems(data: unknown[]) {
-		const rows = data as OrderListRow[];
-		const items: { value: string | number; data?: number }[][] = [];
-		rows.forEach((el) => {
-			const price = Math.round(((el.price ?? 0) + (el.shipping_cost ?? 0)) * 100) / 100;
-			const elName = el.name ?? '';
-			const name = elName.length > 30 ? elName.slice(0, 30) + '...' : elName;
-			items.push([
-				{ value: name, data: el.id },
-				{ value: el.creationDate.substring(0, 10) },
-				{ value: el.lastUpdate.substring(0, 10) },
-				{ value: `${String(price)} €` },
-				{ value: (statusText as Record<string, string>)[el.status] ?? el.status }
-			]);
-		});
-		return items;
-	}
-
-	onMount(() => {
-		if (!skip) {
-			loadUserdata();
-		}
-	});
+	const euro = new Intl.NumberFormat('fr-FR', { style: 'currency', currency: 'EUR' });
+	const day = new Intl.DateTimeFormat('fr-FR', { dateStyle: 'medium' });
 </script>
 
-<div class="flex w-full items-center justify-between sm:px-8 lg:px-16">
-	<h2 class="mb-4 text-4xl font-bold tracking-tight text-white">
-		Bonjour {user?.name ?? 'utilisateur'}
-	</h2>
-</div>
-<div class="w-full py-2 sm:px-8 lg:px-16">
-	<p class="text-gray-300">
-		Voici la liste de vos commandes. Vous pouvez en ajouter, modifier ou supprimer.
-	</p>
-</div>
-<div class="w-full py-2 sm:px-8 lg:px-16">
-	<div class="rounded-lg bg-gray-800">
-		<Table {actions} {dbInfo} {filters} {headers} {parseItems} type="commande" type_accord="une" />
+<svelte:head><title>Mes items — DaVinciBot</title></svelte:head>
+
+<section class="mx-auto max-w-6xl">
+	<header class="mb-6 flex flex-wrap items-end justify-between gap-4">
+		<div>
+			<h1 class="text-2xl font-bold text-white">Mes items</h1>
+			<p class="mt-1 text-sm text-gray-400">
+				Chaque composant que vous demandez suit son propre cycle, de la revue du chef de projet
+				jusqu'à la réception.
+			</p>
+		</div>
+		<a
+			class="bg-primary-600 hover:bg-primary-800 rounded-lg px-4 py-2 text-sm font-medium text-white"
+			href={resolve('/items/new' as '/')}>Faire une commande</a
+		>
+	</header>
+
+	{#if form?.message}
+		<p
+			class="mb-4 rounded-lg bg-rose-500/15 px-4 py-3 text-sm text-rose-200 ring-1 ring-rose-500/30"
+		>
+			{form.message}
+		</p>
+	{/if}
+
+	<div class="mb-4 flex flex-wrap items-center gap-2">
+		<button
+			class="rounded-full px-3 py-1 text-xs font-medium {stateFilter === 'all'
+				? 'bg-white text-gray-900'
+				: 'bg-gray-700 text-gray-300 hover:bg-gray-600'}"
+			onclick={() => (stateFilter = 'all')}
+			type="button">Tous ({counts.all})</button
+		>
+		{#each ITEM_STATES as state (state)}
+			<button
+				class="rounded-full px-3 py-1 text-xs font-medium {stateFilter === state
+					? 'bg-white text-gray-900'
+					: 'bg-gray-700 text-gray-300 hover:bg-gray-600'}"
+				onclick={() => (stateFilter = state)}
+				type="button"
+				>{ITEM_STATE_BADGES[state].emoji} {ITEM_STATE_BADGES[state].label} ({counts[state]})</button
+			>
+		{/each}
+		<input
+			class="ml-auto w-56 rounded-lg border border-gray-600 bg-gray-700 p-2 text-sm text-white placeholder-gray-400"
+			placeholder="Rechercher…"
+			type="search"
+			bind:value={search}
+		/>
 	</div>
-</div>
+
+	{#if visible.length === 0}
+		<p class="rounded-lg border border-dashed border-gray-600 px-4 py-12 text-center text-gray-400">
+			{items.length === 0
+				? "Vous n'avez encore demandé aucun composant."
+				: 'Aucun item ne correspond à ce filtre.'}
+		</p>
+	{:else}
+		<ul class="space-y-3">
+			{#each visible as item (item.id)}
+				<li class="rounded-lg border border-gray-700 bg-gray-800 p-4">
+					<div class="flex flex-wrap items-start justify-between gap-3">
+						<div class="min-w-0 flex-1">
+							<div class="flex flex-wrap items-center gap-2">
+								{#if item.link}
+									<!-- eslint-disable svelte/no-navigation-without-resolve -- URL marchande externe saisie par le membre, hors routes de l'app -->
+									<a
+										class="truncate font-medium text-white hover:underline"
+										href={item.link}
+										rel="noopener noreferrer"
+										target="_blank">{item.name}</a
+									>
+									<!-- eslint-enable svelte/no-navigation-without-resolve -->
+								{:else}
+									<span class="truncate font-medium text-white">{item.name}</span>
+								{/if}
+								<ItemStateBadge state={item.state} />
+								<CampusBadge campus={item.campus} />
+							</div>
+							<p class="mt-1 text-sm text-gray-400">
+								{item.projectName} · {item.quantity} × {euro.format(item.unitPriceTtc)} =
+								<span class="font-medium text-gray-200">{euro.format(item.totalTtc)}</span>
+								· demandé le {day.format(new Date(item.createdAt))}
+							</p>
+							{#if item.tags.length > 0}
+								<p class="mt-1 text-xs text-gray-500">{item.tags.join(' · ')}</p>
+							{/if}
+							{#if item.note}
+								<p class="mt-2 rounded bg-gray-700/50 px-2 py-1 text-sm text-gray-300">
+									{item.note}
+								</p>
+							{/if}
+							{#if item.refusedReason}
+								<p class="mt-2 rounded bg-rose-500/10 px-2 py-1 text-sm text-rose-200">
+									Motif du refus : {item.refusedReason}
+								</p>
+							{/if}
+						</div>
+
+						<div class="flex shrink-0 items-center gap-2">
+							{#if isItemEditableByMember(item.state)}
+								<a
+									class="rounded-lg border border-gray-600 px-3 py-1.5 text-sm text-gray-200 hover:bg-gray-700"
+									href={resolve(`/items/${String(item.id)}/edit` as '/')}>Modifier</a
+								>
+							{/if}
+							{#if isItemDeletableByMember(item.state)}
+								<form action="?/delete" method="POST" use:enhance>
+									<input name="id" type="hidden" value={item.id} />
+									<button
+										class="rounded-lg border border-rose-500/40 px-3 py-1.5 text-sm text-rose-300 hover:bg-rose-500/10"
+										type="submit">Supprimer</button
+									>
+								</form>
+							{/if}
+						</div>
+					</div>
+				</li>
+			{/each}
+		</ul>
+	{/if}
+</section>

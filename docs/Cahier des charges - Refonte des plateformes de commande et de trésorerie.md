@@ -61,7 +61,7 @@ Une première version saine et utilisable est attendue **pour la rentrée**, ave
 ## 2. Acteurs et rôles
 
 | Acteur                   | Description             | Responsabilités principales                                                                     |
-|--------------------------|-------------------------|-------------------------------------------------------------------------------------------------|
+| ------------------------ | ----------------------- | ----------------------------------------------------------------------------------------------- |
 | **Membre**               | Membre d'un projet      | Propose des items (composants à acheter) rattachés à un projet                                  |
 | **CDP** (chef de projet) | Responsable d'un projet | Revoit et valide les items proposés par les membres de son projet                               |
 | **Trésorier**            | Gestion financière      | Regroupe les items validés en commandes, gère projets, partenariats, budgets et flux financiers |
@@ -77,7 +77,7 @@ Une première version saine et utilisable est attendue **pour la rentrée**, ave
 ## 3. Glossaire métier
 
 | Terme                  | Définition                                                                                                                                                                                                                                                                                                                                                                                                                                              |
-|------------------------|---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
+| ---------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
 | **Item**               | Un composant à acheter : nom, lien, prix unitaire TTC, quantité, projet, et un **état** couvrant tout son cycle de vie — de la revue CDP jusqu'à la réception (§7.1). Créé par un membre. Porte son **campus de destination**, calculé à la création (§5.5).                                                                                                                                                                                            |
 | **Commande**           | Un regroupement d'items, généralement passé auprès d'un même fournisseur/partenaire, avec des frais de port. Créée par le trésorier. (possibilité de pré-regroupement en fonction des liens fournisseur)                                                                                                                                                                                                                                                |
 | **Projet**             | Une activité de l'association, à laquelle un membre rattache ses items. Chaque projet **désigne un budget** de l'arbre, à n'importe quelle profondeur (§6.1).                                                                                                                                                                                                                                                                                           |
@@ -118,7 +118,7 @@ Synthèse des dysfonctionnements relevés. Ils constituent le point de départ d
 ### 5.1 Gestion des items (membres)
 
 | ID       | Exigence                                                                                                                                                                                                                                                                                                                              | Prio |
-|----------|---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|------|
+| -------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ---- |
 | CMD-F-01 | Un membre peut créer un item rattaché à un projet, avec : nom, lien, prix unitaire, quantité, tags (si plusieurs tags séléctionnés, demandé à choisir par article).                                                                                                                                                                   | M    |
 | CMD-F-02 | Un membre peut modifier et supprimer ses items tant qu'ils ne sont pas rattachés à une commande passée et qu'ils n'ont pas été validé par le CDP.                                                                                                                                                                                     | M    |
 | CMD-F-03 | Dans le formulaire de création/édition, le retrait du dernier item doit réinitialiser sa ligne.                                                                                                                                                                                                                                       | S    |
@@ -134,7 +134,7 @@ Synthèse des dysfonctionnements relevés. Ils constituent le point de départ d
 ### 5.2 Constitution des commandes (trésorier)
 
 | ID       | Exigence                                                                                                                                                                                                                                                                                                                                                                                                                | Prio |
-|----------|-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|------|
+| -------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ---- |
 | CMD-F-10 | Le trésorier regroupe des items (validés) en une commande, par sélection multiple (cases à cocher).                                                                                                                                                                                                                                                                                                                     | M    |
 | CMD-F-11 | Une commande porte un ou plusieurs items pouvant relever de projets différents.                                                                                                                                                                                                                                                                                                                                         | M    |
 | CMD-F-12 | Les frais de port d'une commande sont répartis entre les projets concernés selon une règle définie (voir §7.3).                                                                                                                                                                                                                                                                                                         | M    |
@@ -148,7 +148,7 @@ Synthèse des dysfonctionnements relevés. Ils constituent le point de départ d
 ### 5.3 Cycle de vie et statuts
 
 | ID       | Exigence                                                                                                                                                                                                                                                                                                                                                                                    | Prio |
-|----------|---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|------|
+| -------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ---- |
 | CMD-F-20 | Les statuts sont un ensemble **fermé et unique**, identique dans les tables, les filtres et l'affichage détail.                                                                                                                                                                                                                                                                             | M    |
 | CMD-F-21 | Statuts d'**item** : **En revue par le CDP** (`pending_cdp`) → **Validé** (`pending_bundled`) → **Regroupé** (`bundled`) → **Reçu** (`received`), plus deux refus terminaux : **Refusé par le CDP** (`refused_cdp`) et **Refusé par le trésorier** (`refused_treso`). Statuts de **commande** : **En attente du trésorier** → **En attente de livraison** → **Terminée**, plus **Annulée**. | M    |
 | CMD-F-22 | Chaque statut dispose d'un repère visuel (badge coloré et/ou emoji) dans toutes les tables.                                                                                                                                                                                                                                                                                                 | M    |
@@ -195,7 +195,7 @@ Synthèse des dysfonctionnements relevés. Ils constituent le point de départ d
 ### 5.4 Modification des commandes et des prix
 
 | ID       | Exigence                                                                                                                                                                 | Prio |
-|----------|--------------------------------------------------------------------------------------------------------------------------------------------------------------------------|------|
+| -------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------ | ---- |
 | CMD-F-30 | On peut modifier le **prix, la quantité, le nom et le lien** des items d'une commande.                                                                                   | M    |
 | CMD-F-31 | Au moment de la validation, le prix de **chaque composant** est modifiable individuellement, en **prix unitaire ou total** (les deux restent cohérents automatiquement). | M    |
 | CMD-F-32 | Une commande **déjà passée** reste modifiable (correction a posteriori), la modification étant tracée dans l'historique.                                                 | M    |
@@ -209,7 +209,7 @@ Synthèse des dysfonctionnements relevés. Ils constituent le point de départ d
 Répond au problème n° 13 (« prix ambigu : unitaire ou total ? »), qui n'était couvert par aucune exigence.
 
 | ID       | Exigence                                                                                                                                         | Prio |
-|----------|--------------------------------------------------------------------------------------------------------------------------------------------------|------|
+| -------- | ------------------------------------------------------------------------------------------------------------------------------------------------ | ---- |
 | CMD-F-37 | Un **item** porte un **prix unitaire TTC** et une **quantité**. Le membre recopie le prix affiché sur le site marchand, sans conversion à faire. | M    |
 | CMD-F-38 | Le total d'un item est **toujours calculé** (`quantité × prix unitaire TTC`) et jamais saisi directement en base.                                | M    |
 | CMD-F-39 | Une **commande** et un **flux financier** portent un **montant TTC unique**, sans aucune décomposition.                                          | M    |
@@ -230,7 +230,7 @@ Répond au problème n° 13 (« prix ambigu : unitaire ou total ? »), qui n'ét
 ### 5.5 Campus et adresses de livraison (Nantes / Paris)
 
 | ID       | Exigence                                                                                                                                                                                                                                          | Prio |
-|----------|---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|------|
+| -------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ---- |
 | CMD-F-40 | Le détail d'une commande distingue clairement si elle est destinée à Nantes ou à Paris (couleur, badge Ker Juliette).                                                                                                                             | M    |
 | CMD-F-41 | Dans la vue trésorier, **un clic sur le badge campus copie l'adresse complète** dans le presse-papier : destinataire, adresse, code postal, ville — prête à coller chez le marchand.                                                              | M    |
 | CMD-F-42 | La distinction Nantes / Paris est visible au moment de commander, dans la liste des items à regrouper comme dans le détail de la commande.                                                                                                        | M    |
@@ -263,7 +263,7 @@ Répond au problème n° 13 (« prix ambigu : unitaire ou total ? »), qui n'ét
 ### 5.6 Budgets et alertes
 
 | ID       | Exigence                                                                                                                                                                                                                                                                              | Prio |
-|----------|---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|------|
+| -------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ---- |
 | CMD-F-50 | Un indicateur de dépassement de budget est affiché côté membre et côté trésorier.                                                                                                                                                                                                     | M    |
 | CMD-F-51 | Le budget consommé tient compte de la quote-part des frais de port (§7.2).                                                                                                                                                                                                            | S    |
 | CMD-F-52 | Côté **membre**, un budget insuffisant **ne bloque jamais** la demande : l'item est créé, une alerte signale le dépassement au membre et le notifie au trésorier.                                                                                                                     | M    |
@@ -292,7 +292,7 @@ Répond au problème n° 13 (« prix ambigu : unitaire ou total ? »), qui n'ét
 ### 5.7 Historique et traçabilité
 
 | ID       | Exigence                                                                                                              | Prio |
-|----------|-----------------------------------------------------------------------------------------------------------------------|------|
+| -------- | --------------------------------------------------------------------------------------------------------------------- | ---- |
 | CMD-F-60 | L'historique enregistre **qui** a modifié **quoi** (champ, ancienne valeur, nouvelle valeur), pas seulement l'auteur. | M    |
 | CMD-F-61 | Les changements de statut sont historisés avec précision (statut précédent, nouveau statut, auteur, date).            | M    |
 | CMD-F-62 | L'historique est présenté de façon **linéaire**, les informations supplémentaires apparaissant au survol.             | S    |
@@ -300,7 +300,7 @@ Répond au problème n° 13 (« prix ambigu : unitaire ou total ? »), qui n'ét
 ### 5.8 Recherche et partenaires
 
 | ID       | Exigence                                                                                                | Prio |
-|----------|---------------------------------------------------------------------------------------------------------|------|
+| -------- | ------------------------------------------------------------------------------------------------------- | ---- |
 | CMD-F-70 | Un moteur de recherche des commandes/items est disponible pour le trésorier et les membres.             | S    |
 | CMD-F-71 | La recherche incite et facilite le passage par les sites partenaires (lien, suggestion).                | C    |
 | CMD-F-72 | Recherche automatique / via API des composants chez les partenaires.                                    | W    |
@@ -309,7 +309,7 @@ Répond au problème n° 13 (« prix ambigu : unitaire ou total ? »), qui n'ét
 ### 5.9 Affichage, tri et ergonomie des listes
 
 | ID       | Exigence                                                                                                                                                                                                                   | Prio |
-|----------|----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|------|
+| -------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ---- |
 | CMD-F-80 | La **file des items à regrouper** (vue trésorier) est triée par **date de validation CDP**, du plus ancien au plus récent : l'item validé en premier est regroupé en premier.                                              | M    |
 | CMD-F-86 | La **liste des commandes** est triée par **date de passation** pour les commandes déjà passées, et par **date de création** pour celles qui ne le sont pas encore — jamais par date de dernière mise à jour (défaut n° 9). | M    |
 | CMD-F-81 | Les commandes sont organisées par **année scolaire**, avec une délimitation claire dans la liste.                                                                                                                          | M    |
@@ -331,7 +331,7 @@ Répond au problème n° 13 (« prix ambigu : unitaire ou total ? »), qui n'ét
 ### 6.1 Projets et budgets
 
 | ID          | Exigence                                                                                                                                                                                                                                                                            | Prio |
-|-------------|-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|------|
+| ----------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ---- |
 | TRESO-F-01  | Le trésorier peut ajouter, modifier et supprimer des projets.                                                                                                                                                                                                                       | M    |
 | TRESO-F-02  | Les budgets forment un **arbre autonome** : tout budget peut porter des sous-budgets sur une profondeur libre. Un **projet désigne un budget** de cet arbre — racine, nœud intermédiaire ou feuille indifféremment — et plusieurs projets peuvent viser des nœuds du même arbre.    | M    |
 | TRESO-F-02c | Chaque sous-arbre désigne une **feuille par défaut**, celle que l'outil présélectionne à l'imputation (CMD-F-18). Elle est marquée explicitement par le trésorier, jamais devinée.                                                                                                  | M    |
@@ -368,10 +368,10 @@ Répond au problème n° 13 (« prix ambigu : unitaire ou total ? »), qui n'ét
 > sur la même activité, sans obligation de se recouvrir.
 >
 > **Seules les feuilles portent un montant.** Le budget d'un nœud intermédiaire n'est pas saisi : c'est la **somme de
-ses
+> ses
 > descendants**. `Pôle Event` vaut 5 000 € parce que ses feuilles totalisent 5 000 €, et cette valeur bouge d'elle-même
 > quand le trésorier réalloue entre WEI et PréCoupe. Un montant saisi sur le parent en plus de ceux des enfants poserait
-> une question sans réponse — le pôle vaut-il 5 000 € ou 5 000 € *plus* ses enfants ? — et se mettrait à diverger dès la
+> une question sans réponse — le pôle vaut-il 5 000 € ou 5 000 € _plus_ ses enfants ? — et se mettrait à diverger dès la
 > première réallocation.
 >
 > **Conséquence : on n'impute pas sur un nœud intermédiaire.** Une dépense de pôle qui ne relève d'aucune activité
@@ -384,8 +384,8 @@ ses
 > trésorier marque donc explicitement une feuille par sous-arbre. À défaut, le sélecteur s'ouvre sans choix imposé,
 > filtré sur le sous-arbre du projet.
 >
-> **Budget et compte de règlement sont deux axes indépendants.** `CDR_Paris_Mouser` est une enveloppe *décidée à
-> l'avance* — le trésorier alloue 300 € d'achats Mouser au CDR Paris — et n'a rien à voir avec l'**enveloppe de crédit**
+> **Budget et compte de règlement sont deux axes indépendants.** `CDR_Paris_Mouser` est une enveloppe _décidée à
+> l'avance_ — le trésorier alloue 300 € d'achats Mouser au CDR Paris — et n'a rien à voir avec l'**enveloppe de crédit**
 > du partenariat Mouser (§6.2), qui est un compte. Un item peut être imputé sur `CDR_Paris_Mouser` tout en étant réglé
 > depuis le compte courant, et un item réglé sur l'enveloppe partenaire peut être imputé ailleurs. Confondre les deux
 > ferait suivre la même dépense à deux endroits.
@@ -402,7 +402,7 @@ ses
 ### 6.2 Partenariats et budgets
 
 | ID         | Exigence                                                                                                                                                                                                          | Prio |
-|------------|-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|------|
+| ---------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ---- |
 | TRESO-F-10 | Le trésorier peut ajouter, modifier et supprimer des partenariats.                                                                                                                                                | M    |
 | TRESO-F-11 | Lorsqu'un partenariat donne droit à une **enveloppe à consommer chez le partenaire**, celle-ci est matérialisée par un **compte dédié** dont le solde décroît à chaque commande réglée dessus.                    | M    |
 | TRESO-F-12 | Un partenariat porte une liste optionnelle de **domaines** (`mouser.fr`, `mouser.com`) permettant de le reconnaître automatiquement dans le lien d'un item.                                                       | M    |
@@ -421,7 +421,7 @@ ses
 ### 6.3 Flux financiers (dépenses / recettes)
 
 | ID         | Exigence                                                                                                                                                                                                                                                                                                   | Prio |
-|------------|------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|------|
+| ---------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ---- |
 | TRESO-F-20 | Le trésorier peut ajouter, modifier et supprimer des dépenses (débits) et des recettes (crédits).                                                                                                                                                                                                          | M    |
 | TRESO-F-22 | Le passage d'une commande à **En attente de livraison** crée **automatiquement** le ou les flux de débit rattachés à cette commande (`order_id`), dont la **somme** égale le total des items majoré des frais de port. Une commande réglée sur deux comptes (TRESO-F-14) produit deux flux, un par compte. | M    |
 | TRESO-F-23 | Un flux issu d'une commande reste modifiable et supprimable par le trésorier ; l'annulation de la commande propose la contrepassation du flux.                                                                                                                                                             | S    |
@@ -430,7 +430,7 @@ ses
 ### 6.4 Justificatifs
 
 | ID         | Exigence                                                                               | Prio |
-|------------|----------------------------------------------------------------------------------------|------|
+| ---------- | -------------------------------------------------------------------------------------- | ---- |
 | TRESO-F-30 | Chaque flux financier peut recevoir une ou plusieurs preuves (PNG, JPEG, PDF).         | M    |
 | TRESO-F-31 | Les justificatifs sont consultables directement depuis le site (visionneuse intégrée). | M    |
 | TRESO-F-32 | Transformation de toutes les images en pdf.                                            | W    |
@@ -439,7 +439,7 @@ ses
 ### 6.5 Documents générés
 
 | ID         | Exigence                      | Prio |
-|------------|-------------------------------|------|
+| ---------- | ----------------------------- | ---- |
 | TRESO-F-40 | Génération de notes de frais. | S    |
 | TRESO-F-41 | Génération de devis.          | S    |
 | TRESO-F-42 | Génération de factures.       | S    |
@@ -448,7 +448,7 @@ ses
 ### 6.6 Tableaux de bord et statistiques
 
 | ID         | Exigence                                                                                    | Prio |
-|------------|---------------------------------------------------------------------------------------------|------|
+| ---------- | ------------------------------------------------------------------------------------------- | ---- |
 | TRESO-F-50 | Graphiques et statistiques utiles sur la trésorerie (s'inspirer de l'Excel « bilan Hugo »). | S    |
 | TRESO-F-51 | Détermination du solde des comptes à un instant donné.                                      | M    |
 | TRESO-F-52 | Calcul des crédits/débits entre deux dates.                                                 | M    |
@@ -456,7 +456,7 @@ ses
 ### 6.7 Évolutions futures de la trésorerie
 
 | ID         | Exigence                                                                           | Prio |
-|------------|------------------------------------------------------------------------------------|------|
+| ---------- | ---------------------------------------------------------------------------------- | ---- |
 | TRESO-F-60 | Budget prévisionnel.                                                               | W    |
 | TRESO-F-61 | Comparatif automatiques de documents bancaires avec les entrées/sorties de la bdd. | W    |
 | TRESO-F-62 | Export de rapports trimestriels (Q1–Q4) et de rapports par projet.                 | M    |
@@ -491,7 +491,7 @@ L'auteur du refus étant porté par l'état lui-même, seul le **motif** est sto
 Deux découpages **distincts** coexistent, et c'est volontaire :
 
 | Période            | Borne                               | S'applique à                                   |
-|--------------------|-------------------------------------|------------------------------------------------|
+| ------------------ | ----------------------------------- | ---------------------------------------------- |
 | **Année scolaire** | 1er septembre → 31 août             | items, commandes, budgets de projet            |
 | **Année fiscale**  | exercice comptable de l'association | flux financiers, soldes, rapports trimestriels |
 
@@ -511,14 +511,15 @@ projet : sans cela, le consommé d'un budget serait faux de sa part de frais de 
 >
 > - **Répartition égale** : `frais_port / nombre_de_budgets_distincts`.
 > - **Répartition proportionnelle** : au poids financier de chaque budget dans la commande
+
     (`montant_items_du_budget / montant_total_commande`).
->
+
 > Par défaut, c'est la **répartition proportionnelle** (plus juste quand les volumes diffèrent), avec la répartition
 > égale comme variante possible sélectionnable par le trésorier. La quote-part calculée alimente le budget consommé
 > (CMD-F-51).
 >
 > L'arrondi suit la **méthode du plus fort reste** : répartition à `0,01 €` près, puis attribution des centimes
-> résiduels aux projets ayant la plus grande partie fractionnaire. La somme des quotes-parts est ainsi *exactement*
+> résiduels aux projets ayant la plus grande partie fractionnaire. La somme des quotes-parts est ainsi _exactement_
 > égale aux frais de port, quel que soit le mode retenu.
 
 ---
@@ -563,27 +564,27 @@ Le lien entre les deux niveaux se lit ainsi : le trésorier n'agit que sur les i
 ### 9.1 Authentification et sessions
 
 | ID          | Exigence                                                                                                                                                                                     | Prio |
-|-------------|----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|------|
+| ----------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ---- |
 | TRANS-NF-01 | La session ne doit pas expirer pendant le traitement d'une commande ; pas de déconnexion intempestive. Revue complète de la gestion des tokens (durée de vie, rafraîchissement, expiration). | M    |
 | TRANS-NF-02 | Une expiration de session ne doit jamais faire disparaître le contenu affiché sans message ni reprise propre.                                                                                | M    |
 
 ### 9.2 Fiabilité d'affichage
 
 | ID          | Exigence                                                                                                 | Prio |
-|-------------|----------------------------------------------------------------------------------------------------------|------|
+| ----------- | -------------------------------------------------------------------------------------------------------- | ---- |
 | TRANS-NF-10 | Les commandes s'affichent de manière déterministe et systématique (correction de l'affichage aléatoire). | M    |
 | TRANS-NF-11 | Le tableau de commandes reste cohérent après actions (validation, édition, changement de statut).        | M    |
 
 ### 9.3 Performance et cache
 
 | ID          | Exigence                                                                                    | Prio |
-|-------------|---------------------------------------------------------------------------------------------|------|
+| ----------- | ------------------------------------------------------------------------------------------- | ---- |
 | TRANS-NF-20 | Repenser la stratégie de cache (invalidation claire, cohérence des données après écriture). | S    |
 
 ### 9.4 Données et archivage
 
 | ID          | Exigence                                                                                                                                           | Prio |
-|-------------|----------------------------------------------------------------------------------------------------------------------------------------------------|------|
+| ----------- | -------------------------------------------------------------------------------------------------------------------------------------------------- | ---- |
 | TRANS-NF-30 | Démarrage sur une base de données neuve à la rentrée ; pas de reprise de l'ancienne BDD.                                                           | M    |
 | TRANS-NF-31 | Délimitation et archivage par année scolaire (items, commandes, budgets, attributions des membres aux projets) — voir §7.1bis.                     | M    |
 | TRANS-NF-32 | Délimitation et archivage par année fiscale (flux, soldes, rapports) — voir §7.1bis.                                                               | M    |
@@ -592,7 +593,7 @@ Le lien entre les deux niveaux se lit ainsi : le trésorier n'agit que sur les i
 ### 9.5 Ergonomie et accessibilité
 
 | ID          | Exigence                                                                               | Prio |
-|-------------|----------------------------------------------------------------------------------------|------|
+| ----------- | -------------------------------------------------------------------------------------- | ---- |
 | TRANS-NF-40 | Repères visuels cohérents (badges/couleurs) pour les statuts dans toute l'application. | M    |
 | TRANS-NF-41 | Lisibilité immédiate de la distinction Nantes / Paris.                                 | M    |
 | TRANS-NF-42 | Préférer des formulaires CRUD lisibles aux drawers exigus.                             | S    |
@@ -600,7 +601,7 @@ Le lien entre les deux niveaux se lit ainsi : le trésorier n'agit que sur les i
 ### 9.6 Journalisation et audit
 
 | ID          | Exigence                                                                                                                                                                                                                  | Prio |
-|-------------|---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|------|
+| ----------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ---- |
 | TRANS-NF-50 | L'auteur et la date de chaque changement sont portés par le **journal**, pas par des colonnes d'attribution sur les tables métier. Une colonne n'est conservée que si une règle déclarative, un tri ou un filtre la lit.  | M    |
 | TRANS-NF-51 | Les changements portant sur le **socle** sont journalisés à part du journal métier : permissions (rôles globaux, overrides individuels, rattachements aux projets, permissions de rôle) et **contenu éditorial du site**. | M    |
 | TRANS-NF-52 | Les écritures **rejetées** par un contrôle métier sont enregistrées avec leur code d'erreur, l'auteur et l'entité visée — notamment les tentatives d'écriture sur une période close.                                      | S    |
