@@ -17,7 +17,8 @@ const profile: UserProfile = {
 	name: 'Alice',
 	avatar: 'https://example.com/avatar.png',
 	id: 'user-1',
-	projects: [{ id: 1, name: 'Eurobot', debut: '2024-09-01', role: 'Membre' }],
+	campus: null,
+	projects: [{ id: 1, name: 'Eurobot', campus: 'nantes', role: 'Membre' }],
 	permissions: [],
 	allProjects: null
 };

@@ -25,6 +25,7 @@ describe('utils helpers', () => {
 			email: '',
 			name: '',
 			avatar: '',
+			campus: null,
 			projects: [],
 			permissions: [],
 			allProjects: null

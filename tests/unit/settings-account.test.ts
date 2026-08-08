@@ -26,6 +26,7 @@ const profile: UserProfile = {
 	name: 'Alice',
 	avatar: 'https://example.com/avatar.png',
 	id: 'user-1',
+	campus: null,
 	projects: [],
 	permissions: [],
 	allProjects: null
