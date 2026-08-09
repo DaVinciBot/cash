@@ -69,12 +69,29 @@ describe('permissions helpers', () => {
 		expect(uris).not.toContain('/admin/users');
 	});
 
-	// Les écrans commande et trésorerie de l'ancien modèle ont disparu du menu :
-	// ils lisaient des tables supprimées par la refonte du schéma.
-	it('ADMIN_MENU no longer exposes the legacy order and treasury screens', () => {
+	// L'écran de trésorerie de l'ancien modèle a disparu du menu : il lisait des
+	// tables supprimées par la refonte du schéma, et sa remplaçante n'arrive
+	// qu'au jalon 6. `/admin/orders` est réapparu depuis, mais c'est une AUTRE
+	// page — la liste des commandes du parcours trésorier —, gardée par les
+	// permissions du nouveau modèle.
+	it('ADMIN_MENU no longer exposes the legacy treasury screen', () => {
 		const uris = ADMIN_MENU.map((item) => item.uri);
 
-		expect(uris).not.toContain('/admin/orders');
 		expect(uris).not.toContain('/admin/treso');
+	});
+
+	it('ADMIN_MENU expose la liste des commandes aux seuls lecteurs de commandes', () => {
+		const pourMembre = filterMenuByPermissions(ADMIN_MENU, ['orders.items.manage.self']).map(
+			(item) => item.uri
+		);
+		const pourTresorier = filterMenuByPermissions(ADMIN_MENU, [
+			'orders.read.all',
+			'orders.bundle.manage'
+		]).map((item) => item.uri);
+
+		expect(pourMembre).not.toContain('/admin/orders');
+		expect(pourMembre).not.toContain('/admin/bundle');
+		expect(pourTresorier).toContain('/admin/orders');
+		expect(pourTresorier).toContain('/admin/bundle');
 	});
 });
