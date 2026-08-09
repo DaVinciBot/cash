@@ -1,3 +1,4 @@
+import { resolve } from '$app/paths';
 import { budgetPressure, currentSchoolYear, memberProjects, resolveCampus } from '$lib/server/cash';
 import { jsonArray, text, textAll } from '$lib/server/form';
 import { cashErrorMessage, type Campus, type ItemTag } from '@davincibot/lib';
@@ -210,6 +211,6 @@ export const actions: Actions = {
 			});
 		}
 
-		redirect(303, '/');
+		redirect(303, resolve('/'));
 	}
 };

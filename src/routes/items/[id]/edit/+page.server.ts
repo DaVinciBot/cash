@@ -1,3 +1,4 @@
+import { resolve } from '$app/paths';
 import { memberProjects } from '$lib/server/cash';
 import { decimal, jsonArray, text } from '$lib/server/form';
 import { cashErrorMessage, type ItemTag } from '@davincibot/lib';
@@ -106,6 +107,6 @@ export const actions: Actions = {
 			});
 		}
 
-		redirect(303, '/');
+		redirect(303, resolve('/'));
 	}
 };
