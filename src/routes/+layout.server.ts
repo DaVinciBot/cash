@@ -5,7 +5,8 @@ import {
 	canAccessAdminPath,
 	filterMenuByPermissions,
 	type EffectivePermission,
-	type GlobalPermission
+	type GlobalPermission,
+	type ProjectPermission
 } from '@davincibot/lib';
 import { redirect } from '@sveltejs/kit';
 import type { LayoutServerLoad } from './$types';
@@ -23,6 +24,7 @@ interface ProfileRow {
 	member_of: {
 		role: string;
 		revoked_at: string | null;
+		permissions: ProjectPermission[] | null;
 		project: {
 			id: number;
 			name: string | null;
@@ -31,7 +33,26 @@ interface ProfileRow {
 	}[];
 }
 
-function resolveEffectivePermissions(data: ProfileRow): EffectivePermission[] {
+/** Catalogue `public.project_role_permissions`, indexé par rôle projet. */
+type ProjectRoleCatalogue = Map<string, ProjectPermission[]>;
+
+/**
+ * Permissions effectives affichables : globales, plus les permissions projet
+ * détenues sur AU MOINS UN projet.
+ *
+ * L'agrégation ne sert qu'au gating d'écran — entrée de menu et garde de route.
+ * Elle ne dit rien du périmètre : un CDP d'un seul projet y apparaît avec
+ * `orders.items.review.project`, ce qui lui ouvre la file mais ne lui donne
+ * aucun droit sur les items des autres projets. Ce découpage-là appartient à la
+ * RLS, qui interroge `has_project_permission()` ligne par ligne.
+ *
+ * Le calcul reprend `has_project_permission()` : permissions du rôle projet,
+ * plus les overrides additifs portés par la ligne `member_of`.
+ */
+function resolveEffectivePermissions(
+	data: ProfileRow,
+	projectRoles: ProjectRoleCatalogue
+): EffectivePermission[] {
 	const set = new Set<EffectivePermission>();
 	for (const p of data.permissions ?? []) {
 		set.add(p);
@@ -41,6 +62,17 @@ function resolveEffectivePermissions(data: ProfileRow): EffectivePermission[] {
 			continue;
 		}
 		for (const p of assignment.global_roles?.permissions ?? []) {
+			set.add(p);
+		}
+	}
+	for (const membership of data.member_of) {
+		if (membership.revoked_at) {
+			continue;
+		}
+		for (const p of projectRoles.get(membership.role) ?? []) {
+			set.add(p);
+		}
+		for (const p of membership.permissions ?? []) {
 			set.add(p);
 		}
 	}
@@ -63,6 +95,7 @@ export const load: LayoutServerLoad = async ({ locals, cookies, url }) => {
 	if (user?.id) {
 		const [
 			profileResult,
+			{ data: projectRoleRows },
 			{ data: canManageOwnItems },
 			{ data: canReadOrders },
 			{ data: canReadFinance },
@@ -74,10 +107,11 @@ export const load: LayoutServerLoad = async ({ locals, cookies, url }) => {
 			supabase
 				.from('profiles')
 				.select(
-					'username,avatar_url,campus,permissions, profile_global_roles!profile_global_roles_profile_fkey(role, revoked_at, global_roles(permissions)), member_of!membre_projet_profile_fkey(role, revoked_at, project(id, name, campus))'
+					'username,avatar_url,campus,permissions, profile_global_roles!profile_global_roles_profile_fkey(role, revoked_at, global_roles(permissions)), member_of!membre_projet_profile_fkey(role, revoked_at, permissions, project(id, name, campus))'
 				)
 				.eq('id', user.id)
 				.single<ProfileRow>(),
+			supabase.from('project_role_permissions').select('role, permissions'),
 			supabase.rpc('has_permission', { p_permission: 'orders.items.manage.self' }),
 			supabase.rpc('has_permission', { p_permission: 'orders.read.all' }),
 			supabase.rpc('has_permission', { p_permission: 'finance.read' }),
@@ -89,9 +123,13 @@ export const load: LayoutServerLoad = async ({ locals, cookies, url }) => {
 
 		canRequestItems = canManageOwnItems === true;
 
+		const projectRoles: ProjectRoleCatalogue = new Map(
+			(projectRoleRows ?? []).map((row) => [row.role, row.permissions])
+		);
+
 		const { data, error } = profileResult;
 		if (!error) {
-			permissions = resolveEffectivePermissions(data);
+			permissions = resolveEffectivePermissions(data, projectRoles);
 
 			// Un rattachement se révoque, il ne se supprime pas : sans ce filtre un
 			// ancien membre continuerait de voir le projet qu'il a quitté.

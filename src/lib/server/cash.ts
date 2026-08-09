@@ -7,7 +7,7 @@
 // (`requested_by = auth.uid()`) qui garantit qu'un membre n'écrit que pour lui.
 
 import type { Database } from '@davincibot/database-types';
-import type { Campus, ItemState, ItemTag } from '@davincibot/lib';
+import type { Campus, ItemState, ItemTag, ProjectPermission } from '@davincibot/lib';
 import type { SupabaseClient } from '@supabase/supabase-js';
 
 type Client = SupabaseClient<Database>;
@@ -229,6 +229,138 @@ export async function myItems(supabase: Client, profileId: string): Promise<MyIt
 		projectId: i.project_id,
 		projectName: names.get(i.project_id) ?? '—',
 		refusedReason: i.refused_reason,
+		createdAt: i.created_at
+	}));
+}
+
+/** Projet sur lequel le membre connecté détient une permission scopée-projet. */
+export interface ScopedProject {
+	id: number;
+	name: string;
+	campus: Campus | null;
+}
+
+/**
+ * Projets sur lesquels le membre connecté détient une permission donnée.
+ *
+ * Reprend le calcul de `public.has_project_permission()` — catalogue du rôle
+ * projet plus overrides additifs de la ligne `member_of` — mais renvoie la
+ * LISTE, là où la fonction SQL ne répond que par oui ou non sur un projet
+ * nommé. La file de revue en a besoin pour se borner : `items_read` autorise
+ * aussi la lecture des items qu'on a soi-même demandés et, pour un porteur
+ * d'`orders.read.all`, celle de tous les items de l'association. Sans ce
+ * bornage explicite, la file d'un trésorier CDP d'un seul projet lui présenterait
+ * l'intégralité des demandes en attente comme si elles lui revenaient.
+ */
+export async function projectsWithPermission(
+	supabase: Client,
+	profileId: string,
+	permission: ProjectPermission
+): Promise<ScopedProject[]> {
+	const [{ data: memberships, error }, { data: catalogue }] = await Promise.all([
+		supabase
+			.from('member_of')
+			.select('role, permissions, project(id, name, campus, archived_at)')
+			.eq('profile', profileId)
+			.is('revoked_at', null),
+		supabase.from('project_role_permissions').select('role, permissions')
+	]);
+
+	if (error) {
+		return [];
+	}
+
+	const byRole = new Map((catalogue ?? []).map((row) => [row.role, row.permissions]));
+
+	return memberships
+		.filter(
+			(m) =>
+				!m.project.archived_at &&
+				((byRole.get(m.role) ?? []).includes(permission) || m.permissions.includes(permission))
+		)
+		.map((m) => ({ id: m.project.id, name: m.project.name ?? '', campus: m.project.campus }))
+		.sort((a, b) => a.name.localeCompare(b.name, 'fr'));
+}
+
+export interface ReviewItem {
+	id: number;
+	name: string;
+	link: string | null;
+	unitPriceTtc: number;
+	quantity: number;
+	totalTtc: number;
+	tags: ItemTag[];
+	note: string | null;
+	campus: Campus;
+	projectId: number;
+	projectName: string;
+	requestedBy: string;
+	requesterName: string;
+	createdAt: string;
+}
+
+/**
+ * File des items en attente de revue, du plus ancien au plus récent.
+ *
+ * L'ordre est celui de l'attente : un item déposé il y a trois semaines passe
+ * avant celui d'hier. C'est le pendant, côté CDP, du tri par date de validation
+ * de la file du trésorier (CMD-F-80).
+ */
+export async function reviewQueue(
+	supabase: Client,
+	projects: ScopedProject[]
+): Promise<ReviewItem[]> {
+	if (projects.length === 0) {
+		return [];
+	}
+
+	const names = new Map(projects.map((p) => [p.id, p.name]));
+
+	const { data, error } = await supabase
+		.schema('cash')
+		.from('items')
+		.select(
+			'id, name, link, unit_price_ttc, quantity, total_ttc, tags, note, campus, project_id, requested_by, created_at'
+		)
+		.eq('state', 'pending_cdp')
+		.in(
+			'project_id',
+			projects.map((p) => p.id)
+		)
+		.order('created_at', { ascending: true });
+
+	if (error) {
+		return [];
+	}
+
+	// `cash.items.requested_by` pointe vers `auth.users` : la relation ne
+	// s'embarque pas depuis PostgREST, le nom d'usage se lit dans public.profiles.
+	const requesterIds = [...new Set(data.map((i) => i.requested_by))];
+	const requesters = new Map<string, string>();
+	if (requesterIds.length > 0) {
+		const { data: profiles } = await supabase
+			.from('profiles')
+			.select('id, username')
+			.in('id', requesterIds);
+		for (const p of profiles ?? []) {
+			requesters.set(p.id, p.username ?? '');
+		}
+	}
+
+	return data.map((i) => ({
+		id: i.id,
+		name: i.name,
+		link: i.link,
+		unitPriceTtc: i.unit_price_ttc,
+		quantity: i.quantity,
+		totalTtc: num(i.total_ttc),
+		tags: i.tags,
+		note: i.note,
+		campus: i.campus,
+		projectId: i.project_id,
+		projectName: names.get(i.project_id) ?? '—',
+		requestedBy: i.requested_by,
+		requesterName: requesters.get(i.requested_by) ?? 'Membre inconnu',
 		createdAt: i.created_at
 	}));
 }
