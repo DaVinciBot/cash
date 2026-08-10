@@ -1,4 +1,3 @@
-import { resolve as resolveRoute } from '$app/paths';
 import { sessionCache } from '$lib/server/sessionCacheInstance';
 import { buildLoginUrl } from '@davincibot/lib';
 import {
@@ -55,14 +54,14 @@ async function guardDevEnvironment(
 	}
 
 	// Health check du déploiement : public, ne divulgue rien.
-	if (event.url.pathname === resolveRoute('/health')) {
+	if (event.url.pathname === '/health') {
 		return;
 	}
 
 	if (!session || !user) {
 		// Un fetch vers l'API ne peut pas suivre la redirection vers la page de
 		// login (il la suivrait en GET) : 401 explicite, traité côté client.
-		if (event.url.pathname.startsWith(resolveRoute('/api'))) {
+		if (event.url.pathname.startsWith('/api')) {
 			error(401, 'Non authentifié');
 		}
 		redirect(302, buildLoginUrl(event.url.href));
