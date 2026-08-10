@@ -1,5 +1,6 @@
-import { decimal, text } from '$lib/server/form';
+import { decimal, text, textAll } from '$lib/server/form';
 import { budgetLeaves, campusAddress, orderDetail } from '$lib/server/orders';
+import { accounts } from '$lib/server/treasury';
 import { cashErrorMessage, SHIPPING_ALLOCATIONS, type ShippingAllocation } from '@davincibot/lib';
 import { error, fail } from '@sveltejs/kit';
 import type { Actions, PageServerLoad } from './$types';
@@ -26,12 +27,18 @@ export const load: PageServerLoad = async ({ locals, params, depends }) => {
 		error(404, 'Commande introuvable.');
 	}
 
-	const [{ leaves }, address] = await Promise.all([
+	const [{ leaves }, address, accountRows] = await Promise.all([
 		budgetLeaves(locals.supabase, order.schoolYearId),
-		order.campus ? campusAddress(locals.supabase, order.campus) : Promise.resolve(null)
+		order.campus ? campusAddress(locals.supabase, order.campus) : Promise.resolve(null),
+		accounts(locals.supabase)
 	]);
 
-	return { order, leaves, address };
+	return {
+		order,
+		leaves,
+		address,
+		accounts: accountRows.filter((a) => !a.archivedAt)
+	};
 };
 
 export const actions: Actions = {
@@ -77,7 +84,7 @@ export const actions: Actions = {
 	 * second n'a de sens qu'une fois le premier levé, ce que l'ordre des triggers
 	 * garantit.
 	 */
-	pass: async ({ locals, params }) => {
+	pass: async ({ locals, params, request }) => {
 		const id = orderId(params);
 
 		// Le trigger dira DVB05, mais avec le message générique de l'imputation
@@ -92,6 +99,36 @@ export const actions: Actions = {
 			});
 		}
 
+		// TRESO-F-14 — le règlement peut être réparti sur deux comptes : l'enveloppe
+		// partenaire à hauteur de son solde, le complément ailleurs. La RPC écrit
+		// les flux AVANT de basculer l'état, sans quoi `on_order_ordered`
+		// fabriquerait son flux par défaut entre-temps.
+		const form = await request.formData();
+		const accountIds = textAll(form, 'account_id')
+			.map(Number)
+			.filter((value) => Number.isSafeInteger(value) && value > 0);
+		const amounts = textAll(form, 'account_amount').map((raw) => Number(raw.replace(',', '.')));
+		const plan = accountIds
+			.map((accountId, index) => ({ accountId, amount: amounts[index] ?? 0 }))
+			.filter((line) => Number.isFinite(line.amount) && line.amount > 0);
+
+		if (plan.length > 0) {
+			const { error: passError } = await locals.supabase.schema('cash').rpc('pass_order', {
+				p_order_id: id,
+				p_account_ids: plan.map((l) => l.accountId),
+				p_amounts: plan.map((l) => Math.round(l.amount * 100) / 100)
+			});
+
+			if (passError) {
+				return fail(400, {
+					message: cashErrorMessage(passError.code, 'La commande n’a pas pu être passée.')
+				});
+			}
+			return { saved: 'passed' };
+		}
+
+		// Sans plan de règlement, le comportement d'origine : un flux unique sur
+		// le compte courant, fabriqué par `on_order_ordered`.
 		const { error: updateError } = await locals.supabase
 			.schema('cash')
 			.from('orders')
@@ -108,9 +145,18 @@ export const actions: Actions = {
 		return { saved: 'passed' };
 	},
 
-	/** Annulation : le trigger `on_order_canceled` renvoie les items non reçus à la file. */
-	cancel: async ({ locals, params }) => {
+	/**
+	 * Annulation : le trigger `on_order_canceled` renvoie les items non reçus à
+	 * la file, et la contrepassation est PROPOSÉE, pas imposée (TRESO-F-23).
+	 *
+	 * On la décoche quand l'argent est réellement parti et ne reviendra pas :
+	 * annuler la commande dans l'outil ne rappelle pas un virement.
+	 */
+	cancel: async ({ locals, params, request }) => {
 		const id = orderId(params);
+		const form = await request.formData();
+		const reverse = text(form, 'reverse') === '1';
+
 		const { error: updateError } = await locals.supabase
 			.schema('cash')
 			.from('orders')
@@ -123,7 +169,24 @@ export const actions: Actions = {
 				message: cashErrorMessage(updateError.code, 'La commande n’a pas pu être annulée.')
 			});
 		}
-		return { saved: 'canceled' };
+
+		if (reverse) {
+			const { data: reversed, error: reverseError } = await locals.supabase
+				.schema('cash')
+				.rpc('reverse_order_flows', { p_order_id: id });
+
+			if (reverseError) {
+				return fail(400, {
+					message: cashErrorMessage(
+						reverseError.code,
+						'La commande est annulée, mais la contrepassation a échoué : vérifiez les mouvements.'
+					)
+				});
+			}
+			return { saved: 'canceled', reversed };
+		}
+
+		return { saved: 'canceled', reversed: 0 };
 	},
 
 	/** Réception item par item (CMD-F-25) — la commande bascule seule (CMD-F-26). */

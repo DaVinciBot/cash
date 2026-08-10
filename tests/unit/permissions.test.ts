@@ -10,9 +10,9 @@ import {
 
 describe('permissions helpers', () => {
 	it('hasAnyPermission returns true when a match exists', () => {
-		expect(
-			hasAnyPermission(['orders.read.all', 'orders.lifecycle.update.all'], ['orders.read.all'])
-		).toBe(true);
+		expect(hasAnyPermission(['orders.read.all', 'orders.bundle.manage'], ['orders.read.all'])).toBe(
+			true
+		);
 	});
 
 	it('hasAnyPermission returns true when no permission is required', () => {
