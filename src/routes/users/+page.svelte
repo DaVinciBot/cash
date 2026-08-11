@@ -576,7 +576,8 @@
 			'Override (exception)': [
 				{ label: 'Voir membres', value: 'members.profile.read.all' },
 				{ label: 'Éditer membres', value: 'members.profile.update.all' },
-				{ label: 'Éditer projets membres', value: 'members.projects.update.all' },
+				{ label: 'Éditer les rattachements aux projets', value: 'members.projects.update.all' },
+				{ label: 'Gérer les projets (nom, campus, budget)', value: 'projects.manage.all' },
 				{ label: 'Inviter un membre', value: 'members.invite.send' },
 				{ label: 'Activer/Désactiver profil', value: 'members.profile.status.update' },
 				{ label: 'Gérer les rôles (IAM)', value: 'iam.roles.manage' },
@@ -594,7 +595,6 @@
 				{ label: 'Gérer ses propres items', value: 'orders.items.manage.self' },
 				{ label: 'Voir toutes commandes', value: 'orders.read.all' },
 				{ label: 'Créer commande globale', value: 'orders.create.all' },
-				{ label: 'Gérer le workflow commandes', value: 'orders.lifecycle.update.all' },
 				{ label: 'Regrouper des items en commande', value: 'orders.bundle.manage' },
 				{ label: 'Refuser un item (trésorier)', value: 'orders.items.refuse' },
 				{ label: 'Marquer un item reçu', value: 'orders.items.receive' },
