@@ -49,9 +49,9 @@
 		"vitest": "^4.1.9"
 	},
 	"dependencies": {
-		"@davincibot/components": "^4.0.1",
-		"@davincibot/database-types": "^3.2.0",
-		"@davincibot/lib": "^3.1.0",
+		"@davincibot/components": "^4.1.0",
+		"@davincibot/database-types": "^3.3.1",
+		"@davincibot/lib": "^3.3.0",
 		"@lucide/svelte": "^1.31.0",
 		"@popperjs/core": "^2.11.8",
 		"@simplewebauthn/browser": "^13.3.0",
