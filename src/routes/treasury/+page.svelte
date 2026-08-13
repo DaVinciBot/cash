@@ -33,10 +33,20 @@
 				Le solde à confronter au relevé bancaire, et les mouvements de la période.
 			</p>
 		</div>
-		<a
-			class="rounded-lg border border-gray-600 px-4 py-2 text-sm text-gray-200 hover:bg-gray-700"
-			href={resolve('/treasury/flows' as '/')}>Dépenses et recettes</a
-		>
+		<div class="flex flex-wrap gap-2">
+			<a
+				class="rounded-lg border border-gray-600 px-4 py-2 text-sm text-gray-200 hover:bg-gray-700"
+				href={resolve('/treasury/flows' as '/')}>Dépenses et recettes</a
+			>
+			<a
+				class="rounded-lg border border-gray-600 px-4 py-2 text-sm text-gray-200 hover:bg-gray-700"
+				href={resolve('/treasury/reports' as '/')}>Rapports</a
+			>
+			<a
+				class="rounded-lg border border-gray-600 px-4 py-2 text-sm text-gray-200 hover:bg-gray-700"
+				href={resolve('/treasury/documents' as '/')}>Documents</a
+			>
+		</div>
 	</header>
 
 	{#if failure}
