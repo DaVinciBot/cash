@@ -148,6 +148,10 @@
 		color: #0958ef;
 	}
 
+	:global(.sheet .border-dvb) {
+		border-color: #0958ef;
+	}
+
 	@media print {
 		/* Ce qui ne doit jamais être coupé en deux par une fin de page. Le tableau
 		   des lignes en est exclu à dessein : l'empêcher de se couper le pousserait
@@ -173,6 +177,9 @@
 			width: 100%;
 			max-width: none !important;
 			box-shadow: none !important;
+
+			-webkit-print-color-adjust: exact;
+			print-color-adjust: exact;
 		}
 	}
 </style>

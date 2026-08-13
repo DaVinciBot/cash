@@ -29,7 +29,7 @@
 				>
 				<td class="py-1 text-right font-medium">{euro.format(0)}</td>
 			</tr>
-			<tr class="border-t-2 border-black">
+			<tr class="border-dvb border-t-2">
 				<td class="text-dvb py-2 pr-8 text-right font-bold">Total</td>
 				<td class="py-2 text-right text-lg font-bold">{euro.format(total)}</td>
 			</tr>
