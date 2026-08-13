@@ -86,7 +86,7 @@
 			<button
 				class="cursor-pointer border-0 bg-transparent p-0"
 				onclick={copyAddress}
-				title="Copier l’adresse de livraison"
+				title="Copier l'adresse de livraison"
 				type="button"
 			>
 				<StateBadge badge={CAMPUS_BADGES[order.campus]} />
@@ -151,7 +151,7 @@
 			<h2 class="text-sm font-semibold text-emerald-200">Régler {euro.format(total)}</h2>
 			<p class="mt-1 text-xs text-gray-400">
 				Laissez les montants à zéro pour régler entièrement sur le compte courant. Une enveloppe
-				partenaire ne couvre que ce qu’elle contient — le complément se met sur un autre compte.
+				partenaire ne couvre que ce qu'elle contient — le complément se met sur un autre compte.
 			</p>
 			<div class="mt-3 space-y-2">
 				{#each data.accounts as account, index (account.id)}
@@ -223,13 +223,13 @@
 				Contrepasser le mouvement de trésorerie
 			</label>
 			<p class="mt-1 text-xs text-gray-500">
-				À décocher si l’argent est réellement parti : annuler la commande ici ne rappelle pas un
+				À décocher si l'argent est réellement parti : annuler la commande ici ne rappelle pas un
 				virement.
 			</p>
 			<div class="mt-3 flex items-center gap-2">
 				<button
 					class="rounded-lg bg-rose-600 px-4 py-2 text-sm font-medium text-white hover:bg-rose-500"
-					type="submit">Confirmer l’annulation</button
+					type="submit">Confirmer l'annulation</button
 				>
 				<button
 					class="rounded-lg border border-gray-600 px-4 py-2 text-sm text-gray-300 hover:bg-gray-700"
@@ -245,7 +245,7 @@
 			class="mb-4 rounded-lg bg-amber-500/15 px-4 py-3 text-sm text-amber-200 ring-1 ring-amber-500/30"
 		>
 			{unallocated.length} item(s) ne sont imputés sur aucun budget : la commande ne peut pas être passée
-			tant qu’ils n’ont pas de poste de dépense.
+			tant qu'ils n'ont pas de poste de dépense.
 		</p>
 	{/if}
 
@@ -262,8 +262,8 @@
 				{/each}
 			</ul>
 			<p class="mt-3 text-xs text-gray-400">
-				Trois issues : imputer l’item sur un autre budget, le répartir sur plusieurs budgets — les
-				deux depuis l’édition de l’item —, ou porter l’enveloppe au montant nécessaire si elle était
+				Trois issues : imputer l'item sur un autre budget, le répartir sur plusieurs budgets — les
+				deux depuis l'édition de l'item —, ou porter l'enveloppe au montant nécessaire si elle était
 				sous-évaluée.
 			</p>
 			<div class="mt-3 flex flex-wrap items-center gap-2">
@@ -287,7 +287,7 @@
 				>
 					<input name="budget" type="hidden" value={raising} />
 					<label class="text-xs text-gray-300">
-						Nouveau montant de l’enveloppe
+						Nouveau montant de l'enveloppe
 						<input
 							name="amount_ttc"
 							class="mt-1 block w-40 rounded-lg border border-gray-600 bg-gray-700 p-2 text-sm text-white"

@@ -25,7 +25,7 @@ describe('submitReport — transmission de p_anonymous', () => {
 		mocks.rpc.mockResolvedValue({ error: null });
 	});
 
-	it('envoie p_anonymous: false quand l’option est absente', async () => {
+	it("envoie p_anonymous: false quand l'option est absente", async () => {
 		await submitReport('user-1', baseInput);
 
 		expect(mocks.rpc).toHaveBeenCalledWith(

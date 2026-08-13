@@ -70,7 +70,7 @@ describe('forwardToAuth', () => {
 		expect((init.headers as Record<string, string>).cookie).toBe('sid=id.secret');
 	});
 
-	it('n’envoie pas de cookie sans sid et tolère une réponse non-JSON', async () => {
+	it("n'envoie pas de cookie sans sid et tolère une réponse non-JSON", async () => {
 		const fetchFn = vi.fn(() => Promise.resolve(new Response('pas du json', { status: 502 })));
 		const { status, result } = await forwardToAuth(
 			fetchFn,

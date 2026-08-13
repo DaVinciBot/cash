@@ -108,7 +108,7 @@ export const actions: Actions = {
 
 		if (error) {
 			return fail(400, {
-				message: cashErrorMessage(error.code, 'Ce mouvement n’a pas pu être enregistré.')
+				message: cashErrorMessage(error.code, "Ce mouvement n'a pas pu être enregistré.")
 			});
 		}
 		return { saved: 'flow' };
@@ -133,7 +133,7 @@ export const actions: Actions = {
 
 		if (error) {
 			return fail(400, {
-				message: cashErrorMessage(error.code, 'Ce mouvement n’a pas pu être modifié.')
+				message: cashErrorMessage(error.code, "Ce mouvement n'a pas pu être modifié.")
 			});
 		}
 		return { saved: 'flow' };
@@ -157,7 +157,7 @@ export const actions: Actions = {
 		const { error } = await locals.supabase.schema('cash').from('flows').delete().eq('id', id);
 		if (error) {
 			return fail(400, {
-				message: cashErrorMessage(error.code, 'Ce mouvement n’a pas pu être supprimé.')
+				message: cashErrorMessage(error.code, "Ce mouvement n'a pas pu être supprimé.")
 			});
 		}
 
@@ -190,7 +190,7 @@ export const actions: Actions = {
 
 		if (error) {
 			return fail(400, {
-				message: cashErrorMessage(error.code, 'Ce mouvement n’a pas pu être pointé.')
+				message: cashErrorMessage(error.code, "Ce mouvement n'a pas pu être pointé.")
 			});
 		}
 		return { saved: 'flow' };
@@ -225,7 +225,7 @@ export const actions: Actions = {
 			.upload(path, file, { contentType: file.type });
 
 		if (uploadError) {
-			return fail(400, { message: 'Ce justificatif n’a pas pu être déposé.' });
+			return fail(400, { message: "Ce justificatif n'a pas pu être déposé." });
 		}
 
 		const { error } = await locals.supabase
@@ -238,7 +238,7 @@ export const actions: Actions = {
 			// impossible à retrouver, donc on le retire.
 			await locals.supabase.storage.from('proof').remove([path]);
 			return fail(400, {
-				message: cashErrorMessage(error.code, 'Ce justificatif n’a pas pu être rattaché.')
+				message: cashErrorMessage(error.code, "Ce justificatif n'a pas pu être rattaché.")
 			});
 		}
 		return { saved: 'proof' };
@@ -266,7 +266,7 @@ export const actions: Actions = {
 
 		if (error) {
 			return fail(400, {
-				message: cashErrorMessage(error.code, 'Ce justificatif n’a pas pu être supprimé.')
+				message: cashErrorMessage(error.code, "Ce justificatif n'a pas pu être supprimé.")
 			});
 		}
 		if (proof) {

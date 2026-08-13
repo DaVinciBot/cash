@@ -133,7 +133,7 @@ describe('StepUpDialog', () => {
 		expect(mocks.stepUpVerify).toHaveBeenCalledWith({ recovery_code: 'AAAAA-BBBBB' });
 	});
 
-	it('démarre sur le TOTP sans envoi et bascule vers l’e-mail via le menu', async () => {
+	it("démarre sur le TOTP sans envoi et bascule vers l'e-mail via le menu", async () => {
 		mocks.stepUpChallenge
 			.mockResolvedValueOnce({ method: 'totp', methods: ['email', 'totp'], email: null })
 			.mockResolvedValueOnce({
@@ -206,7 +206,7 @@ describe('StepUpDialog', () => {
 		expect(mocks.stepUpVerify).toHaveBeenCalledWith({ password: 'motdepasse' });
 	});
 
-	it('affiche l’erreur du service et laisse la demande ouverte', async () => {
+	it("affiche l'erreur du service et laisse la demande ouverte", async () => {
 		mocks.stepUpVerify.mockRejectedValue(new Error('Vérification échouée.'));
 		const target = mountDialog();
 		void requestStepUp();

@@ -87,10 +87,10 @@
 		href={resolve(`/orders/${String(data.order.id)}` as '/')}>← Commande #{data.order.id}</a
 	>
 
-	<h1 class="mt-3 mb-1 text-2xl font-bold text-white">Modifier l’item</h1>
+	<h1 class="mt-3 mb-1 text-2xl font-bold text-white">Modifier l'item</h1>
 	<p class="mb-6 text-sm text-gray-400">
 		Demandé par {item.requesterName} pour {item.projectName}. Une correction reste possible même
-		après le passage de la commande ; elle est tracée dans l’historique.
+		après le passage de la commande ; elle est tracée dans l'historique.
 	</p>
 
 	{#if form?.message}
@@ -159,8 +159,8 @@
 		<fieldset class="rounded-lg border border-gray-700 bg-gray-800 p-4">
 			<legend class="px-1 text-sm font-semibold text-gray-200">Imputation budgétaire</legend>
 			<p class="mb-3 text-xs text-gray-400">
-				Seules les feuilles actives de l’année scolaire sont proposées. La somme des parts doit
-				égaler le total de l’item.
+				Seules les feuilles actives de l'année scolaire sont proposées. La somme des parts doit
+				égaler le total de l'item.
 			</p>
 
 			{#each lines as line (line.id)}

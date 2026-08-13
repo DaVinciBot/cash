@@ -67,7 +67,7 @@ export const actions: Actions = {
 		const { error } = await locals.supabase.from('projects').insert(parsed.values);
 		if (error) {
 			return fail(400, {
-				message: cashErrorMessage(error.code, 'Ce projet n’a pas pu être créé.')
+				message: cashErrorMessage(error.code, "Ce projet n'a pas pu être créé.")
 			});
 		}
 		return { saved: 'project' };
@@ -87,7 +87,7 @@ export const actions: Actions = {
 		const { error } = await locals.supabase.from('projects').update(parsed.values).eq('id', id);
 		if (error) {
 			return fail(400, {
-				message: cashErrorMessage(error.code, 'Ce projet n’a pas pu être modifié.')
+				message: cashErrorMessage(error.code, "Ce projet n'a pas pu être modifié.")
 			});
 		}
 		return { saved: 'project' };
@@ -115,7 +115,7 @@ export const actions: Actions = {
 
 		if (error) {
 			return fail(400, {
-				message: cashErrorMessage(error.code, 'Ce projet n’a pas pu être archivé.')
+				message: cashErrorMessage(error.code, "Ce projet n'a pas pu être archivé.")
 			});
 		}
 		return { saved: 'project' };
@@ -144,7 +144,7 @@ export const actions: Actions = {
 		const { error } = await locals.supabase.from('projects').delete().eq('id', id);
 		if (error) {
 			return fail(400, {
-				message: cashErrorMessage(error.code, 'Ce projet n’a pas pu être supprimé.')
+				message: cashErrorMessage(error.code, "Ce projet n'a pas pu être supprimé.")
 			});
 		}
 		return { saved: 'project' };

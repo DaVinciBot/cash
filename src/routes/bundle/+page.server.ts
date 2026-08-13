@@ -63,7 +63,7 @@ export const actions: Actions = {
 		if (campuses.size > 1) {
 			return fail(400, {
 				message:
-					'Une commande n’a qu’une destination : ces items relèvent de deux campus différents (CMD-F-45).'
+					"Une commande n'a qu'une destination : ces items relèvent de deux campus différents (CMD-F-45)."
 			});
 		}
 		const years = new Set(chosen.map((i) => i.school_year_id));
@@ -87,7 +87,7 @@ export const actions: Actions = {
 
 		if (createError) {
 			return fail(400, {
-				message: cashErrorMessage(createError.code, 'La commande n’a pas pu être créée.')
+				message: cashErrorMessage(createError.code, "La commande n'a pas pu être créée.")
 			});
 		}
 
@@ -106,7 +106,7 @@ export const actions: Actions = {
 			// effet de bord, aucun item ne la référence.
 			await locals.supabase.schema('cash').from('orders').delete().eq('id', order.id);
 			return fail(400, {
-				message: cashErrorMessage(attachError.code, 'Ces items n’ont pas pu être regroupés.')
+				message: cashErrorMessage(attachError.code, "Ces items n'ont pas pu être regroupés.")
 			});
 		}
 
@@ -168,7 +168,7 @@ export const actions: Actions = {
 
 		if (updateError) {
 			return fail(400, {
-				message: cashErrorMessage(updateError.code, 'Ces items n’ont pas pu être refusés.')
+				message: cashErrorMessage(updateError.code, "Ces items n'ont pas pu être refusés.")
 			});
 		}
 

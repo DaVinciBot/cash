@@ -39,7 +39,7 @@ describe('référentiel de trésorerie (§6.2, §6.3)', () => {
 		expect(countsTowardTreasury('partner_credit')).toBe(false);
 	});
 
-	it('distingue un flux généré d’une saisie', () => {
+	it("distingue un flux généré d'une saisie", () => {
 		expect(isFlowGenerated('auto')).toBe(true);
 		expect(isFlowGenerated('manual')).toBe(false);
 	});
@@ -49,7 +49,7 @@ describe('normalisation des domaines de partenariat (TRESO-F-12)', () => {
 	// `items.domain` est extrait du lien sans sous-domaine ni extension : un
 	// partenariat qui enregistrerait « eu.mouser.com » ne se reconnaîtrait dans
 	// aucun item.
-	it('ramène toutes les formes d’un même marchand à un seul domaine', () => {
+	it("ramène toutes les formes d'un même marchand à un seul domaine", () => {
 		expect(parseDomains('mouser.fr, eu.mouser.com, https://www.mouser.com/catalog')).toEqual([
 			'mouser'
 		]);
@@ -59,7 +59,7 @@ describe('normalisation des domaines de partenariat (TRESO-F-12)', () => {
 		expect(parseDomains('gotronic.fr   rs-france.com,,')).toEqual(['gotronic', 'rs-france']);
 	});
 
-	it('remonte d’un cran sur une extension composée', () => {
+	it("remonte d'un cran sur une extension composée", () => {
 		expect(parseDomains('rs-online.co.uk')).toEqual(['rs-online']);
 		expect(parseDomains('shop.example.com.au')).toEqual(['example']);
 	});

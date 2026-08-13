@@ -50,7 +50,7 @@
 		<div>
 			<h1 class="text-2xl font-bold text-white">Dépenses et recettes</h1>
 			<p class="mt-1 text-sm text-gray-400">
-				Les mouvements de l’exercice. Ceux qui portent un numéro de commande ont été générés au
+				Les mouvements de l'exercice. Ceux qui portent un numéro de commande ont été générés au
 				passage de celle-ci.
 			</p>
 		</div>

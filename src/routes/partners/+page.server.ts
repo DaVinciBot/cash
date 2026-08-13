@@ -46,7 +46,7 @@ export const actions: Actions = {
 		let accountId: number | null = null;
 		if (envelope) {
 			if (!Number.isFinite(opening) || opening < 0) {
-				return fail(400, { message: 'Le montant de l’enveloppe doit être positif.' });
+				return fail(400, { message: "Le montant de l'enveloppe doit être positif." });
 			}
 			const { data: account, error: accountError } = await locals.supabase
 				.schema('cash')
@@ -61,7 +61,7 @@ export const actions: Actions = {
 
 			if (accountError) {
 				return fail(400, {
-					message: cashErrorMessage(accountError.code, 'L’enveloppe n’a pas pu être créée.')
+					message: cashErrorMessage(accountError.code, "L'enveloppe n'a pas pu être créée.")
 				});
 			}
 			accountId = account.id;
@@ -80,7 +80,7 @@ export const actions: Actions = {
 
 		if (error) {
 			return fail(400, {
-				message: cashErrorMessage(error.code, 'Ce partenariat n’a pas pu être créé.')
+				message: cashErrorMessage(error.code, "Ce partenariat n'a pas pu être créé.")
 			});
 		}
 		return { saved: 'partner' };
@@ -108,7 +108,7 @@ export const actions: Actions = {
 
 		if (error) {
 			return fail(400, {
-				message: cashErrorMessage(error.code, 'Ce partenariat n’a pas pu être modifié.')
+				message: cashErrorMessage(error.code, "Ce partenariat n'a pas pu être modifié.")
 			});
 		}
 		return { saved: 'partner' };
@@ -133,7 +133,7 @@ export const actions: Actions = {
 
 		if (error) {
 			return fail(400, {
-				message: cashErrorMessage(error.code, 'Ce partenariat n’a pas pu être archivé.')
+				message: cashErrorMessage(error.code, "Ce partenariat n'a pas pu être archivé.")
 			});
 		}
 		return { saved: 'partner' };

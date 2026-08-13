@@ -26,8 +26,8 @@
 		<div>
 			<h1 class="text-2xl font-bold text-white">Projets</h1>
 			<p class="mt-1 text-sm text-gray-400">
-				Chaque projet désigne un nœud de l’arbre budgétaire, à la profondeur qui lui convient. Le
-				campus du projet sert à résoudre la destination des items qu’on y rattache.
+				Chaque projet désigne un nœud de l'arbre budgétaire, à la profondeur qui lui convient. Le
+				campus du projet sert à résoudre la destination des items qu'on y rattache.
 			</p>
 		</div>
 		<button
@@ -47,7 +47,7 @@
 
 	{#if data.schoolYear}
 		<p class="mb-4 text-xs text-gray-500">
-			Arbre de l’année {data.schoolYear.label}. L’arbre appartient à une année scolaire : le budget
+			Arbre de l'année {data.schoolYear.label}. L'arbre appartient à une année scolaire : le budget
 			visé par un projet est à redésigner à chaque rentrée.
 		</p>
 	{:else}
@@ -190,7 +190,7 @@
 	<p class="mt-8 text-xs text-gray-500">
 		La consommation budgétaire de chaque projet se lit sur <a
 			class="underline hover:text-gray-300"
-			href={resolve('/budgets' as '/')}>l’arbre des budgets</a
+			href={resolve('/budgets' as '/')}>l'arbre des budgets</a
 		>, où elle est calculée nœud par nœud.
 	</p>
 </section>

@@ -23,8 +23,8 @@
 		<div>
 			<h1 class="text-2xl font-bold text-white">Partenariats</h1>
 			<p class="mt-1 text-sm text-gray-400">
-				Les domaines servent à reconnaître le partenaire dans le lien d’un item. Seule une
-				<strong>enveloppe de crédit</strong> se modélise : une remise n’a pas de solde à décompter.
+				Les domaines servent à reconnaître le partenaire dans le lien d'un item. Seule une
+				<strong>enveloppe de crédit</strong> se modélise : une remise n'a pas de solde à décompter.
 			</p>
 		</div>
 		<button
@@ -92,7 +92,7 @@
 			</label>
 			{#if withEnvelope}
 				<label class="mt-2 block text-xs text-gray-300">
-					Montant de l’enveloppe
+					Montant de l'enveloppe
 					<input
 						name="opening_balance"
 						class="mt-1 block w-32 rounded-lg border border-gray-600 bg-gray-700 p-2 text-sm text-white"
@@ -101,8 +101,8 @@
 					/>
 				</label>
 				<p class="mt-1 text-xs text-gray-500">
-					Un compte dédié sera créé. Il n’entre jamais dans le solde de trésorerie : c’est un avoir
-					chez un tiers, pas de l’argent en banque.
+					Un compte dédié sera créé. Il n'entre jamais dans le solde de trésorerie : c'est un avoir
+					chez un tiers, pas de l'argent en banque.
 				</p>
 			{/if}
 			<button

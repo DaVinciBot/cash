@@ -59,7 +59,7 @@ describe('fetchSessions', () => {
 		expect(String(fetchMock.mock.calls[0]?.[0])).toContain('/api/account/sessions');
 	});
 
-	it('remonte le message d’erreur du serveur', async () => {
+	it("remonte le message d'erreur du serveur", async () => {
 		vi.stubGlobal(
 			'fetch',
 			vi.fn().mockResolvedValue(jsonResponse(500, { error: 'Service indisponible' }))
@@ -92,7 +92,7 @@ describe('revokeSession', () => {
 		expect(init.body).toBe(JSON.stringify({ session_id: 'session-a' }));
 	});
 
-	it('remonte l’erreur du service (liste périmée)', async () => {
+	it("remonte l'erreur du service (liste périmée)", async () => {
 		vi.stubGlobal(
 			'fetch',
 			vi.fn().mockResolvedValue(jsonResponse(404, { error: 'Session introuvable' }))
@@ -128,7 +128,7 @@ describe('fetchConnections', () => {
 		]);
 	});
 
-	it('utilise un message de repli sans corps d’erreur', async () => {
+	it("utilise un message de repli sans corps d'erreur", async () => {
 		vi.stubGlobal(
 			'fetch',
 			vi.fn().mockResolvedValue({ ok: false, status: 500, json: () => Promise.reject(new Error()) })

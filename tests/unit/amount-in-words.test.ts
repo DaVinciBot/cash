@@ -31,7 +31,7 @@ describe('montant en toutes lettres', () => {
 		expect(amountInWords(21)).toBe('vingt-et-un euros');
 	});
 
-	it('n’écrit jamais « un mille »', () => {
+	it("n'écrit jamais « un mille »", () => {
 		expect(amountInWords(1000)).toBe('mille euros');
 		expect(amountInWords(2000)).toBe('deux-mille euros');
 		expect(amountInWords(1200)).toBe('mille-deux-cents euros');
@@ -44,7 +44,7 @@ describe('montant en toutes lettres', () => {
 	});
 
 	// Mieux vaut pas de mention qu'une mention fausse.
-	it('refuse ce qui n’est pas un montant positif', () => {
+	it("refuse ce qui n'est pas un montant positif", () => {
 		expect(amountInWords(-1)).toBeNull();
 		expect(amountInWords(Number.NaN)).toBeNull();
 		expect(amountInWords(Number.POSITIVE_INFINITY)).toBeNull();

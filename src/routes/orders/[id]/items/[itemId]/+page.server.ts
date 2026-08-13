@@ -53,7 +53,7 @@ export const actions: Actions = {
 		const quantity = Number(text(form, 'quantity'));
 
 		if (name.length === 0) {
-			return fail(400, { message: 'Le nom de l’item est obligatoire.' });
+			return fail(400, { message: "Le nom de l'item est obligatoire." });
 		}
 		if (!Number.isFinite(unitPrice) || unitPrice < 0) {
 			return fail(400, { message: 'Le prix unitaire doit être un montant positif.' });
@@ -78,13 +78,13 @@ export const actions: Actions = {
 			.filter((line) => Number.isFinite(line.amount) && line.amount > 0);
 
 		if (new Set(lines.map((l) => l.budgetId)).size !== lines.length) {
-			return fail(400, { message: 'Un même budget ne peut apparaître qu’une fois.' });
+			return fail(400, { message: "Un même budget ne peut apparaître qu'une fois." });
 		}
 
 		const allocated = Math.round(lines.reduce((sum, l) => sum + l.amount, 0) * 100) / 100;
 		if (lines.length > 0 && allocated !== totalTtc) {
 			return fail(400, {
-				message: `La somme des imputations (${allocated.toFixed(2)} €) doit égaler le total de l’item (${totalTtc.toFixed(2)} €).`
+				message: `La somme des imputations (${allocated.toFixed(2)} €) doit égaler le total de l'item (${totalTtc.toFixed(2)} €).`
 			});
 		}
 
@@ -104,7 +104,7 @@ export const actions: Actions = {
 
 		if (saveError) {
 			return fail(400, {
-				message: cashErrorMessage(saveError.code, 'Cet item n’a pas pu être modifié.')
+				message: cashErrorMessage(saveError.code, "Cet item n'a pas pu être modifié.")
 			});
 		}
 

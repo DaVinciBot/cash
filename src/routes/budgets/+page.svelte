@@ -27,7 +27,7 @@
 	<header class="mb-6">
 		<h1 class="text-2xl font-bold text-white">Budgets</h1>
 		<p class="mt-1 text-sm text-gray-400">
-			Un arbre autonome, par année scolaire. Seules les feuilles portent un montant ; celui d’un
+			Un arbre autonome, par année scolaire. Seules les feuilles portent un montant ; celui d'un
 			nœud est la somme de ses descendants.
 		</p>
 	</header>

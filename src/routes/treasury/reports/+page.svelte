@@ -41,7 +41,7 @@
 		<h1 class="text-2xl font-bold text-white">Rapports</h1>
 		<p class="mt-1 text-sm text-gray-400">
 			Les flux se lisent par exercice fiscal, les items et les budgets par année scolaire : les deux
-			découpages ne se recouvrent pas, d’où deux sélecteurs.
+			découpages ne se recouvrent pas, d'où deux sélecteurs.
 		</p>
 	</header>
 
@@ -128,9 +128,7 @@
 					<tfoot class="border-t border-gray-600 bg-gray-800/60 text-sm">
 						<tr>
 							<td class="px-4 py-2 font-semibold text-gray-200" colspan="2">Exercice</td>
-							<td class="px-4 py-2 text-right text-emerald-300"
-								>{euro.format(yearTotal.credit)}</td
-							>
+							<td class="px-4 py-2 text-right text-emerald-300">{euro.format(yearTotal.credit)}</td>
 							<td class="px-4 py-2 text-right text-rose-300">{euro.format(yearTotal.debit)}</td>
 							<td class="px-4 py-2 text-right font-semibold text-white" colspan="2"
 								>{euro.format(yearTotal.credit - yearTotal.debit)}</td

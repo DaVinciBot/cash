@@ -57,7 +57,7 @@ export const actions: Actions = {
 			return fail(400, { message: 'Type de compte inconnu.' });
 		}
 		if (!Number.isFinite(opening)) {
-			return fail(400, { message: 'Le solde d’ouverture doit être un montant.' });
+			return fail(400, { message: "Le solde d'ouverture doit être un montant." });
 		}
 
 		const { error } = await locals.supabase
@@ -67,7 +67,7 @@ export const actions: Actions = {
 
 		if (error) {
 			return fail(400, {
-				message: cashErrorMessage(error.code, 'Ce compte n’a pas pu être créé.')
+				message: cashErrorMessage(error.code, "Ce compte n'a pas pu être créé.")
 			});
 		}
 		return { saved: 'account' };
@@ -104,7 +104,7 @@ export const actions: Actions = {
 			return fail(400, {
 				message: cashErrorMessage(
 					error.code,
-					archive ? 'Ce compte n’a pas pu être archivé.' : 'Ce compte n’a pas pu être réactivé.'
+					archive ? "Ce compte n'a pas pu être archivé.' : 'Ce compte n'a pas pu être réactivé."
 				)
 			});
 		}
@@ -142,7 +142,7 @@ export const actions: Actions = {
 
 		if (error) {
 			return fail(400, {
-				message: cashErrorMessage(error.code, 'Cette période n’a pas pu être ouverte.')
+				message: cashErrorMessage(error.code, "Cette période n'a pas pu être ouverte.")
 			});
 		}
 		return { saved: 'period' };
@@ -170,7 +170,7 @@ export const actions: Actions = {
 
 		if (error) {
 			return fail(400, {
-				message: cashErrorMessage(error.code, 'Cette période n’a pas pu être modifiée.')
+				message: cashErrorMessage(error.code, "Cette période n'a pas pu être modifiée.")
 			});
 		}
 		return { saved: 'period' };

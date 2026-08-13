@@ -155,7 +155,7 @@
 			<p
 				class="mb-4 rounded-lg bg-amber-500/15 px-4 py-3 text-sm text-amber-200 ring-1 ring-amber-500/30"
 			>
-				Une commande n’a qu’une destination. Votre sélection mélange deux campus : retirez-en un
+				Une commande n'a qu'une destination. Votre sélection mélange deux campus : retirez-en un
 				avant de créer la commande (CMD-F-45).
 			</p>
 		{/if}

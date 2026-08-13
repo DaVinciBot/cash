@@ -66,7 +66,7 @@ export const actions: Actions = {
 
 		if (error) {
 			return fail(400, {
-				message: cashErrorMessage(error.code, 'Ce budget n’a pas pu être créé.')
+				message: cashErrorMessage(error.code, "Ce budget n'a pas pu être créé.")
 			});
 		}
 		return { saved: 'budget' };
@@ -108,7 +108,7 @@ export const actions: Actions = {
 
 		if (error) {
 			return fail(400, {
-				message: cashErrorMessage(error.code, 'Ce budget n’a pas pu être modifié.')
+				message: cashErrorMessage(error.code, "Ce budget n'a pas pu être modifié.")
 			});
 		}
 		return { saved: 'budget' };
@@ -135,7 +135,7 @@ export const actions: Actions = {
 		const { error: clearError } = await siblings;
 		if (clearError) {
 			return fail(400, {
-				message: cashErrorMessage(clearError.code, 'La feuille par défaut n’a pas pu être changée.')
+				message: cashErrorMessage(clearError.code, "La feuille par défaut n'a pas pu être changée.")
 			});
 		}
 
@@ -147,7 +147,7 @@ export const actions: Actions = {
 
 		if (error) {
 			return fail(400, {
-				message: cashErrorMessage(error.code, 'La feuille par défaut n’a pas pu être changée.')
+				message: cashErrorMessage(error.code, "La feuille par défaut n'a pas pu être changée.")
 			});
 		}
 		return { saved: 'budget' };
@@ -195,7 +195,7 @@ export const actions: Actions = {
 
 		if (error) {
 			return fail(400, {
-				message: cashErrorMessage(error.code, 'Ce budget n’a pas pu être archivé.')
+				message: cashErrorMessage(error.code, "Ce budget n'a pas pu être archivé.")
 			});
 		}
 		return { saved: 'budget', archived: targets.size };
@@ -216,7 +216,7 @@ export const actions: Actions = {
 
 		if (error) {
 			return fail(400, {
-				message: cashErrorMessage(error.code, 'Ce budget n’a pas pu être réactivé.')
+				message: cashErrorMessage(error.code, "Ce budget n'a pas pu être réactivé.")
 			});
 		}
 		return { saved: 'budget' };
@@ -262,14 +262,14 @@ export const actions: Actions = {
 		if ((allocations ?? 0) > 0 || (flows ?? 0) > 0) {
 			return fail(400, {
 				message:
-					'Ce budget porte des dépenses : archivez-le, l’historique et les totaux passés doivent rester intacts.'
+					"Ce budget porte des dépenses : archivez-le, l'historique et les totaux passés doivent rester intacts."
 			});
 		}
 
 		const { error } = await locals.supabase.schema('cash').from('budgets').delete().eq('id', id);
 		if (error) {
 			return fail(400, {
-				message: cashErrorMessage(error.code, 'Ce budget n’a pas pu être supprimé.')
+				message: cashErrorMessage(error.code, "Ce budget n'a pas pu être supprimé.")
 			});
 		}
 		return { saved: 'budget' };

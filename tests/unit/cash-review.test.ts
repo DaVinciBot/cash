@@ -24,7 +24,7 @@ describe('périmètre de la revue CDP (§8)', () => {
 });
 
 describe('motif de refus obligatoire (CMD-F-29, réutilisé en J5)', () => {
-	it('refuse un motif vide ou fait d’espaces', () => {
+	it("refuse un motif vide ou fait d'espaces", () => {
 		expect(refusalReasonError('')).toBeTruthy();
 		expect(refusalReasonError('   ')).toBeTruthy();
 	});
@@ -48,7 +48,7 @@ describe('ouverture de la file aux permissions scopées-projet', () => {
 
 	// La revue est une permission projet : gérée comme une permission globale,
 	// son entrée de menu serait inatteignable pour tout le monde.
-	it('affiche l’entrée de menu à un CDP et la cache aux autres', () => {
+	it("affiche l'entrée de menu à un CDP et la cache aux autres", () => {
 		const pourCdp = filterMenuByPermissions(ADMIN_MENU, cdp).map((entry) => entry.uri);
 		const pourMembre = filterMenuByPermissions(ADMIN_MENU, membre).map((entry) => entry.uri);
 		expect(pourCdp).toContain('/admin/review');

@@ -98,7 +98,7 @@
 		{#if envelopes.length > 0}
 			<div class="mt-4 border-t border-gray-700 pt-3">
 				<p class="mb-2 text-xs text-gray-400">
-					Enveloppes partenaires — avoirs chez un tiers, hors trésorerie de l’association.
+					Enveloppes partenaires — avoirs chez un tiers, hors trésorerie de l'association.
 				</p>
 				<ul class="divide-y divide-gray-700">
 					{#each envelopes as snapshot (snapshot.accountId)}
@@ -207,7 +207,7 @@
 					</select>
 				</label>
 				<label class="text-xs text-gray-300">
-					Solde d’ouverture
+					Solde d'ouverture
 					<input
 						name="opening_balance"
 						class="mt-1 block w-32 rounded-lg border border-gray-600 bg-gray-700 p-2 text-sm text-white"
@@ -271,22 +271,22 @@
 								Archiver « {account.name} » ?
 							</p>
 							<p class="mt-1 text-xs text-gray-400">
-								Il disparaîtra des sélecteurs — saisie d’un mouvement, règlement d’une commande —
+								Il disparaîtra des sélecteurs — saisie d'un mouvement, règlement d'une commande —
 								mais ses {account.flowCount} mouvement(s) restent, et son solde de
 								{euro.format(account.balance)} continue de compter dans
 								{account.countsTowardTreasury ? 'la trésorerie' : 'les enveloppes partenaires'}.
 								{#if account.balance !== 0}
 									<span class="text-amber-300">
-										Ce solde n’est pas nul : si le compte est réellement clos, enregistrez d’abord
+										Ce solde n'est pas nul : si le compte est réellement clos, enregistrez d'abord
 										le mouvement qui le vide.
 									</span>
 								{/if}
-								Réversible : un compte archivé se réactive d’un clic.
+								Réversible : un compte archivé se réactive d'un clic.
 							</p>
 							<div class="mt-3 flex items-center gap-2">
 								<button
 									class="rounded-lg bg-amber-600 px-3 py-1.5 text-xs font-medium text-white hover:bg-amber-500"
-									type="submit">Confirmer l’archivage</button
+									type="submit">Confirmer l'archivage</button
 								>
 								<button
 									class="rounded-lg border border-gray-600 px-3 py-1.5 text-xs text-gray-300 hover:bg-gray-700"
@@ -315,8 +315,8 @@
 		</div>
 
 		<p class="mb-3 text-xs text-gray-500">
-			Deux découpages distincts et volontaires : l’<strong>année scolaire</strong> (1<sup>er</sup>
-			septembre → 31 août) délimite items, commandes et budgets ; l’<strong>exercice fiscal</strong> (année
+			Deux découpages distincts et volontaires : l'<strong>année scolaire</strong> (1<sup>er</sup>
+			septembre → 31 août) délimite items, commandes et budgets ; l'<strong>exercice fiscal</strong> (année
 			civile) délimite les flux et les soldes.
 		</p>
 

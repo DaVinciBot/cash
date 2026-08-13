@@ -49,7 +49,7 @@ describe('SessionCache', () => {
 		expect(cache.getStale('sid', 'secret')).toBeNull();
 	});
 
-	it('purge après l’âge maximal', () => {
+	it("purge après l'âge maximal", () => {
 		vi.useFakeTimers();
 		const cache = new SessionCache<TestSession, string>(TTL, STALE_MAX);
 		cache.set('sid', futureSession(), 'user', 'secret');

@@ -69,7 +69,7 @@ export const actions: Actions = {
 			return fail(400, {
 				message: cashErrorMessage(
 					updateError.code,
-					'Les frais de port n’ont pas pu être enregistrés.'
+					"Les frais de port n'ont pas pu être enregistrés."
 				)
 			});
 		}
@@ -95,7 +95,7 @@ export const actions: Actions = {
 		const orphans = detail?.items.filter((i) => i.allocations.length === 0) ?? [];
 		if (orphans.length > 0) {
 			return fail(400, {
-				message: `Sans budget d’imputation : ${orphans.map((i) => i.name).join(', ')}. Ouvrez chaque item pour lui désigner un poste de dépense.`
+				message: `Sans budget d'imputation : ${orphans.map((i) => i.name).join(', ')}. Ouvrez chaque item pour lui désigner un poste de dépense.`
 			});
 		}
 
@@ -121,7 +121,7 @@ export const actions: Actions = {
 
 			if (passError) {
 				return fail(400, {
-					message: cashErrorMessage(passError.code, 'La commande n’a pas pu être passée.')
+					message: cashErrorMessage(passError.code, "La commande n'a pas pu être passée.")
 				});
 			}
 			return { saved: 'passed' };
@@ -138,7 +138,7 @@ export const actions: Actions = {
 
 		if (updateError) {
 			return fail(400, {
-				message: cashErrorMessage(updateError.code, 'La commande n’a pas pu être passée.'),
+				message: cashErrorMessage(updateError.code, "La commande n'a pas pu être passée."),
 				blocked: updateError.code
 			});
 		}
@@ -166,7 +166,7 @@ export const actions: Actions = {
 
 		if (updateError) {
 			return fail(400, {
-				message: cashErrorMessage(updateError.code, 'La commande n’a pas pu être annulée.')
+				message: cashErrorMessage(updateError.code, "La commande n'a pas pu être annulée.")
 			});
 		}
 
@@ -207,7 +207,7 @@ export const actions: Actions = {
 
 		if (updateError) {
 			return fail(400, {
-				message: cashErrorMessage(updateError.code, 'Cet item n’a pas pu être marqué reçu.')
+				message: cashErrorMessage(updateError.code, "Cet item n'a pas pu être marqué reçu.")
 			});
 		}
 		return { saved: 'received' };
@@ -231,7 +231,7 @@ export const actions: Actions = {
 
 		if (updateError) {
 			return fail(400, {
-				message: cashErrorMessage(updateError.code, 'Cet item n’a pas pu être retiré.')
+				message: cashErrorMessage(updateError.code, "Cet item n'a pas pu être retiré.")
 			});
 		}
 		return { saved: 'detached' };
@@ -265,7 +265,7 @@ export const actions: Actions = {
 
 		if (updateError) {
 			return fail(400, {
-				message: cashErrorMessage(updateError.code, 'Ce budget n’a pas pu être modifié.')
+				message: cashErrorMessage(updateError.code, "Ce budget n'a pas pu être modifié.")
 			});
 		}
 		return { saved: 'budget' };
