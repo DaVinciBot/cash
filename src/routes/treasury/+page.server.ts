@@ -104,7 +104,7 @@ export const actions: Actions = {
 			return fail(400, {
 				message: cashErrorMessage(
 					error.code,
-					archive ? "Ce compte n'a pas pu être archivé.' : 'Ce compte n'a pas pu être réactivé."
+					archive ? "Ce compte n'a pas pu être archivé." : "Ce compte n'a pas pu être réactivé."
 				)
 			});
 		}
