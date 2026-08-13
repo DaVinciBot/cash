@@ -10,7 +10,9 @@ import type { Actions, PageServerLoad } from './$types';
 // (`requested_by = auth.uid() AND state = 'pending_cdp'`) ; l'écran ne fait que
 // la rendre lisible, il ne la redouble pas.
 
-export const load: PageServerLoad = async ({ locals, params }) => {
+export const load: PageServerLoad = async ({ depends, locals, params }) => {
+	depends('cash:item');
+
 	const { user } = await locals.safeGetSession();
 	if (!user?.id) {
 		error(401, 'Session expirée.');

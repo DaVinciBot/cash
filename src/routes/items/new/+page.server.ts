@@ -76,7 +76,9 @@ function parseLines(form: FormData): { lines: CartLine[]; message?: string } {
 	return { lines };
 }
 
-export const load: PageServerLoad = async ({ locals }) => {
+export const load: PageServerLoad = async ({ depends, locals }) => {
+	depends('cash:item-form');
+
 	const { user } = await locals.safeGetSession();
 	if (!user?.id) {
 		error(401, 'Session expirée.');

@@ -26,7 +26,9 @@ function ids(params: { id: string; itemId: string }): { orderId: number; itemId:
 	return { orderId, itemId };
 }
 
-export const load: PageServerLoad = async ({ locals, params }) => {
+export const load: PageServerLoad = async ({ depends, locals, params }) => {
+	depends('cash:order-item');
+
 	const { orderId, itemId } = ids(params);
 
 	const order = await orderDetail(locals.supabase, orderId);

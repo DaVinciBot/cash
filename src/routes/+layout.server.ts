@@ -79,7 +79,9 @@ function resolveEffectivePermissions(
 	return [...set];
 }
 
-export const load: LayoutServerLoad = async ({ locals, cookies, url }) => {
+export const load: LayoutServerLoad = async ({ locals, cookies, depends, url }) => {
+	depends('cash:session');
+
 	const { safeGetSession, supabase } = locals;
 	const { session, user } = await safeGetSession();
 
