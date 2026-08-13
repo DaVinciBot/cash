@@ -9,8 +9,15 @@ WORKDIR /app
 
 FROM base AS deps
 
+# Le navigateur du rendu PDF est installé DANS /app et non dans le cache du
+# compte : c'est la seule façon de le copier tel quel dans l'image finale.
+# `chromium-headless-shell` et non `chromium` : ~115 Mo au lieu de ~170, et il
+# n'a de toute façon aucune interface à afficher.
+ENV PLAYWRIGHT_BROWSERS_PATH=/app/.playwright
+
 COPY package.json pnpm-lock.yaml .npmrc pnpm-workspace.yaml ./
-RUN --mount=type=secret,id=npm_token,env=NPM_TOKEN pnpm install --frozen-lockfile --prod
+RUN --mount=type=secret,id=npm_token,env=NPM_TOKEN pnpm install --frozen-lockfile --prod \
+    && node node_modules/playwright/cli.js install chromium-headless-shell
 
 FROM base AS build
 
@@ -30,16 +37,27 @@ RUN apt-get update \
     && apt-get upgrade -y --no-install-recommends \
     && rm -rf /var/lib/apt/lists/*
 
-# Runtime = `node build` uniquement : retirer npm/npx/corepack supprime leur
-# outillage vendored (ex. tar CVE-2026-59873) du périmètre des scans d'image.
-RUN rm -rf /usr/local/lib/node_modules/npm /usr/local/lib/node_modules/corepack \
-    /usr/local/bin/npm /usr/local/bin/npx /usr/local/bin/corepack
-
 WORKDIR /app
+
+ENV PLAYWRIGHT_BROWSERS_PATH=/app/.playwright
 
 COPY package.json ./
 COPY --from=deps /app/node_modules ./node_modules
+COPY --from=deps /app/.playwright ./.playwright
 COPY --from=build /app/build ./build
+
+# Bibliothèques système dont Chromium a besoin. La liste est demandée à
+# Playwright lui-même plutôt qu'écrite en dur : elle change d'une version de
+# Debian à l'autre, et une bibliothèque manquante ne se voit qu'au premier PDF.
+RUN apt-get update \
+    && node node_modules/playwright/cli.js install-deps chromium-headless-shell \
+    && rm -rf /var/lib/apt/lists/*
+
+# Runtime = `node build` uniquement : retirer npm/npx/corepack supprime leur
+# outillage vendored (ex. tar CVE-2026-59873) du périmètre des scans d'image.
+# Ce retrait vient APRÈS l'installation des bibliothèques, qui a besoin d'apt.
+RUN rm -rf /usr/local/lib/node_modules/npm /usr/local/lib/node_modules/corepack \
+    /usr/local/bin/npm /usr/local/bin/npx /usr/local/bin/corepack
 
 EXPOSE 3000
 

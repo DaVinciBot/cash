@@ -11,10 +11,17 @@
 	let { data }: { data: PageData } = $props();
 
 	const doc = $derived(data.document);
+
+	const fileTitle = $derived(
+		`${DOCUMENT_KIND_LABELS[doc.kind]} ${doc.number} — ${doc.recipientName}`
+			.replace(/[\\/:*?"<>|]/g, '-')
+			.slice(0, 120)
+			.trim()
+	);
 </script>
 
 <svelte:head>
-	<title>{doc.number} — {DOCUMENT_KIND_LABELS[doc.kind]}</title>
+	<title>{fileTitle}</title>
 </svelte:head>
 
 <!-- Barre d'action : elle n'existe qu'à l'écran, jamais sur le papier. -->
@@ -22,12 +29,18 @@
 	<a class="text-sm text-gray-400 hover:text-gray-200" href={resolve('/treasury/documents' as '/')}
 		>← Documents</a
 	>
+	<!-- Le téléchargement passe par le serveur : lui seul peut imposer le nom du fichier.
+       Le bouton d'impression reste pour qui veut sortir la pièce sur papier. -->
 	<button
-		class="bg-primary-600 hover:bg-primary-800 ml-auto rounded-lg px-4 py-2 text-sm font-medium text-white"
+		class="ml-auto rounded-lg border border-gray-600 px-4 py-2 text-sm text-gray-200 hover:bg-gray-700"
 		onclick={() => {
 			window.print();
 		}}
-		type="button">Imprimer / Enregistrer en PDF</button
+		type="button">Imprimer</button
+	>
+	<a
+		class="bg-primary-600 hover:bg-primary-800 rounded-lg px-4 py-2 text-sm font-medium text-white"
+		href={resolve(`/treasury/documents/${String(doc.id)}/pdf` as '/')}>Télécharger le PDF</a
 	>
 </div>
 
