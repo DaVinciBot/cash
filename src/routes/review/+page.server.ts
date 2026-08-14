@@ -1,6 +1,7 @@
+import { rejection } from '$lib/server/audit';
 import { projectsWithPermission, reviewQueue } from '$lib/server/cash';
 import { text, textAll } from '$lib/server/form';
-import { cashErrorMessage, refusalReasonError } from '@davincibot/lib';
+import { refusalReasonError } from '@davincibot/lib';
 import { error, fail } from '@sveltejs/kit';
 import type { Actions, PageServerLoad } from './$types';
 
@@ -64,7 +65,14 @@ export const actions: Actions = {
 
 		if (updateError) {
 			return fail(400, {
-				message: cashErrorMessage(updateError.code, "Ces items n'ont pas pu être validés.")
+				message: await rejection(
+					locals.supabase,
+					updateError,
+					"Ces items n'ont pas pu être validés.",
+					{
+						entityType: 'item'
+					}
+				)
 			});
 		}
 
@@ -106,7 +114,14 @@ export const actions: Actions = {
 
 		if (updateError) {
 			return fail(400, {
-				message: cashErrorMessage(updateError.code, "Ces items n'ont pas pu être refusés."),
+				message: await rejection(
+					locals.supabase,
+					updateError,
+					"Ces items n'ont pas pu être refusés.",
+					{
+						entityType: 'item'
+					}
+				),
 				reason,
 				refusing: ids
 			});

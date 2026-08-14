@@ -1,6 +1,6 @@
+import { rejection } from '$lib/server/audit';
 import { text } from '$lib/server/form';
 import { organization } from '$lib/server/reports';
-import { cashErrorMessage } from '@davincibot/lib';
 import { fail } from '@sveltejs/kit';
 import type { Actions, PageServerLoad } from './$types';
 
@@ -47,9 +47,13 @@ export const actions: Actions = {
 
 		if (error) {
 			return fail(400, {
-				message: cashErrorMessage(
-					error.code,
-					"L'identité de l'émetteur n'a pas pu être enregistrée."
+				message: await rejection(
+					locals.supabase,
+					error,
+					"L'identité de l'émetteur n'a pas pu être enregistrée.",
+					{
+						entityType: 'organization'
+					}
 				)
 			});
 		}

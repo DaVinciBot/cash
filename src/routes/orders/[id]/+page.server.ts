@@ -1,7 +1,8 @@
+import { entityHistory, rejection } from '$lib/server/audit';
 import { decimal, text, textAll } from '$lib/server/form';
 import { budgetLeaves, campusAddress, orderDetail } from '$lib/server/orders';
 import { accounts } from '$lib/server/treasury';
-import { cashErrorMessage, SHIPPING_ALLOCATIONS, type ShippingAllocation } from '@davincibot/lib';
+import { SHIPPING_ALLOCATIONS, type ShippingAllocation } from '@davincibot/lib';
 import { error, fail } from '@sveltejs/kit';
 import type { Actions, PageServerLoad } from './$types';
 
@@ -27,17 +28,19 @@ export const load: PageServerLoad = async ({ locals, params, depends }) => {
 		error(404, 'Commande introuvable.');
 	}
 
-	const [{ leaves }, address, accountRows] = await Promise.all([
+	const [{ leaves }, address, accountRows, history] = await Promise.all([
 		budgetLeaves(locals.supabase, order.schoolYearId),
 		order.campus ? campusAddress(locals.supabase, order.campus) : Promise.resolve(null),
-		accounts(locals.supabase)
+		accounts(locals.supabase),
+		entityHistory(locals.supabase, 'order', id)
 	]);
 
 	return {
 		order,
 		leaves,
 		address,
-		accounts: accountRows.filter((a) => !a.archivedAt)
+		accounts: accountRows.filter((a) => !a.archivedAt),
+		history
 	};
 };
 
@@ -67,9 +70,13 @@ export const actions: Actions = {
 
 		if (updateError) {
 			return fail(400, {
-				message: cashErrorMessage(
-					updateError.code,
-					"Les frais de port n'ont pas pu être enregistrés."
+				message: await rejection(
+					locals.supabase,
+					updateError,
+					"Les frais de port n'ont pas pu être enregistrés.",
+					{
+						entityType: 'order'
+					}
 				)
 			});
 		}
@@ -121,7 +128,14 @@ export const actions: Actions = {
 
 			if (passError) {
 				return fail(400, {
-					message: cashErrorMessage(passError.code, "La commande n'a pas pu être passée.")
+					message: await rejection(
+						locals.supabase,
+						passError,
+						"La commande n'a pas pu être passée.",
+						{
+							entityType: 'order'
+						}
+					)
 				});
 			}
 			return { saved: 'passed' };
@@ -138,7 +152,14 @@ export const actions: Actions = {
 
 		if (updateError) {
 			return fail(400, {
-				message: cashErrorMessage(updateError.code, "La commande n'a pas pu être passée."),
+				message: await rejection(
+					locals.supabase,
+					updateError,
+					"La commande n'a pas pu être passée.",
+					{
+						entityType: 'order'
+					}
+				),
 				blocked: updateError.code
 			});
 		}
@@ -166,7 +187,14 @@ export const actions: Actions = {
 
 		if (updateError) {
 			return fail(400, {
-				message: cashErrorMessage(updateError.code, "La commande n'a pas pu être annulée.")
+				message: await rejection(
+					locals.supabase,
+					updateError,
+					"La commande n'a pas pu être annulée.",
+					{
+						entityType: 'order'
+					}
+				)
 			});
 		}
 
@@ -177,9 +205,13 @@ export const actions: Actions = {
 
 			if (reverseError) {
 				return fail(400, {
-					message: cashErrorMessage(
-						reverseError.code,
-						'La commande est annulée, mais la contrepassation a échoué : vérifiez les mouvements.'
+					message: await rejection(
+						locals.supabase,
+						reverseError,
+						'La commande est annulée, mais la contrepassation a échoué : vérifiez les mouvements.',
+						{
+							entityType: 'order'
+						}
 					)
 				});
 			}
@@ -207,7 +239,14 @@ export const actions: Actions = {
 
 		if (updateError) {
 			return fail(400, {
-				message: cashErrorMessage(updateError.code, "Cet item n'a pas pu être marqué reçu.")
+				message: await rejection(
+					locals.supabase,
+					updateError,
+					"Cet item n'a pas pu être marqué reçu.",
+					{
+						entityType: 'order'
+					}
+				)
 			});
 		}
 		return { saved: 'received' };
@@ -231,7 +270,9 @@ export const actions: Actions = {
 
 		if (updateError) {
 			return fail(400, {
-				message: cashErrorMessage(updateError.code, "Cet item n'a pas pu être retiré.")
+				message: await rejection(locals.supabase, updateError, "Cet item n'a pas pu être retiré.", {
+					entityType: 'order'
+				})
 			});
 		}
 		return { saved: 'detached' };
@@ -265,7 +306,14 @@ export const actions: Actions = {
 
 		if (updateError) {
 			return fail(400, {
-				message: cashErrorMessage(updateError.code, "Ce budget n'a pas pu être modifié.")
+				message: await rejection(
+					locals.supabase,
+					updateError,
+					"Ce budget n'a pas pu être modifié.",
+					{
+						entityType: 'order'
+					}
+				)
 			});
 		}
 		return { saved: 'budget' };

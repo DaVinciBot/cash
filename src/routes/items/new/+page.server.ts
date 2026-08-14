@@ -1,4 +1,5 @@
 import { resolve } from '$app/paths';
+import { rejection } from '$lib/server/audit';
 import { budgetPressure, currentSchoolYear, memberProjects, resolveCampus } from '$lib/server/cash';
 import { jsonArray, text, textAll } from '$lib/server/form';
 import { cashErrorMessage, type Campus, type ItemTag } from '@davincibot/lib';
@@ -209,7 +210,14 @@ export const actions: Actions = {
 
 		if (insertError) {
 			return fail(400, {
-				message: cashErrorMessage(insertError.code, "Ces composants n'ont pas pu être enregistrés.")
+				message: await rejection(
+					locals.supabase,
+					insertError,
+					"Ces composants n'ont pas pu être enregistrés.",
+					{
+						entityType: 'item'
+					}
+				)
 			});
 		}
 

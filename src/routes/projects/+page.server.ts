@@ -1,7 +1,8 @@
+import { rejection } from '$lib/server/audit';
 import { currentSchoolYear } from '$lib/server/cash';
 import { text } from '$lib/server/form';
 import { budgetTree, projectList } from '$lib/server/treasury';
-import { CAMPUS_BADGES, cashErrorMessage, type Campus } from '@davincibot/lib';
+import { CAMPUS_BADGES, type Campus } from '@davincibot/lib';
 import { fail } from '@sveltejs/kit';
 import type { Actions, PageServerLoad } from './$types';
 
@@ -67,7 +68,9 @@ export const actions: Actions = {
 		const { error } = await locals.supabase.from('projects').insert(parsed.values);
 		if (error) {
 			return fail(400, {
-				message: cashErrorMessage(error.code, "Ce projet n'a pas pu être créé.")
+				message: await rejection(locals.supabase, error, "Ce projet n'a pas pu être créé.", {
+					entityType: 'project'
+				})
 			});
 		}
 		return { saved: 'project' };
@@ -87,7 +90,9 @@ export const actions: Actions = {
 		const { error } = await locals.supabase.from('projects').update(parsed.values).eq('id', id);
 		if (error) {
 			return fail(400, {
-				message: cashErrorMessage(error.code, "Ce projet n'a pas pu être modifié.")
+				message: await rejection(locals.supabase, error, "Ce projet n'a pas pu être modifié.", {
+					entityType: 'project'
+				})
 			});
 		}
 		return { saved: 'project' };
@@ -115,7 +120,9 @@ export const actions: Actions = {
 
 		if (error) {
 			return fail(400, {
-				message: cashErrorMessage(error.code, "Ce projet n'a pas pu être archivé.")
+				message: await rejection(locals.supabase, error, "Ce projet n'a pas pu être archivé.", {
+					entityType: 'project'
+				})
 			});
 		}
 		return { saved: 'project' };
@@ -144,7 +151,9 @@ export const actions: Actions = {
 		const { error } = await locals.supabase.from('projects').delete().eq('id', id);
 		if (error) {
 			return fail(400, {
-				message: cashErrorMessage(error.code, "Ce projet n'a pas pu être supprimé.")
+				message: await rejection(locals.supabase, error, "Ce projet n'a pas pu être supprimé.", {
+					entityType: 'project'
+				})
 			});
 		}
 		return { saved: 'project' };

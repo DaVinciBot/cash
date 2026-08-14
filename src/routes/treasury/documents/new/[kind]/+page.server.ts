@@ -1,13 +1,9 @@
 import { resolve } from '$app/paths';
+import { rejection } from '$lib/server/audit';
 import { decimal, text, textAll } from '$lib/server/form';
 import { missingIssuerFields, organization } from '$lib/server/reports';
 import { flowList, periods } from '$lib/server/treasury';
-import {
-	cashErrorMessage,
-	DOCUMENT_KINDS,
-	documentFollowsFlow,
-	type DocumentKind
-} from '@davincibot/lib';
+import { DOCUMENT_KINDS, documentFollowsFlow, type DocumentKind } from '@davincibot/lib';
 import { error, fail, redirect } from '@sveltejs/kit';
 import type { Actions, PageServerLoad } from './$types';
 
@@ -128,9 +124,13 @@ export const actions: Actions = {
 
 		if (numberError || !number) {
 			return fail(400, {
-				message: cashErrorMessage(
-					numberError?.code,
-					"Le numéro du document n'a pas pu être attribué."
+				message: await rejection(
+					locals.supabase,
+					numberError,
+					"Le numéro du document n'a pas pu être attribué.",
+					{
+						entityType: 'generated_document'
+					}
 				)
 			});
 		}
@@ -166,7 +166,14 @@ export const actions: Actions = {
 		// d'échec est `insertError`.
 		if (insertError) {
 			return fail(400, {
-				message: cashErrorMessage(insertError.code, "Ce document n'a pas pu être émis.")
+				message: await rejection(
+					locals.supabase,
+					insertError,
+					"Ce document n'a pas pu être émis.",
+					{
+						entityType: 'generated_document'
+					}
+				)
 			});
 		}
 

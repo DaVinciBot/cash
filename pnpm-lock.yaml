@@ -9,14 +9,14 @@ importers:
   .:
     dependencies:
       '@davincibot/components':
-        specifier: ^4.1.0
-        version: 4.1.0(@davincibot/database-types@3.3.1)(@davincibot/lib@3.3.0(@davincibot/database-types@3.3.1)(@supabase/ssr@0.12.0(@supabase/supabase-js@2.112.2))(@supabase/supabase-js@2.112.2)(@sveltejs/kit@2.65.2(@sveltejs/vite-plugin-svelte@7.1.2(svelte@5.56.3(@typescript-eslint/types@8.61.1))(vite@8.0.16(@types/node@25.9.3)(jiti@2.7.0)))(svelte@5.56.3(@typescript-eslint/types@8.61.1))(typescript@6.0.3)(vite@8.0.16(@types/node@25.9.3)(jiti@2.7.0)))(svelte@5.56.3(@typescript-eslint/types@8.61.1)))(@lucide/svelte@1.31.0(svelte@5.56.3(@typescript-eslint/types@8.61.1)))(@supabase/supabase-js@2.112.2)(@sveltejs/kit@2.65.2(@sveltejs/vite-plugin-svelte@7.1.2(svelte@5.56.3(@typescript-eslint/types@8.61.1))(vite@8.0.16(@types/node@25.9.3)(jiti@2.7.0)))(svelte@5.56.3(@typescript-eslint/types@8.61.1))(typescript@6.0.3)(vite@8.0.16(@types/node@25.9.3)(jiti@2.7.0)))(svelte@5.56.3(@typescript-eslint/types@8.61.1))
+        specifier: ^5.0.1
+        version: 5.0.1(@davincibot/database-types@3.4.0)(@davincibot/lib@3.5.0(@davincibot/database-types@3.4.0)(@supabase/ssr@0.12.0(@supabase/supabase-js@2.112.2))(@supabase/supabase-js@2.112.2)(@sveltejs/kit@2.65.2(@sveltejs/vite-plugin-svelte@7.1.2(svelte@5.56.3(@typescript-eslint/types@8.61.1))(vite@8.0.16(@types/node@25.9.3)(jiti@2.7.0)))(svelte@5.56.3(@typescript-eslint/types@8.61.1))(typescript@6.0.3)(vite@8.0.16(@types/node@25.9.3)(jiti@2.7.0)))(svelte@5.56.3(@typescript-eslint/types@8.61.1)))(@lucide/svelte@1.31.0(svelte@5.56.3(@typescript-eslint/types@8.61.1)))(@supabase/supabase-js@2.112.2)(@sveltejs/kit@2.65.2(@sveltejs/vite-plugin-svelte@7.1.2(svelte@5.56.3(@typescript-eslint/types@8.61.1))(vite@8.0.16(@types/node@25.9.3)(jiti@2.7.0)))(svelte@5.56.3(@typescript-eslint/types@8.61.1))(typescript@6.0.3)(vite@8.0.16(@types/node@25.9.3)(jiti@2.7.0)))(svelte@5.56.3(@typescript-eslint/types@8.61.1))
       '@davincibot/database-types':
         specifier: ^3.3.1
-        version: 3.3.1
+        version: 3.4.0
       '@davincibot/lib':
-        specifier: ^3.3.0
-        version: 3.3.0(@davincibot/database-types@3.3.1)(@supabase/ssr@0.12.0(@supabase/supabase-js@2.112.2))(@supabase/supabase-js@2.112.2)(@sveltejs/kit@2.65.2(@sveltejs/vite-plugin-svelte@7.1.2(svelte@5.56.3(@typescript-eslint/types@8.61.1))(vite@8.0.16(@types/node@25.9.3)(jiti@2.7.0)))(svelte@5.56.3(@typescript-eslint/types@8.61.1))(typescript@6.0.3)(vite@8.0.16(@types/node@25.9.3)(jiti@2.7.0)))(svelte@5.56.3(@typescript-eslint/types@8.61.1))
+        specifier: ^3.5.0
+        version: 3.5.0(@davincibot/database-types@3.4.0)(@supabase/ssr@0.12.0(@supabase/supabase-js@2.112.2))(@supabase/supabase-js@2.112.2)(@sveltejs/kit@2.65.2(@sveltejs/vite-plugin-svelte@7.1.2(svelte@5.56.3(@typescript-eslint/types@8.61.1))(vite@8.0.16(@types/node@25.9.3)(jiti@2.7.0)))(svelte@5.56.3(@typescript-eslint/types@8.61.1))(typescript@6.0.3)(vite@8.0.16(@types/node@25.9.3)(jiti@2.7.0)))(svelte@5.56.3(@typescript-eslint/types@8.61.1))
       '@lucide/svelte':
         specifier: ^1.31.0
         version: 1.31.0(svelte@5.56.3(@typescript-eslint/types@8.61.1))
@@ -244,11 +244,11 @@ packages:
     resolution: {integrity: sha512-QxULHAm7cNu72w97JUNCBFODFaXpbDg+dP8b/oWFAZ2MTRppA3U00Y2L1HqaS4J6yBqxwa/Y3nMBaxVKbB/NsA==}
     engines: {node: '>=20.19.0'}
 
-  '@davincibot/components@4.1.0':
-    resolution: {integrity: sha512-6H09oaY296s/k6JpGehyXrY///LU7olIT0K2PAftA6b7zIGhBxtW6nDYUErDwHZZrwht1nYREKuYlEBgfojrEg==, tarball: https://npm.pkg.github.com/download/@davincibot/components/4.1.0/ec63fcf062dce39a14c51fcd986d471410eb81b2}
+  '@davincibot/components@5.0.1':
+    resolution: {integrity: sha512-icf4VLnZMTy5SnUiLYubSjhGTUVCwlAPVZfe64QWOV1j/UNEkm5giPWHzp0Vi7WMyyXdvJtKapmv1ii8ZEpsOw==, tarball: https://npm.pkg.github.com/download/@davincibot/components/5.0.1/2600febc2fb98a06229dfe9b998da32b037bab8e}
     peerDependencies:
-      '@davincibot/database-types': ^3.2.0
-      '@davincibot/lib': ^3.3.0
+      '@davincibot/database-types': ^3.3.1
+      '@davincibot/lib': ^3.5.0
       '@lucide/svelte': ^1.17.0
       '@supabase/supabase-js': ^2.0.0
       '@sveltejs/kit': ^2.0.0
@@ -264,13 +264,13 @@ packages:
       globals: '>=15'
       typescript-eslint: '>=8'
 
-  '@davincibot/database-types@3.3.1':
-    resolution: {integrity: sha512-zjkBA2WrxUiUXLYsc+zy32FFdBGNII47RPpUZnqn6bMeR6DRQ1Snj5puv7LQ4ObuN96q+Okem7X4T+R8AWtojQ==, tarball: https://npm.pkg.github.com/download/@davincibot/database-types/3.3.1/cd8f930c573a1d56267503685282bdc2ca1d96ce}
+  '@davincibot/database-types@3.4.0':
+    resolution: {integrity: sha512-MHJUFBv9doPcrCpgzVBiTuISRQKr0FHf58lZVGwCu856NYvC3O4NA4lkcEUorUAJBMRReiLYkV4Dah3JbFXmpg==, tarball: https://npm.pkg.github.com/download/@davincibot/database-types/3.4.0/849cc6d8792390534c7ab96b6f449e46e9133856}
 
-  '@davincibot/lib@3.3.0':
-    resolution: {integrity: sha512-NeeUAh9yxDZ6qKZnkSxeVGIHhQoF2VxYkYyloeBNm05EHfSemBJjNPt2d+Uv3ZYycaXGlBdggoJ+P0Mx0519mQ==, tarball: https://npm.pkg.github.com/download/@davincibot/lib/3.3.0/3fbe148749a141bba7c17d8519ac1edbd91ce9dc}
+  '@davincibot/lib@3.5.0':
+    resolution: {integrity: sha512-KpnxEZasrU7Qau8EZCX7NOM+HUcxpNOODGrK1FyS8U5V9Y5qpeqnDfJ2emX7Q/AjzbRwDJ3yH8Wwh1Oyg0v7Hw==, tarball: https://npm.pkg.github.com/download/@davincibot/lib/3.5.0/2ccd5349ac966b7182363abecd3b7a28b07a3309}
     peerDependencies:
-      '@davincibot/database-types': ^3.2.0
+      '@davincibot/database-types': ^3.3.1
       '@supabase/ssr': ^0.12.0
       '@supabase/supabase-js': ^2.0.0
       '@sveltejs/kit': ^2.0.0
@@ -2668,10 +2668,10 @@ snapshots:
 
   '@csstools/css-tokenizer@4.0.0': {}
 
-  '@davincibot/components@4.1.0(@davincibot/database-types@3.3.1)(@davincibot/lib@3.3.0(@davincibot/database-types@3.3.1)(@supabase/ssr@0.12.0(@supabase/supabase-js@2.112.2))(@supabase/supabase-js@2.112.2)(@sveltejs/kit@2.65.2(@sveltejs/vite-plugin-svelte@7.1.2(svelte@5.56.3(@typescript-eslint/types@8.61.1))(vite@8.0.16(@types/node@25.9.3)(jiti@2.7.0)))(svelte@5.56.3(@typescript-eslint/types@8.61.1))(typescript@6.0.3)(vite@8.0.16(@types/node@25.9.3)(jiti@2.7.0)))(svelte@5.56.3(@typescript-eslint/types@8.61.1)))(@lucide/svelte@1.31.0(svelte@5.56.3(@typescript-eslint/types@8.61.1)))(@supabase/supabase-js@2.112.2)(@sveltejs/kit@2.65.2(@sveltejs/vite-plugin-svelte@7.1.2(svelte@5.56.3(@typescript-eslint/types@8.61.1))(vite@8.0.16(@types/node@25.9.3)(jiti@2.7.0)))(svelte@5.56.3(@typescript-eslint/types@8.61.1))(typescript@6.0.3)(vite@8.0.16(@types/node@25.9.3)(jiti@2.7.0)))(svelte@5.56.3(@typescript-eslint/types@8.61.1))':
+  '@davincibot/components@5.0.1(@davincibot/database-types@3.4.0)(@davincibot/lib@3.5.0(@davincibot/database-types@3.4.0)(@supabase/ssr@0.12.0(@supabase/supabase-js@2.112.2))(@supabase/supabase-js@2.112.2)(@sveltejs/kit@2.65.2(@sveltejs/vite-plugin-svelte@7.1.2(svelte@5.56.3(@typescript-eslint/types@8.61.1))(vite@8.0.16(@types/node@25.9.3)(jiti@2.7.0)))(svelte@5.56.3(@typescript-eslint/types@8.61.1))(typescript@6.0.3)(vite@8.0.16(@types/node@25.9.3)(jiti@2.7.0)))(svelte@5.56.3(@typescript-eslint/types@8.61.1)))(@lucide/svelte@1.31.0(svelte@5.56.3(@typescript-eslint/types@8.61.1)))(@supabase/supabase-js@2.112.2)(@sveltejs/kit@2.65.2(@sveltejs/vite-plugin-svelte@7.1.2(svelte@5.56.3(@typescript-eslint/types@8.61.1))(vite@8.0.16(@types/node@25.9.3)(jiti@2.7.0)))(svelte@5.56.3(@typescript-eslint/types@8.61.1))(typescript@6.0.3)(vite@8.0.16(@types/node@25.9.3)(jiti@2.7.0)))(svelte@5.56.3(@typescript-eslint/types@8.61.1))':
     dependencies:
-      '@davincibot/database-types': 3.3.1
-      '@davincibot/lib': 3.3.0(@davincibot/database-types@3.3.1)(@supabase/ssr@0.12.0(@supabase/supabase-js@2.112.2))(@supabase/supabase-js@2.112.2)(@sveltejs/kit@2.65.2(@sveltejs/vite-plugin-svelte@7.1.2(svelte@5.56.3(@typescript-eslint/types@8.61.1))(vite@8.0.16(@types/node@25.9.3)(jiti@2.7.0)))(svelte@5.56.3(@typescript-eslint/types@8.61.1))(typescript@6.0.3)(vite@8.0.16(@types/node@25.9.3)(jiti@2.7.0)))(svelte@5.56.3(@typescript-eslint/types@8.61.1))
+      '@davincibot/database-types': 3.4.0
+      '@davincibot/lib': 3.5.0(@davincibot/database-types@3.4.0)(@supabase/ssr@0.12.0(@supabase/supabase-js@2.112.2))(@supabase/supabase-js@2.112.2)(@sveltejs/kit@2.65.2(@sveltejs/vite-plugin-svelte@7.1.2(svelte@5.56.3(@typescript-eslint/types@8.61.1))(vite@8.0.16(@types/node@25.9.3)(jiti@2.7.0)))(svelte@5.56.3(@typescript-eslint/types@8.61.1))(typescript@6.0.3)(vite@8.0.16(@types/node@25.9.3)(jiti@2.7.0)))(svelte@5.56.3(@typescript-eslint/types@8.61.1))
       '@lucide/svelte': 1.31.0(svelte@5.56.3(@typescript-eslint/types@8.61.1))
       '@simplewebauthn/browser': 13.3.0
       '@supabase/supabase-js': 2.112.2
@@ -2688,11 +2688,11 @@ snapshots:
       globals: 17.6.0
       typescript-eslint: 8.61.1(eslint@10.5.0(jiti@2.7.0))(typescript@6.0.3)
 
-  '@davincibot/database-types@3.3.1': {}
+  '@davincibot/database-types@3.4.0': {}
 
-  '@davincibot/lib@3.3.0(@davincibot/database-types@3.3.1)(@supabase/ssr@0.12.0(@supabase/supabase-js@2.112.2))(@supabase/supabase-js@2.112.2)(@sveltejs/kit@2.65.2(@sveltejs/vite-plugin-svelte@7.1.2(svelte@5.56.3(@typescript-eslint/types@8.61.1))(vite@8.0.16(@types/node@25.9.3)(jiti@2.7.0)))(svelte@5.56.3(@typescript-eslint/types@8.61.1))(typescript@6.0.3)(vite@8.0.16(@types/node@25.9.3)(jiti@2.7.0)))(svelte@5.56.3(@typescript-eslint/types@8.61.1))':
+  '@davincibot/lib@3.5.0(@davincibot/database-types@3.4.0)(@supabase/ssr@0.12.0(@supabase/supabase-js@2.112.2))(@supabase/supabase-js@2.112.2)(@sveltejs/kit@2.65.2(@sveltejs/vite-plugin-svelte@7.1.2(svelte@5.56.3(@typescript-eslint/types@8.61.1))(vite@8.0.16(@types/node@25.9.3)(jiti@2.7.0)))(svelte@5.56.3(@typescript-eslint/types@8.61.1))(typescript@6.0.3)(vite@8.0.16(@types/node@25.9.3)(jiti@2.7.0)))(svelte@5.56.3(@typescript-eslint/types@8.61.1))':
     dependencies:
-      '@davincibot/database-types': 3.3.1
+      '@davincibot/database-types': 3.4.0
       '@simplewebauthn/browser': 13.3.0
       '@simplewebauthn/server': 13.3.2
       '@supabase/ssr': 0.12.0(@supabase/supabase-js@2.112.2)

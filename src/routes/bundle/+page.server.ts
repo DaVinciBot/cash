@@ -1,8 +1,9 @@
 import { resolve } from '$app/paths';
+import { rejection } from '$lib/server/audit';
 import { currentSchoolYear } from '$lib/server/cash';
 import { text, textAll } from '$lib/server/form';
 import { budgetLeaves, bundlingQueue, defaultLeafFor } from '$lib/server/orders';
-import { cashErrorMessage, refusalReasonError } from '@davincibot/lib';
+import { refusalReasonError } from '@davincibot/lib';
 import { error, fail, redirect } from '@sveltejs/kit';
 import type { Actions, PageServerLoad } from './$types';
 
@@ -87,7 +88,14 @@ export const actions: Actions = {
 
 		if (createError) {
 			return fail(400, {
-				message: cashErrorMessage(createError.code, "La commande n'a pas pu être créée.")
+				message: await rejection(
+					locals.supabase,
+					createError,
+					"La commande n'a pas pu être créée.",
+					{
+						entityType: 'item'
+					}
+				)
 			});
 		}
 
@@ -106,7 +114,14 @@ export const actions: Actions = {
 			// effet de bord, aucun item ne la référence.
 			await locals.supabase.schema('cash').from('orders').delete().eq('id', order.id);
 			return fail(400, {
-				message: cashErrorMessage(attachError.code, "Ces items n'ont pas pu être regroupés.")
+				message: await rejection(
+					locals.supabase,
+					attachError,
+					"Ces items n'ont pas pu être regroupés.",
+					{
+						entityType: 'item'
+					}
+				)
 			});
 		}
 
@@ -168,7 +183,14 @@ export const actions: Actions = {
 
 		if (updateError) {
 			return fail(400, {
-				message: cashErrorMessage(updateError.code, "Ces items n'ont pas pu être refusés.")
+				message: await rejection(
+					locals.supabase,
+					updateError,
+					"Ces items n'ont pas pu être refusés.",
+					{
+						entityType: 'item'
+					}
+				)
 			});
 		}
 

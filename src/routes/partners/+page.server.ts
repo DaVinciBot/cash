@@ -1,7 +1,7 @@
+import { rejection } from '$lib/server/audit';
 import { currentSchoolYear } from '$lib/server/cash';
 import { decimal, text } from '$lib/server/form';
 import { accounts, parseDomains, partnerships } from '$lib/server/treasury';
-import { cashErrorMessage } from '@davincibot/lib';
 import { fail } from '@sveltejs/kit';
 import type { Actions, PageServerLoad } from './$types';
 
@@ -61,7 +61,14 @@ export const actions: Actions = {
 
 			if (accountError) {
 				return fail(400, {
-					message: cashErrorMessage(accountError.code, "L'enveloppe n'a pas pu être créée.")
+					message: await rejection(
+						locals.supabase,
+						accountError,
+						"L'enveloppe n'a pas pu être créée.",
+						{
+							entityType: 'partnership'
+						}
+					)
 				});
 			}
 			accountId = account.id;
@@ -80,7 +87,9 @@ export const actions: Actions = {
 
 		if (error) {
 			return fail(400, {
-				message: cashErrorMessage(error.code, "Ce partenariat n'a pas pu être créé.")
+				message: await rejection(locals.supabase, error, "Ce partenariat n'a pas pu être créé.", {
+					entityType: 'partnership'
+				})
 			});
 		}
 		return { saved: 'partner' };
@@ -108,7 +117,14 @@ export const actions: Actions = {
 
 		if (error) {
 			return fail(400, {
-				message: cashErrorMessage(error.code, "Ce partenariat n'a pas pu être modifié.")
+				message: await rejection(
+					locals.supabase,
+					error,
+					"Ce partenariat n'a pas pu être modifié.",
+					{
+						entityType: 'partnership'
+					}
+				)
 			});
 		}
 		return { saved: 'partner' };
@@ -133,7 +149,14 @@ export const actions: Actions = {
 
 		if (error) {
 			return fail(400, {
-				message: cashErrorMessage(error.code, "Ce partenariat n'a pas pu être archivé.")
+				message: await rejection(
+					locals.supabase,
+					error,
+					"Ce partenariat n'a pas pu être archivé.",
+					{
+						entityType: 'partnership'
+					}
+				)
 			});
 		}
 		return { saved: 'partner' };

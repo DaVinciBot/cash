@@ -1,7 +1,7 @@
 import { resolve } from '$app/paths';
+import { entityHistory, rejection } from '$lib/server/audit';
 import { decimal, text, textAll } from '$lib/server/form';
 import { budgetLeaves, orderDetail } from '$lib/server/orders';
-import { cashErrorMessage } from '@davincibot/lib';
 import { error, fail, redirect } from '@sveltejs/kit';
 import type { Actions, PageServerLoad } from './$types';
 
@@ -37,9 +37,12 @@ export const load: PageServerLoad = async ({ depends, locals, params }) => {
 		error(404, 'Item introuvable.');
 	}
 
-	const { leaves } = await budgetLeaves(locals.supabase, order.schoolYearId);
+	const [{ leaves }, history] = await Promise.all([
+		budgetLeaves(locals.supabase, order.schoolYearId),
+		entityHistory(locals.supabase, 'item', itemId)
+	]);
 
-	return { order: { id: order.id, state: order.state }, item, leaves };
+	return { order: { id: order.id, state: order.state }, item, leaves, history };
 };
 
 export const actions: Actions = {
@@ -104,7 +107,9 @@ export const actions: Actions = {
 
 		if (saveError) {
 			return fail(400, {
-				message: cashErrorMessage(saveError.code, "Cet item n'a pas pu être modifié.")
+				message: await rejection(locals.supabase, saveError, "Cet item n'a pas pu être modifié.", {
+					entityType: 'item'
+				})
 			});
 		}
 

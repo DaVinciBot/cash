@@ -1,8 +1,9 @@
+import { rejection } from '$lib/server/audit';
 import { currentSchoolYear } from '$lib/server/cash';
 import { decimal, text } from '$lib/server/form';
 import { budgetLeaves } from '$lib/server/orders';
 import { accounts, flowList, periods } from '$lib/server/treasury';
-import { cashErrorMessage, FLOW_DIRECTIONS, type FlowDirection } from '@davincibot/lib';
+import { FLOW_DIRECTIONS, type FlowDirection } from '@davincibot/lib';
 import { fail } from '@sveltejs/kit';
 import type { Actions, PageServerLoad } from './$types';
 
@@ -108,7 +109,14 @@ export const actions: Actions = {
 
 		if (error) {
 			return fail(400, {
-				message: cashErrorMessage(error.code, "Ce mouvement n'a pas pu être enregistré.")
+				message: await rejection(
+					locals.supabase,
+					error,
+					"Ce mouvement n'a pas pu être enregistré.",
+					{
+						entityType: 'flow'
+					}
+				)
 			});
 		}
 		return { saved: 'flow' };
@@ -133,7 +141,9 @@ export const actions: Actions = {
 
 		if (error) {
 			return fail(400, {
-				message: cashErrorMessage(error.code, "Ce mouvement n'a pas pu être modifié.")
+				message: await rejection(locals.supabase, error, "Ce mouvement n'a pas pu être modifié.", {
+					entityType: 'flow'
+				})
 			});
 		}
 		return { saved: 'flow' };
@@ -157,7 +167,9 @@ export const actions: Actions = {
 		const { error } = await locals.supabase.schema('cash').from('flows').delete().eq('id', id);
 		if (error) {
 			return fail(400, {
-				message: cashErrorMessage(error.code, "Ce mouvement n'a pas pu être supprimé.")
+				message: await rejection(locals.supabase, error, "Ce mouvement n'a pas pu être supprimé.", {
+					entityType: 'flow'
+				})
 			});
 		}
 
@@ -190,7 +202,9 @@ export const actions: Actions = {
 
 		if (error) {
 			return fail(400, {
-				message: cashErrorMessage(error.code, "Ce mouvement n'a pas pu être pointé.")
+				message: await rejection(locals.supabase, error, "Ce mouvement n'a pas pu être pointé.", {
+					entityType: 'flow'
+				})
 			});
 		}
 		return { saved: 'flow' };
@@ -238,7 +252,14 @@ export const actions: Actions = {
 			// impossible à retrouver, donc on le retire.
 			await locals.supabase.storage.from('proof').remove([path]);
 			return fail(400, {
-				message: cashErrorMessage(error.code, "Ce justificatif n'a pas pu être rattaché.")
+				message: await rejection(
+					locals.supabase,
+					error,
+					"Ce justificatif n'a pas pu être rattaché.",
+					{
+						entityType: 'flow'
+					}
+				)
 			});
 		}
 		return { saved: 'proof' };
@@ -266,7 +287,14 @@ export const actions: Actions = {
 
 		if (error) {
 			return fail(400, {
-				message: cashErrorMessage(error.code, "Ce justificatif n'a pas pu être supprimé.")
+				message: await rejection(
+					locals.supabase,
+					error,
+					"Ce justificatif n'a pas pu être supprimé.",
+					{
+						entityType: 'flow'
+					}
+				)
 			});
 		}
 		if (proof) {

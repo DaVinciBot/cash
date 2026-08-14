@@ -1,7 +1,7 @@
+import { rejection } from '$lib/server/audit';
 import { currentSchoolYear } from '$lib/server/cash';
 import { decimal, text } from '$lib/server/form';
 import { budgetTree, overdrawnBudgets, periods } from '$lib/server/treasury';
-import { cashErrorMessage } from '@davincibot/lib';
 import { fail } from '@sveltejs/kit';
 import type { Actions, PageServerLoad } from './$types';
 
@@ -66,7 +66,9 @@ export const actions: Actions = {
 
 		if (error) {
 			return fail(400, {
-				message: cashErrorMessage(error.code, "Ce budget n'a pas pu être créé.")
+				message: await rejection(locals.supabase, error, "Ce budget n'a pas pu être créé.", {
+					entityType: 'budget'
+				})
 			});
 		}
 		return { saved: 'budget' };
@@ -108,7 +110,9 @@ export const actions: Actions = {
 
 		if (error) {
 			return fail(400, {
-				message: cashErrorMessage(error.code, "Ce budget n'a pas pu être modifié.")
+				message: await rejection(locals.supabase, error, "Ce budget n'a pas pu être modifié.", {
+					entityType: 'budget'
+				})
 			});
 		}
 		return { saved: 'budget' };
@@ -135,7 +139,14 @@ export const actions: Actions = {
 		const { error: clearError } = await siblings;
 		if (clearError) {
 			return fail(400, {
-				message: cashErrorMessage(clearError.code, "La feuille par défaut n'a pas pu être changée.")
+				message: await rejection(
+					locals.supabase,
+					clearError,
+					"La feuille par défaut n'a pas pu être changée.",
+					{
+						entityType: 'budget'
+					}
+				)
 			});
 		}
 
@@ -147,7 +158,14 @@ export const actions: Actions = {
 
 		if (error) {
 			return fail(400, {
-				message: cashErrorMessage(error.code, "La feuille par défaut n'a pas pu être changée.")
+				message: await rejection(
+					locals.supabase,
+					error,
+					"La feuille par défaut n'a pas pu être changée.",
+					{
+						entityType: 'budget'
+					}
+				)
 			});
 		}
 		return { saved: 'budget' };
@@ -195,7 +213,9 @@ export const actions: Actions = {
 
 		if (error) {
 			return fail(400, {
-				message: cashErrorMessage(error.code, "Ce budget n'a pas pu être archivé.")
+				message: await rejection(locals.supabase, error, "Ce budget n'a pas pu être archivé.", {
+					entityType: 'budget'
+				})
 			});
 		}
 		return { saved: 'budget', archived: targets.size };
@@ -216,7 +236,9 @@ export const actions: Actions = {
 
 		if (error) {
 			return fail(400, {
-				message: cashErrorMessage(error.code, "Ce budget n'a pas pu être réactivé.")
+				message: await rejection(locals.supabase, error, "Ce budget n'a pas pu être réactivé.", {
+					entityType: 'budget'
+				})
 			});
 		}
 		return { saved: 'budget' };
@@ -269,7 +291,9 @@ export const actions: Actions = {
 		const { error } = await locals.supabase.schema('cash').from('budgets').delete().eq('id', id);
 		if (error) {
 			return fail(400, {
-				message: cashErrorMessage(error.code, "Ce budget n'a pas pu être supprimé.")
+				message: await rejection(locals.supabase, error, "Ce budget n'a pas pu être supprimé.", {
+					entityType: 'budget'
+				})
 			});
 		}
 		return { saved: 'budget' };

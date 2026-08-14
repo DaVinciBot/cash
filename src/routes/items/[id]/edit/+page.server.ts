@@ -1,7 +1,8 @@
 import { resolve } from '$app/paths';
+import { rejection } from '$lib/server/audit';
 import { memberProjects } from '$lib/server/cash';
 import { decimal, jsonArray, text } from '$lib/server/form';
-import { cashErrorMessage, type ItemTag } from '@davincibot/lib';
+import { type ItemTag } from '@davincibot/lib';
 import { error, fail, redirect } from '@sveltejs/kit';
 import type { Actions, PageServerLoad } from './$types';
 
@@ -100,7 +101,14 @@ export const actions: Actions = {
 
 		if (updateError) {
 			return fail(400, {
-				message: cashErrorMessage(updateError.code, "Cet item n'a pas pu être modifié.")
+				message: await rejection(
+					locals.supabase,
+					updateError,
+					"Cet item n'a pas pu être modifié.",
+					{
+						entityType: 'item'
+					}
+				)
 			});
 		}
 		if (count === 0) {

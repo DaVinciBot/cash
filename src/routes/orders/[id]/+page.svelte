@@ -2,6 +2,7 @@
 	import { enhance } from '$app/forms';
 	import { resolve } from '$app/paths';
 	import CampusBadge from '$lib/components/cash/CampusBadge.svelte';
+	import HistoryTimeline from '$lib/components/cash/HistoryTimeline.svelte';
 	import ItemStateBadge from '$lib/components/cash/ItemStateBadge.svelte';
 	import StateBadge from '$lib/components/cash/StateBadge.svelte';
 	import {
@@ -469,4 +470,10 @@
 			</table>
 		</div>
 	{/if}
+	<!-- CMD-F-60/61 — la trace de la commande : passation, annulation, corrections
+	     de port. Elle se lit ici plutôt que dans l'écran d'audit, qui sert à
+	     chercher ce qu'on ne sait pas encore où trouver. -->
+	<div class="mt-10">
+		<HistoryTimeline entries={data.history} />
+	</div>
 </section>

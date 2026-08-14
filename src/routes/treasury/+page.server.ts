@@ -1,6 +1,7 @@
+import { rejection } from '$lib/server/audit';
 import { decimal, text } from '$lib/server/form';
 import { accounts, balancesOn, movementsBetween, periods } from '$lib/server/treasury';
-import { ACCOUNT_KINDS, cashErrorMessage, type AccountKind } from '@davincibot/lib';
+import { ACCOUNT_KINDS, type AccountKind } from '@davincibot/lib';
 import { fail } from '@sveltejs/kit';
 import type { Actions, PageServerLoad } from './$types';
 
@@ -67,7 +68,9 @@ export const actions: Actions = {
 
 		if (error) {
 			return fail(400, {
-				message: cashErrorMessage(error.code, "Ce compte n'a pas pu être créé.")
+				message: await rejection(locals.supabase, error, "Ce compte n'a pas pu être créé.", {
+					entityType: 'bank_account'
+				})
 			});
 		}
 		return { saved: 'account' };
@@ -102,9 +105,13 @@ export const actions: Actions = {
 
 		if (error) {
 			return fail(400, {
-				message: cashErrorMessage(
-					error.code,
-					archive ? "Ce compte n'a pas pu être archivé." : "Ce compte n'a pas pu être réactivé."
+				message: await rejection(
+					locals.supabase,
+					error,
+					archive ? "Ce compte n'a pas pu être archivé." : "Ce compte n'a pas pu être réactivé.",
+					{
+						entityType: 'bank_account'
+					}
 				)
 			});
 		}
@@ -142,7 +149,9 @@ export const actions: Actions = {
 
 		if (error) {
 			return fail(400, {
-				message: cashErrorMessage(error.code, "Cette période n'a pas pu être ouverte.")
+				message: await rejection(locals.supabase, error, "Cette période n'a pas pu être ouverte.", {
+					entityType: kind === 'school' ? 'school_year' : 'fiscal_year'
+				})
 			});
 		}
 		return { saved: 'period' };
@@ -170,7 +179,14 @@ export const actions: Actions = {
 
 		if (error) {
 			return fail(400, {
-				message: cashErrorMessage(error.code, "Cette période n'a pas pu être modifiée.")
+				message: await rejection(
+					locals.supabase,
+					error,
+					"Cette période n'a pas pu être modifiée.",
+					{
+						entityType: kind === 'school' ? 'school_year' : 'fiscal_year'
+					}
+				)
 			});
 		}
 		return { saved: 'period' };
