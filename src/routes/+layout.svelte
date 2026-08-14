@@ -9,7 +9,7 @@
 		settingsModal,
 		type SettingsModalState
 	} from '$lib/settings';
-	import { userdata } from '@davincibot/lib';
+	import { hasAnyPermission, userdata } from '@davincibot/lib';
 	import { onDestroy, untrack, type Snippet } from 'svelte';
 	import type { PageData } from './$types';
 
@@ -21,7 +21,9 @@
 	let { data, children }: { data: PageData; children?: Snippet } = $props();
 
 	const userProfile = $derived(data.userProfile);
-	const canRequestItems = $derived(data.canRequestItems);
+	const canRequestItems = $derived(
+		hasAnyPermission(data.permissions, ['orders.items.manage.self'])
+	);
 	const __menu = $derived(data.menu);
 
 	let open = $state(false);

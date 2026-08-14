@@ -28,7 +28,6 @@ declare global {
 			cookies: ReturnType<Cookies['getAll']>;
 			userProfile: UserProfile | null;
 			permissions: EffectivePermission[];
-			canRequestItems: boolean;
 			supabase?: SupabaseClient<Database>;
 			menu: {
 				title: string;
