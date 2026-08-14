@@ -33,9 +33,7 @@
 <svelte:head><title>Rapports — DaVinciBot</title></svelte:head>
 
 <section class="mx-auto max-w-5xl">
-	<a class="text-sm text-gray-400 hover:text-gray-200" href={resolve('/treasury' as '/')}
-		>← Trésorerie</a
-	>
+	<a class="text-sm text-gray-400 hover:text-gray-200" href={resolve('/treasury')}>← Trésorerie</a>
 
 	<header class="mt-3 mb-6">
 		<h1 class="text-2xl font-bold text-white">Rapports</h1>

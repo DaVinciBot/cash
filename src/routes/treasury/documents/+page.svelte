@@ -12,9 +12,7 @@
 <svelte:head><title>Documents — DaVinciBot</title></svelte:head>
 
 <section class="mx-auto max-w-5xl">
-	<a class="text-sm text-gray-400 hover:text-gray-200" href={resolve('/treasury' as '/')}
-		>← Trésorerie</a
-	>
+	<a class="text-sm text-gray-400 hover:text-gray-200" href={resolve('/treasury')}>← Trésorerie</a>
 
 	<header class="mt-3 mb-6 flex flex-wrap items-end justify-between gap-4">
 		<div>
@@ -27,11 +25,11 @@
 		<div class="flex gap-2">
 			<a
 				class="rounded-lg border border-gray-600 px-4 py-2 text-sm text-gray-200 hover:bg-gray-700"
-				href={resolve('/treasury/documents/issuer' as '/')}>Identité de l'émetteur</a
+				href={resolve('/treasury/documents/issuer')}>Identité de l'émetteur</a
 			>
 			<a
 				class="bg-primary-600 hover:bg-primary-800 rounded-lg px-4 py-2 text-sm font-medium text-white"
-				href={resolve('/treasury/documents/new' as '/')}>Nouveau document</a
+				href={resolve('/treasury/documents/new')}>Nouveau document</a
 			>
 		</div>
 	</header>
@@ -41,7 +39,7 @@
 			class="mb-4 rounded-lg bg-amber-500/15 px-4 py-3 text-sm text-amber-200 ring-1 ring-amber-500/30"
 		>
 			L'identité de l'émetteur est incomplète : certaines pièces ne peuvent pas être émises.
-			<a class="underline" href={resolve('/treasury/documents/issuer' as '/')}>La compléter</a>
+			<a class="underline" href={resolve('/treasury/documents/issuer')}>La compléter</a>
 		</p>
 	{/if}
 
@@ -63,7 +61,7 @@
 					<span class="text-xs text-gray-500">{day.format(new Date(doc.issuedOn))}</span>
 					<a
 						class="rounded-lg border border-gray-600 px-3 py-1 text-xs text-gray-200 hover:bg-gray-700"
-						href={resolve(`/treasury/documents/${String(doc.id)}` as '/')}>Ouvrir</a
+						href={resolve(`/treasury/documents/${String(doc.id)}`)}>Ouvrir</a
 					>
 				</li>
 			{/each}

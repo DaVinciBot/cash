@@ -67,9 +67,8 @@
 <svelte:head><title>{DOCUMENT_KIND_LABELS[kind]} — nouveau document</title></svelte:head>
 
 <section class="mx-auto max-w-3xl">
-	<a
-		class="text-sm text-gray-400 hover:text-gray-200"
-		href={resolve('/treasury/documents/new' as '/')}>← Changer de type</a
+	<a class="text-sm text-gray-400 hover:text-gray-200" href={resolve('/treasury/documents/new')}
+		>← Changer de type</a
 	>
 
 	<header class="mt-3 mb-6">
@@ -94,7 +93,7 @@
 			class="mb-4 rounded-lg bg-amber-500/15 px-4 py-3 text-sm text-amber-200 ring-1 ring-amber-500/30"
 		>
 			Il manque {data.missing.join(', ')} à l'identité de l'émetteur.
-			<a class="underline" href={resolve('/treasury/documents/issuer' as '/')}>La compléter</a>
+			<a class="underline" href={resolve('/treasury/documents/issuer')}>La compléter</a>
 		</p>
 	{/if}
 

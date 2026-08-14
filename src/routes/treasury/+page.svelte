@@ -36,15 +36,15 @@
 		<div class="flex flex-wrap gap-2">
 			<a
 				class="rounded-lg border border-gray-600 px-4 py-2 text-sm text-gray-200 hover:bg-gray-700"
-				href={resolve('/treasury/flows' as '/')}>Dépenses et recettes</a
+				href={resolve('/treasury/flows')}>Dépenses et recettes</a
 			>
 			<a
 				class="rounded-lg border border-gray-600 px-4 py-2 text-sm text-gray-200 hover:bg-gray-700"
-				href={resolve('/treasury/reports' as '/')}>Rapports</a
+				href={resolve('/treasury/reports')}>Rapports</a
 			>
 			<a
 				class="rounded-lg border border-gray-600 px-4 py-2 text-sm text-gray-200 hover:bg-gray-700"
-				href={resolve('/treasury/documents' as '/')}>Documents</a
+				href={resolve('/treasury/documents')}>Documents</a
 			>
 		</div>
 	</header>

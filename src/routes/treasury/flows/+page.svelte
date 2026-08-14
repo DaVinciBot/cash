@@ -42,9 +42,7 @@
 <svelte:head><title>Dépenses et recettes — DaVinciBot</title></svelte:head>
 
 <section class="mx-auto max-w-5xl">
-	<a class="text-sm text-gray-400 hover:text-gray-200" href={resolve('/treasury' as '/')}
-		>← Trésorerie</a
-	>
+	<a class="text-sm text-gray-400 hover:text-gray-200" href={resolve('/treasury')}>← Trésorerie</a>
 
 	<header class="mt-3 mb-6 flex flex-wrap items-end justify-between gap-4">
 		<div>
@@ -229,7 +227,7 @@
 						{#if flow.orderId !== null}
 							<a
 								class="text-xs text-gray-400 underline hover:text-gray-200"
-								href={resolve(`/orders/${String(flow.orderId)}` as '/')}>commande #{flow.orderId}</a
+								href={resolve(`/orders/${String(flow.orderId)}`)}>commande #{flow.orderId}</a
 							>
 						{/if}
 						{#if flow.reversesFlowId !== null}

@@ -135,7 +135,7 @@
 					{#if canRequestItems}
 						<a
 							class="bg-primary-600 hover:bg-primary-800 focus:ring-primary-800 mr-2 flex items-center justify-center rounded-lg p-2 py-2 text-sm font-medium text-white focus:ring-4 focus:outline-none sm:px-4"
-							href={resolve('/items/new' as '/')}
+							href={resolve('/items/new')}
 							type="button"
 						>
 							<svg

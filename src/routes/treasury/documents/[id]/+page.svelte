@@ -26,7 +26,7 @@
 
 <!-- Barre d'action : elle n'existe qu'à l'écran, jamais sur le papier. -->
 <div class="no-print mx-auto mb-4 flex max-w-[21cm] flex-wrap items-center gap-3">
-	<a class="text-sm text-gray-400 hover:text-gray-200" href={resolve('/treasury/documents' as '/')}
+	<a class="text-sm text-gray-400 hover:text-gray-200" href={resolve('/treasury/documents')}
 		>← Documents</a
 	>
 	<!-- Le téléchargement passe par le serveur : lui seul peut imposer le nom du fichier.
@@ -40,7 +40,7 @@
 	>
 	<a
 		class="bg-primary-600 hover:bg-primary-800 rounded-lg px-4 py-2 text-sm font-medium text-white"
-		href={resolve(`/treasury/documents/${String(doc.id)}/pdf` as '/')}>Télécharger le PDF</a
+		href={resolve(`/treasury/documents/${String(doc.id)}/pdf`)}>Télécharger le PDF</a
 	>
 </div>
 

@@ -190,7 +190,7 @@
 	<p class="mt-8 text-xs text-gray-500">
 		La consommation budgétaire de chaque projet se lit sur <a
 			class="underline hover:text-gray-300"
-			href={resolve('/budgets' as '/')}>l'arbre des budgets</a
+			href={resolve('/budgets')}>l'arbre des budgets</a
 		>, où elle est calculée nœud par nœud.
 	</p>
 </section>

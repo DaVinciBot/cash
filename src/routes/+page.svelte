@@ -63,7 +63,7 @@
 		</div>
 		<a
 			class="bg-primary-600 hover:bg-primary-800 rounded-lg px-4 py-2 text-sm font-medium text-white"
-			href={resolve('/items/new' as '/')}>Faire une commande</a
+			href={resolve('/items/new')}>Faire une commande</a
 		>
 	</header>
 
@@ -150,10 +150,16 @@
 						</div>
 
 						<div class="flex shrink-0 items-center gap-2">
+							<!-- TRANS-NF-50 — le détail porte l'historique : qui a validé,
+							     qui a refusé, quand. La liste, elle, reste une liste. -->
+							<a
+								class="rounded-lg border border-gray-600 px-3 py-1.5 text-sm text-gray-200 hover:bg-gray-700"
+								href={resolve(`/items/${String(item.id)}`)}>Détail</a
+							>
 							{#if isItemEditableByMember(item.state)}
 								<a
 									class="rounded-lg border border-gray-600 px-3 py-1.5 text-sm text-gray-200 hover:bg-gray-700"
-									href={resolve(`/items/${String(item.id)}/edit` as '/')}>Modifier</a
+									href={resolve(`/items/${String(item.id)}/edit`)}>Modifier</a
 								>
 							{/if}
 							{#if isItemDeletableByMember(item.state)}

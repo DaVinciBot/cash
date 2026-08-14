@@ -17,7 +17,7 @@
 <svelte:head><title>Identité de l'émetteur — DaVinciBot</title></svelte:head>
 
 <section class="mx-auto max-w-3xl">
-	<a class="text-sm text-gray-400 hover:text-gray-200" href={resolve('/treasury/documents' as '/')}
+	<a class="text-sm text-gray-400 hover:text-gray-200" href={resolve('/treasury/documents')}
 		>← Documents</a
 	>
 

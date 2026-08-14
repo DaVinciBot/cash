@@ -75,7 +75,7 @@
 <svelte:head><title>Commande #{order.id} — DaVinciBot</title></svelte:head>
 
 <section class="mx-auto max-w-5xl">
-	<a class="text-sm text-gray-400 hover:text-gray-200" href={resolve('/orders' as '/')}
+	<a class="text-sm text-gray-400 hover:text-gray-200" href={resolve('/orders')}
 		>← Toutes les commandes</a
 	>
 
@@ -406,8 +406,7 @@
 						{#if editable}
 							<a
 								class="rounded-lg border border-gray-600 px-3 py-1.5 text-sm text-gray-200 hover:bg-gray-700"
-								href={resolve(`/orders/${String(order.id)}/items/${String(item.id)}` as '/')}
-								>Modifier</a
+								href={resolve(`/orders/${String(order.id)}/items/${String(item.id)}`)}>Modifier</a
 							>
 						{/if}
 						{#if item.state === 'bundled' && order.state === 'pending_delivery'}

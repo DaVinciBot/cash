@@ -179,6 +179,6 @@ export const actions: Actions = {
 
 		// On mène directement à la pièce : c'est ce qu'on voulait obtenir, et c'est
 		// là qu'on l'imprime.
-		redirect(303, resolve(`/treasury/documents/${String(inserted.id)}` as '/'));
+		redirect(303, resolve(`/treasury/documents/${String(inserted.id)}`));
 	}
 };

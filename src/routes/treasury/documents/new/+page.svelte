@@ -25,7 +25,7 @@
 <svelte:head><title>Nouveau document — DaVinciBot</title></svelte:head>
 
 <section class="mx-auto max-w-3xl">
-	<a class="text-sm text-gray-400 hover:text-gray-200" href={resolve('/treasury/documents' as '/')}
+	<a class="text-sm text-gray-400 hover:text-gray-200" href={resolve('/treasury/documents')}
 		>← Documents</a
 	>
 
@@ -43,7 +43,7 @@
 				<a
 					class="hover:bg-gray-750 flex h-full flex-col rounded-lg border border-gray-700 bg-gray-800 p-4 transition hover:border-gray-500 aria-disabled:pointer-events-none aria-disabled:opacity-50"
 					aria-disabled={missing.length > 0}
-					href={resolve(`/treasury/documents/new/${kind}` as '/')}
+					href={resolve(`/treasury/documents/new/${kind}`)}
 				>
 					<span class="text-2xl">{ICON[kind]}</span>
 					<span class="mt-2 font-medium text-white">{DOCUMENT_KIND_LABELS[kind]}</span>
@@ -63,7 +63,7 @@
 			class="mt-4 rounded-lg bg-amber-500/15 px-4 py-3 text-sm text-amber-200 ring-1 ring-amber-500/30"
 		>
 			Certaines pièces sont indisponibles tant que l'identité de l'émetteur est incomplète.
-			<a class="underline" href={resolve('/treasury/documents/issuer' as '/')}>La compléter</a>
+			<a class="underline" href={resolve('/treasury/documents/issuer')}>La compléter</a>
 		</p>
 	{/if}
 
