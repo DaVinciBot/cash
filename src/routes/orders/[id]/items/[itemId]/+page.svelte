@@ -85,8 +85,9 @@
 <section class="mx-auto max-w-3xl">
 	<a
 		class="text-sm text-gray-400 hover:text-gray-200"
-		href={resolve(`/orders/${String(data.order.id)}`)}>← Commande #{data.order.id}</a
-	>
+		href={resolve('/orders/[id]', { id: String(data.order.id) })}
+		>← Commande #{data.order.id}
+	</a>
 
 	<h1 class="mt-3 mb-1 text-2xl font-bold text-white">Modifier l'item</h1>
 	<p class="mb-6 text-sm text-gray-400">
@@ -225,8 +226,9 @@
 			>
 			<a
 				class="rounded-lg border border-gray-600 px-4 py-2 text-sm text-gray-300 hover:bg-gray-700"
-				href={resolve(`/orders/${String(data.order.id)}`)}>Annuler</a
-			>
+				href={resolve('/orders/[id]', { id: String(data.order.id) })}
+				>Annuler
+			</a>
 		</div>
 	</form>
 	<!-- CMD-F-60 — qui a corrigé le prix, et quand. Le trésorier édite ici : la

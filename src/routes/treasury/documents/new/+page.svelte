@@ -43,7 +43,7 @@
 				<a
 					class="hover:bg-gray-750 flex h-full flex-col rounded-lg border border-gray-700 bg-gray-800 p-4 transition hover:border-gray-500 aria-disabled:pointer-events-none aria-disabled:opacity-50"
 					aria-disabled={missing.length > 0}
-					href={resolve(`/treasury/documents/new/${kind}`)}
+					href={resolve('/treasury/documents/new/[kind]', { kind })}
 				>
 					<span class="text-2xl">{ICON[kind]}</span>
 					<span class="mt-2 font-medium text-white">{DOCUMENT_KIND_LABELS[kind]}</span>

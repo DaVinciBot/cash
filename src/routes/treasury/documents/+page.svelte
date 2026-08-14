@@ -61,8 +61,9 @@
 					<span class="text-xs text-gray-500">{day.format(new Date(doc.issuedOn))}</span>
 					<a
 						class="rounded-lg border border-gray-600 px-3 py-1 text-xs text-gray-200 hover:bg-gray-700"
-						href={resolve(`/treasury/documents/${String(doc.id)}`)}>Ouvrir</a
-					>
+						href={resolve('/treasury/documents/[id]', { id: String(doc.id) })}
+						>Ouvrir
+					</a>
 				</li>
 			{/each}
 		</ul>

@@ -15,6 +15,7 @@ import { chromium, type Browser } from 'playwright';
 // un en-tête `Content-Disposition`, si.
 
 /** Adresse par laquelle le serveur s'atteint lui-même. */
+// eslint-disable-next-line @typescript-eslint/no-unnecessary-condition
 const INTERNAL_BASE = env.PDF_INTERNAL_BASE ?? `http://127.0.0.1:${env.PORT ?? '3000'}`;
 
 /**

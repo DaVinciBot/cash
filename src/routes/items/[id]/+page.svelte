@@ -31,8 +31,9 @@
 		{#if item.isMine && isItemEditableByMember(item.state)}
 			<a
 				class="rounded-lg border border-gray-600 px-4 py-2 text-sm text-gray-200 hover:bg-gray-700"
-				href={resolve(`/items/${String(item.id)}/edit`)}>Modifier</a
-			>
+				href={resolve('/items/[id]/edit', { id: String(item.id) })}
+				>Modifier
+			</a>
 		{/if}
 	</header>
 
@@ -105,9 +106,11 @@
 			<div class="col-span-2 sm:col-span-3">
 				<dt class="text-xs text-gray-500">Commande</dt>
 				<dd>
-					<a class="text-sky-400 hover:underline" href={resolve(`/orders/${String(item.orderId)}`)}
-						>Commande n° {item.orderId}</a
-					>
+					<a
+						class="text-sky-400 hover:underline"
+						href={resolve('/orders/[id]', { id: String(item.orderId) })}
+						>Commande n° {item.orderId}
+					</a>
 				</dd>
 			</div>
 		{/if}

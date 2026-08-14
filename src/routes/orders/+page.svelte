@@ -101,7 +101,7 @@
 						<li>
 							<a
 								class="block rounded-lg border border-gray-700 bg-gray-800 p-4 hover:border-gray-500"
-								href={resolve(`/orders/${String(order.id)}`)}
+								href={resolve('/orders/[id]', { id: String(order.id) })}
 							>
 								<div class="flex flex-wrap items-center gap-3">
 									<span class="font-medium text-white">Commande #{order.id}</span>

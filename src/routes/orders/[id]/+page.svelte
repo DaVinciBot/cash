@@ -406,8 +406,12 @@
 						{#if editable}
 							<a
 								class="rounded-lg border border-gray-600 px-3 py-1.5 text-sm text-gray-200 hover:bg-gray-700"
-								href={resolve(`/orders/${String(order.id)}/items/${String(item.id)}`)}>Modifier</a
-							>
+								href={resolve('/orders/[id]/items/[itemId]', {
+									id: String(order.id),
+									itemId: String(item.id)
+								})}
+								>Modifier
+							</a>
 						{/if}
 						{#if item.state === 'bundled' && order.state === 'pending_delivery'}
 							<form action="?/receive" method="POST" use:enhance>

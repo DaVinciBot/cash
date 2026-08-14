@@ -227,8 +227,10 @@
 						{#if flow.orderId !== null}
 							<a
 								class="text-xs text-gray-400 underline hover:text-gray-200"
-								href={resolve(`/orders/${String(flow.orderId)}`)}>commande #{flow.orderId}</a
+								href={resolve('/orders/[id]', { id: String(flow.orderId) })}
 							>
+								commande #{flow.orderId}
+							</a>
 						{/if}
 						{#if flow.reversesFlowId !== null}
 							<span class="rounded-full bg-gray-700 px-2 py-0.5 text-xs text-gray-300"

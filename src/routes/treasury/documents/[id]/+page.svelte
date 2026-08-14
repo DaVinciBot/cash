@@ -40,8 +40,10 @@
 	>
 	<a
 		class="bg-primary-600 hover:bg-primary-800 rounded-lg px-4 py-2 text-sm font-medium text-white"
-		href={resolve(`/treasury/documents/${String(doc.id)}/pdf`)}>Télécharger le PDF</a
+		href={resolve('/treasury/documents/[id]/pdf', { id: String(doc.id) })}
 	>
+		Télécharger le PDF
+	</a>
 </div>
 
 {#if doc.kind === 'invoice'}

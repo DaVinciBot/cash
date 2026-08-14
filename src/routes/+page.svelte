@@ -154,13 +154,17 @@
 							     qui a refusé, quand. La liste, elle, reste une liste. -->
 							<a
 								class="rounded-lg border border-gray-600 px-3 py-1.5 text-sm text-gray-200 hover:bg-gray-700"
-								href={resolve(`/items/${String(item.id)}`)}>Détail</a
+								href={resolve('/items/[id]', { id: String(item.id) })}
 							>
+								Détail
+							</a>
 							{#if isItemEditableByMember(item.state)}
 								<a
 									class="rounded-lg border border-gray-600 px-3 py-1.5 text-sm text-gray-200 hover:bg-gray-700"
-									href={resolve(`/items/${String(item.id)}/edit`)}>Modifier</a
+									href={resolve('/items/[id]/edit', { id: String(item.id) })}
 								>
+									Modifier
+								</a>
 							{/if}
 							{#if isItemDeletableByMember(item.state)}
 								<form action="?/delete" method="POST" use:enhance>
