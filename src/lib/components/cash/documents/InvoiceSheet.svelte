@@ -26,7 +26,7 @@
 	{#snippet body()}
 		<section class="mt-8">
 			<LinesTable lines={doc.lines} />
-			<TotalsBlock footnote {total} />
+			<TotalsBlock footnote totalHt={total} totalTtc={total} vatLabel="TVA 0 %" />
 		</section>
 
 		{#if doc.subject}
