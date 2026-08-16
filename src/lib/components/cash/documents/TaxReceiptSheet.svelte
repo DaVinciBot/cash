@@ -3,6 +3,7 @@
 	// formulaire impose ; le montant en toutes lettres en fait partie, et c'est la
 	// seule pièce qui le porte.
 	import DocumentSheet from './DocumentSheet.svelte';
+	import SignatureBlock from './helpers/SignatureBlock.svelte';
 	import SubjectBlock from './helpers/SubjectBlock.svelte';
 	import { amountInWords } from '@davincibot/lib';
 	import type { GeneratedDocument } from '$lib/server/reports';
@@ -64,14 +65,12 @@
 
 	{#snippet footer()}
 		{#if issuer}
-			<div class="mt-8 flex items-end justify-end text-sm">
-				<div class="text-right">
-					<p class="text-xs">{issuer.signatoryTitle}</p>
-					<p class="font-medium">{issuer.signatoryName}</p>
-					<div class="mt-10 w-48 border-t border-black"></div>
-					<p class="mt-1 text-xs text-gray-600">Signature</p>
-				</div>
-			</div>
+			<SignatureBlock
+				slots={[
+					{ role: issuer.signatoryTitle ?? "Pour l'association", name: issuer.signatoryName }
+				]}
+				title="Signature"
+			/>
 		{/if}
 	{/snippet}
 </DocumentSheet>

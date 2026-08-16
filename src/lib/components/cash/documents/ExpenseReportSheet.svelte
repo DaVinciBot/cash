@@ -4,6 +4,7 @@
 	// dépense engage l'association, elle ne se rembourse pas sur la seule parole
 	// du demandeur.
 	import DocumentSheet from './DocumentSheet.svelte';
+    import SignatureBlock from './helpers/SignatureBlock.svelte';
 	import LinesTable from './helpers/LinesTable.svelte';
 	import SubjectBlock from './helpers/SubjectBlock.svelte';
 	import TotalsBlock from './helpers/TotalsBlock.svelte';
@@ -44,17 +45,6 @@
 	{/snippet}
 
 	{#snippet footer()}
-		<section class="mt-10 text-sm">
-			<p class="text-dvb font-bold">Signatures</p>
-			<p class="text-xs text-gray-600">suivi de la mention «&nbsp;lu et approuvé&nbsp;»</p>
-			<div class="mt-4 grid grid-cols-3 gap-8">
-				{#each SIGNATORIES as role (role)}
-					<div>
-						<p class="font-medium">{role}</p>
-						<div class="mt-12 border-t border-black"></div>
-					</div>
-				{/each}
-			</div>
-		</section>
+		<SignatureBlock slots={SIGNATORIES.map((role) => ({ role }))} />
 	{/snippet}
 </DocumentSheet>
