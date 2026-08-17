@@ -5,6 +5,49 @@
 // chaque libellé retouché. Elles ne vivent pas non plus dans `$lib/server` : le
 // formulaire d'émission en a besoin dans le navigateur pour peupler son menu.
 
+import type { Database } from '@davincibot/database-types';
+
+/**
+ * Genre d'un poste du bureau. Le type vient de l'enum de la base plutôt que
+ * d'être réécrit ici : ajouter une valeur en base sans l'accorder ci-dessous
+ * doit casser la compilation, pas produire un titre vide sur une pièce.
+ */
+export type OfficerGender = Database['cash']['Enums']['officer_gender'];
+
+export const OFFICER_GENDERS = [
+	'feminine',
+	'masculine',
+	'epicene'
+] as const satisfies readonly OfficerGender[];
+
+/** Ce que l'écran de l'émetteur propose dans son menu. */
+export const OFFICER_GENDER_LABELS: Record<OfficerGender, string> = {
+	feminine: 'Féminin',
+	masculine: 'Masculin',
+	epicene: 'Épicène'
+};
+
+/**
+ * Les titres accordés, poste par poste.
+ *
+ * Le titre est DÉDUIT et non saisi : écrit à la main, il se désaccorderait du nom
+ * au premier changement de bureau, et rien ne le signalerait.
+ */
+const OFFICER_TITLES = {
+	president: { feminine: 'Présidente', masculine: 'Président', epicene: 'Président·e' },
+	treasurer: { feminine: 'Trésorière', masculine: 'Trésorier', epicene: 'Trésorier·ère' }
+} as const satisfies Record<string, Record<OfficerGender, string>>;
+
+export type OfficerRole = keyof typeof OFFICER_TITLES;
+
+export function officerTitle(role: OfficerRole, gender: OfficerGender): string {
+	return OFFICER_TITLES[role][gender];
+}
+
+export function isOfficerGender(value: string): value is OfficerGender {
+	return (OFFICER_GENDERS as readonly string[]).includes(value);
+}
+
 /**
  * Nature de l'opération facturée — mention exigée par la facturation
  * électronique. Trois valeurs et pas deux : une facture qui mêle du matériel

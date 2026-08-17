@@ -5,6 +5,7 @@
 	import DocumentSheet from './DocumentSheet.svelte';
 	import SignatureBlock from './helpers/SignatureBlock.svelte';
 	import SubjectBlock from './helpers/SubjectBlock.svelte';
+	import { officerTitle } from '$lib/documents';
 	import { amountInWords } from '@davincibot/lib';
 	import type { GeneratedDocument } from '$lib/server/reports';
 
@@ -67,7 +68,10 @@
 		{#if issuer}
 			<SignatureBlock
 				slots={[
-					{ role: issuer.signatoryTitle ?? "Pour l'association", name: issuer.signatoryName }
+					{
+						role: officerTitle('president', issuer.presidentGender),
+						name: issuer.presidentName
+					}
 				]}
 				title="Signature"
 			/>

@@ -8,6 +8,7 @@
 	import SignatureBlock from './helpers/SignatureBlock.svelte';
 	import SubjectBlock from './helpers/SubjectBlock.svelte';
 	import TotalsBlock from './helpers/TotalsBlock.svelte';
+	import { officerTitle } from '$lib/documents';
 	import type { GeneratedDocument } from '$lib/server/reports';
 
 	interface Props {
@@ -25,7 +26,18 @@
 		lines.length > 0 ? round(lines.reduce((sum, l) => sum + l.amountTtc, 0)) : doc.amountTtc
 	);
 
-	const SIGNATORIES = ['Président', 'Trésorier', 'Bénéficiaire'];
+	const issuer = $derived(doc.issuer);
+	const signatories = $derived([
+		{
+			role: officerTitle('president', issuer?.presidentGender ?? 'epicene'),
+			name: issuer?.presidentName
+		},
+		{
+			role: officerTitle('treasurer', issuer?.treasurerGender ?? 'epicene'),
+			name: issuer?.treasurerName
+		},
+		{ role: 'Bénéficiaire', name: doc.recipientName }
+	]);
 
 	// La consigne part dans une PROPRIÉTÉ et non dans du balisage : une entité
 	// `&nbsp;` y arriverait telle quelle sur le papier, d'où les insécables
@@ -52,6 +64,6 @@
 	{/snippet}
 
 	{#snippet footer()}
-		<SignatureBlock hint={SIGNATURE_HINT} slots={SIGNATORIES.map((role) => ({ role }))} />
+		<SignatureBlock hint={SIGNATURE_HINT} slots={signatories} />
 	{/snippet}
 </DocumentSheet>

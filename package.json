@@ -50,7 +50,7 @@
 	},
 	"dependencies": {
 		"@davincibot/components": "^5.0.1",
-		"@davincibot/database-types": "^3.3.1",
+		"@davincibot/database-types": "^4.0.0",
 		"@davincibot/lib": "^3.5.0",
 		"@lucide/svelte": "^1.31.0",
 		"@popperjs/core": "^2.11.8",

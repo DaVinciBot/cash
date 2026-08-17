@@ -24,8 +24,10 @@ const issuer: Organization = {
 	vatNumber: null,
 	email: null,
 	website: null,
-	signatoryName: 'Alice Martin',
-	signatoryTitle: 'Trésorière',
+	presidentName: 'Alice Martin',
+	presidentGender: 'feminine',
+	treasurerName: 'Marc Dubois',
+	treasurerGender: 'masculine',
 	taxReceiptsAllowed: true,
 	taxCategory: "Association d'intérêt général",
 	taxArticles: 'articles 200 et 238 bis du CGI',
@@ -146,6 +148,21 @@ describe('note de frais', () => {
 		expect(text).not.toContain('TVA 0');
 	});
 
+	it('accorde le titre de chaque signataire à son genre', () => {
+		const text = render(ExpenseReportSheet, expenses);
+
+		expect(text).toContain('Présidente');
+		expect(text).toContain('Alice Martin');
+		expect(text).toContain('Trésorier');
+		expect(text).toContain('Marc Dubois');
+		// Le troisième cadre est celui de la personne remboursée.
+		expect(text).toContain('Bénéficiaire');
+		expect(text).toContain('Société Exemple');
+		// Les formes non accordées ne doivent jamais sortir telles quelles.
+		expect(text).not.toContain('Président·e');
+		expect(text).not.toContain('Trésorière');
+	});
+
 	it('rappelle la mention à écrire au-dessus des trois cadres', () => {
 		const text = render(ExpenseReportSheet, expenses);
 
@@ -177,6 +194,18 @@ describe('reçu fiscal', () => {
 
 		expect(text).toContain('W911234567');
 		expect(text).toContain('Date et signature');
+	});
+
+	it('fait signer la présidence, avec son titre accordé', () => {
+		const text = render(
+			TaxReceiptSheet,
+			doc({ kind: 'tax_receipt', number: 'REC-2026-0001', lines: [], amountTtc: 50 })
+		);
+
+		expect(text).toContain('Présidente');
+		expect(text).toContain('Alice Martin');
+		// La trésorerie ne signe pas un reçu fiscal.
+		expect(text).not.toContain('Marc Dubois');
 	});
 });
 

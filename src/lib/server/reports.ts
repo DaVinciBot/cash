@@ -4,7 +4,7 @@
 // (finance.read / finance.documents.generate) et `organization_read` /
 // `organization_write` (finance.read / finance.write) tranchent.
 
-import type { InvoiceOperationKind } from '$lib/documents';
+import type { InvoiceOperationKind, OfficerGender } from '$lib/documents';
 import type { Database } from '@davincibot/database-types';
 import type { DocumentKind } from '@davincibot/lib';
 import type { SupabaseClient } from '@supabase/supabase-js';
@@ -29,8 +29,14 @@ export type Organization = {
 	vatNumber: string | null;
 	email: string | null;
 	website: string | null;
-	signatoryName: string | null;
-	signatoryTitle: string | null;
+	/**
+	 * Les deux membres du bureau qui signent. Le titre n'est pas stocké : il se
+	 * déduit du poste et du genre, et reste donc toujours accordé au nom.
+	 */
+	presidentName: string | null;
+	presidentGender: OfficerGender;
+	treasurerName: string | null;
+	treasurerGender: OfficerGender;
 	/** Le bureau atteste que l'association peut délivrer des reçus fiscaux. */
 	taxReceiptsAllowed: boolean;
 	taxCategory: string | null;
@@ -47,7 +53,7 @@ export async function organization(supabase: Client): Promise<Organization> {
 		.schema('cash')
 		.from('organization')
 		.select(
-			'legal_name, address_line, postal_code, city, country, rna, siret, vat_number, email, website, signatory_name, signatory_title, tax_receipts_allowed, tax_category, tax_articles, bank_name, iban, bic'
+			'legal_name, address_line, postal_code, city, country, rna, siret, vat_number, email, website, president_name, president_gender, treasurer_name, treasurer_gender, tax_receipts_allowed, tax_category, tax_articles, bank_name, iban, bic'
 		)
 		.eq('id', 1)
 		.maybeSingle();
@@ -63,8 +69,11 @@ export async function organization(supabase: Client): Promise<Organization> {
 		vatNumber: data?.vat_number ?? null,
 		email: data?.email ?? null,
 		website: data?.website ?? null,
-		signatoryName: data?.signatory_name ?? null,
-		signatoryTitle: data?.signatory_title ?? null,
+		presidentName: data?.president_name ?? null,
+		// La colonne est NOT NULL en base ; le repli ne couvre que la ligne absente.
+		presidentGender: data?.president_gender ?? 'epicene',
+		treasurerName: data?.treasurer_name ?? null,
+		treasurerGender: data?.treasurer_gender ?? 'epicene',
 		taxReceiptsAllowed: data?.tax_receipts_allowed ?? false,
 		taxCategory: data?.tax_category ?? null,
 		taxArticles: data?.tax_articles ?? null,
@@ -93,8 +102,11 @@ export function missingIssuerFields(org: Organization, kind: DocumentKind): stri
 	if (!org.addressLine || !org.postalCode || !org.city) {
 		missing.push("l'adresse du siège");
 	}
-	if (!org.signatoryName) {
-		missing.push('le nom du signataire');
+	if (!org.presidentName) {
+		missing.push('le nom de la présidence');
+	}
+	if (kind === 'expense_report' && !org.treasurerName) {
+		missing.push('le nom de la trésorerie');
 	}
 	if (kind === 'tax_receipt') {
 		if (!org.taxReceiptsAllowed) {

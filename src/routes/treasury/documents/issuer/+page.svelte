@@ -6,6 +6,7 @@
 	// l'on ne savait plus lequel on était en train de faire.
 	import { enhance } from '$app/forms';
 	import { resolve } from '$app/paths';
+	import { OFFICER_GENDERS, OFFICER_GENDER_LABELS, officerTitle } from '$lib/documents';
 	import type { ActionData, PageData } from './$types';
 
 	let { data, form }: { data: PageData; form: ActionData } = $props();
@@ -56,6 +57,46 @@
 			réécrit pas les documents déjà partis.
 		</p>
 		<div class="grid gap-3 md:grid-cols-2">
+			<label class="text-xs text-gray-300">
+				Genre de la présidence
+				<select
+					name="president_gender"
+					class="mt-1 block w-full rounded-lg border border-gray-600 bg-gray-700 p-2 text-sm text-white"
+					value={data.organization.presidentGender}
+				>
+					{#each OFFICER_GENDERS as g (g)}
+						<option value={g}>{OFFICER_GENDER_LABELS[g]} · {officerTitle('president', g)}</option>
+					{/each}
+				</select>
+			</label>
+			<label class="text-xs text-gray-300">
+				Présidence
+				<input
+					name="president_name"
+					class="mt-1 block w-full rounded-lg border border-gray-600 bg-gray-700 p-2 text-sm text-white"
+					value={data.organization.presidentName ?? ''}
+				/>
+			</label>
+			<label class="text-xs text-gray-300">
+				Genre de la trésorerie
+				<select
+					name="treasurer_gender"
+					class="mt-1 block w-full rounded-lg border border-gray-600 bg-gray-700 p-2 text-sm text-white"
+					value={data.organization.treasurerGender}
+				>
+					{#each OFFICER_GENDERS as g (g)}
+						<option value={g}>{OFFICER_GENDER_LABELS[g]} · {officerTitle('treasurer', g)}</option>
+					{/each}
+				</select>
+			</label>
+			<label class="text-xs text-gray-300">
+				Trésorerie
+				<input
+					name="treasurer_name"
+					class="mt-1 block w-full rounded-lg border border-gray-600 bg-gray-700 p-2 text-sm text-white"
+					value={data.organization.treasurerName ?? ''}
+				/>
+			</label>
 			<label class="text-xs text-gray-300">
 				Nom légal
 				<input
@@ -113,30 +154,6 @@
 				/>
 			</label>
 			<label class="text-xs text-gray-300">
-				N° TVA <span class="text-gray-500">(vide si non assujettie)</span>
-				<input
-					name="vat_number"
-					class="mt-1 block w-full rounded-lg border border-gray-600 bg-gray-700 p-2 text-sm text-white"
-					value={data.organization.vatNumber ?? ''}
-				/>
-			</label>
-			<label class="text-xs text-gray-300">
-				Courriel
-				<input
-					name="email"
-					class="mt-1 block w-full rounded-lg border border-gray-600 bg-gray-700 p-2 text-sm text-white"
-					value={data.organization.email ?? ''}
-				/>
-			</label>
-			<label class="text-xs text-gray-300">
-				Site
-				<input
-					name="website"
-					class="mt-1 block w-full rounded-lg border border-gray-600 bg-gray-700 p-2 text-sm text-white"
-					value={data.organization.website ?? ''}
-				/>
-			</label>
-			<label class="text-xs text-gray-300">
 				Banque
 				<input
 					name="bank_name"
@@ -161,19 +178,27 @@
 				/>
 			</label>
 			<label class="text-xs text-gray-300">
-				Signataire
+				N° TVA <span class="text-gray-500">(vide si non assujettie)</span>
 				<input
-					name="signatory_name"
+					name="vat_number"
 					class="mt-1 block w-full rounded-lg border border-gray-600 bg-gray-700 p-2 text-sm text-white"
-					value={data.organization.signatoryName ?? ''}
+					value={data.organization.vatNumber ?? ''}
 				/>
 			</label>
 			<label class="text-xs text-gray-300">
-				Qualité du signataire
+				Courriel
 				<input
-					name="signatory_title"
+					name="email"
 					class="mt-1 block w-full rounded-lg border border-gray-600 bg-gray-700 p-2 text-sm text-white"
-					value={data.organization.signatoryTitle ?? ''}
+					value={data.organization.email ?? ''}
+				/>
+			</label>
+			<label class="text-xs text-gray-300">
+				Site
+				<input
+					name="website"
+					class="mt-1 block w-full rounded-lg border border-gray-600 bg-gray-700 p-2 text-sm text-white"
+					value={data.organization.website ?? ''}
 				/>
 			</label>
 		</div>
