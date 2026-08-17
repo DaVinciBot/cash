@@ -138,7 +138,9 @@
 
 			{#if issuer}
 				<div class="text-right text-nowrap">
-					<p class="text-dvb font-bold">De la part de</p>
+					<p class="text-dvb font-bold">
+						{doc.kind === 'tax_receipt' ? 'Bénéficiaire' : 'De la part de'}
+					</p>
 					<p class="font-bold uppercase">{issuer.legalName}</p>
 					<p>{issuer.addressLine}</p>
 					<p>{issuer.postalCode} {issuer.city}</p>
