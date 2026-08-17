@@ -14,6 +14,17 @@ import { chromium, type Browser } from 'playwright';
 // boîte « Enregistrer au format PDF » du navigateur n'obéit à aucun standard —
 // un en-tête `Content-Disposition`, si.
 
+/**
+ * Pied de page du rendu PDF : « Page X / Y », centré.
+ *
+ * Tout est en style en ligne parce que ce fragment est rendu dans un document
+ * ISOLÉ, qui ne voit ni la feuille de styles de l'application ni celle de la
+ * pièce. La taille est imposée pour la même raison : Chromium applique une
+ * taille nulle par défaut au contenu d'un gabarit, et le pied resterait
+ * invisible.
+ */
+const PAGE_FOOTER = `<div style="width:100%;margin:0 1.6cm;font-family:system-ui,sans-serif;font-size:8px;color:#6b7280;text-align:center;">Page <span class="pageNumber"></span> / <span class="totalPages"></span></div>`;
+
 /** Adresse par laquelle le serveur s'atteint lui-même. */
 // eslint-disable-next-line @typescript-eslint/no-unnecessary-condition
 const INTERNAL_BASE = env.PDF_INTERNAL_BASE ?? `http://127.0.0.1:${env.PORT ?? '3000'}`;
@@ -107,10 +118,18 @@ export async function renderPagePdf(path: string, sid: string): Promise<Uint8Arr
 		// `preferCSSPageSize` fait autorité au `@page` de la feuille — sans lui, le
 		// format passé ici l'écraserait et les marges des pages de suite
 		// disparaîtraient.
+		//
+		// La pagination passe par le pied de Chromium et non par CSS.
+		// La place qu'il occupe est réservée par la marge basse du `@page` de la feuille.
 		return await page.pdf({
 			printBackground: true,
 			preferCSSPageSize: true,
-			format: 'A4'
+			format: 'A4',
+			displayHeaderFooter: true,
+			// Un gabarit vide et non l'absence de gabarit : sans lui Chromium
+			// imprime son en-tête par défaut, titre de la page et URL comprises.
+			headerTemplate: '<div></div>',
+			footerTemplate: PAGE_FOOTER
 		});
 	} finally {
 		await context.close();

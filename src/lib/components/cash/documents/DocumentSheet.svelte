@@ -55,16 +55,20 @@
      démonter est le seul moyen de le cantonner à cet écran. -->
 <svelte:head>
 	<style>
+		/* La marge basse est RÉSERVÉE au pied de page : c'est là que Chromium
+		   dessine « Page X/Y » au moment du rendu PDF (voir `$lib/server/pdf`).
+		   Sans elle, le numéro se superposerait au bas du contenu. */
 		@page {
 			size: A4;
-			margin: 1.2cm 0;
+			margin: 1.2cm 0 1.1cm;
 		}
 
-		/* La première page reste à fleur pour que le bandeau touche les bords,
-		   comme dans le modèle ; les suivantes prennent une marge, sans quoi le
-		   tableau reprend dans la zone que les imprimantes n'atteignent pas. */
+		/* La première page reste à fleur EN HAUT pour que le bandeau touche les
+		   bords, comme dans le modèle ; les suivantes prennent une marge, sans quoi
+		   le tableau reprend dans la zone que les imprimantes n'atteignent pas. La
+		   marge basse, elle, vaut pour toutes les pages : c'est la place du numéro. */
 		@page :first {
-			margin: 0;
+			margin: 0 0 1.1cm;
 		}
 
 		@media print {
