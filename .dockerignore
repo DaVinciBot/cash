@@ -5,6 +5,9 @@ dist
 coverage
 playwright-report
 test-results
+docs
+test
+*.md
 
 .git
 .github
@@ -15,4 +18,12 @@ test-results
 
 .env
 .env.*
-!.env.example
+
+.editorconfig
+.prettierignore
+.prettierrc
+eslint.config.js
+vitest.config.ts
+compose.yaml
+Dockerfile
+.dockerignore
