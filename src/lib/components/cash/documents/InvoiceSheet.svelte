@@ -2,10 +2,15 @@
 	// Facture — la pièce qui réclame un paiement : elle porte donc les conditions
 	// de règlement et les coordonnées bancaires, sans quoi le client ne sait pas
 	// où payer.
+	//
+	// Elle porte aussi les mentions que la facturation électronique impose et que
+	// les autres pièces n'ont pas : DEUX dates (l'émission et la réalisation),
+	// la référence du bon de commande, le SIREN du client, et la nature de l'opération.
 	import DocumentSheet from './DocumentSheet.svelte';
 	import LinesTable from './helpers/LinesTable.svelte';
 	import SubjectBlock from './helpers/SubjectBlock.svelte';
 	import TotalsBlock from './helpers/TotalsBlock.svelte';
+	import { INVOICE_OPERATION_LABELS, formatSiren } from '$lib/documents';
 	import type { GeneratedDocument } from '$lib/server/reports';
 
 	interface Props {
@@ -15,6 +20,7 @@
 	let { doc }: Props = $props();
 
 	const issuer = $derived(doc.issuer);
+	const day = new Intl.DateTimeFormat('fr-FR', { dateStyle: 'long' });
 	const total = $derived(
 		doc.lines.length > 0
 			? doc.lines.reduce((sum, l) => sum + l.quantity * l.unitPriceTtc, 0)
@@ -22,7 +28,36 @@
 	);
 </script>
 
-<DocumentSheet {doc}>
+<DocumentSheet {doc} issuedLabel="Date d'émission">
+	{#snippet meta()}
+		<dl class="mt-1 text-sm text-gray-600">
+			{#if doc.serviceOn}
+				<div class="flex gap-1">
+					<dt>Date de la prestation ou de la livraison&nbsp;:</dt>
+					<dd>{day.format(new Date(doc.serviceOn))}</dd>
+				</div>
+			{/if}
+			{#if doc.operationKind}
+				<div class="flex gap-1">
+					<dt>Nature de l'opération&nbsp;:</dt>
+					<dd>{INVOICE_OPERATION_LABELS[doc.operationKind]}</dd>
+				</div>
+			{/if}
+			{#if doc.purchaseOrder}
+				<div class="flex gap-1">
+					<dt>Bon de commande&nbsp;:</dt>
+					<dd class="font-mono">{doc.purchaseOrder}</dd>
+				</div>
+			{/if}
+		</dl>
+	{/snippet}
+
+	{#snippet recipientExtra()}
+		{#if doc.recipientSiren}
+			<p>SIREN {formatSiren(doc.recipientSiren)}</p>
+		{/if}
+	{/snippet}
+
 	{#snippet body()}
 		<section class="mt-8">
 			<LinesTable lines={doc.lines} />

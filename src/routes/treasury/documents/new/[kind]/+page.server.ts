@@ -1,7 +1,8 @@
 import { resolve } from '$app/paths';
+import { isInvoiceOperationKind, isValidSiren } from '$lib/documents';
 import { rejection } from '$lib/server/audit';
 import { decimal, text, textAll } from '$lib/server/form';
-import { missingIssuerFields, organization } from '$lib/server/reports';
+import { missingIssuerFields, organization, type ExpenseLine } from '$lib/server/reports';
 import { flowList, periods } from '$lib/server/treasury';
 import { DOCUMENT_KINDS, documentFollowsFlow, type DocumentKind } from '@davincibot/lib';
 import { error, fail, redirect } from '@sveltejs/kit';
@@ -83,6 +84,31 @@ export const actions: Actions = {
 			});
 		}
 
+		// La facturation électronique impose des mentions que les autres pièces
+		// n'ont pas. Elles sont vérifiées AVANT que le numéro de série soit
+		// consommé : une facture incomplète devrait être annulée et réémise.
+		const serviceOn = text(form, 'service_on');
+		const purchaseOrder = text(form, 'purchase_order');
+		const recipientSiren = text(form, 'recipient_siren').replace(/\s/g, '');
+		const rawOperation = text(form, 'operation_kind');
+
+		if (kind === 'invoice') {
+			if (!ISO_DAY.test(serviceOn)) {
+				return fail(400, {
+					message: 'La date de la prestation ou de la livraison est obligatoire.'
+				});
+			}
+			if (purchaseOrder.length === 0) {
+				return fail(400, { message: 'Le numéro de bon de commande est obligatoire.' });
+			}
+			if (!isValidSiren(recipientSiren)) {
+				return fail(400, { message: 'Le SIREN du client doit comporter neuf chiffres valides.' });
+			}
+			if (!isInvoiceOperationKind(rawOperation)) {
+				return fail(400, { message: "La nature de l'opération est obligatoire." });
+			}
+		}
+
 		const labels = textAll(form, 'line_label');
 		const quantities = textAll(form, 'line_quantity').map((v) => Number(v.replace(',', '.')));
 		const prices = textAll(form, 'line_price').map((v) => Number(v.replace(',', '.')));
@@ -102,20 +128,65 @@ export const actions: Actions = {
 					l.unitPriceTtc >= 0
 			);
 
+		// Une dépense remboursée se décrit autrement qu'un article vendu : une
+		// date, une nature, et deux montants dont l'écart est la TVA avancée.
+		const expenseDates = textAll(form, 'expense_date');
+		const expenseLabels = textAll(form, 'expense_label');
+		const expenseHt = textAll(form, 'expense_ht').map((v) => Number(v.replace(',', '.')));
+		const expenseTtc = textAll(form, 'expense_ttc').map((v) => Number(v.replace(',', '.')));
+
+		const expenseLines: ExpenseLine[] =
+			kind === 'expense_report'
+				? expenseLabels
+						.map((label, i) => {
+							const ttc = expenseTtc[i] ?? Number.NaN;
+							return {
+								occurredOn: (expenseDates[i] ?? '').trim(),
+								label: label.trim(),
+								// Sans TVA saisie, le HT vaut le TTC : la dépense n'en portait
+								// pas, ou le justificatif ne la détaille pas.
+								amountHt: Number.isFinite(expenseHt[i]) ? (expenseHt[i] ?? 0) : ttc,
+								amountTtc: ttc
+							};
+						})
+						.filter((l) => l.label.length > 0 && Number.isFinite(l.amountTtc) && l.amountTtc >= 0)
+				: [];
+
+		// La date de la dépense est ce qui rattache un justificatif à la note :
+		// sans elle, le trésorier ne peut plus rapprocher la ligne du ticket.
+		if (expenseLines.some((l) => !ISO_DAY.test(l.occurredOn))) {
+			return fail(400, { message: 'Chaque dépense doit porter sa date.' });
+		}
+
 		const flowId = rawFlow === '' ? null : Number(rawFlow);
 		if (flowId !== null && !Number.isSafeInteger(flowId)) {
 			return fail(400, { message: 'Mouvement invalide.' });
 		}
 
-		// Le montant vient des lignes quand il y en a, du champ sinon : un reçu de
-		// don n'a qu'un montant, une facture a un détail.
-		const fromLines =
-			Math.round(lines.reduce((sum, l) => sum + l.quantity * l.unitPriceTtc, 0) * 100) / 100;
-		const amount =
-			lines.length > 0 ? fromLines : Math.round(decimal(form, 'amount_ttc') * 100) / 100;
+		// Le montant vient du détail quand il y en a, du champ sinon : un reçu de
+		// don n'a qu'un montant, une facture a des lignes, une note de frais des
+		// dépenses. C'est le TTC qui fait foi — c'est ce qui est dû.
+		const round = (v: number) => Math.round(v * 100) / 100;
+		const detailTotal =
+			kind === 'expense_report'
+				? expenseLines.length > 0
+					? round(expenseLines.reduce((s, l) => s + l.amountTtc, 0))
+					: null
+				: lines.length > 0
+					? round(lines.reduce((s, l) => s + l.quantity * l.unitPriceTtc, 0))
+					: null;
+
+		const amount = detailTotal ?? round(decimal(form, 'amount_ttc'));
 
 		if (!Number.isFinite(amount) || amount < 0) {
 			return fail(400, { message: 'Le montant doit être un nombre positif.' });
+		}
+
+		// Un HT supérieur au TTC produirait une TVA négative sur la pièce.
+		if (expenseLines.some((l) => l.amountHt > l.amountTtc)) {
+			return fail(400, {
+				message: "Le montant HT d'une dépense ne peut pas dépasser son montant TTC."
+			});
 		}
 
 		const { data: number, error: numberError } = await locals.supabase
@@ -149,6 +220,7 @@ export const actions: Actions = {
 				subject: subject || null,
 				payload: {
 					lines,
+					expenseLines,
 					issuer: org,
 					donation:
 						kind === 'tax_receipt'
@@ -156,7 +228,13 @@ export const actions: Actions = {
 							: null,
 					// L'IBAN du bénéficiaire d'une note de frais change à chaque
 					// document : il appartient à la pièce, pas à l'association.
-					beneficiaryIban: kind === 'expense_report' ? text(form, 'beneficiary_iban') || null : null
+					beneficiaryIban:
+						kind === 'expense_report' ? text(form, 'beneficiary_iban') || null : null,
+					serviceOn: kind === 'invoice' ? serviceOn : null,
+					purchaseOrder: kind === 'invoice' ? purchaseOrder : null,
+					recipientSiren: kind === 'invoice' ? recipientSiren : null,
+					operationKind:
+						kind === 'invoice' && isInvoiceOperationKind(rawOperation) ? rawOperation : null
 				}
 			})
 			.select('id')

@@ -14,11 +14,24 @@
 		doc: GeneratedDocument;
 		body: Snippet;
 		footer?: Snippet;
+		/**
+		 * Nommer la date en tête n'a d'intérêt que sur les pièces qui en portent
+		 * deux — ailleurs, une date seule sous le titre se comprend sans étiquette.
+		 */
+		issuedLabel?: string;
+		/** Mentions propres à la pièce, sous le titre (dates, références). */
+		meta?: Snippet;
+		/** Complément d'identité du destinataire (SIREN, IBAN à rembourser…). */
+		recipientExtra?: Snippet;
 	}
 
-	let { doc, body, footer }: Props = $props();
+	let { doc, body, footer, issuedLabel, meta, recipientExtra }: Props = $props();
 
-	const issuer = $derived(doc.issuer);
+	// Une note de frais est une pièce INTERNE : l'association n'y est pas un
+	// émetteur qui s'adresse à un tiers, elle est les deux bouts de l'échange.
+	// Répéter son adresse en face du bénéficiaire n'apprend donc rien.
+	const showIssuer = $derived(doc.kind !== 'expense_report');
+	const issuer = $derived(showIssuer ? doc.issuer : null);
 	const day = new Intl.DateTimeFormat('fr-FR', { dateStyle: 'long' });
 
 	// Le destinataire ne porte pas le même nom selon la pièce — c'est le libellé
@@ -101,7 +114,11 @@
 				{DOCUMENT_KIND_LABELS[doc.kind]}
 				<span class="font-mono text-xl">{doc.number}</span>
 			</h1>
-			<p class="mt-1 text-sm text-gray-600">{day.format(new Date(doc.issuedOn))}</p>
+			<p class="mt-1 text-sm text-gray-600">
+				{#if issuedLabel}{issuedLabel}&nbsp;:
+				{/if}{day.format(new Date(doc.issuedOn))}
+			</p>
+			{#if meta}{@render meta()}{/if}
 		</header>
 
 		<!-- Destinataire à gauche, émetteur à droite : disposition des modèles. -->
@@ -112,10 +129,11 @@
 				{#if doc.recipientAddress}
 					<p class="whitespace-pre-line">{doc.recipientAddress}</p>
 				{/if}
+				{#if recipientExtra}{@render recipientExtra()}{/if}
 			</div>
 
 			{#if issuer}
-				<div class="text-right">
+				<div class="text-right text-nowrap">
 					<p class="text-dvb font-bold">De la part de</p>
 					<p class="font-bold uppercase">{issuer.legalName}</p>
 					<p>{issuer.addressLine}</p>
@@ -123,7 +141,9 @@
 					{#if issuer.country !== 'France'}<p>{issuer.country}</p>{/if}
 					<p>Association loi 1901</p>
 					{#if issuer.siret}<p>SIRET {issuer.siret}</p>{/if}
-					{#if issuer.rna}<p>RNA {issuer.rna}</p>{/if}
+					<!-- Le RNA n'identifie l'association que devant l'administration : il
+					     ne dit rien à un client, alors que le Cerfa 11580 l'exige. -->
+					{#if doc.kind === 'tax_receipt' && issuer.rna}<p>RNA {issuer.rna}</p>{/if}
 					{#if issuer.vatNumber}<p>N° TVA {issuer.vatNumber}</p>{/if}
 				</div>
 			{/if}

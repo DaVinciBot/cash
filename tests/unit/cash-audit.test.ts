@@ -128,9 +128,9 @@ describe('résumé d’une entrée (CMD-F-62)', () => {
 	});
 
 	it('nomme le champ quand il n’y en a qu’un', () => {
-		expect(
-			summarizeActivity(entry({ changes: [{ field: 'quantity', old: 1, new: 2 }] }))
-		).toBe('Quantité modifié');
+		expect(summarizeActivity(entry({ changes: [{ field: 'quantity', old: 1, new: 2 }] }))).toBe(
+			'Quantité modifié'
+		);
 	});
 });
 

@@ -4,6 +4,7 @@
 	// CETTE pièce demande.
 	import { enhance } from '$app/forms';
 	import { resolve } from '$app/paths';
+	import { INVOICE_OPERATION_KINDS, INVOICE_OPERATION_LABELS } from '$lib/documents';
 	import { DOCUMENT_KIND_LABELS } from '@davincibot/lib';
 	import type { ActionData, PageData } from './$types';
 
@@ -32,23 +33,45 @@
 	};
 
 	// Un reçu fiscal porte un montant global ; les autres pièces se détaillent.
+	// Et la note de frais ne se détaille pas comme les autres : une dépense a une
+	// date et deux montants, pas une quantité et un prix unitaire.
 	const detailed = $derived(kind !== 'tax_receipt');
+	const isExpense = $derived(kind === 'expense_report');
+
+	const number = (raw: string) => Number(raw.replace(',', '.'));
+	const round = (v: number) => Math.round(v * 100) / 100;
 
 	let lines = $state<{ id: number; label: string; quantity: string; price: string }[]>([
 		{ id: 0, label: '', quantity: '1', price: '' }
 	]);
 	let nextLine = 1;
 
+	let expenses = $state<{ id: number; date: string; label: string; ht: string; ttc: string }[]>([
+		{ id: 0, date: today, label: '', ht: '', ttc: '' }
+	]);
+	let nextExpense = 1;
+
 	const total = $derived(
-		Math.round(
-			lines.reduce((sum, l) => {
-				const q = Number(l.quantity.replace(',', '.'));
-				const p = Number(l.price.replace(',', '.'));
-				return sum + (Number.isFinite(q) && Number.isFinite(p) ? q * p : 0);
-			}, 0) * 100
-		) / 100
+		isExpense
+			? round(
+					expenses.reduce((sum, e) => {
+						const ttc = number(e.ttc);
+						return sum + (Number.isFinite(ttc) ? ttc : 0);
+					}, 0)
+				)
+			: round(
+					lines.reduce((sum, l) => {
+						const q = number(l.quantity);
+						const p = number(l.price);
+						return sum + (Number.isFinite(q) && Number.isFinite(p) ? q * p : 0);
+					}, 0)
+				)
 	);
-	const hasLines = $derived(lines.some((l) => l.label.trim().length > 0));
+	const hasLines = $derived(
+		isExpense
+			? expenses.some((e) => e.label.trim().length > 0)
+			: lines.some((l) => l.label.trim().length > 0)
+	);
 
 	function addLine() {
 		lines = [...lines, { id: nextLine++, label: '', quantity: '1', price: '' }];
@@ -58,6 +81,16 @@
 			lines.length > 1
 				? lines.filter((l) => l.id !== id)
 				: [{ id, label: '', quantity: '1', price: '' }];
+	}
+
+	function addExpense() {
+		expenses = [...expenses, { id: nextExpense++, date: today, label: '', ht: '', ttc: '' }];
+	}
+	function removeExpense(id: number) {
+		expenses =
+			expenses.length > 1
+				? expenses.filter((e) => e.id !== id)
+				: [{ id, date: today, label: '', ht: '', ttc: '' }];
 	}
 
 	const CHAMP =
@@ -116,6 +149,37 @@
 				Adresse
 				<textarea name="recipient_address" class={CHAMP} rows="2"></textarea>
 			</label>
+
+			{#if kind === 'invoice'}
+				<div class="mt-3 grid gap-3 md:grid-cols-2">
+					<label class="text-xs text-gray-300">
+						Date de la prestation ou de la livraison
+						<input name="service_on" class={CHAMP} required type="date" value={today} />
+					</label>
+					<label class="text-xs text-gray-300">
+						SIREN du client
+						<input
+							name="recipient_siren"
+							class="{CHAMP} font-mono"
+							inputmode="numeric"
+							placeholder="123 456 789"
+							required
+						/>
+					</label>
+					<label class="text-xs text-gray-300">
+						Numéro de bon de commande
+						<input name="purchase_order" class={CHAMP} required />
+					</label>
+					<label class="text-xs text-gray-300">
+						Nature de l'opération
+						<select name="operation_kind" class={CHAMP} required>
+							{#each INVOICE_OPERATION_KINDS as operation (operation)}
+								<option value={operation}>{INVOICE_OPERATION_LABELS[operation]}</option>
+							{/each}
+						</select>
+					</label>
+				</div>
+			{/if}
 		</fieldset>
 
 		<fieldset class="rounded-lg border border-gray-700 bg-gray-800 p-4">
@@ -123,7 +187,77 @@
 				{detailed ? 'Détail' : 'Montant'}
 			</legend>
 
-			{#if detailed}
+			{#if isExpense}
+				{#each expenses as expense (expense.id)}
+					<div class="mb-2 flex flex-wrap items-end gap-2">
+						<label class="text-xs text-gray-300">
+							Date de la dépense
+							<input
+								name="expense_date"
+								class="{CHAMP} w-40"
+								required
+								type="date"
+								bind:value={expense.date}
+							/>
+						</label>
+						<label class="flex-1 text-xs text-gray-300">
+							Type de dépense
+							<input name="expense_label" class={CHAMP} bind:value={expense.label} />
+						</label>
+						<label class="text-xs text-gray-300">
+							Montant HT
+							<input
+								name="expense_ht"
+								class="{CHAMP} w-28"
+								inputmode="decimal"
+								placeholder="0,00"
+								bind:value={expense.ht}
+							/>
+						</label>
+						<label class="text-xs text-gray-300">
+							Montant TTC
+							<input
+								name="expense_ttc"
+								class="{CHAMP} w-28"
+								inputmode="decimal"
+								placeholder="0,00"
+								bind:value={expense.ttc}
+							/>
+						</label>
+						<button
+							class="rounded-lg border border-gray-600 px-3 py-2 text-xs text-gray-300 hover:bg-gray-700"
+							onclick={() => {
+								removeExpense(expense.id);
+							}}
+							type="button">Retirer</button
+						>
+					</div>
+				{/each}
+
+				<div class="mt-2 flex flex-wrap items-center gap-3">
+					<button
+						class="rounded-lg border border-gray-600 px-3 py-1.5 text-xs text-gray-200 hover:bg-gray-700"
+						onclick={addExpense}
+						type="button">Ajouter une dépense</button
+					>
+					{#if hasLines}
+						<span class="text-xs text-gray-400">Total TTC : {euro.format(total)}</span>
+					{:else}
+						<label class="text-xs text-gray-300">
+							Montant TTC <span class="text-gray-500">(sans détail)</span>
+							<input
+								name="amount_ttc"
+								class="{CHAMP} ml-2 inline-block w-28"
+								inputmode="decimal"
+								placeholder="0,00"
+							/>
+						</label>
+					{/if}
+					<span class="text-xs text-gray-500">
+						Le HT laissé vide vaut le TTC : l'écart entre les deux est la TVA avancée.
+					</span>
+				</div>
+			{:else if detailed}
 				{#each lines as line (line.id)}
 					<div class="mb-2 flex flex-wrap items-end gap-2">
 						<label class="flex-1 text-xs text-gray-300">
@@ -165,10 +299,10 @@
 						type="button">Ajouter une ligne</button
 					>
 					{#if hasLines}
-						<span class="text-xs text-gray-400">Total : {euro.format(total)}</span>
+						<span class="text-xs text-gray-400">Total TTC : {euro.format(total)}</span>
 					{:else}
 						<label class="text-xs text-gray-300">
-							Montant <span class="text-gray-500">(sans détail)</span>
+							Montant TTC <span class="text-gray-500">(sans détail)</span>
 							<input
 								name="amount_ttc"
 								class="{CHAMP} ml-2 inline-block w-28"

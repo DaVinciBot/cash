@@ -4,6 +4,7 @@
 // (finance.read / finance.documents.generate) et `organization_read` /
 // `organization_write` (finance.read / finance.write) tranchent.
 
+import type { InvoiceOperationKind } from '$lib/documents';
 import type { Database } from '@davincibot/database-types';
 import type { DocumentKind } from '@davincibot/lib';
 import type { SupabaseClient } from '@supabase/supabase-js';
@@ -120,6 +121,17 @@ export type DocumentLine = {
 	unitPriceTtc: number;
 };
 
+// Même raison que pour DocumentLine : ces lignes partent dans `payload`, et une
+// interface n'a pas l'index signature implicite qu'attend `Json`.
+// eslint-disable-next-line @typescript-eslint/consistent-type-definitions -- voir ci-dessus
+export type ExpenseLine = {
+	/** Date de la dépense, distincte de la date d'émission de la note. */
+	occurredOn: string;
+	label: string;
+	amountHt: number;
+	amountTtc: number;
+};
+
 export interface GeneratedDocument {
 	id: number;
 	kind: DocumentKind;
@@ -131,19 +143,34 @@ export interface GeneratedDocument {
 	subject: string | null;
 	flowId: number | null;
 	lines: DocumentLine[];
+	/** Dépenses détaillées — propre à la note de frais. */
+	expenseLines: ExpenseLine[];
 	/** Identité de l'émetteur figée à l'émission — un document ne se réécrit pas. */
 	issuer: Organization | null;
 	/** Champs propres au reçu fiscal (nature et mode du don). */
 	donation: { nature: string | null; method: string | null } | null;
 	/** Compte à rembourser — propre à la note de frais. */
 	beneficiaryIban: string | null;
+	/** Date de réalisation de la prestation ou de livraison — propre à la facture. */
+	serviceOn: string | null;
+	/** Référence du bon de commande du client — propre à la facture. */
+	purchaseOrder: string | null;
+	/** SIREN du client facturé — propre à la facture. */
+	recipientSiren: string | null;
+	/** Nature de l'opération facturée — propre à la facture. */
+	operationKind: InvoiceOperationKind | null;
 }
 
 interface Payload {
 	lines?: DocumentLine[];
+	expenseLines?: ExpenseLine[];
 	issuer?: Organization;
 	donation?: { nature: string | null; method: string | null };
 	beneficiaryIban?: string | null;
+	serviceOn?: string | null;
+	purchaseOrder?: string | null;
+	recipientSiren?: string | null;
+	operationKind?: InvoiceOperationKind | null;
 }
 
 function toDocument(
@@ -161,9 +188,14 @@ function toDocument(
 		subject: row.subject,
 		flowId: row.flow_id,
 		lines: payload.lines ?? [],
+		expenseLines: payload.expenseLines ?? [],
 		issuer: payload.issuer ?? null,
 		beneficiaryIban: payload.beneficiaryIban ?? null,
-		donation: payload.donation ?? null
+		donation: payload.donation ?? null,
+		serviceOn: payload.serviceOn ?? null,
+		purchaseOrder: payload.purchaseOrder ?? null,
+		recipientSiren: payload.recipientSiren ?? null,
+		operationKind: payload.operationKind ?? null
 	};
 }
 
