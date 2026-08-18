@@ -2,12 +2,12 @@ name: CI
 
 on:
   push:
-    branches: [ dev, staging, main, master, 'release/**', 'hotfix/**' ]
+    branches: [dev, staging, main, master, 'release/**', 'hotfix/**']
     paths-ignore:
       - '**/*.md'
       - '.vscode/**'
   pull_request:
-    branches: [ dev, staging, main, master, 'release/**', 'hotfix/**' ]
+    branches: [dev, staging, main, master, 'release/**', 'hotfix/**']
     paths-ignore:
       - '**/*.md'
       - '.vscode/**'
