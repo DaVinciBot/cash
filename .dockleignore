@@ -1,0 +1,11 @@
+# Points de contrôle ignorés par dockle — `shared-workflows/container.yml`.
+# Liste des règles : https://github.com/goodwithtech/dockle/blob/master/CHECKPOINT.md
+
+# CIS-DI-0005 — Docker Content Trust. Les images sont signées en keyless avec
+# Cosign dans `container.yml` ; DCT n'entre pas dans la chaîne.
+CIS-DI-0005
+
+# CIS-DI-0008 — binaires setuid/setgid (mount, su, passwd…) hérités de
+# debian-slim. Les retirer casserait apt sans rien gagner : le conteneur tourne
+# déjà sous l'utilisateur non privilégié `node`.
+CIS-DI-0008

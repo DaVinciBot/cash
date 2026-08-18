@@ -1,0 +1,28 @@
+# Analyse de configuration — `checkov` dans `shared-workflows/security-scan.yml`.
+# Règles : https://www.checkov.io/5.Policy%20Index/all.html
+
+# Secrets et vulnérabilités de dépendances sont déjà couverts par Trivy dans le
+# même workflow ; les repasser ici ne ferait que dupliquer les alertes.
+framework:
+  - dockerfile
+  - github_actions
+
+directory:
+  - .
+
+skip-path:
+  - node_modules
+  - .svelte-kit
+  - build
+  - dist
+  - .playwright
+
+skip-check:
+  # CKV_GHA_7 — exige des `workflow_dispatch` sans entrée. C'est une règle de
+  # provenance de build (SLSA) ; `deploy.yml` est un déclenchement manuel de
+  # déploiement dont les entrées `environment` et `image_tag` sont la raison d'être.
+  - CKV_GHA_7
+
+compact: true
+quiet: true
+soft-fail: false
