@@ -41,10 +41,9 @@ WORKDIR /app
 
 ENV PLAYWRIGHT_BROWSERS_PATH=/app/.playwright
 
-COPY package.json ./
-COPY --from=deps /app/node_modules ./node_modules
-COPY --from=deps /app/.playwright ./.playwright
-COPY --from=build /app/build ./build
+COPY --chown=node:node package.json ./
+COPY --from=deps --chown=node:node /app/node_modules ./node_modules
+COPY --from=deps --chown=node:node /app/.playwright ./.playwright
 
 # Bibliothèques système dont Chromium a besoin. La liste est demandée à
 # Playwright lui-même plutôt qu'écrite en dur : elle change d'une version de
@@ -59,6 +58,12 @@ RUN apt-get update \
 RUN rm -rf /usr/local/lib/node_modules/npm /usr/local/lib/node_modules/corepack \
     /usr/local/bin/npm /usr/local/bin/npx /usr/local/bin/corepack
 
+# Utilisateur node : non privilégié fourni par l'image officielle.
+USER 1000
+
 EXPOSE 3000
+
+HEALTHCHECK --interval=30s --timeout=5s --start-period=10s --retries=3 \
+    CMD ["node", "-e", "fetch('http://127.0.0.1:' + (process.env.PORT || 3000) + '/health').then((r) => process.exit(r.ok ? 0 : 1)).catch(() => process.exit(1))"]
 
 CMD ["node", "build"]
