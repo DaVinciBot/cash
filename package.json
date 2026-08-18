@@ -18,7 +18,7 @@
 		"ci-workflow": "pnpm check && pnpm lint && pnpm test:unit && pnpm build"
 	},
 	"devDependencies": {
-		"@davincibot/config": "^3.1.0",
+		"@davincibot/config": "^3.2.0",
 		"@eslint/js": "^10.0.1",
 		"@playwright/test": "^1.61.0",
 		"@sveltejs/adapter-auto": "^7.0.1",
