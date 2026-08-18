@@ -2,8 +2,8 @@
 
 rules:
   # Part des octets de l'image qui servent réellement.
-  lowestEfficiency: 0.90
+  lowestEfficiency: 0.9
   # Octets écrits dans une couche puis écrasés ou supprimés par une couche suivante.
   highestWastedBytes: 50MB
   # Octets gaspillés, rapportés aux octets ajoutés par les couches applicatives.
-  highestUserWastedPercent: 0.10
+  highestUserWastedPercent: 0.1
