@@ -1,4 +1,5 @@
 import { resolve } from '$app/paths';
+import { rejection } from '$lib/server/audit';
 import { budgetPressure, currentSchoolYear, memberProjects, resolveCampus } from '$lib/server/cash';
 import { jsonArray, text, textAll } from '$lib/server/form';
 import { cashErrorMessage, type Campus, type ItemTag } from '@davincibot/lib';
@@ -76,7 +77,9 @@ function parseLines(form: FormData): { lines: CartLine[]; message?: string } {
 	return { lines };
 }
 
-export const load: PageServerLoad = async ({ locals }) => {
+export const load: PageServerLoad = async ({ depends, locals }) => {
+	depends('cash:item-form');
+
 	const { user } = await locals.safeGetSession();
 	if (!user?.id) {
 		error(401, 'Session expirée.');
@@ -207,7 +210,14 @@ export const actions: Actions = {
 
 		if (insertError) {
 			return fail(400, {
-				message: cashErrorMessage(insertError.code, "Ces composants n'ont pas pu être enregistrés.")
+				message: await rejection(
+					locals.supabase,
+					insertError,
+					"Ces composants n'ont pas pu être enregistrés.",
+					{
+						entityType: 'item'
+					}
+				)
 			});
 		}
 

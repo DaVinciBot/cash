@@ -74,7 +74,13 @@
 		key: 'id, username, avatar_url, status, member_of!membre_projet_profile_fkey(project!inner(id, name), revoked_at)'
 	};
 
-	let canEditMembers = $state<boolean>(false);
+	let canEditProfile = $state<boolean>(false);
+	let canManageRoles = $state<boolean>(false);
+	let canManageProjects = $state<boolean>(false);
+	let canInviteMembers = $state<boolean>(false);
+	let canUpdateStatus = $state<boolean>(false);
+	const canReinvite = $derived(canEditProfile || canUpdateStatus);
+	const canImportMembers = $derived(canInviteMembers && canManageRoles && canManageProjects);
 	let pendingInvites = $state<AuthUser[]>([]);
 	let pendingInvitesLoading = $state<boolean>(false);
 	let pendingInvitesError = $state('');
@@ -172,7 +178,7 @@
 	}
 
 	async function loadPendingInvites() {
-		if (!canEditMembers) {
+		if (!canReinvite) {
 			pendingInvites = [];
 			pendingInvitesError = '';
 			return;
@@ -209,7 +215,7 @@
 	}
 
 	async function reinvitePendingUser(authUser: AuthUser) {
-		if (!canEditMembers) {
+		if (!canReinvite) {
 			alert("Vous n'avez pas les permissions requises pour réinviter un utilisateur.");
 			return;
 		}
@@ -291,18 +297,23 @@
 				projectFilter.options = allProjects;
 			}
 		}
-		canEditMembers = hasAnyPermission(user?.permissions ?? [], ['members.profile.update.all']);
+		const permissions = user?.permissions ?? [];
+		canEditProfile = hasAnyPermission(permissions, ['members.profile.update.all']);
+		canManageRoles = hasAnyPermission(permissions, ['iam.roles.manage']);
+		canManageProjects = hasAnyPermission(permissions, ['members.projects.update.all']);
+		canInviteMembers = hasAnyPermission(permissions, ['members.invite.send']);
+		canUpdateStatus = hasAnyPermission(permissions, ['members.profile.status.update']);
 	});
 
 	$effect(() => {
-		if (canEditMembers && !pendingInvitesInitialized) {
+		if (canReinvite && !pendingInvitesInitialized) {
 			pendingInvitesInitialized = true;
 			void loadPendingInvites();
 		}
 	});
 
 	$effect(() => {
-		if (!canEditMembers) {
+		if (!canReinvite) {
 			pendingInvitesInitialized = false;
 			pendingInvites = [];
 			pendingInvitesError = '';
@@ -334,9 +345,9 @@
 				projectOptions: allProjects,
 				title: 'Importer des utilisateurs',
 				onSubmit: async ({ project, users }: { project: string; users: ImportUser[] }) => {
-					if (!canEditMembers) {
+					if (!canImportMembers) {
 						throw new Error(
-							"Vous n'avez pas les permissions requises pour cette action (members.profile.update.all nécessaire)."
+							"Vous n'avez pas les permissions requises pour cette action (members.invite.send, iam.roles.manage et members.projects.update.all nécessaires)."
 						);
 					}
 
@@ -408,6 +419,13 @@
 								if (profileError) {
 									throw new Error((profileError as { message: string }).message);
 								}
+								const { error: roleError } = await supabase.rpc('assign_global_role', {
+									p_profile: createdUserId,
+									p_role: DEFAULT_IMPORT_ROLE
+								});
+								if (roleError) {
+									throw new Error(roleError.message);
+								}
 								const { error: memberError } = await supabase.from('member_of').insert({
 									profile: createdUserId,
 									project: projectId,
@@ -415,16 +433,6 @@
 								});
 								if (memberError) {
 									throw new Error((memberError as { message: string }).message);
-								}
-								// Rôle global par défaut. Le trigger handle_new_user pose déjà
-								// `member` à la création auth ; on le (re)confirme via la RPC
-								// (idempotente) au cas où le trigger n'aurait pas tourné.
-								const { error: roleError } = await supabase.rpc('assign_global_role', {
-									p_profile: createdUserId,
-									p_role: DEFAULT_IMPORT_ROLE
-								});
-								if (roleError) {
-									throw new Error(roleError.message);
 								}
 								createdUsers.push(email);
 								existingAuthUsers.set(email, {
@@ -576,7 +584,8 @@
 			'Override (exception)': [
 				{ label: 'Voir membres', value: 'members.profile.read.all' },
 				{ label: 'Éditer membres', value: 'members.profile.update.all' },
-				{ label: 'Éditer projets membres', value: 'members.projects.update.all' },
+				{ label: 'Éditer les rattachements aux projets', value: 'members.projects.update.all' },
+				{ label: 'Gérer les projets (nom, campus, budget)', value: 'projects.manage.all' },
 				{ label: 'Inviter un membre', value: 'members.invite.send' },
 				{ label: 'Activer/Désactiver profil', value: 'members.profile.status.update' },
 				{ label: 'Gérer les rôles (IAM)', value: 'iam.roles.manage' },
@@ -594,7 +603,6 @@
 				{ label: 'Gérer ses propres items', value: 'orders.items.manage.self' },
 				{ label: 'Voir toutes commandes', value: 'orders.read.all' },
 				{ label: 'Créer commande globale', value: 'orders.create.all' },
-				{ label: 'Gérer le workflow commandes', value: 'orders.lifecycle.update.all' },
 				{ label: 'Regrouper des items en commande', value: 'orders.bundle.manage' },
 				{ label: 'Refuser un item (trésorier)', value: 'orders.items.refuse' },
 				{ label: 'Marquer un item reçu', value: 'orders.items.receive' },
@@ -650,13 +658,84 @@
 		}
 	}
 
+	/**
+	 * Applique un diff de rattachements projet. `member_of` est immuable : un
+	 * retrait ou un changement de rôle pose `revoked_at` sur la ligne active, la
+	 * nouvelle attribution arrivant derrière sous forme de ligne neuve.
+	 */
+	async function applyProjectRoleDiff(
+		supabase: ReturnType<typeof getSupabaseBrowserClient>,
+		profileId: string,
+		next: ProjectRoleEntry[]
+	): Promise<void> {
+		const { data: memberData, error: memberError } = (await supabase
+			.from('member_of')
+			.select('project, role')
+			.eq('profile', profileId)
+			.is('revoked_at', null)) as {
+			data: { project: string | number; role: string }[] | null;
+			error: unknown;
+		};
+		if (memberError) {
+			throw new Error(
+				'Récupération des projets existants impossible : ' +
+					(memberError as { message: string }).message
+			);
+		}
+
+		const memberRows = memberData ?? [];
+		const currentProjectIds = memberRows.map((m) => m.project.toString());
+		// Une ligne sans projet est une ligne que l'utilisateur a ajoutée puis
+		// laissée vide : elle ne compte ni comme ajout ni comme conservation.
+		const nextEntries = next.filter(
+			(p) => p.project_id !== null && p.project_id !== undefined && p.project_id !== ''
+		);
+		const nextProjectIds = nextEntries.map((p) => String(p.project_id));
+		const toAdd = nextEntries.filter((p) => !currentProjectIds.includes(String(p.project_id)));
+		const toRemove = currentProjectIds.filter((pid) => !nextProjectIds.includes(pid));
+		const toReassign = nextEntries.filter((p) => {
+			const existing = memberRows.find((m) => m.project.toString() === String(p.project_id));
+			return existing !== undefined && existing.role !== p.role;
+		});
+
+		const projectIdsToRevoke = [...toRemove, ...toReassign.map((p) => String(p.project_id))]
+			.map((pid) => Number(pid))
+			.filter((pid) => Number.isInteger(pid));
+		if (projectIdsToRevoke.length > 0) {
+			const { error: revokeError } = await supabase
+				.from('member_of')
+				.update({ revoked_at: new Date().toISOString() })
+				.eq('profile', profileId)
+				.is('revoked_at', null)
+				.in('project', projectIdsToRevoke);
+			if (revokeError) {
+				throw new Error(
+					'Révocation des rattachements impossible : ' +
+						(revokeError as { message: string }).message
+				);
+			}
+		}
+
+		const rowsToInsert = [...toAdd, ...toReassign]
+			.map((p) => ({
+				profile: profileId,
+				project: Number(p.project_id),
+				role: (p.role || 'project_member') as ProjectRole
+			}))
+			.filter((row) => Number.isInteger(row.project));
+		if (rowsToInsert.length > 0) {
+			const { error: addError } = await supabase.from('member_of').insert(rowsToInsert);
+			if (addError) {
+				throw new Error(
+					'Rattachement aux projets impossible : ' + (addError as { message: string }).message
+				);
+			}
+		}
+	}
+
 	// Action handlers for rows
 	async function viewUser(e: Event) {
 		e.preventDefault();
-		if (!canEditMembers) {
-			alert("Vous n'avez pas les permissions requises pour modifier un utilisateur.");
-			return;
-		}
 		const supabase = getSupabaseBrowserClient();
 		const tr = (e.currentTarget as HTMLElement).closest('tr');
 		if (!tr) {
@@ -677,7 +756,7 @@
 			data:
 				| (ProfileRow & {
 						campus: Campus | null;
-						permissions: string[];
+						permissions: string[] | null;
 						status: string;
 						profile_global_roles: { role: string; revoked_at: string | null }[];
 				  })
@@ -693,12 +772,12 @@
 			.filter((r) => !r.revoked_at)
 			.map((r) => r.role as GlobalRole);
 
-		const overridePermissions = data.permissions.filter(Boolean);
+		const overridePermissions = (data.permissions ?? []).filter(Boolean);
 
 		const projectsData = data.member_of
 			.filter((m) => !m.revoked_at)
 			.map((m) => ({
-				project_id: m.project?.id,
+				project_id: m.project === null ? undefined : String(m.project.id),
 				role: (m.role || 'project_member') as ProjectRole
 			}))
 			.filter((m) => m.project_id !== undefined);
@@ -758,49 +837,66 @@
 			]
 		};
 
+		// Un champ n'est présenté que si l'appelant peut réellement l'enregistrer.
+		// Sa présence commande aussi l'écriture correspondante à la soumission :
+		// un champ absent ne doit jamais être lu comme « sélection vide », faute
+		// de quoi ouvrir la fiche révoquerait rôles et rattachements.
 		const fields = [
-			{
-				name: 'Nom',
-				type: 'text',
-				placeholder: 'Rob, aka Robert',
-				required: true,
-				wide: true
-			},
-			{
-				name: 'Campus',
-				type: 'select',
-				options: (Object.keys(CAMPUS_BADGES) as Campus[]).map((value) => ({
-					value,
-					text: CAMPUS_BADGES[value].label
-				}))
-			},
-			{
-				name: 'Rôles globaux',
-				id: 'roles',
-				type: 'permissions_grouped',
-				categories: roleCategories,
-				packages: [],
-				wide: true
-			},
-			{
-				name: 'Permissions (override exception)',
-				id: 'permissions',
-				type: 'permissions_grouped',
-				categories: overridePermissionCategories,
-				packages: [],
-				wide: true
-			},
-			{
-				name: 'Projets et rôles',
-				id: 'projects',
-				type: 'project_roles',
-				projects: allProjects,
-				roles: [
-					{ value: 'cdp', text: PROJECT_ROLE_LABELS_FR.cdp },
-					{ value: 'project_member', text: PROJECT_ROLE_LABELS_FR.project_member }
-				],
-				wide: true
-			}
+			...(canEditProfile
+				? [
+						{
+							name: 'Nom',
+							type: 'text',
+							placeholder: 'Rob, aka Robert',
+							required: true,
+							wide: true
+						},
+						{
+							name: 'Campus',
+							type: 'select',
+							options: (Object.keys(CAMPUS_BADGES) as Campus[]).map((value) => ({
+								value,
+								text: CAMPUS_BADGES[value].label
+							}))
+						}
+					]
+				: []),
+			...(canManageRoles
+				? [
+						{
+							name: 'Rôles globaux',
+							id: 'roles',
+							type: 'permissions_grouped',
+							categories: roleCategories,
+							packages: [],
+							wide: true
+						},
+						{
+							name: 'Permissions (override exception)',
+							id: 'permissions',
+							type: 'permissions_grouped',
+							categories: overridePermissionCategories,
+							packages: [],
+							wide: true
+						}
+					]
+				: []),
+			...(canManageProjects
+				? [
+						{
+							name: 'Projets et rôles',
+							id: 'projects',
+							type: 'project_roles',
+							projects: allProjects,
+							roles: [
+								{ value: 'cdp', text: PROJECT_ROLE_LABELS_FR.cdp },
+								{ value: 'project_member', text: PROJECT_ROLE_LABELS_FR.project_member }
+							],
+							defaultRole: 'project_member' satisfies ProjectRole,
+							wide: true
+						}
+					]
+				: [])
 		];
 		mountClosable(ReadDrawer, {
 			target: document.body,
@@ -814,149 +910,85 @@
 				) => {
 					const formData = new FormData(forms);
 
-					const nomVal = formData.get('Nom');
 					const nomField = newFields.find((f) => f.name === 'Nom');
-					const nom =
-						typeof nomVal === 'string'
-							? nomVal
-							: typeof nomField?.value === 'string'
-								? nomField.value
-								: '';
-
-					// rôles globaux (sélection cible)
+					const campusField = newFields.find((f) => f.name === 'Campus');
 					const rolesField = newFields.find((f) => f.id === 'roles');
-					const nextGlobalRoles = Array.isArray(rolesField?.value)
-						? (rolesField.value as GlobalRole[])
-						: [];
-
-					// override de permissions d'exception (profiles.permissions[])
 					const permsField = newFields.find((f) => f.id === 'permissions');
-					const extractedPermissions = Array.isArray(permsField?.value)
-						? (permsField.value as GlobalPermission[])
-						: [];
-
-					// projects
 					const projectsField = newFields.find((f) => f.id === 'projects');
-					const projectsRoles = Array.isArray(projectsField?.value)
-						? (projectsField.value as ProjectRoleEntry[])
-						: [];
 
-					// Le sélecteur renvoie 'undefined' quand rien n'est choisi ; la RPC traite
+					let nom: string | undefined;
+					if (nomField) {
+						const nomVal = formData.get('Nom');
+						nom =
+							typeof nomVal === 'string'
+								? nomVal
+								: typeof nomField.value === 'string'
+									? nomField.value
+									: '';
+					}
+
+					// Le sélecteur renvoie 'NULL' quand rien n'est choisi ; la RPC traite
 					// NULL comme « ne pas toucher », ce qui évite d'effacer un campus déjà
 					// posé en rouvrant simplement la fiche.
-					const campusVal = formData.get('Campus');
-					const campus =
-						typeof campusVal === 'string' && campusVal !== 'NULL'
-							? (campusVal as Campus)
+					let campus: Campus | undefined;
+					if (campusField) {
+						const campusVal = formData.get('Campus');
+						campus =
+							typeof campusVal === 'string' && campusVal !== 'NULL'
+								? (campusVal as Campus)
+								: undefined;
+					}
+
+					const extractedPermissions =
+						permsField && Array.isArray(permsField.value)
+							? (permsField.value as GlobalPermission[])
 							: undefined;
 
-					// update the profile (nom + override permissions + campus)
-					const { error: profileError } = await supabase.rpc('admin_update_profile', {
-						p_profile: id,
-						p_username: nom,
-						p_permissions: extractedPermissions,
-						p_campus: campus
-					});
-					if (profileError) {
-						alert(
-							'Erreur lors de la mise à jour du profil : ' +
-								(profileError as { message: string }).message
-						);
-						return;
-					}
-
-					// rôles globaux : diff via les RPC assign/revoke (immuabilité DB).
-					try {
-						await applyGlobalRoleDiff(supabase, id, activeGlobalRoles, nextGlobalRoles);
-					} catch (roleError) {
-						alert(
-							'Erreur lors de la mise à jour des rôles : ' +
-								((roleError as Error | null)?.message ?? 'Erreur inconnue')
-						);
-						return;
-					}
-
-					// Fetch existing ACTIVE project links (member_of est immuable :
-					// une révocation pose revoked_at, jamais de DELETE ; un changement
-					// de rôle = révoquer l'ancienne ligne + insérer la nouvelle).
-					const { data: memberData, error: memberError } = (await supabase
-						.from('member_of')
-						.select('project, role')
-						.eq('profile', id)
-						.is('revoked_at', null)) as {
-						data: { project: string | number; role: string }[] | null;
-						error: unknown;
-					};
-					if (memberError) {
-						alert(
-							'Erreur lors de la récupération des projets existants : ' +
-								(memberError as { message: string }).message
-						);
-						return;
-					}
-
-					const memberRows = memberData ?? [];
-					const currentProjectIds = memberRows.map((m) => m.project.toString());
-					const newProjectIds = projectsRoles
-						.map((p) => p.project_id?.toString())
-						.filter((id): id is string => Boolean(id));
-					const projectsToAdd = projectsRoles.filter(
-						(p) => p.project_id && !currentProjectIds.includes(p.project_id.toString())
-					);
-					const projectsToRemove = currentProjectIds.filter((pid) => !newProjectIds.includes(pid));
-					const projectsToUpdate = projectsRoles.filter((p) => {
-						if (!p.project_id) {
-							return false;
-						}
-						const existing = memberRows.find(
-							(m) => m.project.toString() === p.project_id?.toString()
-						);
-						return existing && existing.role !== p.role;
-					});
-
-					// Révocation (retraits + changements de rôle) : UPDATE revoked_at.
-					const projectIdsToRevoke = [
-						...projectsToRemove,
-						...projectsToUpdate
-							.map((p) => p.project_id?.toString())
-							.filter((pid): pid is string => Boolean(pid))
-					]
-						.map((pid) => Number(pid))
-						.filter((pid) => Number.isInteger(pid));
-					if (projectIdsToRevoke.length > 0) {
-						const { error: revokeError } = await supabase
-							.from('member_of')
-							.update({ revoked_at: new Date().toISOString() })
-							.eq('profile', id)
-							.is('revoked_at', null)
-							.in('project', projectIdsToRevoke);
-						if (revokeError) {
+					// Nom, campus et override : la RPC lit `undefined` comme « ne touche
+					// pas », donc l'appel n'a lieu que si un des trois a été présenté.
+					if (nom !== undefined || campus !== undefined || extractedPermissions !== undefined) {
+						const { error: profileError } = await supabase.rpc('admin_update_profile', {
+							p_profile: id,
+							p_username: nom,
+							p_permissions: extractedPermissions,
+							p_campus: campus
+						});
+						if (profileError) {
 							alert(
-								'Erreur lors de la révocation des projets : ' +
-									(revokeError as { message: string }).message
+								'Erreur lors de la mise à jour du profil : ' +
+									(profileError as { message: string }).message
 							);
 							return;
 						}
 					}
 
-					// Ajouts + ré-attribution (nouveau rôle) : INSERT de lignes actives.
-					const rowsToInsert = [
-						...projectsToAdd.map((p) => ({
-							profile: id,
-							project: Number(p.project_id),
-							role: (p.role || 'project_member') as ProjectRole
-						})),
-						...projectsToUpdate.map((p) => ({
-							profile: id,
-							project: Number(p.project_id),
-							role: (p.role || 'project_member') as ProjectRole
-						}))
-					].filter((row) => Number.isInteger(row.project));
-					if (rowsToInsert.length > 0) {
-						const { error: addError } = await supabase.from('member_of').insert(rowsToInsert);
-						if (addError) {
+					// rôles globaux : diff via les RPC assign/revoke (immuabilité DB).
+					if (rolesField) {
+						const nextGlobalRoles = Array.isArray(rolesField.value)
+							? (rolesField.value as GlobalRole[])
+							: [];
+						try {
+							await applyGlobalRoleDiff(supabase, id, activeGlobalRoles, nextGlobalRoles);
+						} catch (roleError) {
 							alert(
-								"Erreur lors de l'ajout aux projets : " + (addError as { message: string }).message
+								'Erreur lors de la mise à jour des rôles : ' +
+									((roleError as Error | null)?.message ?? 'Erreur inconnue')
+							);
+							return;
+						}
+					}
+
+					// rattachements projet : même principe de diff, sur member_of.
+					if (projectsField) {
+						const projectsRoles = Array.isArray(projectsField.value)
+							? (projectsField.value as ProjectRoleEntry[])
+							: [];
+						try {
+							await applyProjectRoleDiff(supabase, id, projectsRoles);
+						} catch (projectError) {
+							alert(
+								'Erreur lors de la mise à jour des projets : ' +
+									((projectError as Error | null)?.message ?? 'Erreur inconnue')
 							);
 							return;
 						}
@@ -974,11 +1006,13 @@
 					});
 				},
 				id,
-				actions: [
-					data.status === 'disabled'
-						? { title: 'Réactiver', type: 'validate', handler: reactivateUser }
-						: { title: 'Désactiver', type: 'delete', handler: deleteUser }
-				]
+				actions: canUpdateStatus
+					? [
+							data.status === 'disabled'
+								? { title: 'Réactiver', type: 'validate', handler: reactivateUser }
+								: { title: 'Désactiver', type: 'delete', handler: deleteUser }
+						]
+					: []
 			}
 		});
 	}
@@ -995,7 +1029,7 @@
 
 	async function deleteUser(e: Event) {
 		e.preventDefault();
-		if (!canEditMembers) {
+		if (!canUpdateStatus) {
 			alert("Vous n'avez pas les permissions requises pour désactiver un utilisateur.");
 			return;
 		}
@@ -1018,7 +1052,7 @@
 
 	async function reactivateUser(e: Event) {
 		e.preventDefault();
-		if (!canEditMembers) {
+		if (!canUpdateStatus) {
 			alert("Vous n'avez pas les permissions requises pour réactiver un utilisateur.");
 			return;
 		}
@@ -1040,10 +1074,12 @@
 	}
 </script>
 
+<svelte:head><title>Membres — DaVinciBot</title></svelte:head>
+
 <div class="w-full py-2 sm:px-8 lg:px-16">
 	<div class="mb-4 flex flex-wrap items-center gap-3">
 		<h2 class="text-4xl font-bold tracking-tight text-white">Utilisateurs</h2>
-		{#if canEditMembers}
+		{#if canReinvite}
 			<span
 				class="inline-flex items-center rounded-full border border-amber-500/60 bg-amber-900/40 px-3 py-1 text-xs font-semibold tracking-wide text-amber-200 uppercase"
 			>
@@ -1056,11 +1092,18 @@
 </div>
 <div class="w-full py-2 sm:px-8 lg:px-16">
 	<div class="rounded-lg bg-gray-800">
-		<Table {actions} {addNew} {dbInfo} {filters} {headers} {parseItems} />
+		<Table
+			{actions}
+			addNew={canImportMembers ? addNew : null}
+			{dbInfo}
+			{filters}
+			{headers}
+			{parseItems}
+		/>
 	</div>
 </div>
 
-{#if canEditMembers}
+{#if canReinvite}
 	<div class="w-full py-2 sm:px-8 lg:px-16">
 		<div class="rounded-lg bg-gray-800 p-4">
 			<div class="mb-4 flex items-center justify-between gap-3">

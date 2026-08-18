@@ -250,11 +250,7 @@ describe('MfaSection — méthode active', () => {
 
 		const close = Array.from(
 			target.querySelectorAll<HTMLButtonElement>('#recovery-codes-modal button')
-		).find(
-			(button) =>
-				button.textContent.includes('J’ai enregistré') ||
-				button.textContent.includes("J'ai enregistré")
-		);
+		).find((button) => button.textContent.includes("J'ai enregistré"));
 		close?.click();
 		flushSync();
 		expect(target.querySelector('#recovery-codes-modal')).toBeNull();
@@ -262,7 +258,7 @@ describe('MfaSection — méthode active', () => {
 });
 
 describe('MfaSection — erreurs', () => {
-	it('affiche l’erreur de chargement et permet de réessayer', async () => {
+	it("affiche l'erreur de chargement et permet de réessayer", async () => {
 		mocks.fetchMfaState.mockRejectedValueOnce(new Error('Service indisponible'));
 		const target = mountSection();
 

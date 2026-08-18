@@ -79,7 +79,9 @@ function resolveEffectivePermissions(
 	return [...set];
 }
 
-export const load: LayoutServerLoad = async ({ locals, cookies, url }) => {
+export const load: LayoutServerLoad = async ({ locals, cookies, depends, url }) => {
+	depends('cash:session');
+
 	const { safeGetSession, supabase } = locals;
 	const { session, user } = await safeGetSession();
 
@@ -89,21 +91,10 @@ export const load: LayoutServerLoad = async ({ locals, cookies, url }) => {
 
 	let userProfile: UserProfile | null = null;
 	let permissions: EffectivePermission[] = [];
-	let canRequestItems = false;
 	let menu = filterMenuByPermissions(ADMIN_MENU, []);
 
 	if (user?.id) {
-		const [
-			profileResult,
-			{ data: projectRoleRows },
-			{ data: canManageOwnItems },
-			{ data: canReadOrders },
-			{ data: canReadFinance },
-			{ data: canReadProfiles },
-			{ data: canWriteFinance },
-			{ data: canUpdateProfiles },
-			{ data: canReadStats }
-		] = await Promise.all([
+		const [profileResult, { data: projectRoleRows }] = await Promise.all([
 			supabase
 				.from('profiles')
 				.select(
@@ -111,17 +102,8 @@ export const load: LayoutServerLoad = async ({ locals, cookies, url }) => {
 				)
 				.eq('id', user.id)
 				.single<ProfileRow>(),
-			supabase.from('project_role_permissions').select('role, permissions'),
-			supabase.rpc('has_permission', { p_permission: 'orders.items.manage.self' }),
-			supabase.rpc('has_permission', { p_permission: 'orders.read.all' }),
-			supabase.rpc('has_permission', { p_permission: 'finance.read' }),
-			supabase.rpc('has_permission', { p_permission: 'members.profile.read.all' }),
-			supabase.rpc('has_permission', { p_permission: 'finance.write' }),
-			supabase.rpc('has_permission', { p_permission: 'members.profile.update.all' }),
-			supabase.rpc('has_permission', { p_permission: 'stats.read.all' })
+			supabase.from('project_role_permissions').select('role, permissions')
 		]);
-
-		canRequestItems = canManageOwnItems === true;
 
 		const projectRoles: ProjectRoleCatalogue = new Map(
 			(projectRoleRows ?? []).map((row) => [row.role, row.permissions])
@@ -155,14 +137,18 @@ export const load: LayoutServerLoad = async ({ locals, cookies, url }) => {
 				allProjects: null
 			};
 
-			if (
-				canReadOrders ||
-				canReadFinance ||
-				canReadProfiles ||
-				canWriteFinance ||
-				canUpdateProfiles ||
-				canReadStats
-			) {
+			const seesEveryProject = (
+				[
+					'orders.read.all',
+					'finance.read',
+					'finance.write',
+					'members.profile.read.all',
+					'members.profile.update.all',
+					'stats.read.all'
+				] as const
+			).some((permission) => permissions.includes(permission));
+
+			if (seesEveryProject) {
 				const { data: allProjects, error: projectsError } = await supabase
 					.from('projects')
 					.select('id, name, campus')
@@ -199,7 +185,6 @@ export const load: LayoutServerLoad = async ({ locals, cookies, url }) => {
 		cookies: cookies.getAll(),
 		userProfile,
 		permissions,
-		canRequestItems,
 		menu
 	};
 };

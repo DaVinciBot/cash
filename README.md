@@ -28,7 +28,20 @@ AUTH_PROXY_TARGET=http://localhost:5174
 PUBLIC_AUTH_BASE_URL=http://localhost:5177
 # Préfixe optionnel des noms de cookies, vide en prod
 PUBLIC_COOKIE_PREFIX=
+# Facultatif — adresse par laquelle le serveur s'atteint lui-même pour les PDF
+# PDF_INTERNAL_BASE=http://127.0.0.1:3000
 ```
+
+Le téléchargement d'un document en PDF passe par un **navigateur embarqué** : le serveur ouvre sa propre page de
+document et l'imprime. C'est le seul moyen d'imposer le nom du fichier — la boîte « Enregistrer au format PDF » d'un
+navigateur n'obéit à aucun standard. En développement, `pnpm dev` suffit ; le navigateur, lui, doit exister :
+
+```sh
+node node_modules/playwright/cli.js install chromium-headless-shell
+```
+
+L'image de production l'installe elle-même (voir `Dockerfile`) et pèse environ 650 Mo de plus pour cette raison. Si le
+navigateur manque, le téléchargement répond 503 et la pièce reste imprimable depuis le navigateur de l'utilisateur.
 
 L'authentification est déléguée au service `auth` : pour un parcours de login complet en local, faire tourner l'app
 `auth` sur le port 5177. L'enrôlement des passkeys et le step-up MFA tournent sur l'origine de cash — penser à lister

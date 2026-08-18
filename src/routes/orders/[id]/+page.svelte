@@ -2,6 +2,7 @@
 	import { enhance } from '$app/forms';
 	import { resolve } from '$app/paths';
 	import CampusBadge from '$lib/components/cash/CampusBadge.svelte';
+	import HistoryTimeline from '$lib/components/cash/HistoryTimeline.svelte';
 	import ItemStateBadge from '$lib/components/cash/ItemStateBadge.svelte';
 	import StateBadge from '$lib/components/cash/StateBadge.svelte';
 	import {
@@ -31,9 +32,25 @@
 	// Feuille visée par la troisième issue de CMD-F-53. Vide = panneau fermé.
 	let raising = $state<number | null>(null);
 	let raiseAmount = $state('');
+	let passing = $state(false);
+	let canceling = $state(false);
 
 	const receivedCount = $derived(order.items.filter((i) => i.state === 'received').length);
 	const total = $derived(order.amountTtc + order.shippingCostTtc);
+
+	// Répartition du règlement (TRESO-F-14). Une somme nulle vaut « tout sur le
+	// compte courant » et laisse `on_order_ordered` faire comme avant ; dès
+	// qu'un montant est saisi, la somme doit tomber exactement sur le dû.
+	const settlementRaw = $state<string[]>([]);
+	const settlement = $derived(
+		settlementRaw.reduce((sum, raw) => {
+			const value = Number(raw.replace(',', '.'));
+			return sum + (Number.isFinite(value) && value > 0 ? value : 0);
+		}, 0)
+	);
+	const settlementError = $derived(
+		settlement > 0 && Math.round(settlement * 100) !== Math.round(total * 100)
+	);
 	const unallocated = $derived(order.items.filter((i) => i.allocations.length === 0));
 	// Le dépassement se lit avant de cliquer : `budget_consumption` compte déjà
 	// les quotes-parts de cette commande, même non passée. Attendre le refus
@@ -58,7 +75,7 @@
 <svelte:head><title>Commande #{order.id} — DaVinciBot</title></svelte:head>
 
 <section class="mx-auto max-w-5xl">
-	<a class="text-sm text-gray-400 hover:text-gray-200" href={resolve('/orders' as '/')}
+	<a class="text-sm text-gray-400 hover:text-gray-200" href={resolve('/orders')}
 		>← Toutes les commandes</a
 	>
 
@@ -70,7 +87,7 @@
 			<button
 				class="cursor-pointer border-0 bg-transparent p-0"
 				onclick={copyAddress}
-				title="Copier l’adresse de livraison"
+				title="Copier l'adresse de livraison"
 				type="button"
 			>
 				<StateBadge badge={CAMPUS_BADGES[order.campus]} />
@@ -105,29 +122,131 @@
 	<!-- Actions de cycle de vie -->
 	<div class="mb-6 flex flex-wrap items-center gap-2">
 		{#if isOrderPassable(order.state)}
-			<form action="?/pass" method="POST" use:enhance>
-				<button
-					class="rounded-lg bg-emerald-600 px-4 py-2 text-sm font-medium text-white hover:bg-emerald-500"
-					type="submit">Passer la commande</button
-				>
-			</form>
+			<button
+				class="rounded-lg bg-emerald-600 px-4 py-2 text-sm font-medium text-white hover:bg-emerald-500"
+				onclick={() => (passing = !passing)}
+				type="button">Passer la commande</button
+			>
 		{/if}
 		{#if isOrderCancelable(order.state)}
-			<form action="?/cancel" method="POST" use:enhance>
-				<button
-					class="rounded-lg border border-rose-500/40 px-4 py-2 text-sm text-rose-300 hover:bg-rose-500/10"
-					type="submit">Annuler la commande</button
-				>
-			</form>
+			<button
+				class="rounded-lg border border-rose-500/40 px-4 py-2 text-sm text-rose-300 hover:bg-rose-500/10"
+				onclick={() => (canceling = !canceling)}
+				type="button">Annuler la commande</button
+			>
 		{/if}
 	</div>
+
+	<!-- TRESO-F-14 — le règlement peut être scindé sur deux comptes -->
+	{#if passing}
+		<form
+			class="mb-6 rounded-lg border border-emerald-500/40 bg-emerald-500/5 p-4"
+			action="?/pass"
+			method="POST"
+			use:enhance={() =>
+				({ update }) => {
+					passing = false;
+					return update();
+				}}
+		>
+			<h2 class="text-sm font-semibold text-emerald-200">Régler {euro.format(total)}</h2>
+			<p class="mt-1 text-xs text-gray-400">
+				Laissez les montants à zéro pour régler entièrement sur le compte courant. Une enveloppe
+				partenaire ne couvre que ce qu'elle contient — le complément se met sur un autre compte.
+			</p>
+			<div class="mt-3 space-y-2">
+				{#each data.accounts as account, index (account.id)}
+					<label class="flex flex-wrap items-center gap-2 text-sm text-gray-300">
+						<input name="account_id" type="hidden" value={account.id} />
+						<span class="w-56">{account.name}</span>
+						<span class="w-32 text-xs text-gray-500"
+							>solde {euro.format(account.balance)}
+							{#if !account.countsTowardTreasury}· enveloppe{/if}</span
+						>
+						<input
+							name="account_amount"
+							class="w-32 rounded-lg border border-gray-600 bg-gray-700 p-2 text-sm text-white"
+							inputmode="decimal"
+							placeholder="0,00"
+							bind:value={settlementRaw[index]}
+						/>
+					</label>
+				{/each}
+			</div>
+			<p class="mt-2 text-xs {settlementError ? 'text-rose-300' : 'text-gray-500'}">
+				Réparti : {euro.format(settlement)} sur {euro.format(total)}
+			</p>
+			<div class="mt-3 flex items-center gap-2">
+				<button
+					class="rounded-lg bg-emerald-600 px-4 py-2 text-sm font-medium text-white hover:bg-emerald-500 disabled:opacity-40"
+					disabled={settlementError}
+					type="submit">Confirmer le passage</button
+				>
+				<button
+					class="rounded-lg border border-gray-600 px-4 py-2 text-sm text-gray-300 hover:bg-gray-700"
+					onclick={() => (passing = false)}
+					type="button">Annuler</button
+				>
+			</div>
+		</form>
+	{/if}
+
+	<!-- TRESO-F-23 — la contrepassation est proposée, pas imposée -->
+	{#if canceling}
+		<form
+			class="mb-6 rounded-lg border border-rose-500/40 bg-rose-500/5 p-4"
+			action="?/cancel"
+			method="POST"
+			use:enhance={() =>
+				({ update }) => {
+					canceling = false;
+					return update();
+				}}
+		>
+			<h2 class="text-sm font-semibold text-rose-200">Annuler la commande #{order.id}</h2>
+			<p class="mt-1 text-xs text-gray-400">
+				Les items non reçus repartent dans la file de regroupement.
+				{#if receivedCount > 0}
+					<span class="text-amber-300">
+						{receivedCount} item(s) déjà reçus resteront rattachés à cette commande, et la contrepassation
+						annulera la totalité du débit.
+					</span>
+				{/if}
+			</p>
+			<label class="mt-3 flex items-center gap-2 text-sm text-gray-300">
+				<input
+					name="reverse"
+					class="size-4 rounded border-gray-600 bg-gray-700"
+					checked
+					type="checkbox"
+					value="1"
+				/>
+				Contrepasser le mouvement de trésorerie
+			</label>
+			<p class="mt-1 text-xs text-gray-500">
+				À décocher si l'argent est réellement parti : annuler la commande ici ne rappelle pas un
+				virement.
+			</p>
+			<div class="mt-3 flex items-center gap-2">
+				<button
+					class="rounded-lg bg-rose-600 px-4 py-2 text-sm font-medium text-white hover:bg-rose-500"
+					type="submit">Confirmer l'annulation</button
+				>
+				<button
+					class="rounded-lg border border-gray-600 px-4 py-2 text-sm text-gray-300 hover:bg-gray-700"
+					onclick={() => (canceling = false)}
+					type="button">Revenir</button
+				>
+			</div>
+		</form>
+	{/if}
 
 	{#if unallocated.length > 0 && isOrderPassable(order.state)}
 		<p
 			class="mb-4 rounded-lg bg-amber-500/15 px-4 py-3 text-sm text-amber-200 ring-1 ring-amber-500/30"
 		>
 			{unallocated.length} item(s) ne sont imputés sur aucun budget : la commande ne peut pas être passée
-			tant qu’ils n’ont pas de poste de dépense.
+			tant qu'ils n'ont pas de poste de dépense.
 		</p>
 	{/if}
 
@@ -144,8 +263,8 @@
 				{/each}
 			</ul>
 			<p class="mt-3 text-xs text-gray-400">
-				Trois issues : imputer l’item sur un autre budget, le répartir sur plusieurs budgets — les
-				deux depuis l’édition de l’item —, ou porter l’enveloppe au montant nécessaire si elle était
+				Trois issues : imputer l'item sur un autre budget, le répartir sur plusieurs budgets — les
+				deux depuis l'édition de l'item —, ou porter l'enveloppe au montant nécessaire si elle était
 				sous-évaluée.
 			</p>
 			<div class="mt-3 flex flex-wrap items-center gap-2">
@@ -169,7 +288,7 @@
 				>
 					<input name="budget" type="hidden" value={raising} />
 					<label class="text-xs text-gray-300">
-						Nouveau montant de l’enveloppe
+						Nouveau montant de l'enveloppe
 						<input
 							name="amount_ttc"
 							class="mt-1 block w-40 rounded-lg border border-gray-600 bg-gray-700 p-2 text-sm text-white"
@@ -287,9 +406,12 @@
 						{#if editable}
 							<a
 								class="rounded-lg border border-gray-600 px-3 py-1.5 text-sm text-gray-200 hover:bg-gray-700"
-								href={resolve(`/orders/${String(order.id)}/items/${String(item.id)}` as '/')}
-								>Modifier</a
-							>
+								href={resolve('/orders/[id]/items/[itemId]', {
+									id: String(order.id),
+									itemId: String(item.id)
+								})}
+								>Modifier
+							</a>
 						{/if}
 						{#if item.state === 'bundled' && order.state === 'pending_delivery'}
 							<form action="?/receive" method="POST" use:enhance>
@@ -351,4 +473,10 @@
 			</table>
 		</div>
 	{/if}
+	<!-- CMD-F-60/61 — la trace de la commande : passation, annulation, corrections
+	     de port. Elle se lit ici plutôt que dans l'écran d'audit, qui sert à
+	     chercher ce qu'on ne sait pas encore où trouver. -->
+	<div class="mt-10">
+		<HistoryTimeline entries={data.history} />
+	</div>
 </section>

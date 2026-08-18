@@ -36,7 +36,6 @@ const layoutData = {
 	cookies: [],
 	userProfile: profile,
 	permissions: [],
-	canRequestItems: false,
 	menu: [{ title: 'Mes commandes', uri: '/admin', icon: 'home-outline' }]
 };
 

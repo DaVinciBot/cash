@@ -68,7 +68,7 @@ describe('updateUsername', () => {
 		expect(get(userdata)?.name).toBe('Bob');
 	});
 
-	it('lève une erreur sans toucher au store en cas d’échec', async () => {
+	it("lève une erreur sans toucher au store en cas d'échec", async () => {
 		mocks.rpc.mockResolvedValue({ data: null, error: { message: 'nope' } });
 
 		await expect(updateUsername('user-1', 'Bob')).rejects.toThrow();
@@ -96,7 +96,7 @@ describe('uploadAvatar', () => {
 		expect(get(userdata)?.avatar).toBe(avatarUrl);
 	});
 
-	it('traduit l’erreur 413 en message lisible', async () => {
+	it("traduit l'erreur 413 en message lisible", async () => {
 		mocks.upload.mockResolvedValue({
 			error: { message: 'Request failed with status code 413' }
 		});
@@ -112,7 +112,7 @@ describe('changePassword', () => {
 		await expect(changePassword('secret')).resolves.toBeUndefined();
 	});
 
-	it('remonte le message d’erreur du serveur', async () => {
+	it("remonte le message d'erreur du serveur", async () => {
 		vi.stubGlobal(
 			'fetch',
 			vi.fn().mockResolvedValue({

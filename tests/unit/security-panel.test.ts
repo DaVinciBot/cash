@@ -140,7 +140,7 @@ describe('SecurityPanel — appareils connectés', () => {
 		expect(target.querySelector('#session-revoke-sess-other')).not.toBeNull();
 	});
 
-	it('demande confirmation, révoque l’appareil visé puis recharge', async () => {
+	it("demande confirmation, révoque l'appareil visé puis recharge", async () => {
 		const target = mountPanel();
 		await waitForSelector(target, '#session-revoke-sess-other');
 
@@ -176,7 +176,7 @@ describe('SecurityPanel — appareils connectés', () => {
 		});
 	});
 
-	it('affiche l’erreur de chargement et permet de réessayer', async () => {
+	it("affiche l'erreur de chargement et permet de réessayer", async () => {
 		mocks.fetchSessions.mockRejectedValueOnce(new Error('Service indisponible'));
 		const target = mountPanel();
 
@@ -222,7 +222,7 @@ describe('SecurityPanel — applications connectées', () => {
 		});
 	});
 
-	it('affiche l’état vide sans application', async () => {
+	it("affiche l'état vide sans application", async () => {
 		mocks.fetchConnections.mockResolvedValue([]);
 		const target = mountPanel();
 

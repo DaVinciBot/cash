@@ -70,7 +70,7 @@ describe('CodeInput', () => {
 		expect(document.activeElement).toBe(cell(target, 5));
 	});
 
-	it('ignore ce qui n’est pas un chiffre', () => {
+	it("ignore ce qui n'est pas un chiffre", () => {
 		const { target, state } = mountInput({ id: 'otp' });
 		typeInCell(target, 0, '12a-3');
 		expect(state.value).toBe('123');

@@ -4,12 +4,13 @@ pnpm-lock.yaml
 yarn.lock
 
 # Build output
-.svelte-kit
-build
-dist
-coverage
-playwright-report
-test-results
+node_modules/
+.svelte-kit/
+build/
+dist/
+coverage/
+playwright-report/
+test-results/
 
 # Miscellaneous
 /static/

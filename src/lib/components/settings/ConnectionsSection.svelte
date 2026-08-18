@@ -29,7 +29,7 @@
 
 	async function handleRevoke(connection: ConnectionInfo) {
 		const confirmed = window.confirm(
-			`Révoquer l’accès de « ${connection.name} » ? L’application ne pourra plus obtenir ni rafraîchir de jetons.`
+			`Révoquer l'accès de « ${connection.name} » ? L'application ne pourra plus obtenir ni rafraîchir de jetons.`
 		);
 		if (!confirmed) {
 			return;
@@ -82,10 +82,10 @@
 					<button
 						id={`connection-revoke-${connection.client_id}`}
 						class="shrink-0 cursor-pointer rounded-lg border-0 bg-transparent p-2 text-red-400 hover:bg-red-500/10 disabled:cursor-not-allowed disabled:opacity-50"
-						aria-label="Révoquer l’accès de cette application"
+						aria-label="Révoquer l'accès de cette application"
 						disabled={busy}
 						onclick={() => void handleRevoke(connection)}
-						title="Révoquer l’accès de cette application"
+						title="Révoquer l'accès de cette application"
 						type="button"
 					>
 						<Unlink class="size-4" />

@@ -1,0 +1,10 @@
+# Lint des Dockerfiles — joué par `shared-workflows/container.yml` avant le build.
+# Règles : https://github.com/hadolint/hadolint/wiki
+
+# `warning` et au-dessus font échouer le job ; `info` et `style` restent informatifs.
+failure-threshold: warning
+
+# Registres d'où une image de base a le droit de venir.
+trustedRegistries:
+  - docker.io
+  - ghcr.io

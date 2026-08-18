@@ -55,8 +55,8 @@ describe('résolution du campus de destination (CMD-F-43 / CMD-F-46)', () => {
 	});
 });
 
-describe('référentiel des états d’item (CMD-F-20 / CMD-F-22)', () => {
-	it('couvre exactement les six états de l’enum cash.item_state', () => {
+describe("référentiel des états d'item (CMD-F-20 / CMD-F-22)", () => {
+	it("couvre exactement les six états de l'enum cash.item_state", () => {
 		expect(ITEM_STATES).toEqual([
 			'pending_cdp',
 			'pending_bundled',
@@ -91,7 +91,7 @@ describe('référentiel des états d’item (CMD-F-20 / CMD-F-22)', () => {
 
 describe('droits du membre sur ses items (CMD-F-02)', () => {
 	// Miroir de la policy items_update : seul pending_cdp reste modifiable.
-	it('ne laisse modifier qu’un item en revue par le CDP', () => {
+	it("ne laisse modifier qu'un item en revue par le CDP", () => {
 		expect(isItemEditableByMember('pending_cdp')).toBe(true);
 		for (const state of ITEM_STATES.filter((s) => s !== 'pending_cdp')) {
 			expect(isItemEditableByMember(state)).toBe(false);
@@ -116,7 +116,7 @@ describe('droits du membre sur ses items (CMD-F-02)', () => {
 	});
 });
 
-describe('traduction des codes d’erreur de la base', () => {
+describe("traduction des codes d'erreur de la base", () => {
 	// On branche sur error.code, jamais sur error.message, qui est en français et
 	// non versionné (Supabased/docs/ERROR_CODES.md).
 	it('traduit un code métier connu', () => {

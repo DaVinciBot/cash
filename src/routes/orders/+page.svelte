@@ -57,7 +57,7 @@
 		</div>
 		<a
 			class="rounded-lg border border-gray-600 px-4 py-2 text-sm text-gray-200 hover:bg-gray-700"
-			href={resolve('/bundle' as '/')}>Items à regrouper</a
+			href={resolve('/bundle')}>Items à regrouper</a
 		>
 	</header>
 
@@ -101,7 +101,7 @@
 						<li>
 							<a
 								class="block rounded-lg border border-gray-700 bg-gray-800 p-4 hover:border-gray-500"
-								href={resolve(`/orders/${String(order.id)}` as '/')}
+								href={resolve('/orders/[id]', { id: String(order.id) })}
 							>
 								<div class="flex flex-wrap items-center gap-3">
 									<span class="font-medium text-white">Commande #{order.id}</span>

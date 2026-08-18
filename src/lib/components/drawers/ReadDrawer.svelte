@@ -375,7 +375,9 @@
 						option.selected = option.value === bodyItem.value;
 					});
 					field.value = bodyItem.value;
-				} else if (['permissions_grouped', 'project_roles'].includes(field.type)) {
+				} else if (field.type === 'project_roles') {
+					field.value = normalizeProjectRoleItems(bodyItem.data, field);
+				} else if (field.type === 'permissions_grouped') {
 					field.value = bodyItem.data;
 				} else {
 					field.value = bodyItem.value;
@@ -438,6 +440,25 @@
 
 	function projectRoles(value: FieldValue): ProjectRoleItem[] {
 		return Array.isArray(value) && value.every(isProjectRoleItem) ? value : [];
+	}
+
+	function normalizeProjectRoleItems(value: FieldValue, field: EditableField): ProjectRoleItem[] {
+		if (!Array.isArray(value)) {
+			return [];
+		}
+		const fallbackRole = field.defaultRole ?? field.roles?.[0]?.value ?? '';
+		const items: ProjectRoleItem[] = [];
+		for (const entry of value as unknown[]) {
+			if (!isRecord(entry)) {
+				continue;
+			}
+			const rawId = entry.project_id;
+			items.push({
+				project_id: typeof rawId === 'string' || typeof rawId === 'number' ? String(rawId) : null,
+				role: typeof entry.role === 'string' && entry.role !== '' ? entry.role : fallbackRole
+			});
+		}
+		return items;
 	}
 
 	function selectedPermissionValues(value: FieldValue): string[] {
@@ -1192,7 +1213,10 @@
 										onclick={() => {
 											field.value = [
 												...rolesValue,
-												{ project_id: null, role: field.defaultRole ?? 'membre' }
+												{
+													project_id: null,
+													role: field.defaultRole ?? field.roles?.[0]?.value ?? ''
+												}
 											];
 										}}
 										type="button"

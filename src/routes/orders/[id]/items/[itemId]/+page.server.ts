@@ -1,7 +1,7 @@
 import { resolve } from '$app/paths';
+import { entityHistory, rejection } from '$lib/server/audit';
 import { decimal, text, textAll } from '$lib/server/form';
 import { budgetLeaves, orderDetail } from '$lib/server/orders';
-import { cashErrorMessage } from '@davincibot/lib';
 import { error, fail, redirect } from '@sveltejs/kit';
 import type { Actions, PageServerLoad } from './$types';
 
@@ -26,7 +26,9 @@ function ids(params: { id: string; itemId: string }): { orderId: number; itemId:
 	return { orderId, itemId };
 }
 
-export const load: PageServerLoad = async ({ locals, params }) => {
+export const load: PageServerLoad = async ({ depends, locals, params }) => {
+	depends('cash:order-item');
+
 	const { orderId, itemId } = ids(params);
 
 	const order = await orderDetail(locals.supabase, orderId);
@@ -35,9 +37,12 @@ export const load: PageServerLoad = async ({ locals, params }) => {
 		error(404, 'Item introuvable.');
 	}
 
-	const { leaves } = await budgetLeaves(locals.supabase, order.schoolYearId);
+	const [{ leaves }, history] = await Promise.all([
+		budgetLeaves(locals.supabase, order.schoolYearId),
+		entityHistory(locals.supabase, 'item', itemId)
+	]);
 
-	return { order: { id: order.id, state: order.state }, item, leaves };
+	return { order: { id: order.id, state: order.state }, item, leaves, history };
 };
 
 export const actions: Actions = {
@@ -51,7 +56,7 @@ export const actions: Actions = {
 		const quantity = Number(text(form, 'quantity'));
 
 		if (name.length === 0) {
-			return fail(400, { message: 'Le nom de l’item est obligatoire.' });
+			return fail(400, { message: "Le nom de l'item est obligatoire." });
 		}
 		if (!Number.isFinite(unitPrice) || unitPrice < 0) {
 			return fail(400, { message: 'Le prix unitaire doit être un montant positif.' });
@@ -76,13 +81,13 @@ export const actions: Actions = {
 			.filter((line) => Number.isFinite(line.amount) && line.amount > 0);
 
 		if (new Set(lines.map((l) => l.budgetId)).size !== lines.length) {
-			return fail(400, { message: 'Un même budget ne peut apparaître qu’une fois.' });
+			return fail(400, { message: "Un même budget ne peut apparaître qu'une fois." });
 		}
 
 		const allocated = Math.round(lines.reduce((sum, l) => sum + l.amount, 0) * 100) / 100;
 		if (lines.length > 0 && allocated !== totalTtc) {
 			return fail(400, {
-				message: `La somme des imputations (${allocated.toFixed(2)} €) doit égaler le total de l’item (${totalTtc.toFixed(2)} €).`
+				message: `La somme des imputations (${allocated.toFixed(2)} €) doit égaler le total de l'item (${totalTtc.toFixed(2)} €).`
 			});
 		}
 
@@ -102,7 +107,9 @@ export const actions: Actions = {
 
 		if (saveError) {
 			return fail(400, {
-				message: cashErrorMessage(saveError.code, 'Cet item n’a pas pu être modifié.')
+				message: await rejection(locals.supabase, saveError, "Cet item n'a pas pu être modifié.", {
+					entityType: 'item'
+				})
 			});
 		}
 

@@ -52,7 +52,7 @@ describe('SettingsModal', () => {
 		userdata.set(profile);
 	});
 
-	it('affiche l’onglet Profil avec les données du store', () => {
+	it("affiche l'onglet Profil avec les données du store", () => {
 		const { target, cleanup } = mountModal();
 
 		const usernameInput = target.querySelector<HTMLInputElement>('#username');
@@ -63,7 +63,7 @@ describe('SettingsModal', () => {
 		cleanup();
 	});
 
-	it('bascule sur l’onglet Sécurité au clic dans la sidebar', () => {
+	it("bascule sur l'onglet Sécurité au clic dans la sidebar", () => {
 		const { target, cleanup } = mountModal();
 
 		findCategoryButton(target, 'Sécurité').click();
@@ -100,7 +100,7 @@ describe('SettingsModal', () => {
 		cleanup();
 	});
 
-	it('sans catégorie initiale, l’état mobile affiche la liste puis le panneau avec retour', () => {
+	it("sans catégorie initiale, l'état mobile affiche la liste puis le panneau avec retour", () => {
 		const { target, cleanup } = mountModal(null);
 
 		const nav = target.querySelector('#settings-categories');

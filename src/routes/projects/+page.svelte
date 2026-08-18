@@ -1,495 +1,196 @@
-<!--<script lang="ts">-->
-<!--	import { getSupabaseBrowserClient } from '@davincibot/lib/supabase';-->
-<!--	import { onMount } from 'svelte';-->
-
-<!--	import type { UserData } from '@davincibot/lib';-->
-<!--	import { loadUserdata, userdata } from '@davincibot/lib';-->
-
-<!--	import { Bar, Pie } from 'svelte5-chartjs';-->
-
-<!--	import {-->
-<!--		ArcElement,-->
-<!--		BarElement,-->
-<!--		CategoryScale,-->
-<!--		Chart as ChartJS,-->
-<!--		Legend,-->
-<!--		LinearScale,-->
-<!--		Title,-->
-<!--		Tooltip-->
-<!--	} from 'chart.js';-->
-
-<!--	ChartJS.register(Title, Tooltip, Legend, ArcElement, CategoryScale, LinearScale, BarElement);-->
-
-<!--	interface BudgetData {-->
-<!--		budget: number | null;-->
-<!--		year: string | null;-->
-<!--		current: boolean | null;-->
-<!--		cost?: number;-->
-<!--	}-->
-
-<!--	interface ProjectData {-->
-<!--		id: number;-->
-<!--		name: string | null;-->
-<!--		debut: string | null;-->
-<!--		budget: BudgetData | null;-->
-<!--	}-->
-
-<!--	interface StatEntry {-->
-<!--		label: string;-->
-<!--		value: number | string;-->
-<!--	}-->
-
-<!--	interface StatsData {-->
-<!--		websites: StatEntry[];-->
-<!--		users: StatEntry[];-->
-<!--		tags: StatEntry[];-->
-<!--		banks: StatEntry[];-->
-<!--	}-->
-
-<!--	let selectedProjectId = $state<number | undefined>(undefined);-->
-<!--	let project = $state<Partial<ProjectData>>({});-->
-<!--	let stats = $state<StatsData>({ websites: [], users: [], tags: [], banks: [] });-->
-<!--	let skip = false;-->
-<!--	let user = $state<UserData>(null);-->
-<!--	let showDropdown = $state<boolean>(false);-->
-<!--	let dropdownEl = $state<HTMLElement | undefined>(undefined);-->
-<!--	let selectedYear = $state<string | undefined>(undefined);-->
-<!--	let budgets = $state<BudgetData[]>([]);-->
-
-<!--	const barOptions = {-->
-<!--		responsive: true,-->
-<!--		maintainAspectRatio: false,-->
-<!--		plugins: { legend: { display: false } },-->
-<!--		scales: {-->
-<!--			x: {-->
-<!--				ticks: { color: '#cbd5e1' },-->
-<!--				grid: { color: 'rgba(148,163,184,0.15)' }-->
-<!--			},-->
-<!--			y: {-->
-<!--				ticks: { color: '#cbd5e1' },-->
-<!--				grid: { color: 'rgba(148,163,184,0.15)' }-->
-<!--			}-->
-<!--		}-->
-<!--	};-->
-
-<!--	function fmt(n: number | null | undefined): string {-->
-<!--		if (n === null || n === undefined) {-->
-<!--			return '0';-->
-<!--		}-->
-<!--		try {-->
-<!--			return n.toLocaleString('fr-FR');-->
-<!--		} catch {-->
-<!--			return String(n);-->
-<!--		}-->
-<!--	}-->
-
-<!--	const year = new Date().getFullYear();-->
-
-<!--	userdata.subscribe((value) => {-->
-<!--		if (value) {-->
-<!--			user = value;-->
-<!--			const userProfile = value;-->
-<!--			selectedProjectId =-->
-<!--				userProfile.projects.length > 0 ? userProfile.projects.at(0)?.id : undefined;-->
-
-<!--			if (userProfile.allProjects) {-->
-<!--				userProfile.allProjects.forEach((p) => {-->
-<!--					if (!userProfile.projects.some((proj) => proj.id === p.value)) {-->
-<!--						// Only add projects that are not already in the user's projects-->
-<!--						userProfile.projects.push({-->
-<!--							id: p.value,-->
-<!--							name: p.name,-->
-<!--							debut: p.debut,-->
-<!--							role: 'membre'-->
-<!--						});-->
-<!--					}-->
-<!--				});-->
-<!--			}-->
-
-<!--			if (selectedProjectId) {-->
-<!--				void loadPage();-->
-<!--			}-->
-<!--			skip = true;-->
-<!--		}-->
-<!--	});-->
-
-<!--	const budgetChartData = $derived({-->
-<!--		labels: ['Budget restant', 'Dépenses'],-->
-<!--		datasets: [-->
-<!--			{-->
-<!--				data: [-->
-<!--					(project.budget?.budget ?? 0) - (project.budget?.cost ?? 0) < 0-->
-<!--						? 0-->
-<!--						: (project.budget?.budget ?? 0) - (project.budget?.cost ?? 0),-->
-<!--					project.budget?.cost ?? 0-->
-<!--				],-->
-<!--				backgroundColor: ['#36A2EB', '#FF6384'],-->
-<!--				hoverBackgroundColor: ['#36A2EB', '#FF6384']-->
-<!--			}-->
-<!--		]-->
-<!--	});-->
-
-<!--	async function fetchProject(): Promise<Partial<ProjectData>> {-->
-<!--		if (!selectedProjectId) {-->
-<!--			return { name: 'Aucun projet sélectionné', budget: { budget: 0, year: '0', current: null } };-->
-<!--		}-->
-<!--		const supabase = getSupabaseBrowserClient();-->
-<!--		const { data, error } = (await supabase-->
-<!--			.from('projects')-->
-<!--			.select('id, name, debut, budget(budget, year, current)')-->
-<!--			.eq('id', selectedProjectId)-->
-<!--			.single()) as { data: ProjectData | null; error: unknown };-->
-
-<!--		if (error || !data) {-->
-<!--			return {};-->
-<!--		}-->
-<!--		const rawBudgets = (-->
-<!--			Array.isArray(data.budget) ? data.budget : data.budget ? [data.budget] : []-->
-<!--		) as BudgetData[];-->
-<!--		budgets = rawBudgets.sort((a, b) => String(b.year).localeCompare(String(a.year)));-->
-<!--		const current = budgets.find((b) => b.current);-->
-<!--		selectedYear = selectedYear ?? current?.year ?? budgets[0]?.year ?? String(year);-->
-<!--		const fallbackYear = selectedYear;-->
-<!--		const matchedBudget = budgets.find((b) => b.year === fallbackYear) ??-->
-<!--			budgets[0] ?? { budget: 0, year: fallbackYear, current: null };-->
-<!--		return { ...data, budget: matchedBudget };-->
-<!--	}-->
-
-<!--	onMount(() => {-->
-<!--		void loadPage();-->
-<!--		if (!skip) {-->
-<!--			loadUserdata();-->
-<!--		}-->
-<!--	});-->
-
-<!--	async function loadPage() {-->
-<!--		project = await fetchProject();-->
-<!--		if (selectedProjectId === 0) {-->
-<!--			project.budget = { budget: 0, year: String(year), current: null, cost: 0 };-->
-<!--		}-->
-<!--		if (selectedProjectId === undefined || !project.budget) {-->
-<!--			return;-->
-<!--		}-->
-<!--		// Les RPC attendent l'année en numérique ; elle circule en string côté UI.-->
-<!--		const rpcYear = Number(selectedYear ?? project.budget.year ?? year);-->
-<!--		const supabase = getSupabaseBrowserClient();-->
-<!--		const { data: costData, error: costErr } = (await supabase.rpc('get_project_cost', {-->
-<!--			projectid: selectedProjectId,-->
-<!--			year: rpcYear-->
-<!--		})) as { data: number | null; error: unknown };-->
-<!--		if (costErr) {-->
-<!--			return;-->
-<!--		}-->
-<!--		project.budget.cost = costData ?? 0;-->
-
-<!--		// Fetch aggregated stats in one call (try with year, fallback without)-->
-<!--		let statsResult = (await supabase.rpc('get_project_stats', {-->
-<!--			projectid: selectedProjectId,-->
-<!--			year: rpcYear-->
-<!--		})) as { data: StatsData | null; error: unknown };-->
-<!--		if (statsResult.error) {-->
-<!--			statsResult = (await supabase.rpc('get_project_stats', {-->
-<!--				projectid: selectedProjectId-->
-<!--			})) as { data: StatsData | null; error: unknown };-->
-<!--		}-->
-<!--		if (!statsResult.error) {-->
-<!--			stats = statsResult.data ?? { websites: [], users: [], tags: [], banks: [] };-->
-<!--		}-->
-<!--	}-->
-
-<!--	async function handleYearChange(e: Event) {-->
-<!--		const target = e.target as HTMLSelectElement;-->
-<!--		selectedYear = target.value;-->
-<!--		// update displayed budget object to match selected year-->
-<!--		if (budgets.length) {-->
-<!--			project.budget = budgets.find((b) => b.year === selectedYear) ?? project.budget;-->
-<!--		}-->
-<!--		await loadPage();-->
-<!--	}-->
-
-<!--	function handleWindowClick(e: MouseEvent) {-->
-<!--		if (!showDropdown) {-->
-<!--			return;-->
-<!--		}-->
-<!--		const target = e.target as Node;-->
-<!--		if (dropdownEl && !dropdownEl.contains(target)) {-->
-<!--			showDropdown = false;-->
-<!--		}-->
-<!--	}-->
-<!--</script>-->
-
-<!--<svelte:window onclick={handleWindowClick} />-->
-
-<!--<div class="mx-auto flex w-full max-w-7xl flex-col items-start justify-center gap-6 px-4 py-8">-->
-<!--	<div class="flex h-14 w-full items-center justify-between">-->
-<!--		<h2 class="h-full w-full self-center align-middle text-3xl font-bold tracking-tight text-white">-->
-<!--			{#if (user?.projects.length ?? 0) > 1}-->
-<!--				<div bind:this={dropdownEl} class="relative inline-block h-full min-w-64 md:min-w-72">-->
-<!--					<button-->
-<!--						class="flex h-full w-full items-center justify-between rounded-md border border-gray-800 bg-gray-900 px-6 py-2 text-2xl font-bold text-white hover:bg-gray-800"-->
-<!--						onclick={() => (showDropdown = !showDropdown)}-->
-<!--						type="button"-->
-<!--					>-->
-<!--						{user?.projects.find((p) => p.id === selectedProjectId)?.name ??-->
-<!--						'Sélectionner un projet'}-->
-<!--						<svg class="ml-2 h-6 w-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">-->
-<!--							<path-->
-<!--								d="M19 9l-7 7-7-7"-->
-<!--								stroke-linecap="round"-->
-<!--								stroke-linejoin="round"-->
-<!--								stroke-width="2"-->
-<!--							/>-->
-<!--						</svg>-->
-<!--					</button>-->
-<!--					{#if showDropdown}-->
-<!--						<ul-->
-<!--							class="absolute z-20 mt-1 w-full overflow-hidden rounded-xl border border-gray-700 bg-gray-800 shadow-xl"-->
-<!--						>-->
-<!--							{#each user?.projects ?? [] as p (p.id)}-->
-<!--								<li>-->
-<!--									<button-->
-<!--										class="w-full px-4 py-2 text-left text-white hover:bg-gray-700"-->
-<!--										onclick={() => {-->
-<!--											selectedProjectId = p.id;-->
-<!--											showDropdown = false;-->
-<!--											void loadPage();-->
-<!--										}}-->
-<!--									>-->
-<!--										{p.name}-->
-<!--									</button>-->
-<!--								</li>-->
-<!--							{/each}-->
-<!--						</ul>-->
-<!--					{/if}-->
-<!--				</div>-->
-<!--			{:else}-->
-<!--				{project.name}-->
-<!--				<span class="text-xl text-gray-400 italic">({project.debut?.split('-')[0]})</span>-->
-<!--			{/if}-->
-<!--		</h2>-->
-<!--		<div class="flex h-full items-center gap-2">-->
-<!--			<select-->
-<!--				id="year"-->
-<!--				class="h-full rounded-md border border-gray-800 bg-gray-900 px-3 py-2 text-white"-->
-<!--				aria-label="Sélection de l'année du budget"-->
-<!--				onchange={handleYearChange}-->
-<!--				bind:value={selectedYear}-->
-<!--			>-->
-<!--				{#if budgets.length}-->
-<!--					{#each budgets.sort((a, b) => parseInt(b.year ?? '0', 10) - parseInt(a.year ?? '0', 10)) as b (b.year)}-->
-<!--						<option value={b.year}>{b.year}</option>-->
-<!--					{/each}-->
-<!--				{:else}-->
-<!--					<option value={project.budget?.year}>{project.budget?.year}</option>-->
-<!--				{/if}-->
-<!--			</select>-->
-<!--		</div>-->
-<!--	</div>-->
-
-<!--	&lt;!&ndash; Top summary and budget card &ndash;&gt;-->
-<!--	<div class="grid w-full gap-6 md:grid-cols-2">-->
-<!--		<div class="rounded-xl border border-gray-800 bg-gray-900 p-5">-->
-<!--			<div class="flex items-center justify-between">-->
-<!--				<h3 class="text-2xl font-bold tracking-tight text-white">Budget</h3>-->
-<!--				<div class="flex items-center space-x-3 text-white/80">-->
-<!--					<span class="text-lg font-semibold">{fmt(project.budget?.budget ?? 0)} €</span>-->
-<!--					<span class="rounded border border-gray-700 bg-gray-800 px-2 py-0.5 text-sm"-->
-<!--					>{project.budget?.year ?? 0}</span-->
-<!--					>-->
-<!--				</div>-->
-<!--			</div>-->
-<!--			<div class="mt-4 grid items-center gap-4 sm:grid-cols-2">-->
-<!--				<div class="h-56">-->
-<!--					<Pie data={budgetChartData} options={{ responsive: true, maintainAspectRatio: false }} />-->
-<!--				</div>-->
-<!--				<div class="space-y-2 text-white">-->
-<!--					<div class="flex items-center justify-between">-->
-<!--						<span class="text-white/70">Dépenses</span>-->
-<!--						<span class="font-semibold">{fmt(project.budget?.cost ?? 0)} €</span>-->
-<!--					</div>-->
-<!--					<div class="flex items-center justify-between">-->
-<!--						<span class="text-white/70">Restant</span>-->
-<!--						<span class="font-semibold"-->
-<!--						>{fmt(Math.max((project.budget?.budget ?? 0) - (project.budget?.cost ?? 0), 0))} €</span-->
-<!--						>-->
-<!--					</div>-->
-<!--					{#if (project.budget?.budget ?? 0) - (project.budget?.cost ?? 0) < 0}-->
-<!--						<p class="text-sm font-semibold text-red-400">Dépassement de budget !</p>-->
-<!--					{/if}-->
-<!--				</div>-->
-<!--			</div>-->
-<!--		</div>-->
-
-<!--		&lt;!&ndash; Quick facts card &ndash;&gt;-->
-<!--		<div class="grid grid-cols-2 gap-4">-->
-<!--			<div class="rounded-xl border border-gray-800 bg-gray-900 p-5">-->
-<!--				<p class="text-sm text-white/70">Nombre de sites</p>-->
-<!--				<p class="mt-1 text-2xl font-bold text-white">{stats.websites.length}</p>-->
-<!--			</div>-->
-<!--			<div class="rounded-xl border border-gray-800 bg-gray-900 p-5">-->
-<!--				<p class="text-sm text-white/70">Tags</p>-->
-<!--				<p class="mt-1 text-2xl font-bold text-white">{stats.tags.length}</p>-->
-<!--			</div>-->
-<!--			<div class="rounded-xl border border-gray-800 bg-gray-900 p-5">-->
-<!--				<p class="text-sm text-white/70">Utilisateurs</p>-->
-<!--				<p class="mt-1 text-2xl font-bold text-white">{stats.users.length}</p>-->
-<!--			</div>-->
-<!--			<div class="rounded-xl border border-gray-800 bg-gray-900 p-5">-->
-<!--				<p class="text-sm text-white/70">Banques</p>-->
-<!--				<p class="mt-1 text-2xl font-bold text-white">{stats.banks.length}</p>-->
-<!--			</div>-->
-<!--		</div>-->
-<!--	</div>-->
-
-<!--	&lt;!&ndash; Aggregated charts &ndash;&gt;-->
-<!--	<div class="mt-4 grid w-full gap-6 md:grid-cols-2">-->
-<!--		<div class="rounded-xl border border-gray-800 bg-gray-900 p-5">-->
-<!--			<h3 class="mb-2 text-xl font-bold text-white">Sites les plus utilisés</h3>-->
-<!--			<div class="h-72">-->
-<!--				<Bar-->
-<!--					data={{-->
-<!--						labels: stats.websites.map((d) => d.label).slice(0, 10),-->
-<!--						datasets: [-->
-<!--							{-->
-<!--								label: 'Montant',-->
-<!--								data: stats.websites.map((d) => Number(d.value)).slice(0, 10),-->
-<!--								backgroundColor: '#36A2EB'-->
-<!--							}-->
-<!--						]-->
-<!--					}}-->
-<!--					options={barOptions}-->
-<!--				/>-->
-<!--			</div>-->
-<!--		</div>-->
-
-<!--		<div class="rounded-xl border border-gray-800 bg-gray-900 p-5">-->
-<!--			<h3 class="mb-2 text-xl font-bold text-white">Plus gros utilisateurs</h3>-->
-<!--			<div class="h-72">-->
-<!--				<Bar-->
-<!--					data={{-->
-<!--						labels: stats.users.map((d) => d.label).slice(0, 10),-->
-<!--						datasets: [-->
-<!--							{-->
-<!--								label: 'Montant',-->
-<!--								data: stats.users.map((d) => Number(d.value)).slice(0, 10),-->
-<!--								backgroundColor: '#FF6384'-->
-<!--							}-->
-<!--						]-->
-<!--					}}-->
-<!--					options={barOptions}-->
-<!--				/>-->
-<!--			</div>-->
-<!--		</div>-->
-
-<!--		<div class="rounded-xl border border-gray-800 bg-gray-900 p-5">-->
-<!--			<h3 class="mb-2 text-xl font-bold text-white">Tags les plus utilisés</h3>-->
-<!--			<div class="h-72">-->
-<!--				<Bar-->
-<!--					data={{-->
-<!--						labels: stats.tags.map((d) => d.label).slice(0, 10),-->
-<!--						datasets: [-->
-<!--							{-->
-<!--								label: 'Nombre',-->
-<!--								data: stats.tags.map((d) => Number(d.value)).slice(0, 10),-->
-<!--								backgroundColor: '#4BC0C0'-->
-<!--							}-->
-<!--						]-->
-<!--					}}-->
-<!--					options={barOptions}-->
-<!--				/>-->
-<!--			</div>-->
-<!--		</div>-->
-
-<!--		<div class="rounded-xl border border-gray-800 bg-gray-900 p-5">-->
-<!--			<h3 class="mb-2 text-xl font-bold text-white">Banques les plus utilisées</h3>-->
-<!--			<div class="h-72">-->
-<!--				<Bar-->
-<!--					data={{-->
-<!--						labels: stats.banks.map((d) => d.label).slice(0, 10),-->
-<!--						datasets: [-->
-<!--							{-->
-<!--								label: 'Dépenses',-->
-<!--								data: stats.banks.map((d) => Number(d.value)).slice(0, 10),-->
-<!--								backgroundColor: '#9966FF'-->
-<!--							}-->
-<!--						]-->
-<!--					}}-->
-<!--					options={barOptions}-->
-<!--				/>-->
-<!--			</div>-->
-<!--		</div>-->
-<!--	</div>-->
-<!--</div>-->
-
 <script lang="ts">
+	import { enhance } from '$app/forms';
+	import { resolve } from '$app/paths';
 	import CampusBadge from '$lib/components/cash/CampusBadge.svelte';
-	import type { PageData } from './$types';
+	import { CAMPUS_BADGES } from '@davincibot/lib';
+	import type { ActionData, PageData } from './$types';
 
-	let { data }: { data: PageData } = $props();
+	let { data, form }: { data: PageData; form: ActionData } = $props();
 
-	const euro = new Intl.NumberFormat('fr-FR', { style: 'currency', currency: 'EUR' });
+	const failure = $derived(form && 'message' in form ? form.message : null);
+
+	let editing = $state<number | null>(null);
+	let creating = $state(false);
+
+	const active = $derived(data.projects.filter((p) => !p.archivedAt));
+	const archived = $derived(data.projects.filter((p) => p.archivedAt));
+	const campuses = Object.keys(CAMPUS_BADGES) as (keyof typeof CAMPUS_BADGES)[];
 </script>
+
+<!-- eslint-disable @typescript-eslint/no-confusing-void-expression -- {@render} est vu comme une expression void imbriquée par la règle ; les snippets sont pourtant la bonne forme ici -->
 
 <svelte:head><title>Projets — DaVinciBot</title></svelte:head>
 
-<section class="mx-auto max-w-6xl">
-	<header class="mb-6">
-		<h1 class="text-2xl font-bold text-white">Projets</h1>
-		<p class="mt-1 text-sm text-gray-400">
-			{#if data.schoolYear}
-				Année scolaire {data.schoolYear.label}.
-			{/if}
-			Un projet désigne un nœud de l'arbre des budgets, à la profondeur qui lui convient ; le montant
-			affiché est celui du sous-arbre visé.
-		</p>
+<section class="mx-auto max-w-4xl">
+	<header class="mb-6 flex flex-wrap items-end justify-between gap-4">
+		<div>
+			<h1 class="text-2xl font-bold text-white">Projets</h1>
+			<p class="mt-1 text-sm text-gray-400">
+				Chaque projet désigne un nœud de l'arbre budgétaire, à la profondeur qui lui convient. Le
+				campus du projet sert à résoudre la destination des items qu'on y rattache.
+			</p>
+		</div>
+		<button
+			class="bg-primary-600 hover:bg-primary-800 rounded-lg px-4 py-2 text-sm font-medium text-white"
+			onclick={() => (creating = !creating)}
+			type="button">{creating ? 'Annuler' : 'Nouveau projet'}</button
+		>
 	</header>
 
-	<div class="overflow-x-auto rounded-lg border border-gray-700">
-		<table class="w-full text-left text-sm">
-			<thead class="bg-gray-800 text-xs text-gray-400 uppercase">
-				<tr>
-					<th class="px-4 py-3">Projet</th>
-					<th class="px-4 py-3">Campus</th>
-					<th class="px-4 py-3">Budget désigné</th>
-					<th class="px-4 py-3 text-right">Alloué</th>
-					<th class="px-4 py-3 text-right">Engagé</th>
-					<th class="px-4 py-3 text-right">Reste</th>
-				</tr>
-			</thead>
-			<tbody>
-				{#each data.projects as project (project.id)}
-					<tr class="border-t border-gray-700 bg-gray-900">
-						<td class="px-4 py-3 font-medium text-white">{project.name}</td>
-						<td class="px-4 py-3">
-							{#if project.campus}
-								<CampusBadge campus={project.campus} compact />
-							{:else}
-								<span class="text-gray-500">—</span>
-							{/if}
-						</td>
-						<td class="px-4 py-3 text-gray-300">
-							{#if project.budgetName}
-								{project.budgetName}
-							{:else}
-								<span class="text-gray-500 italic">aucun</span>
-							{/if}
-						</td>
-						<td class="px-4 py-3 text-right text-gray-300">
-							{project.allocatedTtc === null ? '—' : euro.format(project.allocatedTtc)}
-						</td>
-						<td class="px-4 py-3 text-right text-gray-300">
-							{project.consumedTtc === null ? '—' : euro.format(project.consumedTtc)}
-						</td>
-						<td
-							class="px-4 py-3 text-right font-medium {(project.remainingTtc ?? 0) < 0
-								? 'text-amber-300'
-								: 'text-gray-200'}"
+	{#if failure}
+		<p
+			class="mb-4 rounded-lg bg-rose-500/15 px-4 py-3 text-sm text-rose-200 ring-1 ring-rose-500/30"
+		>
+			{failure}
+		</p>
+	{/if}
+
+	{#if data.schoolYear}
+		<p class="mb-4 text-xs text-gray-500">
+			Arbre de l'année {data.schoolYear.label}. L'arbre appartient à une année scolaire : le budget
+			visé par un projet est à redésigner à chaque rentrée.
+		</p>
+	{:else}
+		<p
+			class="mb-4 rounded-lg bg-amber-500/15 px-4 py-3 text-sm text-amber-200 ring-1 ring-amber-500/30"
+		>
+			Aucune année scolaire ne couvre la date du jour : ouvrez-en une depuis la trésorerie avant de
+			rattacher un projet à un budget.
+		</p>
+	{/if}
+
+	{#snippet projectForm(project: (typeof data.projects)[number] | null)}
+		<form
+			class="mb-3 flex flex-wrap items-end gap-3 rounded-lg border border-gray-600 bg-gray-900/60 p-3"
+			action={project ? '?/update' : '?/create'}
+			method="POST"
+			use:enhance={() =>
+				({ update }) => {
+					editing = null;
+					creating = false;
+					return update();
+				}}
+		>
+			{#if project}
+				<input name="id" type="hidden" value={project.id} />
+			{/if}
+			<label class="text-xs text-gray-300">
+				Nom
+				<input
+					name="name"
+					class="mt-1 block rounded-lg border border-gray-600 bg-gray-700 p-2 text-sm text-white"
+					required
+					value={project?.name ?? ''}
+				/>
+			</label>
+			<label class="text-xs text-gray-300">
+				Campus
+				<select
+					name="campus"
+					class="mt-1 block rounded-lg border border-gray-600 bg-gray-700 p-2 text-sm text-white"
+					value={project?.campus ?? ''}
+				>
+					<option value="">— aucun —</option>
+					{#each campuses as campus (campus)}
+						<option value={campus}>{CAMPUS_BADGES[campus].label}</option>
+					{/each}
+				</select>
+			</label>
+			<label class="flex-1 text-xs text-gray-300">
+				Budget désigné
+				<select
+					name="budget_id"
+					class="mt-1 block w-full rounded-lg border border-gray-600 bg-gray-700 p-2 text-sm text-white"
+					value={project?.budgetId ?? ''}
+				>
+					<option value="">— aucun —</option>
+					{#each data.tree as node (node.id)}
+						<option value={node.id}>{'— '.repeat(node.depth)}{node.name}</option>
+					{/each}
+				</select>
+			</label>
+			<button
+				class="bg-primary-600 hover:bg-primary-800 rounded-lg px-3 py-2 text-sm font-medium text-white"
+				type="submit">Enregistrer</button
+			>
+		</form>
+	{/snippet}
+
+	{#if creating}
+		{@render projectForm(null)}
+	{/if}
+
+	<ul class="space-y-2">
+		{#each active as project (project.id)}
+			<li class="rounded-lg border border-gray-700 bg-gray-800 p-4">
+				<div class="flex flex-wrap items-center gap-3">
+					<span class="font-medium text-white">{project.name}</span>
+					{#if project.campus}
+						<CampusBadge campus={project.campus} />
+					{:else}
+						<span class="text-xs text-amber-300">sans campus</span>
+					{/if}
+					<span class="text-sm text-gray-400">
+						{#if project.budgetPath}
+							{project.budgetPath}
+						{:else}
+							<span class="text-amber-300">aucun budget désigné</span>
+						{/if}
+					</span>
+					<span class="ml-auto text-xs text-gray-500">{project.itemCount} item(s)</span>
+				</div>
+				<div class="mt-3 flex flex-wrap items-center gap-2">
+					<button
+						class="text-xs text-gray-400 underline hover:text-gray-200"
+						onclick={() => (editing = editing === project.id ? null : project.id)}
+						type="button">modifier</button
+					>
+					<form action="?/toggleArchive" method="POST" use:enhance>
+						<input name="id" type="hidden" value={project.id} />
+						<input name="archive" type="hidden" value="1" />
+						<button class="text-xs text-gray-400 underline hover:text-gray-200" type="submit"
+							>archiver</button
 						>
-							{project.remainingTtc === null ? '—' : euro.format(project.remainingTtc)}
-						</td>
-					</tr>
-				{/each}
-			</tbody>
-		</table>
-	</div>
+					</form>
+					{#if project.itemCount === 0}
+						<form action="?/remove" method="POST" use:enhance>
+							<input name="id" type="hidden" value={project.id} />
+							<button class="text-xs text-rose-400 underline hover:text-rose-200" type="submit"
+								>supprimer</button
+							>
+						</form>
+					{/if}
+				</div>
+				{#if editing === project.id}
+					{@render projectForm(project)}
+				{/if}
+			</li>
+		{/each}
+	</ul>
+
+	{#if archived.length > 0}
+		<h2 class="mt-8 mb-2 text-sm font-semibold tracking-wide text-gray-400 uppercase">Archivés</h2>
+		<ul class="space-y-1">
+			{#each archived as project (project.id)}
+				<li class="flex items-center gap-3 text-sm text-gray-500">
+					<span>{project.name}</span>
+					<span class="text-xs">{project.itemCount} item(s)</span>
+					<form action="?/toggleArchive" method="POST" use:enhance>
+						<input name="id" type="hidden" value={project.id} />
+						<input name="archive" type="hidden" value="0" />
+						<button class="text-xs text-gray-400 underline hover:text-gray-200" type="submit"
+							>réactiver</button
+						>
+					</form>
+				</li>
+			{/each}
+		</ul>
+	{/if}
+
+	<p class="mt-8 text-xs text-gray-500">
+		La consommation budgétaire de chaque projet se lit sur <a
+			class="underline hover:text-gray-300"
+			href={resolve('/budgets')}>l'arbre des budgets</a
+		>, où elle est calculée nœud par nœud.
+	</p>
 </section>

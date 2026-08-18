@@ -28,11 +28,11 @@ const nodes = [
 ];
 const leafIds = new Set([2, 4, 11, 12, 13]);
 
-describe('présélection de la feuille d’imputation (CMD-F-18, TRESO-F-02c)', () => {
+describe("présélection de la feuille d'imputation (CMD-F-18, TRESO-F-02c)", () => {
 	// Le projet pointe presque toujours un nœud intermédiaire, qui ne reçoit
 	// aucune imputation : c'est la descente jusqu'à la feuille par défaut qui
 	// rend la présélection possible.
-	it('descend du nœud désigné jusqu’à la feuille par défaut', () => {
+	it("descend du nœud désigné jusqu'à la feuille par défaut", () => {
 		expect(defaultLeafFor(nodes, leafIds, 10)).toBe(11);
 		expect(defaultLeafFor(nodes, leafIds, 1)).toBe(4);
 	});
@@ -41,7 +41,7 @@ describe('présélection de la feuille d’imputation (CMD-F-18, TRESO-F-02c)', 
 		expect(defaultLeafFor(nodes, leafIds, 5)).toBe(11);
 	});
 
-	it('retient le nœud lui-même quand c’est déjà une feuille', () => {
+	it("retient le nœud lui-même quand c'est déjà une feuille", () => {
 		expect(defaultLeafFor(nodes, leafIds, 13)).toBe(13);
 	});
 
@@ -69,13 +69,13 @@ describe('cycle de vie côté trésorier (§8)', () => {
 
 	// CMD-F-2A : un item regroupé ne se refuse pas directement, il faut d'abord
 	// annuler la commande qui le porte ; un item reçu ne se refuse jamais.
-	it('n’ouvre le veto trésorier que sur un item validé', () => {
+	it("n'ouvre le veto trésorier que sur un item validé", () => {
 		expect(isItemRefusableByTreasurer('pending_bundled')).toBe(true);
 		expect(isItemRefusableByTreasurer('bundled')).toBe(false);
 		expect(isItemRefusableByTreasurer('received')).toBe(false);
 	});
 
-	it('ne laisse passer qu’une commande en attente du trésorier', () => {
+	it("ne laisse passer qu'une commande en attente du trésorier", () => {
 		expect(isOrderPassable('pending_treso')).toBe(true);
 		for (const state of ORDER_STATES.filter((s) => s !== 'pending_treso')) {
 			expect(isOrderPassable(state)).toBe(false);
@@ -85,14 +85,14 @@ describe('cycle de vie côté trésorier (§8)', () => {
 	// CMD-F-32 : la correction a posteriori vise d'abord la commande terminée —
 	// c'est au relevé bancaire qu'on découvre le montant réellement débité.
 	// L'annulation, elle, se ferme dès la livraison complète.
-	it('garde une commande modifiable jusqu’à l’annulation', () => {
+	it("garde une commande modifiable jusqu'à l'annulation", () => {
 		expect(isOrderEditable('pending_treso')).toBe(true);
 		expect(isOrderEditable('pending_delivery')).toBe(true);
 		expect(isOrderEditable('completed')).toBe(true);
 		expect(isOrderEditable('canceled')).toBe(false);
 	});
 
-	it('n’annule que ce qui n’est pas encore entièrement livré', () => {
+	it("n'annule que ce qui n'est pas encore entièrement livré", () => {
 		expect(isOrderCancelable('pending_treso')).toBe(true);
 		expect(isOrderCancelable('pending_delivery')).toBe(true);
 		expect(isOrderCancelable('completed')).toBe(false);
@@ -101,7 +101,7 @@ describe('cycle de vie côté trésorier (§8)', () => {
 });
 
 describe('référentiel de répartition des frais de port (§7.2)', () => {
-	it('couvre exactement l’enum cash.shipping_allocation, proportionnel en tête', () => {
+	it("couvre exactement l'enum cash.shipping_allocation, proportionnel en tête", () => {
 		expect(SHIPPING_ALLOCATIONS).toEqual(['proportional', 'equal']);
 		for (const mode of SHIPPING_ALLOCATIONS) {
 			expect(SHIPPING_ALLOCATION_LABELS[mode]).toBeTruthy();

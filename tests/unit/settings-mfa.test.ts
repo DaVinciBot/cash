@@ -144,7 +144,7 @@ describe('désactivation et codes', () => {
 });
 
 describe('enrôlement TOTP', () => {
-	it('startTotpEnrollment renvoie le secret et l’URL otpauth', async () => {
+	it("startTotpEnrollment renvoie le secret et l'URL otpauth", async () => {
 		const fetchMock = vi.fn().mockResolvedValue(
 			jsonResponse(200, {
 				ok: true,
