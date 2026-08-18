@@ -2,9 +2,9 @@ name: Security Scan
 
 on:
   push:
-    branches: [dev, staging, main, master, 'release/**', 'hotfix/**']
+    branches: [ dev, staging, main, master, 'release/**', 'hotfix/**' ]
   pull_request:
-    branches: [dev, staging, main, master, 'release/**', 'hotfix/**']
+    branches: [ dev, staging, main, master, 'release/**', 'hotfix/**' ]
   schedule:
     - cron: '20 4 * * 1'
   workflow_dispatch:
@@ -21,4 +21,4 @@ permissions:
 jobs:
   security:
     name: Security
-    uses: DaVinciBot/shared-workflows/.github/workflows/security-scan.yml@v5.1.1
+    uses: DaVinciBot/shared-workflows/.github/workflows/security-scan.yml@v6.0.0

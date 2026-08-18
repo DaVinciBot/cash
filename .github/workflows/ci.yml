@@ -2,12 +2,12 @@ name: CI
 
 on:
   push:
-    branches: [dev, staging, main, master, 'release/**', 'hotfix/**']
+    branches: [ dev, staging, main, master, 'release/**', 'hotfix/**' ]
     paths-ignore:
       - '**/*.md'
       - '.vscode/**'
   pull_request:
-    branches: [dev, staging, main, master, 'release/**', 'hotfix/**']
+    branches: [ dev, staging, main, master, 'release/**', 'hotfix/**' ]
     paths-ignore:
       - '**/*.md'
       - '.vscode/**'
@@ -22,7 +22,7 @@ permissions:
 jobs:
   quality:
     name: Quality
-    uses: DaVinciBot/shared-workflows/.github/workflows/ci.yml@v5.1.1
+    uses: DaVinciBot/shared-workflows/.github/workflows/ci.yml@v6.0.0
     secrets: inherit
     with:
       pnpm_version: 11.5.2

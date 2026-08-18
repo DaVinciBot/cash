@@ -2,9 +2,9 @@ name: E2E
 
 on:
   push:
-    branches: [staging, main, master]
+    branches: [ staging, main, master ]
   pull_request:
-    branches: [staging, main, master, 'release/**', 'hotfix/**']
+    branches: [ staging, main, master, 'release/**', 'hotfix/**' ]
 
 concurrency:
   group: ${{ github.workflow }}-${{ github.ref }}
@@ -16,7 +16,7 @@ permissions:
 jobs:
   e2e:
     name: Playwright
-    uses: DaVinciBot/shared-workflows/.github/workflows/e2e.yml@v5.1.1
+    uses: DaVinciBot/shared-workflows/.github/workflows/e2e.yml@v6.0.0
     secrets: inherit
     with:
       pnpm_version: 11.5.2
