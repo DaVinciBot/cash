@@ -119,6 +119,42 @@ export const actions: Actions = {
 	},
 
 	/**
+	 * Subdivision d'une feuille qui porte déjà quelque chose (TRESO-F-05).
+	 *
+	 * `check_budget_tree` refuse un enfant sous un nœud à montant : une enveloppe
+	 * posée sur une feuille en faisait une impasse. La fonction `split_budget_leaf`
+	 * lève l'impasse en une transaction — la feuille devient un nœud, et un enfant
+	 * `<nom>_default` reprend son montant, ses imputations et ses flux.
+	 *
+	 * Tout est en base parce que rien ici n'est atomique vu de PostgREST : le
+	 * montant doit quitter le parent AVANT que l'enfant existe, et un échec entre
+	 * les deux le perdrait.
+	 */
+	split: async ({ locals, request }) => {
+		const form = await request.formData();
+		const id = budgetId(form);
+		if (id === null) {
+			return fail(400, { message: 'Budget invalide.' });
+		}
+
+		const { error } = await locals.supabase
+			.schema('cash')
+			.rpc('split_budget_leaf', { p_budget_id: id });
+
+		if (error) {
+			return fail(400, {
+				message: await rejection(
+					locals.supabase,
+					error,
+					"Ce budget n'a pas pu être transformé en parent.",
+					{ entityType: 'budget' }
+				)
+			});
+		}
+		return { saved: 'budget' };
+	},
+
+	/**
 	 * Feuille présélectionnée à l'imputation (TRESO-F-02c).
 	 *
 	 * Le marquage est exclusif dans la fratrie : deux feuilles par défaut sous le

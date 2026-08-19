@@ -13,9 +13,10 @@
 	let showArchived = $state(false);
 
 	const visible = $derived(data.tree.filter((b) => showArchived || !b.archivedAt));
-	// Un parent possible est un nœud qui ne porte pas de montant : lui en ajouter
-	// un enfant le ferait cesser d'être une feuille, ce que `check_budget_tree`
-	// refuse. Autant ne pas le proposer.
+	// Un parent possible est un nœud qui ne porte pas de montant : y déplacer un
+	// budget ferait cesser la cible d'être une feuille, ce que `check_budget_tree`
+	// refuse. Une feuille à montant n'est plus une impasse pour autant — elle
+	// s'ouvre par « transformer en parent », pas en la choisissant ici.
 	const parentOptions = $derived(data.tree.filter((b) => !b.archivedAt && b.amountTtc === null));
 </script>
 
@@ -223,6 +224,16 @@
 								onclick={() => (creatingUnder = creatingUnder === node.id ? undefined : node.id)}
 								type="button">ajouter dessous</button
 							>
+						{/if}
+						{#if node.isLeaf && !node.archivedAt}
+							<form action="?/split" method="POST" use:enhance>
+								<input name="id" type="hidden" value={node.id} />
+								<button
+									class="text-xs text-gray-400 underline hover:text-gray-200"
+									title="Crée {node.name}_default sous ce budget, qui reprend son montant et ses dépenses."
+									type="submit">transformer en parent</button
+								>
+							</form>
 						{/if}
 						{#if node.isLeaf && !node.isDefault && !node.archivedAt}
 							<form action="?/setDefault" method="POST" use:enhance>
