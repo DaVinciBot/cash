@@ -20,7 +20,7 @@ Copier `.env.example` en `.env` :
 
 ```sh
 PUBLIC_SUPABASE_URL=https://project.supabase.co
-PUBLIC_SUPABASE_PUBLISHABLE_KEY=local-anon-key
+PUBLIC_SUPABASE_PUBLISHABLE_KEY=sb_publishable_xx
 # Clé secrète Supabase (service role) — serveur uniquement
 SUPABASE_SECRET_KEY=
 AUTH_PROXY_TARGET=http://localhost:5174
