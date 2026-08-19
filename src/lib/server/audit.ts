@@ -13,7 +13,12 @@
 //     porte le code annule la transaction, donc l'enregistrement vient d'après.
 
 import type { Database } from '@davincibot/database-types';
-import { cashErrorMessage, type ActivityEntry, type JournalChange } from '@davincibot/lib';
+import {
+	cashErrorMessage,
+	type ActivityEntry,
+	type JournalChange,
+	type JsonValue
+} from '@davincibot/lib';
 import type { PostgrestError, SupabaseClient } from '@supabase/supabase-js';
 
 type Client = SupabaseClient<Database>;
@@ -194,8 +199,8 @@ export async function socleJournal(
 interface ChangeRow {
 	activity_id: number;
 	field: string;
-	old_value: unknown;
-	new_value: unknown;
+	old_value: JsonValue;
+	new_value: JsonValue;
 }
 
 function groupChanges(rows: ChangeRow[] | null): Map<number, JournalChange[]> {

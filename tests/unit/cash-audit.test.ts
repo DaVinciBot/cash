@@ -73,7 +73,6 @@ describe('libellés de champs', () => {
 describe('valeurs de journal', () => {
 	it('dit l’absence en français, pas en JSON', () => {
 		expect(formatJournalValue(null)).toBe('—');
-		expect(formatJournalValue(undefined)).toBe('—');
 		expect(formatJournalValue([])).toBe('—');
 	});
 
