@@ -12,8 +12,8 @@
 	import { hasAnyPermission, userdata } from '@davincibot/lib';
 	import { onDestroy, untrack, type Snippet } from 'svelte';
 	import type { PageData } from './$types';
-
-	import { SideBar } from '@davincibot/components';
+	import { dev } from '$app/environment';
+	import { DevRbacPanel, SideBar } from '@davincibot/components';
 	import SettingsModal from '$lib/components/settings/SettingsModal.svelte';
 	import UserBadge from '$lib/components/share/UserBadge.svelte';
 	import '../app.css';
@@ -170,6 +170,10 @@
 
 		{#if settingsState}
 			<SettingsModal initialCategory={settingsState.category} onClose={closeSettings} />
+		{/if}
+
+		{#if dev}
+			<DevRbacPanel />
 		{/if}
 	</div>
 </div>
