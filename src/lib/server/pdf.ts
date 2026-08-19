@@ -26,7 +26,6 @@ import { chromium, type Browser } from 'playwright';
 const PAGE_FOOTER = `<div style="width:100%;margin:0 1.6cm;font-family:system-ui,sans-serif;font-size:8px;color:#6b7280;text-align:center;">Page <span class="pageNumber"></span> / <span class="totalPages"></span></div>`;
 
 /** Adresse par laquelle le serveur s'atteint lui-même. */
-// eslint-disable-next-line @typescript-eslint/no-unnecessary-condition
 const INTERNAL_BASE = env.PDF_INTERNAL_BASE ?? `http://127.0.0.1:${env.PORT ?? '3000'}`;
 
 /**
