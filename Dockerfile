@@ -44,7 +44,11 @@ COPY --chown=node:node package.json ./
 COPY --from=deps --chown=node:node /app/node_modules ./node_modules
 COPY --from=deps --chown=node:node /app/.playwright ./.playwright
 
-RUN node node_modules/playwright/cli.js install-deps chromium-headless-shell \
+# Correctifs de sécurité de la base Debian : l'image node officielle traîne
+# util-linux et consorts en version vulnérable.
+RUN apt-get update \
+    && apt-get upgrade -y --no-install-recommends \
+    && node node_modules/playwright/cli.js install-deps chromium-headless-shell \
     && apt-get purge -y --auto-remove \
         xvfb \
         libgl1-mesa-dri \
