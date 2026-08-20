@@ -8,15 +8,13 @@
 // `projects.manage.all` porte l'ENTITÉ projet — nom, campus, budget désigné,
 // archivage. Les adhésions relèvent d'une autre permission et d'un autre écran.
 
+import { num, str } from '$lib/server/coerce';
 import type { Database } from '@davincibot/database-types';
 import type { AccountKind, Campus, FlowDirection, FlowOrigin } from '@davincibot/lib';
 import { countsTowardTreasury } from '@davincibot/lib';
 import type { SupabaseClient } from '@supabase/supabase-js';
 
 type Client = SupabaseClient<Database>;
-
-const num = (value: number | null): number => value ?? 0;
-const str = (value: string | null): string => value ?? '';
 
 export interface BudgetNode {
 	id: number;

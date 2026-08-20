@@ -6,19 +6,12 @@
 // — jamais la clé de service : c'est la policy `items_insert`
 // (`requested_by = auth.uid()`) qui garantit qu'un membre n'écrit que pour lui.
 
+import { num, str } from '$lib/server/coerce';
 import type { Database } from '@davincibot/database-types';
 import type { Campus, ItemState, ItemTag, ProjectPermission } from '@davincibot/lib';
 import type { SupabaseClient } from '@supabase/supabase-js';
 
 type Client = SupabaseClient<Database>;
-
-// Les vues `cash.*` sont bâties sur des CTE récursives et `total_ttc` est une
-// colonne générée : Postgres déclare tout cela nullable, donc les types générés
-// aussi, même là où une valeur nulle est impossible en pratique. Ces deux
-// coercitions concentrent la conversion en un seul endroit plutôt que d'essaimer
-// des `?? 0` que le typage et le lint interprètent différemment.
-const num = (value: number | null): number => value ?? 0;
-const str = (value: string | null): string => value ?? '';
 
 /** Vue projet du sélecteur de panier : ce qu'il faut pour résoudre le campus. */
 export interface ProjectChoice {

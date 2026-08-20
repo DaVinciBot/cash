@@ -1,5 +1,6 @@
 import { resolve } from '$app/paths';
 import { isInvoiceOperationKind, isValidSiren } from '$lib/documents';
+import { round } from '$lib/numbers';
 import { rejection } from '$lib/server/audit';
 import { decimal, text, textAll } from '$lib/server/form';
 import { missingIssuerFields, organization, type ExpenseLine } from '$lib/server/reports';
@@ -166,7 +167,6 @@ export const actions: Actions = {
 		// Le montant vient du détail quand il y en a, du champ sinon : un reçu de
 		// don n'a qu'un montant, une facture a des lignes, une note de frais des
 		// dépenses. C'est le TTC qui fait foi — c'est ce qui est dû.
-		const round = (v: number) => Math.round(v * 100) / 100;
 		const detailTotal =
 			kind === 'expense_report'
 				? expenseLines.length > 0

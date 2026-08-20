@@ -5,14 +5,13 @@
 // `organization_write` (finance.read / finance.write) tranchent.
 
 import type { InvoiceOperationKind, OfficerGender } from '$lib/documents';
+import { round } from '$lib/numbers';
+import { num } from '$lib/server/coerce';
 import type { Database } from '@davincibot/database-types';
 import type { DocumentKind } from '@davincibot/lib';
 import type { SupabaseClient } from '@supabase/supabase-js';
 
 type Client = SupabaseClient<Database>;
-
-const num = (value: number | null): number => value ?? 0;
-const round = (value: number): number => Math.round(value * 100) / 100;
 
 // Alias de type et non `interface` : une interface n'a pas d'index signature
 // implicite, et cet objet part tel quel dans une colonne `jsonb`. Le déclarer en

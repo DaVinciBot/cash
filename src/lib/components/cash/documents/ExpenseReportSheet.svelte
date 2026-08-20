@@ -8,6 +8,7 @@
 	import SignatureBlock from './helpers/SignatureBlock.svelte';
 	import SubjectBlock from './helpers/SubjectBlock.svelte';
 	import TotalsBlock from './helpers/TotalsBlock.svelte';
+	import { round } from '$lib/numbers';
 	import { officerTitle } from '$lib/documents';
 	import type { GeneratedDocument } from '$lib/server/reports';
 
@@ -17,7 +18,6 @@
 
 	let { doc }: Props = $props();
 
-	const round = (v: number) => Math.round(v * 100) / 100;
 	const lines = $derived(doc.expenseLines);
 	const totalHt = $derived(
 		lines.length > 0 ? round(lines.reduce((sum, l) => sum + l.amountHt, 0)) : doc.amountTtc

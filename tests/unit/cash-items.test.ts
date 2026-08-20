@@ -118,7 +118,7 @@ describe('droits du membre sur ses items (CMD-F-02)', () => {
 
 describe("traduction des codes d'erreur de la base", () => {
 	// On branche sur error.code, jamais sur error.message, qui est en français et
-	// non versionné (Supabased/docs/ERROR_CODES.md).
+	// non versionné.
 	it('traduit un code métier connu', () => {
 		expect(cashErrorMessage('DVB02', 'repli')).toContain('close');
 	});

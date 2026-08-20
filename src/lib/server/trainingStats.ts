@@ -9,6 +9,7 @@ import type {
 	StatsTotals,
 	WeekRow
 } from '$lib/helpers/trainingStatsTypes';
+import { round } from '$lib/numbers';
 import type { Database } from '@davincibot/database-types';
 import { getParisDateKey, type TrainingCategory } from '@davincibot/lib';
 import type { SupabaseClient } from '@supabase/supabase-js';
@@ -44,14 +45,6 @@ export interface StatsSlot {
 	trainerName: string;
 	/** Pseudos des inscrit·es confirmé·es. */
 	attendees: string[];
-}
-
-/**
- * Les heures s'additionnent par quarts d'heure : sans arrondi, une somme de
- * `0.25` finit par afficher `10.750000000000002`.
- */
-function round(value: number): number {
-	return Math.round(value * 100) / 100;
 }
 
 function categoryLabel(value: string): string {
@@ -219,7 +212,7 @@ export function pivotByPeriod(slots: StatsSlot[], range: StatsRange): PivotTable
 
 	const categories = categoryOptions
 		.filter((option) => slots.some((slot) => slot.category === option.value))
-		.map((option) => ({ value: option.value as TrainingCategory, label: option.text }));
+		.map((option) => ({ value: option.value, label: option.text }));
 
 	const rows: PivotRow[] = [];
 	for (let day = start; day <= last; day += width) {

@@ -1,10 +1,8 @@
 <script lang="ts">
-	// Le tableau à sept colonnes du classeur, servi tel quel par catégorie puis
-	// par formateur·ice : seule change la colonne de gauche, d'où un composant
-	// unique plutôt que deux tableaux jumeaux à maintenir en parallèle.
+	import StatsTrendLegend from '$lib/components/training/stats/StatsTrendLegend.svelte';
 	import {
 		CELL_LABEL,
-		CELL_NUMBER,
+		cellNumber,
 		EMPTY,
 		HEAD_CELL,
 		HEAD_CELL_NUMBER,
@@ -14,6 +12,7 @@
 		TOTAL_CELL_NUMBER
 	} from '$lib/components/training/stats/statsTable';
 	import { formatDecimal, formatHours, formatRatio } from '$lib/helpers/trainingStatsFormat';
+	import { compareToAverage } from '$lib/helpers/trainingStatsHighlight';
 	import type { GroupRow, StatsTotals } from '$lib/helpers/trainingStatsTypes';
 
 	interface Props {
@@ -24,6 +23,16 @@
 	}
 
 	let { rows, total, headLabel }: Props = $props();
+
+	const trends = $derived({
+		slots: compareToAverage(rows.map((row) => row.slots)),
+		hours: compareToAverage(rows.map((row) => row.hours)),
+		attendees: compareToAverage(rows.map((row) => row.attendees)),
+		seats: compareToAverage(rows.map((row) => row.seats)),
+		average: compareToAverage(rows.map((row) => row.average)),
+		fillRate: compareToAverage(rows.map((row) => row.fillRate)),
+		trainingTypes: compareToAverage(rows.map((row) => row.trainingTypes))
+	});
 </script>
 
 <div class={SCROLLER}>
@@ -41,16 +50,16 @@
 			</tr>
 		</thead>
 		<tbody>
-			{#each rows as row (row.key)}
+			{#each rows as row, index (row.key)}
 				<tr>
 					<th class={CELL_LABEL} scope="row">{row.label}</th>
-					<td class={CELL_NUMBER}>{row.slots}</td>
-					<td class={CELL_NUMBER}>{formatHours(row.hours)}</td>
-					<td class={CELL_NUMBER}>{row.attendees}</td>
-					<td class={CELL_NUMBER}>{row.seats}</td>
-					<td class={CELL_NUMBER}>{formatDecimal(row.average)}</td>
-					<td class={CELL_NUMBER}>{formatRatio(row.fillRate)}</td>
-					<td class={CELL_NUMBER}>{row.trainingTypes}</td>
+					<td class={cellNumber(trends.slots[index])}>{row.slots}</td>
+					<td class={cellNumber(trends.hours[index])}>{formatHours(row.hours)}</td>
+					<td class={cellNumber(trends.attendees[index])}>{row.attendees}</td>
+					<td class={cellNumber(trends.seats[index])}>{row.seats}</td>
+					<td class={cellNumber(trends.average[index])}>{formatDecimal(row.average)}</td>
+					<td class={cellNumber(trends.fillRate[index])}>{formatRatio(row.fillRate)}</td>
+					<td class={cellNumber(trends.trainingTypes[index])}>{row.trainingTypes}</td>
 				</tr>
 			{:else}
 				<tr>
@@ -74,3 +83,7 @@
 		{/if}
 	</table>
 </div>
+
+{#if rows.length > 0}
+	<StatsTrendLegend />
+{/if}

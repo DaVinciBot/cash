@@ -23,9 +23,9 @@
 	// transforme cinq corrections de prix en un mur de texte, ce qui est
 	// exactement ce que le format linéaire cherche à éviter.
 	//
-	// « Au survol » au sens du cahier des charges, mais l'ouverture répond aussi
-	// au clic et au clavier : un détail qui n'existe qu'au survol n'existe pas
-	// sur un écran tactile, et pas du tout pour qui navigue au clavier.
+	// Le détail s'ouvre au survol, mais aussi au clic et au clavier : un détail
+	// qui n'existe qu'au survol n'existe pas sur un écran tactile, et pas du tout
+	// pour qui navigue au clavier.
 	let open = $state<number | null>(null);
 
 	const moment = new Intl.DateTimeFormat('fr-FR', { dateStyle: 'medium', timeStyle: 'short' });

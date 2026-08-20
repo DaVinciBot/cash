@@ -25,8 +25,23 @@ import { chromium, type Browser } from 'playwright';
  */
 const PAGE_FOOTER = `<div style="width:100%;margin:0 1.6cm;font-family:system-ui,sans-serif;font-size:8px;color:#6b7280;text-align:center;">Page <span class="pageNumber"></span> / <span class="totalPages"></span></div>`;
 
-/** Adresse par laquelle le serveur s'atteint lui-même. */
-const INTERNAL_BASE = env.PDF_INTERNAL_BASE ?? `http://127.0.0.1:${env.PORT ?? '3000'}`;
+/**
+ * Adresse par laquelle le serveur s'atteint lui-même.
+ *
+ * Fallback en if : la nullabilité de env.* dépend de la présence d'un .env
+ * (types générés), un `??` ne linte pas pareil en CI et en local.
+ */
+const internalBase = (): string => {
+	const base = env.PDF_INTERNAL_BASE;
+	if (base) {
+		return base;
+	}
+	const port = env.PORT;
+	if (port) {
+		return `http://127.0.0.1:${port}`;
+	}
+	return 'http://127.0.0.1:3000';
+};
 
 /**
  * Le navigateur est démarré une fois et réutilisé : chaque lancement coûte
@@ -105,7 +120,7 @@ export async function renderPagePdf(path: string, sid: string): Promise<Uint8Arr
 		]);
 
 		const page = await context.newPage();
-		const response = await page.goto(`${INTERNAL_BASE}${path}`, {
+		const response = await page.goto(`${internalBase()}${path}`, {
 			waitUntil: 'networkidle',
 			timeout: 20_000
 		});

@@ -5,6 +5,7 @@
 	import { enhance } from '$app/forms';
 	import { resolve } from '$app/paths';
 	import { INVOICE_OPERATION_KINDS, INVOICE_OPERATION_LABELS } from '$lib/documents';
+	import { round } from '$lib/numbers';
 	import { DOCUMENT_KIND_LABELS } from '@davincibot/lib';
 	import type { ActionData, PageData } from './$types';
 
@@ -39,7 +40,6 @@
 	const isExpense = $derived(kind === 'expense_report');
 
 	const number = (raw: string) => Number(raw.replace(',', '.'));
-	const round = (v: number) => Math.round(v * 100) / 100;
 
 	let lines = $state<{ id: number; label: string; quantity: string; price: string }[]>([
 		{ id: 0, label: '', quantity: '1', price: '' }

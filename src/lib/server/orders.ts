@@ -12,14 +12,12 @@
 // réinsertion des imputations dans une même transaction, ce qu'un client
 // PostgREST ne sait pas faire (voir la migration 20260809110000).
 
+import { num, str } from '$lib/server/coerce';
 import type { Database } from '@davincibot/database-types';
 import type { Campus, ItemTag, OrderState, ShippingAllocation } from '@davincibot/lib';
 import type { SupabaseClient } from '@supabase/supabase-js';
 
 type Client = SupabaseClient<Database>;
-
-const num = (value: number | null): number => value ?? 0;
-const str = (value: string | null): string => value ?? '';
 
 /** Item validé par son CDP et libre de toute commande. */
 export interface BundlableItem {
