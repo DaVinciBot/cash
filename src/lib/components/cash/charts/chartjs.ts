@@ -121,8 +121,46 @@ const euroCompact = new Intl.NumberFormat('fr-FR', {
 
 const euroExact = new Intl.NumberFormat('fr-FR', { style: 'currency', currency: 'EUR' });
 
-/** Options partagées : thème sombre, axes discrets, infobulle en euros. */
-export function baseOptions(theme: ChartPalette): Record<string, unknown> {
+/**
+ * Comment écrire une valeur : `tick` le long de l'axe, où la place manque, et
+ * `value` dans l'infobulle, où l'on peut être exact.
+ */
+export interface ValueFormat {
+	tick: (value: number) => string;
+	value: (value: number) => string;
+}
+
+/** Le format des écrans de trésorerie, et le défaut historique de `baseOptions`. */
+export const euroFormat: ValueFormat = {
+	tick: (value) => euroCompact.format(value),
+	value: (value) => euroExact.format(value)
+};
+
+const decimal = new Intl.NumberFormat('fr-FR', { maximumFractionDigits: 2 });
+
+/** Des effectifs, des heures : tout ce qui se compte sans devise. */
+export const countFormat: ValueFormat = {
+	tick: (value) => decimal.format(value),
+	value: (value) => decimal.format(value)
+};
+
+/** Un pourcentage déjà exprimé sur cent, comme les aires empilées normalisées. */
+export const percentFormat: ValueFormat = {
+	tick: (value) => `${decimal.format(Math.round(value))} %`,
+	value: (value) => `${decimal.format(value)} %`
+};
+
+/**
+ * Options partagées : thème sombre, axes discrets, infobulle formatée.
+ *
+ * Le format est un argument et non une constante : les mêmes axes servent des
+ * euros en trésorerie et des effectifs en formation, et seule l'écriture des
+ * nombres change d'un écran à l'autre.
+ */
+export function baseOptions(
+	theme: ChartPalette,
+	format: ValueFormat = euroFormat
+): Record<string, unknown> {
 	return {
 		responsive: true,
 		maintainAspectRatio: false,
@@ -148,7 +186,7 @@ export function baseOptions(theme: ChartPalette): Record<string, unknown> {
 				callbacks: {
 					label: (ctx: { dataset: { label?: string }; parsed: { y?: number } | number }) => {
 						const raw = typeof ctx.parsed === 'number' ? ctx.parsed : (ctx.parsed.y ?? 0);
-						return ` ${ctx.dataset.label ?? ''} : ${euroExact.format(raw)}`;
+						return ` ${ctx.dataset.label ?? ''} : ${format.value(raw)}`;
 					}
 				}
 			}
@@ -163,7 +201,7 @@ export function baseOptions(theme: ChartPalette): Record<string, unknown> {
 				ticks: {
 					color: theme.text,
 					font: { size: 10 },
-					callback: (v: number | string) => euroCompact.format(Number(v))
+					callback: (v: number | string) => format.tick(Number(v))
 				},
 				grid: { color: theme.grid },
 				border: { display: false }

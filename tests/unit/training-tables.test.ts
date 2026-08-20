@@ -42,14 +42,15 @@ describe('training table helpers', () => {
 		expect(rows.at(0)?.at(2)).toEqual({ value: 'Aucune description' });
 	});
 
-	it('createSlotTableItems maps nested slot/trainer data', () => {
+	it('createSlotTableItems maps flattened slot/trainer data', () => {
 		const { index, rows } = createSlotTableItems([
 			{
 				id: 3,
 				training_id: 1,
-				custom_name: null,
-				custom_description: null,
-				custom_prerequisites: null,
+				name: 'Svelte',
+				description: 'Desc',
+				prerequisites: 'JS',
+				category: 'software',
 				start: '2025-01-10T10:00:00.000Z',
 				duration_hours: 2,
 				on_site_seats: 10,
@@ -59,13 +60,8 @@ describe('training table helpers', () => {
 				excusable: true,
 				status: 'draft',
 				trainer_id: 't-1',
-				training: {
-					name: 'Svelte',
-					description: 'Desc',
-					prerequisites: 'JS',
-					category: 'software'
-				},
-				profiles: { username: null, avatar_url: null }
+				trainer_username: null,
+				trainer_avatar_url: null
 			}
 		]);
 

@@ -1,4 +1,5 @@
 <script lang="ts">
+	import { resolve } from '$app/paths';
 	import CrudForm from '$lib/components/modals/CrudForm.svelte';
 	import AdminHeader from '$lib/components/training/admin/AdminHeader.svelte';
 	import AdminSlotSection from '$lib/components/training/admin/AdminSlotSection.svelte';
@@ -88,8 +89,8 @@ DVBisous ! :robot:`;
 	};
 	const slotDbInfo = {
 		schema: 'formation',
-		table: 'training_slot',
-		key: 'id,training_id,custom_name,custom_description,custom_prerequisites,start,duration_hours,on_site_seats,remote_seats,location,video_conference_link,excusable,status,trainer_id,training!inner(name,description,prerequisites,category),profiles!slot_trainer_id_fkey(username,avatar_url)',
+		table: 'training_slot_expanded_view',
+		key: 'id,training_id,name,description,prerequisites,category,start,duration_hours,on_site_seats,remote_seats,location,video_conference_link,excusable,status,trainer_id,trainer_username,trainer_avatar_url',
 		ordering: 'start:desc'
 	};
 	let trainingIndex = new Map<number, TrainingListItem>();
@@ -619,6 +620,7 @@ DVBisous ! :robot:`;
 				openTrainingModal();
 			}}
 			{slotRangeDays}
+			statsHref={resolve('/trainings/stats')}
 			trainingsCount={trainings.length}
 			upcomingCount={upcomingSlots.length}
 		/>

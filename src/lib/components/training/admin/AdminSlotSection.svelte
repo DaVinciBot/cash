@@ -64,7 +64,7 @@
 				headers={['Début', 'Formation', 'Formateur·ice', 'Statut', 'Actions']}
 				parseItems={parseSlotItems}
 				refreshTopic={slotTableTopic}
-				searchable="training.name"
+				searchable="name"
 				size={10}
 			/>
 		</div>
