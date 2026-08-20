@@ -158,6 +158,22 @@
 		}
 	}
 
+	// `transcode` exige la permission `blog.draft.write`, qu'elle lit dans le jeton
+	// de l'appelant : c'est donc le JWT de session qui doit voyager sur
+	// `Authorization`, jamais la clé publiable. Cette clé n'étant pas un JWT, la
+	// passerelle rejetait la requête en `Invalid JWT`. Elle part désormais sur
+	// `apikey`, seul en-tête qui l'accepte.
+	async function transcodeHeaders(): Promise<Record<string, string>> {
+		const {
+			data: { session }
+		} = await getSupabaseBrowserClient().auth.getSession();
+		return {
+			'Content-Type': 'application/json',
+			apikey: supabaseKey,
+			Authorization: `Bearer ${session?.access_token ?? ''}`
+		};
+	}
+
 	async function transcodeHero(): Promise<boolean> {
 		const supabase = getSupabaseBrowserClient();
 		if (!meta.heroImage) {
@@ -171,10 +187,7 @@
 		try {
 			const res = await fetch(`${supabaseUrl}functions/v1/transcode/blog-post-hero`, {
 				method: 'POST',
-				headers: {
-					'Content-Type': 'application/json',
-					Authorization: `Bearer ${supabaseKey}`
-				},
+				headers: await transcodeHeaders(),
 				body: JSON.stringify({
 					image: meta.heroImage,
 					title,
@@ -211,10 +224,7 @@
 		try {
 			const res = await fetch(`${supabaseUrl}functions/v1/transcode/blog-post-og`, {
 				method: 'POST',
-				headers: {
-					'Content-Type': 'application/json',
-					Authorization: `Bearer ${supabaseKey}`
-				},
+				headers: await transcodeHeaders(),
 				body: JSON.stringify({
 					image: meta.heroImage,
 					title,
@@ -264,10 +274,7 @@
 		try {
 			const res = await fetch(`${supabaseUrl}functions/v1/transcode/blog-post-image`, {
 				method: 'POST',
-				headers: {
-					'Content-Type': 'application/json',
-					Authorization: `Bearer ${supabaseKey}`
-				},
+				headers: await transcodeHeaders(),
 				body: JSON.stringify({
 					images: uniqueImages,
 					bucketName: 'articles',
