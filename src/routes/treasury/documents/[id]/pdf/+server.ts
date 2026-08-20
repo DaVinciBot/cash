@@ -50,7 +50,7 @@ export const GET: RequestHandler = async ({ cookies, locals, params }) => {
 		// Volontairement sans trace en console : le code serveur du projet n'en
 		// écrit nulle part. La cause remonte dans les journaux du conteneur, que
 		// Playwright renseigne lui-même quand le navigateur manque.
-		error(503, 'Le PDF n’a pas pu être produit. La pièce reste imprimable depuis le navigateur.');
+		error(503, "Le PDF n'a pas pu être produit. La pièce reste imprimable depuis le navigateur.");
 	}
 	const name = `${fileName(document.kind, document.number, document.recipientName)}.pdf`;
 

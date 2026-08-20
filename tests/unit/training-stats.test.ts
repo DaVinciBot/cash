@@ -154,7 +154,7 @@ describe('regroupement par catégorie', () => {
 		expect(categoryRows(slots).map((item) => item.key)).toEqual(['code', 'software']);
 	});
 
-	it('laisse le remplissage indéfini quand aucune place n’était proposée', () => {
+	it("laisse le remplissage indéfini quand aucune place n'était proposée", () => {
 		const rows = categoryRows([slot({ seats: 0, attendees: [] })]);
 
 		expect(rows[0]?.fillRate).toBeNull();
@@ -220,7 +220,7 @@ describe('tableau croisé par période', () => {
 		expect(table.totals).toMatchObject({ counts: [2, 1], total: 3 });
 	});
 
-	it('n’ouvre pas de colonne pour une catégorie absente de la plage', () => {
+	it("n'ouvre pas de colonne pour une catégorie absente de la plage", () => {
 		const table = pivotByPeriod([slot({ category: 'code' })], range);
 
 		expect(table.categories).toHaveLength(1);
@@ -253,7 +253,7 @@ describe('séries des aires empilées', () => {
 		expect(series[1]?.values[1]).toBeCloseTo(100);
 	});
 
-	it('rend une période vide à zéro plutôt qu’en division par zéro', () => {
+	it("rend une période vide à zéro plutôt qu'en division par zéro", () => {
 		const empty = pivotByPeriod([slot({ start: '2026-04-08T10:00:00Z' })], {
 			from: '2026-04-06',
 			to: '2026-05-17',
@@ -298,7 +298,7 @@ describe('lecture des lignes de la base', () => {
 		expect(mapped).toMatchObject({ seats: 10, attendees: ['Fay'], trainerName: 'Courrieu' });
 	});
 
-	it('compte zéro place quand la capacité n’est pas renseignée', () => {
+	it("compte zéro place quand la capacité n'est pas renseignée", () => {
 		const [mapped] = toStatsSlots([
 			{
 				id: 7,
@@ -383,8 +383,8 @@ describe('bornes de la plage', () => {
 	});
 });
 
-describe('plage demandée par l’URL', () => {
-	it('couvre les douze derniers mois quand l’URL ne dit rien', () => {
+describe("plage demandée par l'URL", () => {
+	it("couvre les douze derniers mois quand l'URL ne dit rien", () => {
 		expect(resolveRange({}, '2026-08-19')).toEqual({
 			from: '2025-08-19',
 			to: '2026-08-19',
@@ -398,7 +398,7 @@ describe('plage demandée par l’URL', () => {
 		).toEqual({ from: '2026-04-06', to: '2026-04-26', periodDays: 7 });
 	});
 
-	it('remet à l’endroit une plage saisie à l’envers', () => {
+	it("remet à l'endroit une plage saisie à l'envers", () => {
 		const resolved = resolveRange({ from: '2026-04-26', to: '2026-04-06' }, '2026-08-19');
 
 		expect(resolved.from).toBe('2026-04-06');
@@ -415,7 +415,7 @@ describe('plage demandée par l’URL', () => {
 		expect(resolveRange({ period: 'trois' }, '2026-08-19').periodDays).toBe(21);
 	});
 
-	it('plafonne le pas à la longueur d’une année', () => {
+	it("plafonne le pas à la longueur d'une année", () => {
 		expect(resolveRange({ period: '5000' }, '2026-08-19').periodDays).toBe(366);
 	});
 });

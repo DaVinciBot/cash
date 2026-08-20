@@ -30,7 +30,7 @@ describe('écriture des grandeurs', () => {
 		expect(formatDecimal(null)).toBe('—');
 	});
 
-	it('distingue zéro de l’absence de valeur', () => {
+	it("distingue zéro de l'absence de valeur", () => {
 		expect(formatRatio(0)).toBe('0 %');
 		expect(formatDecimal(0)).toBe('0');
 	});

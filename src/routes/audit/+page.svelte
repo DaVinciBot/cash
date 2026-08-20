@@ -37,7 +37,7 @@
 	<header class="mb-6">
 		<h1 class="text-2xl font-bold text-white">Audit</h1>
 		<p class="mt-1 text-sm text-gray-400">
-			Ce qui a changé, qui l’a changé, et ce que les règles ont refusé. L’historique d’une ligne
+			Ce qui a changé, qui l'a changé, et ce que les règles ont refusé. L'historique d'une ligne
 			précise, lui, se lit sur la ligne elle-même.
 		</p>
 	</header>

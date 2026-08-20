@@ -34,7 +34,7 @@ describe('référentiel des journaux (jalon 8)', () => {
 		expect(SOCLE_ACTIVITY_KINDS).toEqual(['created', 'updated', 'deleted']);
 	});
 
-	it('donne un repère visuel distinct à chaque nature d’événement', () => {
+	it("donne un repère visuel distinct à chaque nature d'événement", () => {
 		const classes = new Set(ACTIVITY_KINDS.map((k) => ACTIVITY_BADGES[k].className));
 		expect(classes.size).toBe(ACTIVITY_KINDS.length);
 		for (const kind of ACTIVITY_KINDS) {
@@ -52,18 +52,18 @@ describe('référentiel des journaux (jalon 8)', () => {
 });
 
 describe('libellés de champs', () => {
-	it('traduit ce qu’il connaît', () => {
+	it("traduit ce qu'il connaît", () => {
 		expect(fieldLabel('refused_reason')).toBe('Motif du refus');
 		expect(fieldLabel('unit_price_ttc')).toBe('Prix unitaire TTC');
 	});
 
-	it('laisse passer le nom de colonne pour ce qu’il ne connaît pas', () => {
+	it("laisse passer le nom de colonne pour ce qu'il ne connaît pas", () => {
 		// Volontaire : une colonne ajoutée sans passer par le référentiel reste
 		// lisible, et son absence se voit.
 		expect(fieldLabel('colonne_inconnue')).toBe('colonne_inconnue');
 	});
 
-	it('tait les identifiants bruts, qui n’apprennent rien', () => {
+	it("tait les identifiants bruts, qui n'apprennent rien", () => {
 		expect(isOpaqueField('project_id')).toBe(true);
 		expect(isOpaqueField('requested_by')).toBe(true);
 		expect(isOpaqueField('name')).toBe(false);
@@ -71,7 +71,7 @@ describe('libellés de champs', () => {
 });
 
 describe('valeurs de journal', () => {
-	it('dit l’absence en français, pas en JSON', () => {
+	it("dit l'absence en français, pas en JSON", () => {
 		expect(formatJournalValue(null)).toBe('—');
 		expect(formatJournalValue([])).toBe('—');
 	});
@@ -92,13 +92,13 @@ describe('valeurs de journal', () => {
 	});
 });
 
-describe('résumé d’une entrée (CMD-F-62)', () => {
+describe("résumé d'une entrée (CMD-F-62)", () => {
 	it('nomme la création et la suppression sans détail', () => {
 		expect(summarizeActivity(entry({ kind: 'created' }))).toBe('Créé');
 		expect(summarizeActivity(entry({ kind: 'deleted' }))).toBe('Supprimé');
 	});
 
-	it('met le changement d’état en avant (CMD-F-61)', () => {
+	it("met le changement d'état en avant (CMD-F-61)", () => {
 		const summary = summarizeActivity(
 			entry({
 				kind: 'state_changed',
@@ -126,21 +126,21 @@ describe('résumé d’une entrée (CMD-F-62)', () => {
 		).toBe('2 champs modifiés');
 	});
 
-	it('nomme le champ quand il n’y en a qu’un', () => {
+	it("nomme le champ quand il n'y en a qu'un", () => {
 		expect(summarizeActivity(entry({ changes: [{ field: 'quantity', old: 1, new: 2 }] }))).toBe(
 			'Quantité modifié'
 		);
 	});
 });
 
-describe('auteur d’une entrée', () => {
-	it('dit « Système » quand aucun utilisateur n’est en cause', () => {
+describe("auteur d'une entrée", () => {
+	it("dit « Système » quand aucun utilisateur n'est en cause", () => {
 		// Un trigger déclenché hors session HTTP n'a pas d'acteur, et c'est
 		// l'information juste : personne ne l'a fait à la main.
 		expect(actorLabel({ actorId: null, actorName: null })).toBe('Système');
 	});
 
-	it('distingue un compte supprimé d’une action système', () => {
+	it("distingue un compte supprimé d'une action système", () => {
 		expect(actorLabel({ actorId: 'x', actorName: null })).toBe('Compte supprimé');
 	});
 

@@ -106,7 +106,7 @@ describe('facture', () => {
 });
 
 describe('devis', () => {
-	it('demande la mention manuscrite et laisse le cadre pour l’écrire', () => {
+	it("demande la mention manuscrite et laisse le cadre pour l'écrire", () => {
 		const text = render(QuoteSheet, doc({ kind: 'quote', number: 'DEV-2026-0002' }));
 
 		expect(text).toContain('Lu et approuvé, bon pour accord');
@@ -215,7 +215,7 @@ describe('SIREN', () => {
 		expect(isValidSiren('552 100 554')).toBe(true);
 	});
 
-	it('refuse une coquille d’un chiffre ou une longueur fausse', () => {
+	it("refuse une coquille d'un chiffre ou une longueur fausse", () => {
 		expect(isValidSiren('552100555')).toBe(false);
 		expect(isValidSiren('55210055')).toBe(false);
 		expect(isValidSiren('')).toBe(false);
