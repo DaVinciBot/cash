@@ -3,7 +3,6 @@
 	// rechargement refait le calcul côté serveur, et le lien obtenu montre à qui
 	// le reçoit exactement ce que l'expéditeur avait sous les yeux.
 	import type { StatsRange } from '$lib/helpers/trainingStatsTypes';
-	import { CTAButton } from '@davincibot/components';
 
 	interface Props {
 		range: StatsRange;
@@ -11,20 +10,19 @@
 
 	let { range }: Props = $props();
 
-	const field =
-		'border-light-blue/20 bg-dark-blue/80 text-light-blue/90 mt-1 block rounded-lg border p-2 text-sm';
+	const field = 'mt-1 block rounded-lg border border-gray-600 bg-gray-700 p-2 text-sm text-white';
 </script>
 
 <form class="flex flex-wrap items-end gap-3" method="GET">
-	<label class="text-light-blue/70 text-xs">
+	<label class="text-xs text-gray-300">
 		Du
 		<input name="from" class={field} max={range.to} type="date" value={range.from} />
 	</label>
-	<label class="text-light-blue/70 text-xs">
+	<label class="text-xs text-gray-300">
 		Au
 		<input name="to" class={field} min={range.from} type="date" value={range.to} />
 	</label>
-	<label class="text-light-blue/70 text-xs">
+	<label class="text-xs text-gray-300">
 		Période (jours)
 		<input
 			name="period"
@@ -36,5 +34,8 @@
 			value={range.periodDays}
 		/>
 	</label>
-	<CTAButton fullWidth={false} size="sm" type="submit" variant="primary">Afficher</CTAButton>
+	<button
+		class="rounded-lg border border-gray-600 px-3 py-2 text-sm text-gray-200 hover:bg-gray-700"
+		type="submit">Afficher</button
+	>
 </form>

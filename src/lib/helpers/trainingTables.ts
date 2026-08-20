@@ -1,5 +1,5 @@
-import { categoryOptions, statusOptions } from '$lib/helpers/trainingOptions';
-import { Badge } from '@davincibot/components';
+import StateBadge from '$lib/components/cash/StateBadge.svelte';
+import { SLOT_STATUS_BADGES, TRAINING_CATEGORY_BADGES } from '$lib/helpers/trainingOptions';
 import type {
 	SlotStatus,
 	TrainingCategory,
@@ -16,12 +16,23 @@ export function findTrainingName(trainingId: number, trainings: TrainingListItem
 	return trainings.find((training) => training.training_id === trainingId)?.name ?? 'Formation';
 }
 
-function getCategoryLabel(category: string) {
-	return categoryOptions.find((opt) => opt.value === category)?.text ?? 'Autre';
+/**
+ * Une catégorie inconnue de la base retombe sur « Autre » plutôt que sur du
+ * vide : le référentiel du client peut retarder d'une migration sur celui de la
+ * base, et une case vide ne dirait pas que la valeur existe.
+ */
+export function categoryBadge(category: string | null | undefined) {
+	const key = (category ?? 'other') as TrainingCategory;
+	return Object.hasOwn(TRAINING_CATEGORY_BADGES, key)
+		? TRAINING_CATEGORY_BADGES[key]
+		: TRAINING_CATEGORY_BADGES.other;
 }
 
-function getStatusOption(status: string) {
-	return statusOptions.find((opt) => opt.value === status);
+export function statusBadge(status: string | null | undefined) {
+	const key = (status ?? 'draft') as SlotStatus;
+	return Object.hasOwn(SLOT_STATUS_BADGES, key)
+		? SLOT_STATUS_BADGES[key]
+		: SLOT_STATUS_BADGES.draft;
 }
 
 interface TrainingRawItem {
@@ -69,11 +80,8 @@ export function createTrainingTableItems(data: TrainingRawItem[]) {
 	const rows = data.map((training) => [
 		{ value: training.name, data: training.id },
 		{
-			component: Badge,
-			props: {
-				text: getCategoryLabel(training.category),
-				color: 'light-blue'
-			}
+			component: StateBadge,
+			props: { badge: categoryBadge(training.category) }
 		},
 		{ value: training.description ?? 'Aucune description' }
 	]);
@@ -113,21 +121,15 @@ export function createSlotTableItems(data: SlotRawItem[]) {
 		])
 	);
 
-	const rows = data.map((slot) => {
-		const statusOption = getStatusOption(slot.status);
-		return [
-			{ value: formatSlotDate(slot.start), data: slot.id },
-			{ value: slot.name ?? '' },
-			{ value: slot.trainer_username ?? 'À définir', avatar: slot.trainer_avatar_url },
-			{
-				component: Badge,
-				props: {
-					text: statusOption?.text ?? slot.status,
-					color: statusOption?.color
-				}
-			}
-		];
-	});
+	const rows = data.map((slot) => [
+		{ value: formatSlotDate(slot.start), data: slot.id },
+		{ value: slot.name ?? '' },
+		{ value: slot.trainer_username ?? 'À définir', avatar: slot.trainer_avatar_url },
+		{
+			component: StateBadge,
+			props: { badge: statusBadge(slot.status) }
+		}
+	]);
 
 	return { index, rows };
 }

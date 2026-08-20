@@ -1,6 +1,7 @@
 <script lang="ts">
+	import StateBadge from '$lib/components/cash/StateBadge.svelte';
+	import { categoryBadge } from '$lib/helpers/trainingTables';
 	import {
-		CTAButton,
 		Table,
 		type Action,
 		type DBInfo,
@@ -14,7 +15,6 @@
 
 	interface Props {
 		trainings?: TrainingListItem[];
-		categoryOptions?: { value: string; text: string; selected?: boolean }[];
 		trainingDbInfo: DBInfo;
 		trainingActions?: Action[];
 		trainingFilters?: Filter[];
@@ -26,7 +26,6 @@
 
 	let {
 		trainings = [],
-		categoryOptions = [],
 		trainingDbInfo,
 		trainingActions = [],
 		trainingFilters = [],
@@ -37,64 +36,67 @@
 	}: Props = $props();
 </script>
 
-<section class="border-light-blue/10 bg-dark-blue/80 rounded-[28px] border p-5 sm:p-6">
-	<div class="flex flex-col gap-4 lg:flex-row lg:items-center lg:justify-between">
+<div class="mb-8">
+	<div class="mb-3 flex flex-wrap items-center justify-between gap-3">
 		<div>
-			<h2 class="text-xl font-semibold text-white">Formations types</h2>
-			<p class="text-light-blue/70 text-sm">Gérez les contenus de référence pour les sessions.</p>
+			<h2 class="text-sm font-semibold tracking-wide text-gray-300 uppercase">Formations types</h2>
+			<p class="mt-1 text-xs text-gray-500">
+				Les contenus de référence dont héritent les sessions.
+			</p>
 		</div>
-		<div class="flex flex-col sm:w-40 sm:flex-row sm:flex-wrap">
-			<CTAButton onclick={onAddTraining} size="sm" type="button" variant="secondary">
-				Ajouter
-			</CTAButton>
-		</div>
+		<button
+			class="rounded-lg border border-gray-600 px-3 py-1.5 text-sm text-gray-200 hover:bg-gray-700"
+			onclick={onAddTraining}
+			type="button">Ajouter</button
+		>
 	</div>
 
-	<div class="border-light-blue/10 mt-6 overflow-hidden rounded-xl border">
-		<div class="hidden md:block">
-			<Table
-				actions={trainingActions}
-				dbInfo={trainingDbInfo}
-				emptyMessage="Aucune formation"
-				filters={trainingFilters}
-				headers={['Nom', 'Catégorie', 'Description', 'Actions']}
-				parseItems={parseTrainingItems}
-				refreshTopic={trainingTableTopic}
-				searchable="name"
-				size={5}
-			/>
-		</div>
-		<div class="md:hidden">
-			{#if trainings.length === 0}
-				<p class="text-light-blue/70 px-4 py-6 text-center text-sm">Aucune formation</p>
-			{:else}
-				<div class="grid gap-3 p-4">
-					{#each trainings as training (training.training_id)}
-						<article class="border-light-blue/10 bg-dark-blue/90 rounded-2xl border p-4">
-							<div class="flex items-start justify-between gap-4">
-								<div>
-									<p class="text-base font-semibold text-white">{training.name}</p>
-									<p class="text-light-blue/60 mt-1 text-xs tracking-[0.2em] uppercase">
-										{categoryOptions.find((opt) => opt.value === training.category)?.text ??
-											'Autre'}
-									</p>
-								</div>
-								<button
-									class="text-light-blue/70 text-xs tracking-[0.2em] uppercase hover:text-white"
-									onclick={() => {
-										onEditTraining(training);
-									}}
-								>
-									Editer
-								</button>
-							</div>
-							<p class="text-light-blue/70 mt-3 text-sm">
-								{training.description ?? 'Aucune description'}
-							</p>
-						</article>
-					{/each}
-				</div>
-			{/if}
-		</div>
+	<div class="hidden rounded-lg border border-gray-700 bg-gray-800 md:block">
+		<Table
+			actions={trainingActions}
+			dbInfo={trainingDbInfo}
+			emptyMessage="Aucune formation"
+			filters={trainingFilters}
+			headers={['Nom', 'Catégorie', 'Description', 'Actions']}
+			parseItems={parseTrainingItems}
+			refreshTopic={trainingTableTopic}
+			searchable="name"
+			size={5}
+		/>
 	</div>
-</section>
+
+	<div class="md:hidden">
+		{#if trainings.length === 0}
+			<p
+				class="rounded-lg border border-dashed border-gray-600 px-4 py-12 text-center text-gray-400"
+			>
+				Aucune formation
+			</p>
+		{:else}
+			<ul class="space-y-2">
+				{#each trainings as training (training.training_id)}
+					<li class="rounded-lg border border-gray-700 bg-gray-800 p-4">
+						<div class="flex flex-wrap items-start justify-between gap-3">
+							<div class="min-w-0 flex-1">
+								<div class="flex flex-wrap items-center gap-2">
+									<span class="font-medium text-white">{training.name}</span>
+									<StateBadge badge={categoryBadge(training.category)} />
+								</div>
+								<p class="mt-1 text-sm text-gray-400">
+									{training.description ?? 'Aucune description'}
+								</p>
+							</div>
+							<button
+								class="rounded-lg border border-gray-600 px-3 py-1.5 text-sm text-gray-200 hover:bg-gray-700"
+								onclick={() => {
+									onEditTraining(training);
+								}}
+								type="button">Éditer</button
+							>
+						</div>
+					</li>
+				{/each}
+			</ul>
+		{/if}
+	</div>
+</div>

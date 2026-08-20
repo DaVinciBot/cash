@@ -1,6 +1,7 @@
 <script lang="ts">
+	import StateBadge from '$lib/components/cash/StateBadge.svelte';
+	import { statusBadge } from '$lib/helpers/trainingTables';
 	import {
-		CTAButton,
 		Table,
 		type Action,
 		type DBInfo,
@@ -14,7 +15,6 @@
 
 	interface Props {
 		slots?: TrainingSlotListItem[];
-		statusOptions?: { value: string; text: string }[];
 		slotDbInfo: DBInfo;
 		slotActions?: Action[];
 		slotFilters?: Filter[];
@@ -29,7 +29,6 @@
 
 	let {
 		slots = [],
-		statusOptions = [],
 		slotDbInfo,
 		slotActions = [],
 		slotFilters = [],
@@ -43,73 +42,75 @@
 	}: Props = $props();
 </script>
 
-<section class="border-light-blue/10 bg-dark-blue/80 rounded-[28px] border p-5 sm:p-6">
-	<div class="flex flex-col gap-4 lg:flex-row lg:items-center lg:justify-between">
+<div class="mb-8">
+	<div class="mb-3 flex flex-wrap items-center justify-between gap-3">
 		<div>
-			<h2 class="text-xl font-semibold text-white">Sessions de formation</h2>
-			<p class="text-light-blue/70 text-sm">Planifiez, suivez et ajustez les sessions.</p>
+			<h2 class="text-sm font-semibold tracking-wide text-gray-300 uppercase">
+				Sessions de formation
+			</h2>
+			<p class="mt-1 text-xs text-gray-500">Planifiez, suivez et ajustez les sessions.</p>
 		</div>
-		<div class="flex flex-col sm:w-40 sm:flex-row sm:flex-wrap">
-			<CTAButton onclick={onAddSlot} size="sm" type="button" variant="secondary">Ajouter</CTAButton>
-		</div>
+		<button
+			class="rounded-lg border border-gray-600 px-3 py-1.5 text-sm text-gray-200 hover:bg-gray-700"
+			onclick={onAddSlot}
+			type="button">Ajouter</button
+		>
 	</div>
 
-	<div class="border-light-blue/10 mt-6 overflow-hidden rounded-2xl border">
-		<div class="hidden md:block">
-			<Table
-				actions={slotActions}
-				dbInfo={slotDbInfo}
-				emptyMessage="Aucune session"
-				filters={slotFilters}
-				headers={['Début', 'Formation', 'Formateur·ice', 'Statut', 'Actions']}
-				parseItems={parseSlotItems}
-				refreshTopic={slotTableTopic}
-				searchable="name"
-				size={10}
-			/>
-		</div>
-		<div class="md:hidden">
-			{#if slots.length === 0}
-				<p class="text-light-blue/70 px-4 py-6 text-center text-sm">Aucune session</p>
-			{:else}
-				<div class="grid gap-3 p-4">
-					{#each slots as slot (slot.slot_id)}
-						<article class="border-light-blue/10 bg-dark-blue/90 rounded-2xl border p-4">
-							<div class="flex items-start justify-between gap-4">
-								<div>
-									<p class="text-base font-semibold text-white">{formatSlotDate(slot.start)}</p>
-									<p class="text-light-blue/70 mt-1 text-sm">
-										{findTrainingName(slot.training_id, trainings)}
-									</p>
-								</div>
-								<button
-									class="text-light-blue/70 text-xs tracking-[0.2em] uppercase hover:text-white"
-									onclick={() => {
-										onEditSlot(slot);
-									}}
-								>
-									Editer
-								</button>
-							</div>
-							<div class="text-light-blue/70 mt-3 flex flex-wrap items-center gap-3 text-sm">
-								<div class="flex items-center gap-2">
-									{#if slot.trainer_avatar_url}
-										<img
-											class="h-6 w-6 rounded-full"
-											alt={slot.trainer_username ?? 'Formateur·ice'}
-											src={slot.trainer_avatar_url}
-										/>
-									{/if}
-									<span>{slot.trainer_username ?? 'A definir'}</span>
-								</div>
-								<span class="border-light-blue/20 rounded-full border px-3 py-1 text-xs uppercase">
-									{statusOptions.find((opt) => opt.value === slot.status)?.text ?? slot.status}
-								</span>
-							</div>
-						</article>
-					{/each}
-				</div>
-			{/if}
-		</div>
+	<!-- La table paginée reste au clavier et à la souris ; sous 768 px elle
+	     déborderait, d'où la même liste rendue en cartes. -->
+	<div class="hidden rounded-lg border border-gray-700 bg-gray-800 md:block">
+		<Table
+			actions={slotActions}
+			dbInfo={slotDbInfo}
+			emptyMessage="Aucune session"
+			filters={slotFilters}
+			headers={['Début', 'Formation', 'Formateur·ice', 'Statut', 'Actions']}
+			parseItems={parseSlotItems}
+			refreshTopic={slotTableTopic}
+			searchable="name"
+			size={10}
+		/>
 	</div>
-</section>
+
+	<div class="md:hidden">
+		{#if slots.length === 0}
+			<p
+				class="rounded-lg border border-dashed border-gray-600 px-4 py-12 text-center text-gray-400"
+			>
+				Aucune session
+			</p>
+		{:else}
+			<ul class="space-y-2">
+				{#each slots as slot (slot.slot_id)}
+					<li class="rounded-lg border border-gray-700 bg-gray-800 p-4">
+						<div class="flex flex-wrap items-start justify-between gap-3">
+							<div class="min-w-0 flex-1">
+								<p class="font-medium text-white">{formatSlotDate(slot.start)}</p>
+								<p class="mt-1 text-sm text-gray-400">
+									{findTrainingName(slot.training_id, trainings)}
+								</p>
+							</div>
+							<button
+								class="rounded-lg border border-gray-600 px-3 py-1.5 text-sm text-gray-200 hover:bg-gray-700"
+								onclick={() => {
+									onEditSlot(slot);
+								}}
+								type="button">Éditer</button
+							>
+						</div>
+						<div class="mt-3 flex flex-wrap items-center gap-3 text-sm text-gray-400">
+							<span class="flex items-center gap-2">
+								{#if slot.trainer_avatar_url}
+									<img class="h-6 w-6 rounded-full" alt="" src={slot.trainer_avatar_url} />
+								{/if}
+								{slot.trainer_username ?? 'À définir'}
+							</span>
+							<StateBadge badge={statusBadge(slot.status)} />
+						</div>
+					</li>
+				{/each}
+			</ul>
+		{/if}
+	</div>
+</div>

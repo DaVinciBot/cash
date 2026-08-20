@@ -18,7 +18,6 @@
 		findTrainingName,
 		formatSlotDate
 	} from '$lib/helpers/trainingTables';
-	import { CTAButton, Spinner } from '@davincibot/components';
 	import type { CrudField } from '@davincibot/lib';
 	import {
 		createTraining,
@@ -597,113 +596,105 @@ DVBisous ! :robot:`;
 	});
 </script>
 
-<section class="px-4 py-6 sm:px-6 sm:py-8">
-	<div class="mx-auto flex w-full max-w-6xl flex-col gap-8">
-		<section class="border-light-blue/10 bg-dark-blue/70 rounded-[22px] border p-4 sm:p-5">
-			<div class="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
-				<div>
-					<h2 class="text-base font-semibold text-white">Calendrier public</h2>
-					<p class="text-light-blue/60 text-xs">Consulter les formations publiées.</p>
-				</div>
-				<CTAButton fullWidth={false} href="/formation" size="sm" variant="secondary">
-					Voir le calendrier
-				</CTAButton>
-			</div>
-		</section>
+<svelte:head><title>Formations — DaVinciBot</title></svelte:head>
 
-		<AdminHeader
-			draftCount={draftSlots.length}
+<section class="mx-auto max-w-6xl">
+	<AdminHeader
+		calendarHref="/formation"
+		draftCount={draftSlots.length}
+		onAddSlot={() => {
+			openSlotModal();
+		}}
+		onAddTraining={() => {
+			openTrainingModal();
+		}}
+		{slotRangeDays}
+		statsHref={resolve('/trainings/stats')}
+		trainingsCount={trainings.length}
+		upcomingCount={upcomingSlots.length}
+	/>
+
+	{#if formError}
+		<p
+			class="mb-4 rounded-lg bg-rose-500/15 px-4 py-3 text-sm text-rose-200 ring-1 ring-rose-500/30"
+		>
+			{formError}
+		</p>
+	{/if}
+
+	<!-- La synthèse part d'abord sur le webhook de test, et n'atteint le salon
+	     réel qu'après confirmation : un ping de masse ne se rattrape pas. -->
+	<div class="mb-8 rounded-lg border border-gray-700 bg-gray-800 p-4">
+		<div class="flex flex-wrap items-center justify-between gap-3">
+			<div>
+				<h2 class="text-sm font-semibold text-gray-200">Synthèse Discord</h2>
+				<p class="mt-1 text-xs text-gray-500">
+					Les formations d'une période, annoncées sur le serveur. Un envoi de test précède toujours
+					l'envoi réel.
+				</p>
+			</div>
+			<button
+				class="bg-primary-600 hover:bg-primary-800 rounded-lg px-4 py-2 text-sm font-medium text-white disabled:cursor-not-allowed disabled:opacity-50"
+				disabled={summarySending}
+				onclick={openSummaryModal}
+				type="button">{summarySending ? 'Envoi…' : 'Configurer et envoyer'}</button
+			>
+		</div>
+		{#if summaryError}
+			<p
+				class="mt-3 rounded-lg bg-rose-500/15 px-4 py-3 text-sm text-rose-200 ring-1 ring-rose-500/30"
+			>
+				{summaryError}
+			</p>
+		{/if}
+	</div>
+
+	{#if loading}
+		<p class="rounded-lg border border-dashed border-gray-600 px-4 py-12 text-center text-gray-400">
+			Chargement des formations…
+		</p>
+	{:else if error}
+		<div class="rounded-lg bg-rose-500/15 px-4 py-3 ring-1 ring-rose-500/30">
+			<p class="text-sm text-rose-200">{error}</p>
+			<button
+				class="mt-3 rounded-lg border border-rose-500/40 px-3 py-1.5 text-sm text-rose-200 hover:bg-rose-500/10"
+				onclick={loadData}
+				type="button">Réessayer</button
+			>
+		</div>
+	{:else}
+		<AdminSlotSection
+			{findTrainingName}
+			{formatSlotDate}
 			onAddSlot={() => {
 				openSlotModal();
 			}}
+			onEditSlot={(slot: TrainingSlotListItem) => {
+				openSlotModal(slot);
+			}}
+			{parseSlotItems}
+			{slotActions}
+			{slotDbInfo}
+			{slotFilters}
+			{slotTableTopic}
+			{slots}
+			{trainings}
+		/>
+		<AdminTrainingSection
 			onAddTraining={() => {
 				openTrainingModal();
 			}}
-			{slotRangeDays}
-			statsHref={resolve('/trainings/stats')}
-			trainingsCount={trainings.length}
-			upcomingCount={upcomingSlots.length}
+			onEditTraining={(training: TrainingListItem) => {
+				openTrainingModal(training);
+			}}
+			{parseTrainingItems}
+			{trainingActions}
+			{trainingDbInfo}
+			{trainingFilters}
+			{trainingTableTopic}
+			{trainings}
 		/>
-
-		<section class="border-light-blue/10 bg-dark-blue/70 rounded-[22px] border p-4 sm:p-5">
-			<div class="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
-				<div>
-					<h2 class="text-base font-semibold text-white">Discord</h2>
-					<p class="text-light-blue/60 text-xs">Synthèse des formations.</p>
-				</div>
-				<div class="flex flex-wrap gap-2">
-					<CTAButton
-						disabled={summarySending}
-						fullWidth={false}
-						onclick={openSummaryModal}
-						size="sm"
-						type="button"
-						variant={summarySending ? 'disabled' : 'primary'}
-					>
-						{summarySending ? 'Envoi...' : 'Configurer & envoyer'}
-					</CTAButton>
-				</div>
-			</div>
-			{#if summaryError}
-				<p class="text-waiting mt-3 text-sm">{summaryError}</p>
-			{/if}
-		</section>
-
-		{#if loading}
-			<Spinner
-				divClass="rounded-[26px] border border-light-blue/20 bg-dark-blue/80 p-10 text-light-blue/80"
-			>
-				Chargement des données
-			</Spinner>
-		{:else if error}
-			<div
-				class="border-light-blue/20 bg-dark-blue/80 text-waiting flex flex-col items-center justify-center gap-3 rounded-[26px] border p-10"
-			>
-				<p class="text-sm">{error}</p>
-				<CTAButton onclick={loadData} size="sm" type="button" variant="peps">Réessayer</CTAButton>
-			</div>
-		{:else}
-			{#if formError}
-				<p class="text-waiting text-sm">{formError}</p>
-			{/if}
-
-			<div class="grid gap-8">
-				<AdminSlotSection
-					{findTrainingName}
-					{formatSlotDate}
-					onAddSlot={() => {
-						openSlotModal();
-					}}
-					onEditSlot={(slot: TrainingSlotListItem) => {
-						openSlotModal(slot);
-					}}
-					{parseSlotItems}
-					{slotActions}
-					{slotDbInfo}
-					{slotFilters}
-					{slotTableTopic}
-					{slots}
-					{statusOptions}
-					{trainings}
-				/>
-				<AdminTrainingSection
-					{categoryOptions}
-					onAddTraining={() => {
-						openTrainingModal();
-					}}
-					onEditTraining={(training: TrainingListItem) => {
-						openTrainingModal(training);
-					}}
-					{parseTrainingItems}
-					{trainingActions}
-					{trainingDbInfo}
-					{trainingFilters}
-					{trainingTableTopic}
-					{trainings}
-				/>
-			</div>
-		{/if}
-	</div>
+	{/if}
 </section>
 
 {#if showSlotModal}
