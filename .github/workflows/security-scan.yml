@@ -21,4 +21,4 @@ permissions:
 jobs:
   security:
     name: Security
-    uses: DaVinciBot/shared-workflows/.github/workflows/security-scan.yml@v6.1.2
+    uses: DaVinciBot/shared-workflows/.github/workflows/security-scan.yml@v6.1.3
