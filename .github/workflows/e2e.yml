@@ -16,7 +16,7 @@ permissions:
 jobs:
   e2e:
     name: Playwright
-    uses: DaVinciBot/shared-workflows/.github/workflows/e2e.yml@v6.2.0
+    uses: DaVinciBot/shared-workflows/.github/workflows/e2e.yml@v7.0.1
     secrets: inherit
     with:
       pnpm_version: 11.5.2
