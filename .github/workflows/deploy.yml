@@ -26,7 +26,7 @@ jobs:
   deploy-staging:
     name: Deploy Staging
     if: inputs.environment == 'staging'
-    uses: DaVinciBot/shared-workflows/.github/workflows/deploy.yml@v6.1.2
+    uses: DaVinciBot/shared-workflows/.github/workflows/deploy.yml@v6.2.0
     with:
       environment: staging
       image_tag: ${{ inputs.image_tag }}
@@ -36,7 +36,7 @@ jobs:
   deploy-prod:
     name: Deploy Prod
     if: inputs.environment == 'prod'
-    uses: DaVinciBot/shared-workflows/.github/workflows/deploy.yml@v6.1.2
+    uses: DaVinciBot/shared-workflows/.github/workflows/deploy.yml@v6.2.0
     with:
       environment: prod
       image_tag: ${{ inputs.image_tag }}
