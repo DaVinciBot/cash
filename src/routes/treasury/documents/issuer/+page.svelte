@@ -239,6 +239,19 @@
 					/>
 				</label>
 			</div>
+			<label class="mt-3 block text-xs text-gray-300">
+				Objet de l'association <span class="text-gray-500">(statuts)</span>
+				<textarea
+					name="purpose"
+					class="mt-1 block w-full rounded-lg border border-gray-600 bg-gray-700 p-2 text-sm text-white"
+					rows="5">{data.organization.purpose ?? ''}</textarea
+				>
+			</label>
+			<p class="mt-1 text-xs text-gray-400">
+				Reproduit tel quel sur le reçu fiscal : c'est l'objet qui range l'association parmi les
+				organismes d'intérêt général, et le donateur n'a rien d'autre sous les yeux pour le
+				constater.
+			</p>
 		</div>
 
 		<button

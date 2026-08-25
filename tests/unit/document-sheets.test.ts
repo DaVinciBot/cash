@@ -28,6 +28,7 @@ const issuer: Organization = {
 	presidentGender: 'feminine',
 	treasurerName: 'Marc Dubois',
 	treasurerGender: 'masculine',
+	purpose: 'Rassembler des étudiants autour de projets de robotique.',
 	taxReceiptsAllowed: true,
 	taxCategory: "Association d'intérêt général",
 	taxArticles: 'articles 200 et 238 bis du CGI',
@@ -194,6 +195,17 @@ describe('reçu fiscal', () => {
 
 		expect(text).toContain('W911234567');
 		expect(text).toContain('Date et signature');
+	});
+
+	it("porte l'objet statutaire, qui fonde l'intérêt général", () => {
+		const text = render(
+			TaxReceiptSheet,
+			doc({ kind: 'tax_receipt', number: 'REC-2026-0001', lines: [], amountTtc: 50 })
+		);
+
+		expect(text).toContain('Rassembler des étudiants autour de projets de robotique.');
+		// Il ne regarde que le reçu : une facture n'a pas à exposer les statuts.
+		expect(render(InvoiceSheet, doc())).not.toContain('Rassembler des étudiants');
 	});
 
 	it('fait signer la présidence, avec son titre accordé', () => {

@@ -48,6 +48,7 @@ export const actions: Actions = {
 				bank_name: field('bank_name'),
 				iban: field('iban'),
 				bic: field('bic'),
+				purpose: field('purpose'),
 				tax_receipts_allowed: text(form, 'tax_receipts_allowed') === '1',
 				tax_category: field('tax_category'),
 				tax_articles: field('tax_articles')

@@ -36,6 +36,8 @@ export type Organization = {
 	presidentGender: OfficerGender;
 	treasurerName: string | null;
 	treasurerGender: OfficerGender;
+	/** L'objet statutaire. */
+	purpose: string | null;
 	/** Le bureau atteste que l'association peut délivrer des reçus fiscaux. */
 	taxReceiptsAllowed: boolean;
 	taxCategory: string | null;
@@ -52,7 +54,7 @@ export async function organization(supabase: Client): Promise<Organization> {
 		.schema('cash')
 		.from('organization')
 		.select(
-			'legal_name, address_line, postal_code, city, country, rna, siret, vat_number, email, website, president_name, president_gender, treasurer_name, treasurer_gender, tax_receipts_allowed, tax_category, tax_articles, bank_name, iban, bic'
+			'legal_name, address_line, postal_code, city, country, rna, siret, vat_number, email, website, president_name, president_gender, treasurer_name, treasurer_gender, purpose, tax_receipts_allowed, tax_category, tax_articles, bank_name, iban, bic'
 		)
 		.eq('id', 1)
 		.maybeSingle();
@@ -73,6 +75,7 @@ export async function organization(supabase: Client): Promise<Organization> {
 		presidentGender: data?.president_gender ?? 'epicene',
 		treasurerName: data?.treasurer_name ?? null,
 		treasurerGender: data?.treasurer_gender ?? 'epicene',
+		purpose: data?.purpose ?? null,
 		taxReceiptsAllowed: data?.tax_receipts_allowed ?? false,
 		taxCategory: data?.tax_category ?? null,
 		taxArticles: data?.tax_articles ?? null,

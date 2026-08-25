@@ -28,16 +28,21 @@
 				Reçu au titre des dons à certains organismes d'intérêt général
 			</p>
 			<p class="mt-1 text-xs text-gray-600">
-				Articles 200, 238 bis et 978 du code général des impôts (CGI)
+				Le bénéficiaire certifie sur l'honneur que les dons et versements qu'il reçoit ouvrent droit
+				à la réduction d'impôt prévue à l'article 200 du Code Général des Impôts.
+			</p>
+			<p class="text-xs text-gray-600">
+				Particulier : vous pouvez bénéficier d'une réduction d'impôt égale à 66 % du montant de
+				votre don, dans la limite de 20 % de votre revenu imposable.
 			</p>
 
 			{#if issuer}
 				<p class="mt-4">
-					Le bénéficiaire est&nbsp;: <span class="font-medium">{issuer.taxCategory}</span>
+					<span class="font-bold">{issuer.legalName} - {issuer.taxCategory}</span> est le bénéficiaire
 				</p>
-				<p class="mt-1">
-					Le don ouvre droit à réduction d'impôt au titre des
-					<span class="font-medium">{issuer.taxArticles}</span>.
+				<p class="mt-2 text-xs text-gray-600">
+					<span class="font-semibold">Objet de l'association&nbsp;:</span>
+					{issuer.purpose}
 				</p>
 			{/if}
 
