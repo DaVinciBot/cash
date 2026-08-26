@@ -6,11 +6,11 @@
 	// croire à des croisements qui n'existent pas.
 	import { browser } from '$app/environment';
 	import {
-		baseOptions,
+		chartOptions,
+		chartPalette,
 		countFormat,
-		palette,
 		registerChartJs
-	} from '$lib/components/cash/charts/chartjs';
+	} from '$lib/components/charts/chartjs';
 	import type { WeekRow } from '$lib/helpers/trainingStatsTypes';
 	import { Line } from 'svelte-chartjs';
 
@@ -25,37 +25,36 @@
 		registerChartJs();
 	}
 
-	const theme = $derived(browser ? palette() : null);
+	const theme = $derived(browser ? chartPalette() : null);
 
 	const data = $derived.by(() => {
 		const series = [
-			{ label: 'Nb de formations', values: rows.map((row) => row.slots), color: theme?.slices[0] },
-			{
-				label: 'Nb de formé·es',
-				values: rows.map((row) => row.attendees),
-				color: theme?.slices[1]
-			},
-			{ label: 'Places proposées', values: rows.map((row) => row.seats), color: theme?.slices[2] },
-			{ label: 'Somme de durée (h)', values: rows.map((row) => row.hours), color: theme?.slices[3] }
+			{ label: 'Nb de formations', values: rows.map((row) => row.slots) },
+			{ label: 'Nb de formé·es', values: rows.map((row) => row.attendees) },
+			{ label: 'Places proposées', values: rows.map((row) => row.seats) },
+			{ label: 'Somme de durée (h)', values: rows.map((row) => row.hours) }
 		];
 
 		return {
 			labels: rows.map((row) => row.label),
-			datasets: series.map((item) => ({
-				label: item.label,
-				data: item.values,
-				borderColor: item.color,
-				backgroundColor: item.color,
-				fill: false,
-				tension: 0.3,
-				pointRadius: 2,
-				pointHoverRadius: 5,
-				borderWidth: 2
-			}))
+			datasets: series.map((item, index) => {
+				const color = theme?.series[index % theme.series.length];
+				return {
+					label: item.label,
+					data: item.values,
+					borderColor: color,
+					backgroundColor: color,
+					fill: false,
+					tension: 0.3,
+					pointRadius: 2,
+					pointHoverRadius: 5,
+					borderWidth: 2
+				};
+			})
 		};
 	});
 
-	const options = $derived(theme ? baseOptions(theme, countFormat) : {});
+	const options = $derived(theme ? chartOptions<'line'>(theme, { format: countFormat }) : {});
 </script>
 
 <div style="height: {height}">

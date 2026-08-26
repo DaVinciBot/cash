@@ -7,12 +7,12 @@
 	// normalisée du serveur — la bibliothèque ne sait pas empiler en pourcentage.
 	import { browser } from '$app/environment';
 	import {
-		baseOptions,
+		chartOptions,
+		chartPalette,
 		countFormat,
-		palette,
 		percentFormat,
 		registerChartJs
-	} from '$lib/components/cash/charts/chartjs';
+	} from '$lib/components/charts/chartjs';
 	import type { Series } from '$lib/helpers/trainingStatsTypes';
 	import { Line } from 'svelte-chartjs';
 
@@ -30,12 +30,12 @@
 		registerChartJs();
 	}
 
-	const theme = $derived(browser ? palette() : null);
+	const theme = $derived(browser ? chartPalette() : null);
 
 	const data = $derived({
 		labels,
 		datasets: series.map((item, index) => {
-			const color = theme?.slices[index % theme.slices.length];
+			const color = theme?.series[index % theme.series.length];
 			return {
 				label: item.label,
 				data: item.values,
@@ -50,20 +50,15 @@
 		})
 	});
 
-	const options = $derived.by(() => {
-		if (!theme) {
-			return {};
-		}
-		const base = baseOptions(theme, normalized ? percentFormat : countFormat);
-		const scales = base.scales as { x: object; y: object };
-		return {
-			...base,
-			scales: {
-				...scales,
-				y: { ...scales.y, stacked: true, ...(normalized ? { max: 100, min: 0 } : {}) }
-			}
-		};
-	});
+	const options = $derived(
+		theme
+			? chartOptions<'line'>(theme, {
+					format: normalized ? percentFormat : countFormat,
+					stacked: true,
+					range: normalized ? { min: 0, max: 100 } : undefined
+				})
+			: {}
+	);
 </script>
 
 <div style="height: {height}">

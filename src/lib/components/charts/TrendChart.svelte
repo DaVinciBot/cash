@@ -6,21 +6,23 @@
 	// elle ne connaît que des longueurs positives.
 	import { browser } from '$app/environment';
 	import { Line } from 'svelte-chartjs';
-	import { baseOptions, palette, registerChartJs } from './chartjs';
+	import { chartOptions, chartPalette, registerChartJs, type ValueFormat } from './chartjs';
 
 	interface Props {
 		points: { label: string; value: number }[];
-		seriesLabel?: string;
+		seriesLabel: string;
+		/** Ce que suit la courbe : une somme, un décompte, un pourcentage. */
+		format: ValueFormat;
 		height?: string;
 	}
 
-	let { points, seriesLabel = 'Solde cumulé', height = '14rem' }: Props = $props();
+	let { points, seriesLabel, format, height = '14rem' }: Props = $props();
 
 	if (browser) {
 		registerChartJs();
 	}
 
-	const theme = $derived(browser ? palette() : null);
+	const theme = $derived(browser ? chartPalette() : null);
 
 	const data = $derived({
 		labels: points.map((p) => p.label),
@@ -28,10 +30,10 @@
 			{
 				label: seriesLabel,
 				data: points.map((p) => p.value),
-				borderColor: theme?.primary,
+				borderColor: theme?.series[0],
 				// L'aplat vient du thème et non d'un alpha calculé : sur le fond nuit,
 				// une transparence laisse voir la grille au travers de la courbe.
-				backgroundColor: theme?.primarySoft,
+				backgroundColor: theme?.areaFill,
 				fill: true,
 				tension: 0.3,
 				pointRadius: 2,
@@ -41,13 +43,7 @@
 		]
 	});
 
-	const options = $derived.by(() => {
-		if (!theme) {
-			return {};
-		}
-		const base = baseOptions(theme);
-		return { ...base, plugins: { ...(base.plugins as object), legend: { display: false } } };
-	});
+	const options = $derived(theme ? chartOptions<'line'>(theme, { format, legend: false }) : {});
 </script>
 
 <div style="height: {height}">

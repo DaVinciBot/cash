@@ -1,8 +1,9 @@
 <script lang="ts">
 	import { resolve } from '$app/paths';
-	import GroupedBarsChart from '$lib/components/cash/charts/GroupedBarsChart.svelte';
-	import RankingChart from '$lib/components/cash/charts/RankingChart.svelte';
-	import TrendChart from '$lib/components/cash/charts/TrendChart.svelte';
+	import { euroFormat } from '$lib/components/charts/chartjs';
+	import GroupedBarsChart from '$lib/components/charts/GroupedBarsChart.svelte';
+	import RankingChart from '$lib/components/charts/RankingChart.svelte';
+	import TrendChart from '$lib/components/charts/TrendChart.svelte';
 	import type { PageData } from './$types';
 
 	let { data }: { data: PageData } = $props();
@@ -216,12 +217,17 @@
 		<div class="grid gap-4 md:grid-cols-2">
 			<div class="rounded-lg border border-gray-700 bg-gray-800 p-4">
 				<h3 class="mb-3 text-sm font-medium text-gray-200">Solde cumulé, mois par mois</h3>
-				<TrendChart points={data.charts.balanceByMonth} />
+				<TrendChart
+					format={euroFormat}
+					points={data.charts.balanceByMonth}
+					seriesLabel="Solde cumulé"
+				/>
 			</div>
 
 			<div class="rounded-lg border border-gray-700 bg-gray-800 p-4">
 				<h3 class="mb-3 text-sm font-medium text-gray-200">Recettes et dépenses par mois</h3>
 				<GroupedBarsChart
+					format={euroFormat}
 					labels={['Recettes', 'Dépenses']}
 					rows={data.charts.monthly.map((m) => ({
 						label: m.label,
@@ -234,19 +240,20 @@
 			<div class="rounded-lg border border-gray-700 bg-gray-800 p-4">
 				<h3 class="mb-3 text-sm font-medium text-gray-200">Budget par branche</h3>
 				<GroupedBarsChart
+					format={euroFormat}
 					labels={['Alloué', 'Consommé']}
+					pair="neutral"
 					rows={data.charts.budgetRoots.map((b) => ({
 						label: b.label,
 						first: b.allocated,
 						second: b.consumed
 					}))}
-					tint="budget"
 				/>
 			</div>
 
 			<div class="rounded-lg border border-gray-700 bg-gray-800 p-4">
 				<h3 class="mb-3 text-sm font-medium text-gray-200">Dépenses par projet</h3>
-				<RankingChart rows={data.charts.byProject} seriesLabel="Engagé" />
+				<RankingChart format={euroFormat} rows={data.charts.byProject} seriesLabel="Engagé" />
 			</div>
 
 			<div class="rounded-lg border border-gray-700 bg-gray-800 p-4 md:col-span-2">
@@ -254,7 +261,7 @@
 				<p class="mb-3 text-xs text-gray-500">
 					Le marchand est déduit du lien de chaque item, sans référentiel de fournisseurs.
 				</p>
-				<RankingChart rows={data.charts.byMerchant} seriesLabel="Engagé" />
+				<RankingChart format={euroFormat} rows={data.charts.byMerchant} seriesLabel="Engagé" />
 			</div>
 		</div>
 	{/if}
