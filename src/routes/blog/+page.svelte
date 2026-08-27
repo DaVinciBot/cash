@@ -169,7 +169,7 @@
 		} = await getSupabaseBrowserClient().auth.getSession();
 		return {
 			'Content-Type': 'application/json',
-			apikey: supabaseKey,
+			apikey: supabaseKey(),
 			Authorization: `Bearer ${session?.access_token ?? ''}`
 		};
 	}
@@ -185,7 +185,7 @@
 		}
 
 		try {
-			const res = await fetch(`${supabaseUrl}functions/v1/transcode/blog-post-hero`, {
+			const res = await fetch(`${supabaseUrl()}/functions/v1/transcode/blog-post-hero`, {
 				method: 'POST',
 				headers: await transcodeHeaders(),
 				body: JSON.stringify({
@@ -222,7 +222,7 @@
 		}
 
 		try {
-			const res = await fetch(`${supabaseUrl}functions/v1/transcode/blog-post-og`, {
+			const res = await fetch(`${supabaseUrl()}/functions/v1/transcode/blog-post-og`, {
 				method: 'POST',
 				headers: await transcodeHeaders(),
 				body: JSON.stringify({
@@ -259,7 +259,7 @@
 			// Check if it's a supabase storage URL and not already transcoded
 			// Heuristic for already transcoded: ends with .webp and contains 'image-' and digits
 			const isTranscoded = /\/image-\d+-\d+\.webp$/.test(url);
-			if (url.includes(supabaseUrl) && !isTranscoded) {
+			if (url.includes(supabaseUrl()) && !isTranscoded) {
 				imagesToTranscode.push(url);
 			}
 		}
@@ -272,7 +272,7 @@
 		const uniqueImages = [...new Set(imagesToTranscode)];
 
 		try {
-			const res = await fetch(`${supabaseUrl}functions/v1/transcode/blog-post-image`, {
+			const res = await fetch(`${supabaseUrl()}/functions/v1/transcode/blog-post-image`, {
 				method: 'POST',
 				headers: await transcodeHeaders(),
 				body: JSON.stringify({

@@ -18,7 +18,7 @@
 		"ci-workflow": "pnpm check && pnpm lint && pnpm test:unit && pnpm build"
 	},
 	"devDependencies": {
-		"@davincibot/config": "^3.2.0",
+		"@davincibot/config": "^4.0.0",
 		"@eslint/js": "^10.0.1",
 		"@playwright/test": "^1.62.1",
 		"@sveltejs/adapter-node": "^5.5.7",
@@ -46,9 +46,9 @@
 		"vitest": "^4.1.10"
 	},
 	"dependencies": {
-		"@davincibot/components": "^5.2.0",
+		"@davincibot/components": "^5.2.1",
 		"@davincibot/database-types": "^4.4.0",
-		"@davincibot/lib": "^3.8.0",
+		"@davincibot/lib": "^4.0.0",
 		"@lucide/svelte": "^1.31.0",
 		"@simplewebauthn/browser": "^13.3.0",
 		"@supabase/phoenix": "^0.4.5",

@@ -1,4 +1,4 @@
-import { env } from '$env/dynamic/public';
+import { publicEnv } from '@davincibot/lib';
 import { sidCookieName } from '@davincibot/lib/server';
 import type { Cookies } from '@sveltejs/kit';
 
@@ -15,10 +15,8 @@ export const forwardToAuth = async (
 	path: string,
 	init: { method?: 'GET' | 'POST'; body?: string } = {}
 ): Promise<AuthProxyResponse> => {
-	const rawAuthBase = env.PUBLIC_AUTH_BASE_URL;
-	const authBase = rawAuthBase ? rawAuthBase.replace(/\/$/, '') : 'https://auth.davincibot.fr';
 	const sid = cookies.get(sidCookieName());
-	const response = await fetchFn(`${authBase}${path}`, {
+	const response = await fetchFn(`${publicEnv.PUBLIC_AUTH_BASE_URL}${path}`, {
 		method: init.method ?? 'GET',
 		headers: {
 			...(init.body === undefined ? {} : { 'Content-Type': 'application/json' }),

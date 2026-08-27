@@ -1,32 +1,8 @@
-import { env as privateEnv } from '$env/dynamic/private';
-import { env as publicEnv } from '$env/dynamic/public';
-import type { Database } from '@davincibot/database-types';
+import { getAdminClient, requireEditMembers } from '$lib/server/adminUsers';
+import { publicEnv } from '@davincibot/lib';
 import { sidCookieName } from '@davincibot/lib/server';
-import { createClient, type SupabaseClient } from '@supabase/supabase-js';
 import { json } from '@sveltejs/kit';
 import type { RequestEvent } from './$types';
-
-const getAdminClient = (): SupabaseClient<Database> => {
-	const supabaseUrl = publicEnv.PUBLIC_SUPABASE_URL;
-	if (!supabaseUrl) {
-		throw new Error('Missing PUBLIC_SUPABASE_URL.');
-	}
-	const key = privateEnv.SUPABASE_SECRET_KEY;
-	if (!key) {
-		throw new Error('Missing SUPABASE_SECRET_KEY.');
-	}
-	return createClient<Database>(supabaseUrl, key, {
-		auth: { persistSession: false, autoRefreshToken: false }
-	});
-};
-
-const requireEditMembers = async (locals: App.Locals): Promise<boolean> => {
-	const [{ data: canUpdate }, { data: canStatusUpdate }] = await Promise.all([
-		locals.supabase.rpc('has_permission', { p_permission: 'members.profile.update.all' }),
-		locals.supabase.rpc('has_permission', { p_permission: 'members.profile.status.update' })
-	]);
-	return canUpdate === true || canStatusUpdate === true;
-};
 
 export const GET = async (event: RequestEvent) => {
 	const { locals, url } = event;
@@ -67,10 +43,8 @@ export const POST = async (event: RequestEvent) => {
 
 	// Délégué au service auth : il re-vérifie la session (cookie sid forwardé) et
 	// la permission members.invite.send, puis envoie l'invitation.
-	const rawAuthBase = publicEnv.PUBLIC_AUTH_BASE_URL;
-	const authBase = rawAuthBase ? rawAuthBase.replace(/\/$/, '') : 'https://auth.davincibot.fr';
 	const sid = cookies.get(sidCookieName());
-	const response = await fetch(`${authBase}/api/invitations`, {
+	const response = await fetch(`${publicEnv.PUBLIC_AUTH_BASE_URL}/api/invitations`, {
 		method: 'POST',
 		headers: {
 			'Content-Type': 'application/json',

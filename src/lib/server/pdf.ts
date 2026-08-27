@@ -1,6 +1,6 @@
-import { env } from '$env/dynamic/private';
 import { sidCookieName } from '@davincibot/lib/server';
 import { chromium, type Browser } from 'playwright';
+import { appServerEnv } from './env';
 
 // Génération de PDF côté serveur.
 //
@@ -25,23 +25,9 @@ import { chromium, type Browser } from 'playwright';
  */
 const PAGE_FOOTER = `<div style="width:100%;margin:0 1.6cm;font-family:system-ui,sans-serif;font-size:8px;color:#6b7280;text-align:center;">Page <span class="pageNumber"></span> / <span class="totalPages"></span></div>`;
 
-/**
- * Adresse par laquelle le serveur s'atteint lui-même.
- *
- * Fallback en if : la nullabilité de env.* dépend de la présence d'un .env
- * (types générés), un `??` ne linte pas pareil en CI et en local.
- */
-const internalBase = (): string => {
-	const base = env.PDF_INTERNAL_BASE;
-	if (base) {
-		return base;
-	}
-	const port = env.PORT;
-	if (port) {
-		return `http://127.0.0.1:${port}`;
-	}
-	return 'http://127.0.0.1:3000';
-};
+/** Adresse par laquelle le serveur s'atteint lui-même. */
+const internalBase = (): string =>
+	appServerEnv.PDF_INTERNAL_BASE ?? `http://127.0.0.1:${appServerEnv.PORT}`;
 
 /**
  * Le navigateur est démarré une fois et réutilisé : chaque lancement coûte

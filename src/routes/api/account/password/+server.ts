@@ -1,4 +1,4 @@
-import { env } from '$env/dynamic/public';
+import { publicEnv } from '@davincibot/lib';
 import { sidCookieName } from '@davincibot/lib/server';
 import { json } from '@sveltejs/kit';
 import type { RequestHandler } from './$types';
@@ -7,10 +7,8 @@ import type { RequestHandler } from './$types';
 // changement de mot de passe passe par la session sid, sans exposer de CORS.
 export const POST: RequestHandler = async ({ request, cookies }) => {
 	const body = await request.text();
-	const rawAuthBase = env.PUBLIC_AUTH_BASE_URL;
-	const authBase = rawAuthBase ? rawAuthBase.replace(/\/$/, '') : 'https://auth.davincibot.fr';
 	const sid = cookies.get(sidCookieName());
-	const response = await fetch(`${authBase}/password`, {
+	const response = await fetch(`${publicEnv.PUBLIC_AUTH_BASE_URL}/password`, {
 		method: 'POST',
 		headers: {
 			'Content-Type': 'application/json',

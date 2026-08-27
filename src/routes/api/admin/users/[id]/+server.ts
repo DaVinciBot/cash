@@ -1,13 +1,6 @@
+import { requireEditMembers } from '$lib/server/adminUsers';
 import { json } from '@sveltejs/kit';
 import type { RequestEvent } from './$types';
-
-const requireEditMembers = async (locals: App.Locals): Promise<boolean> => {
-	const [{ data: canUpdate }, { data: canStatusUpdate }] = await Promise.all([
-		locals.supabase.rpc('has_permission', { p_permission: 'members.profile.update.all' }),
-		locals.supabase.rpc('has_permission', { p_permission: 'members.profile.status.update' })
-	]);
-	return canUpdate === true || canStatusUpdate === true;
-};
 
 const updateProfileStatus = async (
 	locals: App.Locals,

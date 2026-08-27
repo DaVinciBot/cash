@@ -1,31 +1,8 @@
-import { env as privateEnv } from '$env/dynamic/private';
-import { env as publicEnv } from '$env/dynamic/public';
+import { getAdminClient, requireEditMembers } from '$lib/server/adminUsers';
 import type { Database } from '@davincibot/database-types';
-import { createClient, type SupabaseClient } from '@supabase/supabase-js';
+import type { SupabaseClient } from '@supabase/supabase-js';
 import { json } from '@sveltejs/kit';
 import type { RequestEvent } from './$types';
-
-const getAdminClient = (): SupabaseClient<Database> => {
-	const supabaseUrl = publicEnv.PUBLIC_SUPABASE_URL;
-	if (!supabaseUrl) {
-		throw new Error('Missing PUBLIC_SUPABASE_URL.');
-	}
-	const key = privateEnv.SUPABASE_SECRET_KEY;
-	if (!key) {
-		throw new Error('Missing SUPABASE_SECRET_KEY.');
-	}
-	return createClient<Database>(supabaseUrl, key, {
-		auth: { persistSession: false, autoRefreshToken: false }
-	});
-};
-
-const requireEditMembers = async (locals: App.Locals): Promise<boolean> => {
-	const [{ data: canUpdate }, { data: canStatusUpdate }] = await Promise.all([
-		locals.supabase.rpc('has_permission', { p_permission: 'members.profile.update.all' }),
-		locals.supabase.rpc('has_permission', { p_permission: 'members.profile.status.update' })
-	]);
-	return canUpdate === true || canStatusUpdate === true;
-};
 
 interface AdminUser {
 	email?: string;

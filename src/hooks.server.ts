@@ -1,14 +1,28 @@
+import { building } from '$app/environment';
 import { resolve as resolveRoute } from '$app/paths';
+import { appServerEnvCheck } from '$lib/server/env';
 import { sessionCache } from '$lib/server/sessionCacheInstance';
-import { buildLoginUrl } from '@davincibot/lib';
+import { buildLoginUrl, publicEnvCheck } from '@davincibot/lib';
+import { assertEnv } from '@davincibot/lib/env';
 import {
 	createAnonClient,
 	createUserClient,
+	privateEnvCheck,
 	resolveSessionViaAuth,
 	sidCookieName
 } from '@davincibot/lib/server';
 import type { User } from '@supabase/supabase-js';
-import { error, redirect, type Handle, type RequestEvent } from '@sveltejs/kit';
+import { error, redirect, type Handle, type RequestEvent, type ServerInit } from '@sveltejs/kit';
+
+export const init: ServerInit = () => {
+	if (building) {
+		return;
+	}
+	// Résout d'un coup tout ce qui est obligatoire et lève une erreur unique
+	// listant les variables manquantes : une prod mal configurée ne démarre pas,
+	// au lieu de casser à la première requête d'un utilisateur.
+	assertEnv(publicEnvCheck, privateEnvCheck, appServerEnvCheck);
+};
 
 function createSessionUser({
 	id,
