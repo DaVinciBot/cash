@@ -28,6 +28,7 @@ jobs:
     if: inputs.environment == 'staging'
     uses: DaVinciBot/shared-workflows/.github/workflows/deploy.yml@v7.2.0
     with:
+      runner: '["ubuntu-latest"]'
       environment: staging
       image_tag: ${{ inputs.image_tag }}
       health_url: https://staging.davincibot.fr/admin/health
@@ -38,6 +39,7 @@ jobs:
     if: inputs.environment == 'prod'
     uses: DaVinciBot/shared-workflows/.github/workflows/deploy.yml@v7.2.0
     with:
+      runner: '["ubuntu-latest"]'
       environment: prod
       image_tag: ${{ inputs.image_tag }}
       health_url: https://davincibot.fr/admin/health

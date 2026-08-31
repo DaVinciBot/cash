@@ -22,3 +22,5 @@ jobs:
   security:
     name: Security
     uses: DaVinciBot/shared-workflows/.github/workflows/security-scan.yml@v7.2.0
+    with:
+      runner: '["ubuntu-latest"]'

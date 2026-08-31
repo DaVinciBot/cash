@@ -22,6 +22,7 @@ jobs:
     name: Build and Publish
     uses: DaVinciBot/shared-workflows/.github/workflows/container.yml@v7.2.0
     with:
+      runner: '["ubuntu-latest"]'
       push: ${{ github.event_name == 'push' }}
     secrets: inherit
 
@@ -31,6 +32,7 @@ jobs:
     needs: build-and-publish
     uses: DaVinciBot/shared-workflows/.github/workflows/deploy.yml@v7.2.0
     with:
+      runner: '["ubuntu-latest"]'
       environment: dev
       health_url: https://dev.davincibot.fr/admin/health
     secrets: inherit

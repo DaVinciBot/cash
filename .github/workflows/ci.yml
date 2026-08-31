@@ -25,5 +25,6 @@ jobs:
     uses: DaVinciBot/shared-workflows/.github/workflows/ci.yml@v7.2.0
     secrets: inherit
     with:
+      runner: '["ubuntu-latest"]'
       pnpm_version: 11.5.2
       node_version_file: .nvmrc
