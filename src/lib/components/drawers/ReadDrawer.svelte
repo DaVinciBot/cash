@@ -1339,11 +1339,30 @@
 							{:else if field.type === 'project_roles'}
 								{@const rolesValue = projectRoles(field.value)}
 								<div class="mb-4 space-y-2">
-									{#each rolesValue as item, idx (`${item.project_id ?? 'empty'}-${String(idx)}`)}
+									{#each rolesValue as item, idx (idx)}
 										<div class="flex flex-wrap items-center gap-2">
 											<select
 												class="focus:border-primary-500 focus:ring-primary-500 block min-w-0 flex-1 basis-44 rounded-lg border border-gray-600 bg-gray-700 p-2.5 text-sm text-white placeholder-gray-400"
-												bind:value={item.project_id}
+												onchange={(e: Event) => {
+													const select = e.currentTarget;
+													if (!(select instanceof HTMLSelectElement)) {
+														return;
+													}
+													// L'index 0 est « Sélectionner un projet » : passer par la
+													// position évite de convertir null en chaîne et retour.
+													const options = field.projects ?? [];
+													const projectId =
+														select.selectedIndex === 0
+															? null
+															: (options[select.selectedIndex - 1]?.value ?? null);
+													setFieldValue(
+														field,
+														rolesValue.map((row, i) =>
+															i === idx ? { ...row, project_id: projectId } : row
+														)
+													);
+												}}
+												value={item.project_id}
 											>
 												<option value={null}>Sélectionner un projet</option>
 												{#each field.projects ?? [] as p (p.value)}
@@ -1357,7 +1376,18 @@
 											</select>
 											<select
 												class="focus:border-primary-500 focus:ring-primary-500 block min-w-0 flex-1 basis-36 rounded-lg border border-gray-600 bg-gray-700 p-2.5 text-sm text-white placeholder-gray-400"
-												bind:value={item.role}
+												onchange={(e: Event) => {
+													const select = e.currentTarget;
+													if (!(select instanceof HTMLSelectElement)) {
+														return;
+													}
+													const role = select.value;
+													setFieldValue(
+														field,
+														rolesValue.map((row, i) => (i === idx ? { ...row, role } : row))
+													);
+												}}
+												value={item.role}
 											>
 												{#each field.roles ?? [] as r (r.value)}
 													<option value={r.value}>{r.text}</option>
@@ -1367,7 +1397,10 @@
 												class="rounded-lg bg-transparent p-2 text-red-500 hover:bg-gray-700 hover:text-red-400"
 												aria-label="Supprimer ce projet"
 												onclick={() => {
-													field.value = rolesValue.filter((_, i) => i !== idx);
+													setFieldValue(
+														field,
+														rolesValue.filter((_, i) => i !== idx)
+													);
 												}}
 												type="button"
 											>
@@ -1388,13 +1421,13 @@
 									<button
 										class="text-primary-500 mt-2 flex w-full items-center justify-center gap-2 rounded-lg border border-dashed border-gray-600 p-2 text-sm hover:bg-gray-700"
 										onclick={() => {
-											field.value = [
+											setFieldValue(field, [
 												...rolesValue,
 												{
 													project_id: null,
 													role: field.defaultRole ?? field.roles?.[0]?.value ?? ''
 												}
-											];
+											]);
 										}}
 										type="button"
 									>
