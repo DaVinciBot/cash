@@ -1,5 +1,5 @@
 <script lang="ts">
-	import { CTAButton as CtaButton } from '@davincibot/components';
+	import { CtaButton } from '@davincibot/components';
 	import { updateUsername, uploadAvatar } from '$lib/settings';
 	import { userdata, type UserData } from '@davincibot/lib';
 	import { onDestroy } from 'svelte';

@@ -3,7 +3,7 @@
 	import MfaSection from '$lib/components/settings/MfaSection.svelte';
 	import SessionsSection from '$lib/components/settings/SessionsSection.svelte';
 	import StepUpDialog from '$lib/components/settings/StepUpDialog.svelte';
-	import { CTAButton as CtaButton } from '@davincibot/components';
+	import { CtaButton } from '@davincibot/components';
 	import { changePassword } from '$lib/settings';
 	import { StepUpCancelledError, withStepUp } from '$lib/settings';
 

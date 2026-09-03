@@ -1,6 +1,6 @@
 <script lang="ts">
 	import { Checkbox } from '@davincibot/components';
-	import { CTAButton as CtaButton } from '@davincibot/components';
+	import { CtaButton } from '@davincibot/components';
 	import {
 		MAX_REPORT_IMAGES,
 		MAX_REPORT_TOTAL_BYTES,

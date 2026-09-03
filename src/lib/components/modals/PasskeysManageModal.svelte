@@ -2,7 +2,7 @@
 	import { OverlayBackdrop } from '@davincibot/components';
 	import PasskeyNameModal from '$lib/components/modals/PasskeyNameModal.svelte';
 	import RecoveryCodesModal from '$lib/components/modals/RecoveryCodesModal.svelte';
-	import { CTAButton as CtaButton } from '@davincibot/components';
+	import { CtaButton } from '@davincibot/components';
 	import { formatParisDateTimeShort } from '@davincibot/lib';
 	import {
 		deletePasskey,

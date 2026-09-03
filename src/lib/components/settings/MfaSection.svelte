@@ -4,7 +4,7 @@
 	import PasskeysManageModal from '$lib/components/modals/PasskeysManageModal.svelte';
 	import RecoveryCodesModal from '$lib/components/modals/RecoveryCodesModal.svelte';
 	import TotpEnrollModal from '$lib/components/modals/TotpEnrollModal.svelte';
-	import { CTAButton as CtaButton } from '@davincibot/components';
+	import { CtaButton } from '@davincibot/components';
 	import {
 		disableMfaMethod,
 		fetchMfaState,

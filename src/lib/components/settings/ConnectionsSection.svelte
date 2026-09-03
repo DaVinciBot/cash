@@ -1,5 +1,5 @@
 <script lang="ts">
-	import { CTAButton as CtaButton } from '@davincibot/components';
+	import { CtaButton } from '@davincibot/components';
 	import { formatParisDateTimeShort } from '@davincibot/lib';
 	import { fetchConnections, revokeConnection } from '$lib/settings';
 	import type { ConnectionInfo } from '$lib/settings';

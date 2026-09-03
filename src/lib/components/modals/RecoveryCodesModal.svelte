@@ -1,6 +1,6 @@
 <script lang="ts">
 	import { OverlayBackdrop } from '@davincibot/components';
-	import { CTAButton as CtaButton } from '@davincibot/components';
+	import { CtaButton } from '@davincibot/components';
 	import { Copy, Download, TriangleAlert } from '@lucide/svelte';
 
 	interface Props {

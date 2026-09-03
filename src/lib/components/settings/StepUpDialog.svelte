@@ -1,7 +1,7 @@
 <script lang="ts">
 	import { OverlayBackdrop } from '@davincibot/components';
 	import { CodeInput } from '@davincibot/components';
-	import { CTAButton as CtaButton } from '@davincibot/components';
+	import { CtaButton } from '@davincibot/components';
 	import { stepUpChallenge, stepUpVerify, stepUpVerifyWebauthn } from '$lib/settings';
 	import { stepUpRequest, type StepUpRequest } from '$lib/settings';
 	import { onDestroy } from 'svelte';

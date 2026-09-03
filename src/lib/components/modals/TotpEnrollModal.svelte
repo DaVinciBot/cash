@@ -1,7 +1,7 @@
 <script lang="ts">
 	import { OverlayBackdrop } from '@davincibot/components';
 	import { CodeInput } from '@davincibot/components';
-	import { CTAButton as CtaButton } from '@davincibot/components';
+	import { CtaButton } from '@davincibot/components';
 	import { verifyTotpEnrollment, type TotpEnrollmentInfo } from '$lib/settings';
 	import { StepUpCancelledError, withStepUp } from '$lib/settings';
 	import { Copy } from '@lucide/svelte';
