@@ -2,6 +2,7 @@
 	import { getSupabaseBrowserClient } from '@davincibot/lib/supabase';
 	import type { SupabaseClient } from '@supabase/supabase-js';
 	import { onDestroy, onMount } from 'svelte';
+	import { SvelteSet } from 'svelte/reactivity';
 	import type { Database } from '@davincibot/database-types';
 
 	import { Stepper } from '@davincibot/components';
@@ -159,6 +160,12 @@
 		searchTerm?: string;
 		packages?: PermissionPackage[];
 		categories?: Record<string, Permission[]>;
+		/**
+		 * `permissions_grouped` : affiche « Tout cocher » / « Vider » par section.
+		 * À laisser à `false` quand cocher une section entière n'a pas de sens —
+		 * les rôles globaux s'attribuent à l'unité, pas par paquet.
+		 */
+		bulkActions?: boolean;
 		projects?: ProjectOption[];
 		roles?: SelectOption[];
 		defaultRole?: string;
@@ -184,6 +191,8 @@
 		actions?: DrawerAction[];
 		fields?: EditableField[];
 		id?: string;
+		/** Largeur d'ouverture souhaitée, en px — bornée par minWidth/maxWidth et par le viewport. */
+		initialWidth?: number;
 		onSubmit?: (
 			event: SubmitEvent,
 			form: HTMLFormElement | null,
@@ -203,6 +212,7 @@
 		actions = [],
 		fields = $bindable([]),
 		id = 'readDrawer',
+		initialWidth = 384,
 		onSubmit = noop,
 		onClose = noop
 	}: Props = $props();
@@ -217,21 +227,33 @@
 		isEditing = false;
 	}
 
+	const formId = $derived(`drawer-form-${id}`);
+
 	let current_file = $state('');
 	let current_file_index = $state(0);
 	let scroll_body: HTMLDivElement | null = $state<HTMLDivElement | null>(null);
-	let isMobile = $state<boolean>(false);
 	const files_array: FilePreview[] = $state([{ mime: 'application/pdf', url: null }]);
 	let forms: HTMLFormElement | null = $state<HTMLFormElement | null>(null);
 
 	// Resizing state for the right-anchored drawer (drag from left edge)
-	let width = $state(384); // default equals Tailwind w-96
 	const minWidth = 320;
 	const maxWidth = 960;
+	// svelte-ignore state_referenced_locally
+	let width = $state(Math.max(minWidth, Math.min(maxWidth, initialWidth)));
+	// Lié à la fenêtre : la largeur demandée ne doit jamais dépasser le viewport,
+	// sinon le tiroir déborde à droite sur un téléphone étroit (384 > 360) et la
+	// page entière gagne une barre de défilement horizontale.
+	let viewportWidth = $state(1024);
+	const isMobile = $derived(viewportWidth < 768);
+	const clampedWidth = $derived(Math.max(Math.min(width, maxWidth, viewportWidth), 0));
 	let isResizing = false;
 	let startX = 0;
 	// svelte-ignore state_referenced_locally
 	let startWidth = width;
+
+	function clampWidth(next: number): number {
+		return Math.max(minWidth, Math.min(maxWidth, next));
+	}
 
 	const updateText: Partial<Record<string, string>> = {
 		'order-creation': 'Création de la commande',
@@ -266,7 +288,7 @@
 			return;
 		}
 		const dx = startX - e.clientX; // dragging left increases width
-		width = Math.max(minWidth, Math.min(maxWidth, startWidth + dx));
+		width = clampWidth(startWidth + dx);
 	}
 
 	function onTouchMove(e: TouchEvent) {
@@ -276,7 +298,7 @@
 		if (e.touches.length > 0) {
 			e.preventDefault();
 			const dx = startX - (e.touches[0]?.clientX ?? 0);
-			width = Math.max(minWidth, Math.min(maxWidth, startWidth + dx));
+			width = clampWidth(startWidth + dx);
 		}
 	}
 
@@ -297,12 +319,6 @@
 		}
 		beginResize(touch.clientX);
 	}
-
-	const cropTitle = $derived(
-		values.header.title.length > width / 10
-			? values.header.title.slice(0, width / 10 - 3) + '...'
-			: values.header.title
-	);
 
 	onDestroy(() => {
 		// ensure listeners are cleared if component is destroyed mid-drag
@@ -327,6 +343,67 @@
 		categories: Record<string, Permission[]> | null | undefined
 	): [string, Permission[]][] {
 		return Object.entries(categories ?? {});
+	}
+
+	// --- Sélecteurs de permissions : recherche + sections repliables ---------
+	// Un référentiel RBAC complet ne tient pas dans un tiroir : la liste est
+	// découpée en catégories qu'on replie, et un champ de recherche traverse
+	// toutes les catégories d'un coup.
+	const permissionSearch = $state<Record<string, string>>({});
+	const openCategories = new SvelteSet<string>();
+
+	function categoryKey(groupKey: string, catName: string): string {
+		return `${groupKey} ${catName}`;
+	}
+
+	/**
+	 * État d'ouverture initial, figé à l'entrée en édition : une catégorie
+	 * s'ouvre si elle porte déjà une sélection, ou si elle est seule. Le calculer
+	 * à la volée refermerait la section sous le curseur au moment où l'on
+	 * décoche sa dernière case.
+	 */
+	function initPermissionCategories(field: EditableField): void {
+		const groupKey = getFieldKey(field);
+		const categories = getPermissionCategories(field.categories);
+		const selected = new Set(selectedPermissionValues(field.value));
+		for (const [catName, perms] of categories) {
+			const key = categoryKey(groupKey, catName);
+			if (categories.length === 1 || perms.some((perm) => selected.has(perm.value))) {
+				openCategories.add(key);
+			} else {
+				openCategories.delete(key);
+			}
+		}
+	}
+
+	function isCategoryOpen(groupKey: string, catName: string, searching: boolean): boolean {
+		return searching || openCategories.has(categoryKey(groupKey, catName));
+	}
+
+	function toggleCategory(groupKey: string, catName: string): void {
+		const key = categoryKey(groupKey, catName);
+		if (openCategories.has(key)) {
+			openCategories.delete(key);
+		} else {
+			openCategories.add(key);
+		}
+	}
+
+	function matchingPermissions(perms: Permission[], search: string): Permission[] {
+		if (!search) {
+			return perms;
+		}
+		return perms.filter(
+			(perm) =>
+				perm.label.toLowerCase().includes(search) || perm.value.toLowerCase().includes(search)
+		);
+	}
+
+	function togglePermissions(field: EditableField, perms: Permission[], checked: boolean): void {
+		const current = selectedPermissionValues(field.value);
+		const touched = new Set(perms.map((perm) => perm.value));
+		const kept = current.filter((value) => !touched.has(value));
+		setFieldValue(field, checked ? [...kept, ...touched] : kept);
 	}
 
 	function getFieldKey(field: EditableField): string {
@@ -382,6 +459,10 @@
 				} else {
 					field.value = bodyItem.value;
 				}
+			}
+			if (field.type === 'permissions_grouped') {
+				permissionSearch[getFieldKey(field)] = '';
+				initPermissionCategories(field);
 			}
 		});
 	}
@@ -492,8 +573,6 @@
 	}
 
 	onMount(async () => {
-		// check if mobile
-		isMobile = window.innerWidth < 768;
 		if (files.length > 0) {
 			// get the all signed url from supabase
 			const { data: urls } = await getSupabase().storage.from('proof').createSignedUrls(files, 600);
@@ -523,14 +602,16 @@
 	});
 </script>
 
+<svelte:window bind:innerWidth={viewportWidth} />
+
 <!-- Backdrop -->
 <OverlayBackdrop className="z-40" onClose={__onClose} />
 
 <!-- Drawer -->
 <div
 	id={'drawer-' + id}
-	style={`transform: translateX(0); width: ${String(width)}px;`}
-	class="fixed top-0 right-0 z-50 flex h-full flex-col bg-gray-800 shadow-lg transition-transform duration-300"
+	style={`transform: translateX(0); width: ${String(clampedWidth)}px;`}
+	class="fixed top-0 right-0 z-50 flex h-full max-w-full flex-col bg-gray-800 shadow-lg transition-transform duration-300"
 	tabindex="-1"
 >
 	<!-- Resize handle (left edge) -->
@@ -541,10 +622,10 @@
 			// keyboard resizing: arrow left increases width (drawer anchored right)
 			const step = e.shiftKey ? 40 : 10;
 			if (e.key === 'ArrowLeft') {
-				width = Math.min(maxWidth, width + step);
+				width = clampWidth(width + step);
 			}
 			if (e.key === 'ArrowRight') {
-				width = Math.max(minWidth, width - step);
+				width = clampWidth(width - step);
 			}
 		}}
 		onmousedown={(e: MouseEvent) => {
@@ -557,15 +638,19 @@
 		></span>
 	</button>
 	<!-- Header -->
-	<div class="flex items-center justify-between border-gray-700 p-4">
-		<div class="flex flex-col">
-			<span class="text-lg font-semibold text-white">{cropTitle}</span>
+	<div class="flex items-center justify-between gap-2 border-gray-700 p-4">
+		<div class="flex min-w-0 flex-col">
+			<span class="truncate text-lg font-semibold text-white" title={values.header.title}
+				>{values.header.title}</span
+			>
 			{#if values.header.sub}
-				<span class="text-sm text-gray-400">{values.header.sub}</span>
+				<span class="truncate text-sm text-gray-400" title={values.header.sub}
+					>{values.header.sub}</span
+				>
 			{/if}
 		</div>
 		<button
-			class="rounded-lg bg-transparent p-1.5 text-sm text-gray-400 hover:bg-gray-600 hover:text-white"
+			class="shrink-0 rounded-lg bg-transparent p-1.5 text-sm text-gray-400 hover:bg-gray-600 hover:text-white"
 			onclick={__onClose}
 			type="button"
 		>
@@ -586,12 +671,17 @@
 		</div>
 	{/if}
 	<!-- Content -->
-	<div class="flex-1 space-y-4 overflow-y-auto p-4">
+	<!-- `@container` : les colonnes suivent la largeur du tiroir, pas celle de la
+	     fenêtre. Avec les points de rupture `sm:` un tiroir de 384 px se coupait
+	     quand même en deux colonnes de 160 px dès que l'écran était large. -->
+	<div class="@container flex-1 space-y-4 overflow-y-auto p-4">
 		{#if isEditing}
-			<form bind:this={forms} onsubmit={handleSave}>
-				<div class="mb-4 grid gap-4 sm:grid-cols-2">
+			<!-- Save et Cancel vivent dans la barre d'actions, hors du <form> : ils s'y
+			     rattachent par l'attribut `form`, ce qui garde la soumission native. -->
+			<form bind:this={forms} id={formId} onsubmit={handleSave}>
+				<div class="mb-4 grid grid-cols-1 gap-4 @2xl:grid-cols-2">
 					{#each fields as field (getFieldKey(field))}
-						<div class={field.wide ? 'col-span-2' : ''}>
+						<div class={field.wide ? 'min-w-0 @2xl:col-span-2' : 'min-w-0'}>
 							{#if field.type === 'document' || field.type === 'img'}
 								<p
 									class="mb-2 block text-sm font-medium text-white"
@@ -1078,12 +1168,20 @@
 									{/if}
 								</div>
 							{:else if field.type === 'permissions_grouped'}
+								{@const groupKey = getFieldKey(field)}
 								{@const packages = field.packages ?? []}
 								{@const permissionValues = selectedPermissionValues(field.value)}
-								<div class="mb-4 space-y-4">
+								{@const search = (permissionSearch[groupKey] ?? '').trim().toLowerCase()}
+								{@const categories = getPermissionCategories(field.categories)
+									.map(
+										([catName, perms]) =>
+											[catName, matchingPermissions(perms, search)] as [string, Permission[]]
+									)
+									.filter(([, perms]) => perms.length > 0)}
+								<div class="mb-4 space-y-3">
 									{#if packages.length > 0}
 										<div
-											class="mb-4 flex flex-wrap gap-2 rounded-lg border border-gray-600 bg-gray-900 p-3"
+											class="flex flex-wrap gap-2 rounded-lg border border-gray-600 bg-gray-900 p-3"
 										>
 											<p class="mb-1 w-full text-xs font-semibold text-gray-400">
 												Packs pré-définis :
@@ -1099,62 +1197,141 @@
 													{pack.label}
 												</button>
 											{/each}
-											<div class="mt-1 flex w-full justify-end border-t border-gray-700 pt-2">
-												<button
-													class="px-2 py-1 text-xs text-red-400 underline hover:text-red-300"
-													onclick={() => {
-														setFieldValue(field, []);
-													}}
-													type="button"
-												>
-													Tout décocher
-												</button>
-											</div>
 										</div>
 									{/if}
-									<div class="grid grid-cols-1 gap-4 sm:grid-cols-2">
-										{#each getPermissionCategories(field.categories) as [catName, perms] (catName)}
-											<div class="rounded-lg border border-gray-700 bg-gray-800 p-3">
-												<h4
-													class="mb-3 border-b border-gray-700 pb-1 text-sm font-semibold text-white"
-												>
-													{catName}
-												</h4>
-												<div class="flex flex-col gap-2">
-													{#each perms as perm (perm.value)}
-														<label class="group inline-flex cursor-pointer items-center">
-															<input
-																name={field.id ?? 'permissions'}
-																class="text-primary-600 focus:ring-primary-600 h-4 w-4 cursor-pointer rounded border-gray-500 bg-gray-900 transition duration-200 focus:ring-2"
-																checked={permissionValues.includes(perm.value)}
-																onchange={(e: Event) => {
-																	const input = e.currentTarget;
-																	if (!(input instanceof HTMLInputElement)) {
-																		return;
-																	}
-																	const currentValue = selectedPermissionValues(field.value);
 
-																	if (input.checked) {
-																		if (!currentValue.includes(perm.value)) {
-																			setFieldValue(field, [...currentValue, perm.value]);
-																		}
-																	} else {
-																		setFieldValue(
-																			field,
-																			currentValue.filter((value) => value !== perm.value)
-																		);
-																	}
-																}}
-																type="checkbox"
-																value={perm.value}
+									<!-- Barre d'outils : recherche transverse + compteur + remise à zéro -->
+									<div class="flex flex-wrap items-center gap-2">
+										<input
+											id={`${groupKey}-search`}
+											class="focus:border-primary-500 focus:ring-primary-500 min-w-0 flex-1 basis-48 rounded-lg border border-gray-600 bg-gray-700 p-2 text-sm text-white placeholder-gray-400"
+											aria-label={`Rechercher dans ${field.name}`}
+											oninput={(e: Event) => {
+												const input = e.currentTarget;
+												if (input instanceof HTMLInputElement) {
+													permissionSearch[groupKey] = input.value;
+												}
+											}}
+											placeholder="Rechercher..."
+											type="search"
+											value={permissionSearch[groupKey] ?? ''}
+										/>
+										<span class="text-xs whitespace-nowrap text-gray-400">
+											Sélection : {permissionValues.length}
+										</span>
+										<button
+											class="rounded-md border border-gray-600 px-2 py-1 text-xs text-gray-300 hover:bg-gray-700 hover:text-white disabled:cursor-not-allowed disabled:opacity-40"
+											disabled={permissionValues.length === 0}
+											onclick={() => {
+												setFieldValue(field, []);
+											}}
+											type="button"
+										>
+											Tout décocher
+										</button>
+									</div>
+
+									{#if categories.length === 0}
+										<p
+											class="rounded-lg border border-gray-700 bg-gray-800 p-3 text-sm text-gray-400"
+										>
+											Aucune entrée ne correspond à cette recherche.
+										</p>
+									{/if}
+
+									<div class="space-y-2">
+										{#each categories as [catName, perms] (catName)}
+											{@const selectedCount = perms.filter((perm) =>
+												permissionValues.includes(perm.value)
+											).length}
+											{@const open = isCategoryOpen(groupKey, catName, search !== '')}
+											<div class="overflow-hidden rounded-lg border border-gray-700 bg-gray-800">
+												<h4>
+													<button
+														class="flex w-full items-center gap-2 px-3 py-2 text-left hover:bg-gray-700/60"
+														aria-expanded={open}
+														onclick={() => {
+															toggleCategory(groupKey, catName);
+														}}
+														type="button"
+													>
+														<svg
+															class={'h-4 w-4 shrink-0 text-gray-400 transition-transform ' +
+																(open ? 'rotate-90' : '')}
+															aria-hidden="true"
+															fill="none"
+															stroke="currentColor"
+															stroke-width="2"
+															viewBox="0 0 24 24"
+														>
+															<path
+																d="m9 18 6-6-6-6"
+																stroke-linecap="round"
+																stroke-linejoin="round"
 															/>
-															<span
-																class="ml-2 text-sm text-gray-300 transition-colors group-hover:text-white"
-																>{perm.label}</span
-															>
-														</label>
-													{/each}
-												</div>
+														</svg>
+														<span class="min-w-0 flex-1 truncate text-sm font-semibold text-white"
+															>{catName}</span
+														>
+														<span
+															class={'shrink-0 rounded-full px-2 py-0.5 text-xs font-medium ' +
+																(selectedCount > 0
+																	? 'bg-primary-900 text-primary-100 border-primary-500 border'
+																	: 'border border-gray-600 bg-gray-900 text-gray-400')}
+														>
+															{selectedCount}/{perms.length}
+														</span>
+													</button>
+												</h4>
+												{#if open}
+													<div class="border-t border-gray-700 p-3">
+														{#if field.bulkActions !== false}
+															<div class="mb-2 flex flex-wrap justify-end gap-3 text-xs">
+																<button
+																	class="text-primary-400 hover:text-primary-300 underline"
+																	onclick={() => {
+																		togglePermissions(field, perms, true);
+																	}}
+																	type="button">Tout cocher</button
+																>
+																<button
+																	class="text-gray-400 underline hover:text-gray-200"
+																	onclick={() => {
+																		togglePermissions(field, perms, false);
+																	}}
+																	type="button">Vider</button
+																>
+															</div>
+														{/if}
+														<div class="grid grid-cols-1 gap-x-4 gap-y-2 @lg:grid-cols-2">
+															{#each perms as perm (perm.value)}
+																<label
+																	class="group inline-flex cursor-pointer items-start gap-2"
+																	title={perm.value}
+																>
+																	<input
+																		name={field.id ?? 'permissions'}
+																		class="text-primary-600 focus:ring-primary-600 mt-0.5 h-4 w-4 shrink-0 cursor-pointer rounded border-gray-500 bg-gray-900 transition duration-200 focus:ring-2"
+																		checked={permissionValues.includes(perm.value)}
+																		onchange={(e: Event) => {
+																			const input = e.currentTarget;
+																			if (!(input instanceof HTMLInputElement)) {
+																				return;
+																			}
+																			togglePermissions(field, [perm], input.checked);
+																		}}
+																		type="checkbox"
+																		value={perm.value}
+																	/>
+																	<span
+																		class="min-w-0 text-sm text-gray-300 transition-colors group-hover:text-white"
+																		>{perm.label}</span
+																	>
+																</label>
+															{/each}
+														</div>
+													</div>
+												{/if}
 											</div>
 										{/each}
 									</div>
@@ -1163,9 +1340,9 @@
 								{@const rolesValue = projectRoles(field.value)}
 								<div class="mb-4 space-y-2">
 									{#each rolesValue as item, idx (`${item.project_id ?? 'empty'}-${String(idx)}`)}
-										<div class="flex items-center gap-2">
+										<div class="flex flex-wrap items-center gap-2">
 											<select
-												class="focus:border-primary-500 focus:ring-primary-500 block w-full rounded-lg border border-gray-600 bg-gray-700 p-2.5 text-sm text-white placeholder-gray-400"
+												class="focus:border-primary-500 focus:ring-primary-500 block min-w-0 flex-1 basis-44 rounded-lg border border-gray-600 bg-gray-700 p-2.5 text-sm text-white placeholder-gray-400"
 												bind:value={item.project_id}
 											>
 												<option value={null}>Sélectionner un projet</option>
@@ -1179,7 +1356,7 @@
 												{/each}
 											</select>
 											<select
-												class="focus:border-primary-500 focus:ring-primary-500 block w-32 rounded-lg border border-gray-600 bg-gray-700 p-2.5 text-sm text-white placeholder-gray-400"
+												class="focus:border-primary-500 focus:ring-primary-500 block min-w-0 flex-1 basis-36 rounded-lg border border-gray-600 bg-gray-700 p-2.5 text-sm text-white placeholder-gray-400"
 												bind:value={item.role}
 											>
 												{#each field.roles ?? [] as r (r.value)}
@@ -1266,17 +1443,6 @@
 							{/if}
 						</div>
 					{/each}
-				</div>
-				<div class="flex space-x-2">
-					<button
-						class="rounded-lg bg-green-600 px-4 py-2 text-white hover:bg-green-700"
-						type="submit">Save</button
-					>
-					<button
-						class="rounded-lg bg-gray-700 px-4 py-2 text-gray-400 hover:bg-gray-600"
-						onclick={handleCancel}
-						type="button">Cancel</button
-					>
 				</div>
 			</form>
 		{:else}
@@ -1434,16 +1600,20 @@
 							</dd>
 						{:else if detail.type === 'badges'}
 							<dd class="mb-4">
-								<div class="mt-1 flex flex-wrap gap-1">
-									{#each detail.list as badge (badge.text)}
-										<span
-											class="rounded-md px-2 py-1 text-xs font-medium shadow-sm {badge.color ??
-												'border border-gray-600 bg-gray-700 text-gray-200'}"
-										>
-											{badge.text}
-										</span>
-									{/each}
-								</div>
+								{#if detail.list.length === 0}
+									<p class="mt-1 text-sm text-gray-500">Aucune</p>
+								{:else}
+									<div class="mt-1 flex flex-wrap gap-1">
+										{#each detail.list as badge (badge.text)}
+											<span
+												class="rounded-md px-2 py-1 text-xs font-medium break-words shadow-sm {badge.color ??
+													'border border-gray-600 bg-gray-700 text-gray-200'}"
+											>
+												{badge.text}
+											</span>
+										{/each}
+									</div>
+								{/if}
 							</dd>
 						{:else if detail.type === 'items'}
 							<dd class="mb-4 ml-2 font-light text-gray-400">
@@ -1582,87 +1752,102 @@
 	</div>
 
 	<!-- Actions -->
-	<div class="flex items-center justify-between space-x-2 border-t border-gray-700 p-4">
-		<!-- toggle edit mode if fields provided -->
-		{#if !isEditing && fields.length > 0}
-			<button
-				class="bg-primary-600 hover:bg-primary-700 focus:ring-primary-800 inline-flex items-center rounded-lg px-5 py-2.5 text-center text-sm font-medium text-white focus:ring-4 focus:outline-none"
-				onclick={() => {
-					isEditing = true;
-					parseValuesToFields();
-				}}
-				type="button"
-			>
-				<svg
-					class="mr-1 -ml-1 h-5 w-5"
-					aria-hidden="true"
-					fill="currentColor"
-					viewBox="0 0 20 20"
-					xmlns="http://www.w3.org/2000/svg"
-					><path d="M17.414 2.586a2 2 0 00-2.828 0L7 10.172V13h2.828l7.586-7.586a2 2 0 000-2.828z"
-					></path><path
-						clip-rule="evenodd"
-						d="M2 6a2 2 0 012-2h4a1 1 0 010 2H4v10h10v-4a1 1 0 112 0v4a2 2 0 01-2 2H4a2 2 0 01-2-2V6z"
-						fill-rule="evenodd"
-					></path></svg
-				>
-				Modifier
-			</button>
-		{/if}
-		{#each actions as action (actionKey(action))}
-			{#if action.type === 'selector'}
-				<select
-					class=" focus:border-primary-500 focus:ring-primary-500 block w-full rounded-lg border border-gray-600 bg-gray-700 p-2.5 text-sm text-white placeholder-gray-400"
-					onchange={action.handler}
-				>
-					<option disabled selected value="">Choisir une option</option>
-					{#each action.title as { name, value } (value)}
-						<option {value}>{name}</option>
-					{/each}
-				</select>
-			{/if}
-			{#if action.type === 'validate'}
+	<div class="flex flex-wrap items-center justify-between gap-2 border-t border-gray-700 p-4">
+		<div class="flex min-w-0 flex-wrap items-center gap-2">
+			<!-- toggle edit mode if fields provided -->
+			{#if isEditing}
 				<button
-					class="bg-primary-700 hover:bg-primary-800 focus:ring-primary-300 inline-flex items-center rounded-lg px-5 py-2.5 text-center text-sm font-medium text-white focus:ring-4 focus:outline-none"
-					onclick={action.handler}
+					class="rounded-lg bg-green-600 px-5 py-2.5 text-sm font-medium text-white hover:bg-green-700"
+					form={formId}
+					type="submit">Sauvegarder</button
+				>
+				<button
+					class="rounded-lg bg-gray-700 px-5 py-2.5 text-sm font-medium text-gray-300 hover:bg-gray-600 hover:text-white"
+					onclick={handleCancel}
+					type="button">Annuler</button
+				>
+			{:else if fields.length > 0}
+				<button
+					class="bg-primary-600 hover:bg-primary-700 focus:ring-primary-800 inline-flex items-center rounded-lg px-5 py-2.5 text-center text-sm font-medium text-white focus:ring-4 focus:outline-none"
+					onclick={() => {
+						isEditing = true;
+						parseValuesToFields();
+					}}
 					type="button"
 				>
 					<svg
-						class="mr-1.5 -ml-1 h-5 w-5"
+						class="mr-1 -ml-1 h-5 w-5"
 						aria-hidden="true"
 						fill="currentColor"
 						viewBox="0 0 20 20"
-					>
-						<path
+						xmlns="http://www.w3.org/2000/svg"
+						><path d="M17.414 2.586a2 2 0 00-2.828 0L7 10.172V13h2.828l7.586-7.586a2 2 0 000-2.828z"
+						></path><path
 							clip-rule="evenodd"
-							d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z"
+							d="M2 6a2 2 0 012-2h4a1 1 0 010 2H4v10h10v-4a1 1 0 112 0v4a2 2 0 01-2 2H4a2 2 0 01-2-2V6z"
 							fill-rule="evenodd"
-						></path>
-					</svg>
-					{action.title}
+						></path></svg
+					>
+					Modifier
 				</button>
 			{/if}
-			{#if action.type === 'delete'}
-				<button
-					class="inline-flex items-center rounded-lg bg-red-600 px-5 py-2.5 text-center text-sm font-medium text-white hover:bg-red-700 focus:ring-4 focus:ring-red-300 focus:outline-none"
-					onclick={action.handler}
-					type="button"
-				>
-					<svg
-						class="mr-1.5 -ml-1 h-5 w-5"
-						aria-hidden="true"
-						fill="currentColor"
-						viewBox="0 0 20 20"
+		</div>
+		<div class="flex min-w-0 flex-wrap items-center gap-2">
+			{#each actions as action (actionKey(action))}
+				{#if action.type === 'selector'}
+					<select
+						class=" focus:border-primary-500 focus:ring-primary-500 block w-full rounded-lg border border-gray-600 bg-gray-700 p-2.5 text-sm text-white placeholder-gray-400"
+						onchange={action.handler}
 					>
-						<path
-							clip-rule="evenodd"
-							d="M9 2a1 1 0 00-.894.553L7.382 4H4a1 1 0 000 2v10a2 2 0 002 2h8a2 2 0 002-2V6a1 1 0 100-2h-3.382l-.724-1.447A1 1 0 0011 2H9zM7 8a1 1 0 012 0v6a1 1 0 11-2 0V8zm5-1a1 1 0 00-1 1v6a1 1 0 102 0V8a1 1 0 00-1-1z"
-							fill-rule="evenodd"
-						></path>
-					</svg>
-					{action.title}
-				</button>
-			{/if}
-		{/each}
+						<option disabled selected value="">Choisir une option</option>
+						{#each action.title as { name, value } (value)}
+							<option {value}>{name}</option>
+						{/each}
+					</select>
+				{/if}
+				{#if action.type === 'validate'}
+					<button
+						class="bg-primary-700 hover:bg-primary-800 focus:ring-primary-300 inline-flex items-center rounded-lg px-5 py-2.5 text-center text-sm font-medium text-white focus:ring-4 focus:outline-none"
+						onclick={action.handler}
+						type="button"
+					>
+						<svg
+							class="mr-1.5 -ml-1 h-5 w-5"
+							aria-hidden="true"
+							fill="currentColor"
+							viewBox="0 0 20 20"
+						>
+							<path
+								clip-rule="evenodd"
+								d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z"
+								fill-rule="evenodd"
+							></path>
+						</svg>
+						{action.title}
+					</button>
+				{/if}
+				{#if action.type === 'delete'}
+					<button
+						class="inline-flex items-center rounded-lg bg-red-600 px-5 py-2.5 text-center text-sm font-medium text-white hover:bg-red-700 focus:ring-4 focus:ring-red-300 focus:outline-none"
+						onclick={action.handler}
+						type="button"
+					>
+						<svg
+							class="mr-1.5 -ml-1 h-5 w-5"
+							aria-hidden="true"
+							fill="currentColor"
+							viewBox="0 0 20 20"
+						>
+							<path
+								clip-rule="evenodd"
+								d="M9 2a1 1 0 00-.894.553L7.382 4H4a1 1 0 000 2v10a2 2 0 002 2h8a2 2 0 002-2V6a1 1 0 100-2h-3.382l-.724-1.447A1 1 0 0011 2H9zM7 8a1 1 0 012 0v6a1 1 0 11-2 0V8zm5-1a1 1 0 00-1 1v6a1 1 0 102 0V8a1 1 0 00-1-1z"
+								fill-rule="evenodd"
+							></path>
+						</svg>
+						{action.title}
+					</button>
+				{/if}
+			{/each}
+		</div>
 	</div>
 </div>

@@ -2,13 +2,14 @@
 	import { resolve } from '$app/paths';
 	import ReadDrawer from '$lib/components/drawers/ReadDrawer.svelte';
 	import SucessModal from '$lib/components/modals/InfoModal.svelte';
+	import { GLOBAL_ROLE_CATEGORIES, OVERRIDE_PERMISSION_CATEGORIES } from '$lib/rbacCatalog';
 	import { Table, UserImportModal } from '@davincibot/components';
 	import {
 		CAMPUS_BADGES,
-		GLOBAL_ROLE_LABELS_FR,
+		GLOBAL_ROLE_LABELS,
 		hasAnyPermission,
 		mountClosable,
-		PROJECT_ROLE_LABELS_FR,
+		PROJECT_ROLE_LABELS,
 		userdata,
 		type Campus,
 		type GlobalPermission,
@@ -572,54 +573,6 @@
 		});
 	}
 
-	const roleCategories: Record<string, { value: GlobalRole; label: string }[]> = {
-		'Rôles globaux': (Object.keys(GLOBAL_ROLE_LABELS_FR) as GlobalRole[]).map((role) => ({
-			value: role,
-			label: GLOBAL_ROLE_LABELS_FR[role]
-		}))
-	};
-
-	const overridePermissionCategories: Record<string, { value: GlobalPermission; label: string }[]> =
-		{
-			'Override (exception)': [
-				{ label: 'Voir membres', value: 'members.profile.read.all' },
-				{ label: 'Éditer membres', value: 'members.profile.update.all' },
-				{ label: 'Éditer les rattachements aux projets', value: 'members.projects.update.all' },
-				{ label: 'Gérer les projets (nom, campus, budget)', value: 'projects.manage.all' },
-				{ label: 'Inviter un membre', value: 'members.invite.send' },
-				{ label: 'Activer/Désactiver profil', value: 'members.profile.status.update' },
-				{ label: 'Gérer les rôles (IAM)', value: 'iam.roles.manage' },
-				{ label: 'Gérer les overrides (IAM)', value: 'iam.overrides.manage' },
-				{ label: 'Voir catalogue formation', value: 'training.catalog.read' },
-				{ label: 'Voir sessions formation', value: 'training.slot.read' },
-				{ label: 'Créer/éditer session formation', value: 'training.slot.manage' },
-				{ label: 'Gérer sa propre inscription', value: 'training.registration.manage.self' },
-				{ label: 'Voir toutes inscriptions', value: 'training.registration.read.all' },
-				{ label: 'Gérer toutes inscriptions', value: 'training.registration.manage.all' },
-				{ label: 'Éditer présence', value: 'training.presence.update' },
-				{ label: 'Recevoir récap formation (email)', value: 'training.summary_email.receive' },
-				{ label: 'Envoyer récap formation (Discord)', value: 'training.summary.discord.send' },
-				{ label: 'Envoyer story formation (Discord)', value: 'training.story.discord.send' },
-				{ label: 'Gérer ses propres items', value: 'orders.items.manage.self' },
-				{ label: 'Voir toutes commandes', value: 'orders.read.all' },
-				{ label: 'Créer commande globale', value: 'orders.create.all' },
-				{ label: 'Regrouper des items en commande', value: 'orders.bundle.manage' },
-				{ label: 'Refuser un item (trésorier)', value: 'orders.items.refuse' },
-				{ label: 'Marquer un item reçu', value: 'orders.items.receive' },
-				{ label: 'Voir stats globales', value: 'stats.read.all' },
-				{ label: 'Voir la trésorerie', value: 'finance.read' },
-				{ label: 'Éditer la trésorerie', value: 'finance.write' },
-				{ label: 'Clore une période', value: 'finance.periods.close' },
-				{ label: 'Générer des documents', value: 'finance.documents.generate' },
-				{ label: 'Éditer brouillons blog', value: 'blog.draft.write' },
-				{ label: 'Publier blog', value: 'blog.publish' },
-				{ label: 'Caster SmartShare', value: 'integration.smartshare.cast' },
-				{ label: 'Voir logs', value: 'audit.logs.read' },
-				{ label: 'Exporter logs', value: 'audit.events.export' },
-				{ label: 'Accès environnements (infra)', value: 'infra.environments.access' }
-			]
-		};
-
 	const DEFAULT_IMPORT_ROLE: GlobalRole = 'guest';
 
 	/**
@@ -783,11 +736,11 @@
 			.filter((m) => m.project_id !== undefined);
 
 		const roleBadges = activeGlobalRoles.map((role) => ({
-			text: GLOBAL_ROLE_LABELS_FR[role],
+			text: GLOBAL_ROLE_LABELS[role],
 			color: 'bg-primary-900 border border-primary-500 text-primary-100'
 		}));
 
-		const flatOverride = Object.values(overridePermissionCategories).flat();
+		const flatOverride = Object.values(OVERRIDE_PERMISSION_CATEGORIES).flat();
 		const permBadges = overridePermissions.map((p: string) => {
 			const label = flatOverride.find((fp) => fp.value === p)?.label ?? p;
 			return { text: label, color: 'bg-fuchsia-900 border border-fuchsia-500 text-fuchsia-100' };
@@ -803,7 +756,7 @@
 					m.role === 'cdp'
 						? 'bg-amber-900 border border-amber-500 text-amber-100'
 						: 'bg-blue-900 border border-blue-500 text-blue-100';
-				const roleLabel = PROJECT_ROLE_LABELS_FR[(m.role || 'project_member') as ProjectRole];
+				const roleLabel = PROJECT_ROLE_LABELS[(m.role || 'project_member') as ProjectRole];
 				return { text: `${m.project.name} (${roleLabel})`, color: roleColor };
 			})
 			.filter((b): b is { text: string; color: string } => b !== null);
@@ -823,7 +776,7 @@
 					data: activeGlobalRoles
 				},
 				{
-					label: 'Permissions (override exception)',
+					label: 'Permissions supplémentaires',
 					value: { type: 'badges', list: permBadges },
 					id: 'permissions',
 					data: overridePermissions
@@ -867,15 +820,16 @@
 							name: 'Rôles globaux',
 							id: 'roles',
 							type: 'permissions_grouped',
-							categories: roleCategories,
+							categories: GLOBAL_ROLE_CATEGORIES,
 							packages: [],
+							bulkActions: false,
 							wide: true
 						},
 						{
-							name: 'Permissions (override exception)',
+							name: 'Permissions supplémentaires',
 							id: 'permissions',
 							type: 'permissions_grouped',
-							categories: overridePermissionCategories,
+							categories: OVERRIDE_PERMISSION_CATEGORIES,
 							packages: [],
 							wide: true
 						}
@@ -889,8 +843,8 @@
 							type: 'project_roles',
 							projects: allProjects,
 							roles: [
-								{ value: 'cdp', text: PROJECT_ROLE_LABELS_FR.cdp },
-								{ value: 'project_member', text: PROJECT_ROLE_LABELS_FR.project_member }
+								{ value: 'cdp', text: PROJECT_ROLE_LABELS.cdp },
+								{ value: 'project_member', text: PROJECT_ROLE_LABELS.project_member }
 							],
 							defaultRole: 'project_member' satisfies ProjectRole,
 							wide: true
@@ -901,6 +855,7 @@
 		mountClosable(ReadDrawer, {
 			target: document.body,
 			props: {
+				initialWidth: 560,
 				values,
 				fields,
 				onSubmit: async (
