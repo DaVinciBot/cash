@@ -48,7 +48,7 @@
 	"dependencies": {
 		"@davincibot/components": "^5.3.0",
 		"@davincibot/database-types": "^4.4.0",
-		"@davincibot/lib": "^5.2.0",
+		"@davincibot/lib": "^5.3.0",
 		"@lucide/svelte": "^1.31.0",
 		"@simplewebauthn/browser": "^13.3.0",
 		"@supabase/phoenix": "^0.4.5",
