@@ -86,6 +86,7 @@
 	let pendingInvitesLoading = $state<boolean>(false);
 	let pendingInvitesError = $state('');
 	let reinvitingUserId = $state<string | null>(null);
+	let cancelingUserId = $state<string | null>(null);
 	let pendingInvitesInitialized = $state<boolean>(false);
 
 	async function listAuthUsers(page: number, perPage: number): Promise<AuthUser[]> {
@@ -157,6 +158,27 @@
 			const fallback = body.trim()
 				? body.trim()
 				: `Réinvitation impossible pour cet utilisateur (status ${String(res.status)}).`;
+			const message = payload.error ?? fallback;
+			throw new Error(message);
+		}
+		return payload;
+	}
+
+	async function cancelAuthUserInvite(id: string): Promise<ApiPayload> {
+		const res = await fetch(`${resolve('/api/admin/users')}/${id}/cancel-invite`, {
+			method: 'POST'
+		});
+		const body = await res.text();
+		let payload: ApiPayload;
+		try {
+			payload = body ? (JSON.parse(body) as ApiPayload) : {};
+		} catch {
+			payload = {};
+		}
+		if (!res.ok) {
+			const fallback = body.trim()
+				? body.trim()
+				: `Annulation impossible pour cette invitation (status ${String(res.status)}).`;
 			const message = payload.error ?? fallback;
 			throw new Error(message);
 		}
@@ -242,6 +264,43 @@
 			alert((error as Error | null)?.message ?? 'Impossible de renvoyer cette invitation.');
 		} finally {
 			reinvitingUserId = null;
+		}
+	}
+
+	async function cancelPendingInvite(authUser: AuthUser) {
+		if (!canReinvite) {
+			alert("Vous n'avez pas les permissions requises pour annuler une invitation.");
+			return;
+		}
+		if (!authUser.id || !authUser.email) {
+			alert("Utilisateur invalide, impossible d'annuler cette invitation.");
+			return;
+		}
+		if (
+			!confirm(
+				`Voulez-vous vraiment annuler l'invitation de ${authUser.email} ? Le compte en attente sera supprimé.`
+			)
+		) {
+			return;
+		}
+
+		cancelingUserId = authUser.id;
+		try {
+			await cancelAuthUserInvite(authUser.id);
+			mountClosable(SucessModal, {
+				target: document.body,
+				props: {
+					message: `Invitation annulée pour ${authUser.email}.`,
+					onClose: () => {
+						/* no-op */
+					}
+				}
+			});
+			await loadPendingInvites();
+		} catch (error) {
+			alert((error as Error | null)?.message ?? "Impossible d'annuler cette invitation.");
+		} finally {
+			cancelingUserId = null;
 		}
 	}
 
@@ -1065,7 +1124,7 @@
 				<h3 class="text-xl font-semibold text-white">Invitations en attente</h3>
 				<button
 					class="rounded-lg border border-gray-600 px-3 py-2 text-sm font-medium text-gray-200 hover:bg-gray-700 disabled:cursor-not-allowed disabled:opacity-50"
-					disabled={pendingInvitesLoading || reinvitingUserId !== null}
+					disabled={pendingInvitesLoading || reinvitingUserId !== null || cancelingUserId !== null}
 					onclick={() => {
 						void loadPendingInvites();
 					}}
@@ -1095,7 +1154,7 @@
 								<th class="px-3 py-2">Email</th>
 								<th class="px-3 py-2">Invité le</th>
 								<th class="px-3 py-2">Dernière connexion</th>
-								<th class="px-3 py-2 text-right">Action</th>
+								<th class="px-3 py-2 text-right">Actions</th>
 							</tr>
 						</thead>
 						<tbody>
@@ -1105,16 +1164,28 @@
 									<td class="px-3 py-2">{formatDate(authUser.invited_at)}</td>
 									<td class="px-3 py-2">{formatDate(authUser.last_sign_in_at)}</td>
 									<td class="px-3 py-2 text-right">
-										<button
-											class="bg-primary-700 hover:bg-primary-800 rounded-lg px-3 py-1.5 text-sm font-medium text-white disabled:cursor-not-allowed disabled:opacity-50"
-											disabled={reinvitingUserId !== null}
-											onclick={() => {
-												void reinvitePendingUser(authUser);
-											}}
-											type="button"
-										>
-											{reinvitingUserId === authUser.id ? 'Envoi...' : 'Réinviter'}
-										</button>
+										<div class="flex flex-wrap justify-end gap-2">
+											<button
+												class="bg-primary-700 hover:bg-primary-800 rounded-lg px-3 py-1.5 text-sm font-medium text-white disabled:cursor-not-allowed disabled:opacity-50"
+												disabled={reinvitingUserId !== null || cancelingUserId !== null}
+												onclick={() => {
+													void reinvitePendingUser(authUser);
+												}}
+												type="button"
+											>
+												{reinvitingUserId === authUser.id ? 'Envoi...' : 'Réinviter'}
+											</button>
+											<button
+												class="rounded-lg border border-red-600 px-3 py-1.5 text-sm font-medium text-red-200 hover:bg-red-900/40 disabled:cursor-not-allowed disabled:opacity-50"
+												disabled={reinvitingUserId !== null || cancelingUserId !== null}
+												onclick={() => {
+													void cancelPendingInvite(authUser);
+												}}
+												type="button"
+											>
+												{cancelingUserId === authUser.id ? 'Annulation...' : 'Annuler'}
+											</button>
+										</div>
 									</td>
 								</tr>
 							{/each}
