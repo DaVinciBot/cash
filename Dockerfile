@@ -46,8 +46,32 @@ COPY --from=deps --chown=node:node /app/.playwright ./.playwright
 
 # Correctifs de sécurité de la base Debian : l'image node officielle traîne
 # util-linux et consorts en version vulnérable.
+#
+# Mise à jour ciblée plutôt qu'`apt-get upgrade` global : patcher un paquet
+# depuis une couche dérivée y recopie l'original hérité de la couche de base,
+# que dive compte en octets gaspillés. L'upgrade global en dupliquait 93 Mo —
+# libc6, tzdata et perl-base en tête — alors que libc6 et tzdata, les deux plus
+# gros, n'ont aucune CVE corrigée. Cette liste est exactement ce que trivy
+# signale en HIGH/CRITICAL avec un correctif disponible : l'étendre quand le
+# scan d'image en signale un nouveau, et retirer ce que la base finit par
+# embarquer d'elle-même.
 RUN apt-get update \
-    && apt-get upgrade -y --no-install-recommends \
+    && apt-get install -y --no-install-recommends --only-upgrade \
+        perl-base \
+        libssl3t64 \
+        openssl-provider-legacy \
+        libsqlite3-0 \
+        libpcre2-8-0 \
+        gzip \
+        util-linux \
+        mount \
+        login \
+        bsdutils \
+        libuuid1 \
+        libblkid1 \
+        libmount1 \
+        libsmartcols1 \
+        liblastlog2-2 \
     && node node_modules/playwright/cli.js install-deps chromium-headless-shell \
     && apt-get purge -y --auto-remove \
         xvfb \
