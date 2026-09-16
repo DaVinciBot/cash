@@ -55,6 +55,11 @@ COPY --from=deps --chown=node:node /app/.playwright ./.playwright
 # signale en HIGH/CRITICAL avec un correctif disponible : l'étendre quand le
 # scan d'image en signale un nouveau, et retirer ce que la base finit par
 # embarquer d'elle-même.
+#
+# DL3008 : pas de version épinglée, le but est justement de prendre le dernier
+# correctif publié ; un pin le figerait et casserait dès que Debian retire la
+# version du miroir.
+# hadolint ignore=DL3008
 RUN apt-get update \
     && apt-get install -y --no-install-recommends --only-upgrade \
         perl-base \
