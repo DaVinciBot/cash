@@ -3,13 +3,20 @@
 	import ReadDrawer from '$lib/components/drawers/ReadDrawer.svelte';
 	import SucessModal from '$lib/components/modals/InfoModal.svelte';
 	import { GLOBAL_ROLE_CATEGORIES, OVERRIDE_PERMISSION_CATEGORIES } from '$lib/rbacCatalog';
-	import { Table, UserImportModal } from '@davincibot/components';
+	import {
+		Table,
+		UserImportModal,
+		type Filter,
+		type TableColumn,
+		type TableRow
+	} from '@davincibot/components';
 	import {
 		CAMPUS_BADGES,
 		GLOBAL_ROLE_LABELS,
 		hasAnyPermission,
 		mountClosable,
 		PROJECT_ROLE_LABELS,
+		triggerTableRefresh,
 		userdata,
 		type Campus,
 		type GlobalPermission,
@@ -17,6 +24,7 @@
 		type ProjectRole
 	} from '@davincibot/lib';
 	import { getSupabaseBrowserClient } from '@davincibot/lib/supabase';
+	import { unmount } from 'svelte';
 	import { SvelteMap } from 'svelte/reactivity';
 
 	interface AuthUser {
@@ -68,11 +76,36 @@
 		message: string;
 	}
 
-	const headers = ['Nom', 'Projets', 'Statut', 'Actions'];
+	const columns: TableColumn[] = [
+		{ key: 'username', label: 'Nom', sortable: true },
+		{ key: 'projects', label: 'Projets' },
+		{ key: 'status', label: 'Statut', sortable: true }
+	];
 
+	// Recharger la table par son topic plutôt que la page entière : la recherche, les filtres, le
+	// tri et la page en cours survivent à une édition.
+	const usersTableTopic = 'users';
+	let drawerInstance: ReturnType<typeof mountClosable> | null = null;
+
+	function closeDrawer() {
+		if (!drawerInstance) {
+			return;
+		}
+		void unmount(drawerInstance);
+		drawerInstance = null;
+	}
+
+	/** Après une écriture : le tiroir se ferme et la table se recharge là où l'utilisateur en était. */
+	function refreshAfterWrite() {
+		closeDrawer();
+		triggerTableRefresh(usersTableTopic);
+	}
+
+	// `project_filter` ne sert qu'au filtre Projets : filtrer l'embed affiché masquerait les
+	// autres projets des membres retenus.
 	const dbInfo = {
 		table: 'profiles',
-		key: 'id, username, avatar_url, status, member_of!membre_projet_profile_fkey(project!inner(id, name), revoked_at)'
+		key: 'id, username, avatar_url, status, member_of!membre_projet_profile_fkey(project!inner(id, name), revoked_at), project_filter:member_of!membre_projet_profile_fkey(project, revoked_at)'
 	};
 
 	let canEditProfile = $state<boolean>(false);
@@ -316,17 +349,12 @@
 		{ name: 'CDR Nantes', value: '14' }
 	]);
 
-	interface TableFilter {
-		category: string;
-		value: string;
-		wide?: boolean;
-		options: { name: string; value: string; active?: boolean }[];
-	}
-
-	const filters = $derived<TableFilter[]>([
+	const filters = $derived<Filter[]>([
 		{
 			category: 'Projets',
-			value: 'member_of.project',
+			value: 'project',
+			relation: 'project_filter',
+			where: [{ column: 'revoked_at', operator: 'is', value: 'null' }],
 			options: allProjects
 		},
 		{
@@ -352,10 +380,6 @@
 	userdata.subscribe((user) => {
 		if (user?.allProjects) {
 			allProjects = user.allProjects.map(normalizeProjectOption);
-			const projectFilter = filters[0];
-			if (projectFilter) {
-				projectFilter.options = allProjects;
-			}
 		}
 		const permissions = user?.permissions ?? [];
 		canEditProfile = hasAnyPermission(permissions, ['members.profile.update.all']);
@@ -382,7 +406,7 @@
 
 	function parseItems(data: unknown[]) {
 		const typedData = data as ProfileRow[];
-		const items: { value: string; data?: string; avatar?: string | null }[][] = [];
+		const items: TableRow[] = [];
 		for (const el of typedData) {
 			const project = el.member_of
 				.filter((m) => !m.revoked_at)
@@ -623,7 +647,8 @@
 						props: {
 							message,
 							onClose: () => {
-								window.location.reload();
+								triggerTableRefresh(usersTableTopic);
+								void loadPendingInvites();
 							}
 						}
 					});
@@ -745,19 +770,12 @@
 		}
 	}
 
-	// Action handlers for rows
-	async function viewUser(e: Event) {
-		e.preventDefault();
+	async function viewUser(row: TableRow) {
+		const id = row[0]?.data;
+		if (typeof id !== 'string' || !id) {
+			return;
+		}
 		const supabase = getSupabaseBrowserClient();
-		const tr = (e.currentTarget as HTMLElement).closest('tr');
-		if (!tr) {
-			return;
-		}
-		const dataEl = tr.querySelector('[data-utils]');
-		const id = dataEl instanceof HTMLElement ? dataEl.getAttribute('data-utils') : null;
-		if (!id) {
-			return;
-		}
 		const { data, error } = (await supabase
 			.from('profiles')
 			.select(
@@ -911,7 +929,7 @@
 					]
 				: [])
 		];
-		mountClosable(ReadDrawer, {
+		drawerInstance = mountClosable(ReadDrawer, {
 			target: document.body,
 			props: {
 				initialWidth: 560,
@@ -1013,9 +1031,7 @@
 						props: {
 							message: 'Utilisateur mis à jour avec succès',
 							open: true,
-							onClose: () => {
-								window.location.reload();
-							}
+							onClose: refreshAfterWrite
 						}
 					});
 				},
@@ -1030,16 +1046,6 @@
 			}
 		});
 	}
-
-	const actions = [
-		{
-			title: 'Voir',
-			type: 'view',
-			handler: async (e: Event) => {
-				await viewUser(e);
-			}
-		}
-	];
 
 	async function deleteUser(e: Event) {
 		e.preventDefault();
@@ -1061,7 +1067,7 @@
 			alert((error as Error | null)?.message ?? 'Erreur lors de la désactivation du compte.');
 			return;
 		}
-		window.location.reload();
+		refreshAfterWrite();
 	}
 
 	async function reactivateUser(e: Event) {
@@ -1084,7 +1090,7 @@
 			alert((error as Error | null)?.message ?? 'Erreur lors de la réactivation du compte.');
 			return;
 		}
-		window.location.reload();
+		refreshAfterWrite();
 	}
 </script>
 
@@ -1107,12 +1113,15 @@
 <div class="w-full py-2 sm:px-8 lg:px-16">
 	<div class="rounded-lg bg-gray-800">
 		<Table
-			{actions}
 			addNew={canImportMembers ? addNew : null}
+			{columns}
 			{dbInfo}
 			{filters}
-			{headers}
+			onRowClick={(row) => void viewUser(row)}
+			pageSize={15}
 			{parseItems}
+			refreshTopic={usersTableTopic}
+			searchable="username"
 		/>
 	</div>
 </div>
