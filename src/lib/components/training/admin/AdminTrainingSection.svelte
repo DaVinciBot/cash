@@ -1,12 +1,13 @@
 <script lang="ts">
 	import StateBadge from '$lib/components/cash/StateBadge.svelte';
-	import { categoryBadge } from '$lib/helpers/trainingTables';
+	import { categoryBadge, stateBadgeLabel } from '$lib/helpers/trainingTables';
 	import {
 		Table,
-		type Action,
 		type DBInfo,
 		type Filter,
-		type ParseItems
+		type ParseItems,
+		type TableColumn,
+		type TableRow
 	} from '@davincibot/components';
 	import type { TrainingListItem } from '@davincibot/lib';
 
@@ -16,7 +17,7 @@
 	interface Props {
 		trainings?: TrainingListItem[];
 		trainingDbInfo: DBInfo;
-		trainingActions?: Action[];
+		onTrainingRowClick?: (row: TableRow) => void;
 		trainingFilters?: Filter[];
 		trainingTableTopic?: string;
 		parseTrainingItems: ParseItems;
@@ -27,13 +28,19 @@
 	let {
 		trainings = [],
 		trainingDbInfo,
-		trainingActions = [],
+		onTrainingRowClick,
 		trainingFilters = [],
 		trainingTableTopic = '',
 		parseTrainingItems,
 		onAddTraining = noop,
 		onEditTraining = noopTraining
 	}: Props = $props();
+
+	const columns: TableColumn[] = [
+		{ key: 'name', label: 'Nom', sortable: true },
+		{ key: 'category', label: 'Catégorie', sortable: true, csv: (row) => stateBadgeLabel(row[1]) },
+		{ key: 'description', label: 'Description' }
+	];
 </script>
 
 <div class="mb-8">
@@ -53,15 +60,14 @@
 
 	<div class="hidden rounded-lg border border-gray-700 bg-gray-800 md:block">
 		<Table
-			actions={trainingActions}
+			{columns}
 			dbInfo={trainingDbInfo}
-			emptyMessage="Aucune formation"
 			filters={trainingFilters}
-			headers={['Nom', 'Catégorie', 'Description', 'Actions']}
+			onRowClick={onTrainingRowClick}
+			pageSize={5}
 			parseItems={parseTrainingItems}
 			refreshTopic={trainingTableTopic}
 			searchable="name"
-			size={5}
 		/>
 	</div>
 

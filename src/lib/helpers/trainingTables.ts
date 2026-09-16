@@ -1,12 +1,14 @@
-import StateBadge from '$lib/components/cash/StateBadge.svelte';
 import { SLOT_STATUS_BADGES, TRAINING_CATEGORY_BADGES } from '$lib/helpers/trainingOptions';
+import type { TableCell, TableRow } from '@davincibot/components';
 import type {
 	SlotStatus,
+	StateBadge,
 	TrainingCategory,
 	TrainingListItem,
 	TrainingSlotListItem
 } from '@davincibot/lib';
 import { formatParisDateTimeShort } from '@davincibot/lib';
+import type { Snippet } from 'svelte';
 
 export function formatSlotDate(dateString: string) {
 	return formatParisDateTimeShort(dateString);
@@ -33,6 +35,14 @@ export function statusBadge(status: string | null | undefined) {
 	return Object.hasOwn(SLOT_STATUS_BADGES, key)
 		? SLOT_STATUS_BADGES[key]
 		: SLOT_STATUS_BADGES.draft;
+}
+
+/** Rendu d'une cellule dont la valeur est un `StateBadge`. */
+export type BadgeCell = Snippet<[TableCell]>;
+
+/** Libellé d'une cellule de badge, pour l'export CSV. */
+export function stateBadgeLabel(cell: TableCell | undefined) {
+	return (cell?.value as StateBadge | undefined)?.label ?? '';
 }
 
 interface TrainingRawItem {
@@ -63,7 +73,7 @@ interface SlotRawItem {
 	trainer_avatar_url: string | null;
 }
 
-export function createTrainingTableItems(data: TrainingRawItem[]) {
+export function createTrainingTableItems(data: TrainingRawItem[], badgeCell: BadgeCell) {
 	const index = new Map<number, TrainingListItem>(
 		data.map((training) => [
 			training.id,
@@ -77,19 +87,16 @@ export function createTrainingTableItems(data: TrainingRawItem[]) {
 		])
 	);
 
-	const rows = data.map((training) => [
+	const rows: TableRow[] = data.map((training) => [
 		{ value: training.name, data: training.id },
-		{
-			component: StateBadge,
-			props: { badge: categoryBadge(training.category) }
-		},
+		{ value: categoryBadge(training.category), cell: badgeCell },
 		{ value: training.description ?? 'Aucune description' }
 	]);
 
 	return { index, rows };
 }
 
-export function createSlotTableItems(data: SlotRawItem[]) {
+export function createSlotTableItems(data: SlotRawItem[], badgeCell: BadgeCell) {
 	const index = new Map<number, TrainingSlotListItem>(
 		data.map((slot) => [
 			slot.id,
@@ -121,14 +128,11 @@ export function createSlotTableItems(data: SlotRawItem[]) {
 		])
 	);
 
-	const rows = data.map((slot) => [
+	const rows: TableRow[] = data.map((slot) => [
 		{ value: formatSlotDate(slot.start), data: slot.id },
 		{ value: slot.name ?? '' },
 		{ value: slot.trainer_username ?? 'À définir', avatar: slot.trainer_avatar_url },
-		{
-			component: StateBadge,
-			props: { badge: statusBadge(slot.status) }
-		}
+		{ value: statusBadge(slot.status), cell: badgeCell }
 	]);
 
 	return { index, rows };

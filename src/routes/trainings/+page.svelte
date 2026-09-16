@@ -1,5 +1,6 @@
 <script lang="ts">
 	import { resolve } from '$app/paths';
+	import StateBadge from '$lib/components/cash/StateBadge.svelte';
 	import CrudForm from '$lib/components/modals/CrudForm.svelte';
 	import AdminHeader from '$lib/components/training/admin/AdminHeader.svelte';
 	import AdminSlotSection from '$lib/components/training/admin/AdminSlotSection.svelte';
@@ -18,7 +19,8 @@
 		findTrainingName,
 		formatSlotDate
 	} from '$lib/helpers/trainingTables';
-	import type { CrudField } from '@davincibot/lib';
+	import type { TableCell, TableRow } from '@davincibot/components';
+	import type { CrudField, StateBadge as StateBadgeData } from '@davincibot/lib';
 	import {
 		createTraining,
 		createTrainingSlot,
@@ -427,7 +429,8 @@ DVBisous ! :robot:`;
 
 	function parseTrainingItems(data: unknown[]) {
 		const { index, rows } = createTrainingTableItems(
-			data as Parameters<typeof createTrainingTableItems>[0]
+			data as Parameters<typeof createTrainingTableItems>[0],
+			badgeCell
 		);
 		trainingIndex = index;
 		return rows;
@@ -435,7 +438,8 @@ DVBisous ! :robot:`;
 
 	function parseSlotItems(data: unknown[]) {
 		const { index, rows } = createSlotTableItems(
-			data as Parameters<typeof createSlotTableItems>[0]
+			data as Parameters<typeof createSlotTableItems>[0],
+			badgeCell
 		);
 		slotIndex = index;
 		return rows;
@@ -530,38 +534,22 @@ DVBisous ! :robot:`;
 		}
 	}
 
-	const trainingActions = [
-		{
-			title: 'Editer',
-			type: 'view',
-			handler: (event: Event) => {
-				const id = Number(
-					(event.target as HTMLElement | null)?.closest('tr')?.querySelector('th')?.dataset.utils
-				);
-				const training =
-					trainingIndex.get(id) ?? trainings.find((item) => item.training_id === id) ?? null;
-				if (training) {
-					openTrainingModal(training);
-				}
-			}
+	function onTrainingRowClick(row: TableRow) {
+		const id = Number(row[0]?.data);
+		const training =
+			trainingIndex.get(id) ?? trainings.find((item) => item.training_id === id) ?? null;
+		if (training) {
+			openTrainingModal(training);
 		}
-	];
+	}
 
-	const slotActions = [
-		{
-			title: 'Editer',
-			type: 'view',
-			handler: (event: Event) => {
-				const id = Number(
-					(event.target as HTMLElement | null)?.closest('tr')?.querySelector('th')?.dataset.utils
-				);
-				const slot = slotIndex.get(id) ?? slots.find((item) => item.slot_id === id) ?? null;
-				if (slot) {
-					openSlotModal(slot);
-				}
-			}
+	function onSlotRowClick(row: TableRow) {
+		const id = Number(row[0]?.data);
+		const slot = slotIndex.get(id) ?? slots.find((item) => item.slot_id === id) ?? null;
+		if (slot) {
+			openSlotModal(slot);
 		}
-	];
+	}
 
 	const trainingFilters = [
 		{
@@ -595,6 +583,10 @@ DVBisous ! :robot:`;
 		void loadData();
 	});
 </script>
+
+{#snippet badgeCell(cell: TableCell)}
+	<StateBadge badge={cell.value as StateBadgeData} />
+{/snippet}
 
 <svelte:head><title>Formations — DaVinciBot</title></svelte:head>
 
@@ -672,8 +664,8 @@ DVBisous ! :robot:`;
 			onEditSlot={(slot: TrainingSlotListItem) => {
 				openSlotModal(slot);
 			}}
+			{onSlotRowClick}
 			{parseSlotItems}
-			{slotActions}
 			{slotDbInfo}
 			{slotFilters}
 			{slotTableTopic}
@@ -687,8 +679,8 @@ DVBisous ! :robot:`;
 			onEditTraining={(training: TrainingListItem) => {
 				openTrainingModal(training);
 			}}
+			{onTrainingRowClick}
 			{parseTrainingItems}
-			{trainingActions}
 			{trainingDbInfo}
 			{trainingFilters}
 			{trainingTableTopic}

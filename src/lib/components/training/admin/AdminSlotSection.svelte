@@ -1,12 +1,13 @@
 <script lang="ts">
 	import StateBadge from '$lib/components/cash/StateBadge.svelte';
-	import { statusBadge } from '$lib/helpers/trainingTables';
+	import { statusBadge, stateBadgeLabel } from '$lib/helpers/trainingTables';
 	import {
 		Table,
-		type Action,
 		type DBInfo,
 		type Filter,
-		type ParseItems
+		type ParseItems,
+		type TableColumn,
+		type TableRow
 	} from '@davincibot/components';
 	import type { TrainingListItem, TrainingSlotListItem } from '@davincibot/lib';
 
@@ -16,7 +17,7 @@
 	interface Props {
 		slots?: TrainingSlotListItem[];
 		slotDbInfo: DBInfo;
-		slotActions?: Action[];
+		onSlotRowClick?: (row: TableRow) => void;
 		slotFilters?: Filter[];
 		slotTableTopic?: string;
 		parseSlotItems: ParseItems;
@@ -30,7 +31,7 @@
 	let {
 		slots = [],
 		slotDbInfo,
-		slotActions = [],
+		onSlotRowClick,
 		slotFilters = [],
 		slotTableTopic = '',
 		parseSlotItems,
@@ -40,6 +41,13 @@
 		findTrainingName,
 		trainings = []
 	}: Props = $props();
+
+	const columns: TableColumn[] = [
+		{ key: 'start', label: 'Début', sortable: true },
+		{ key: 'name', label: 'Formation', sortable: true },
+		{ key: 'trainer_username', label: 'Formateur·ice', sortable: true },
+		{ key: 'status', label: 'Statut', sortable: true, csv: (row) => stateBadgeLabel(row[3]) }
+	];
 </script>
 
 <div class="mb-8">
@@ -61,15 +69,14 @@
 	     déborderait, d'où la même liste rendue en cartes. -->
 	<div class="hidden rounded-lg border border-gray-700 bg-gray-800 md:block">
 		<Table
-			actions={slotActions}
+			{columns}
 			dbInfo={slotDbInfo}
-			emptyMessage="Aucune session"
 			filters={slotFilters}
-			headers={['Début', 'Formation', 'Formateur·ice', 'Statut', 'Actions']}
+			onRowClick={onSlotRowClick}
+			pageSize={10}
 			parseItems={parseSlotItems}
 			refreshTopic={slotTableTopic}
 			searchable="name"
-			size={10}
 		/>
 	</div>
 
