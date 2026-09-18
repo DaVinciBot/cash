@@ -12,7 +12,7 @@
 	import { hasAnyPermission, userdata } from '@davincibot/lib';
 	import { onDestroy, untrack, type Snippet } from 'svelte';
 	import type { PageData } from './$types';
-	import { Button, DevRbacPanel, SideBar } from '@davincibot/components';
+	import { DevRbacPanel, SideBar } from '@davincibot/components';
 	import { Menu, Plus } from '@lucide/svelte';
 	import SettingsModal from '$lib/components/settings/SettingsModal.svelte';
 	import UserBadge from '$lib/components/share/UserBadge.svelte';
@@ -80,7 +80,7 @@
 </svelte:head>
 
 <!-- Une seule coquille : le fond de marque était jusqu'ici intégralement masqué
-	 par un bg-dark-blue/60 posé sur le div enfant. -->
+	 par un gris Tailwind posé sur le div enfant. -->
 <div
 	class="bg-dark-blue text-light-blue min-h-screen min-w-screen overflow-hidden font-['Almarai'] antialiased"
 >
@@ -114,16 +114,18 @@
 
 			<div class="flex items-center lg:order-2">
 				{#if canRequestItems}
-					<!-- En étroit le libellé disparaît : l'aria-label garde un nom au bouton. -->
-					<Button
-						class="mr-2"
+					<!-- En étroit le libellé disparaît : l'aria-label garde un nom au bouton.
+						 Classes du bouton primaire écrites à la main : la primitive Button
+						 vit dans @davincibot/components mais n'est pas encore publiée. À la
+						 prochaine release de la lib, ce bloc redevient un <Button>. -->
+					<a
+						class="bg-light-blue text-dark-blue focus-visible:ring-light-blue/60 mr-2 inline-flex cursor-pointer items-center justify-center gap-2 rounded-xl px-4 py-2.5 text-sm font-semibold transition-colors hover:bg-white focus-visible:ring-2 focus-visible:outline-none"
 						aria-label="Faire une commande"
 						href={resolve('/items/new')}
-						variant="primary"
 					>
 						<Plus class="size-4 shrink-0" />
 						<span class="hidden sm:block">Faire une commande</span>
-					</Button>
+					</a>
 				{/if}
 				<UserBadge />
 			</div>

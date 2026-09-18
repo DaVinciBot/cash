@@ -4,6 +4,17 @@
    classes utilisées par les composants packagés sont purgées. */
 @source '../node_modules/@davincibot/components/dist';
 
+/* Surface des coquilles de modale et de la barre de navigation.
+   Ce jeton existe aussi dans le thème partagé, mais dans une version pas encore
+   publiée : sans cette déclaration locale, `bg-surface-modal` n'est pas générée
+   et les surfaces concernées deviennent transparentes — une panne muette, que
+   ni le typecheck ni les tests ne voient. Tailwind v4 fusionne les blocs
+   `@theme` : le jour où la lib est publiée, les deux valeurs coïncident et
+   cette déclaration peut disparaître. */
+@theme {
+	--color-surface-modal: #060a2c;
+}
+
 @layer base {
 	/* Un <select> non stylé garde le widget du système : flèche dessinée par
 	   macOS, Windows ou GTK, hauteur imposée par la plateforme, et largeur calée
