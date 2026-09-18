@@ -114,14 +114,14 @@
 									{#if q.count > 0}· {q.count} mouvement(s){/if}
 								</td>
 								<td class="px-4 py-2 text-right text-emerald-300">{euro.format(q.credit)}</td>
-								<td class="px-4 py-2 text-right text-rose-300">{euro.format(q.debit)}</td>
+								<td class="px-4 py-2 text-right text-red-400">{euro.format(q.debit)}</td>
 								<td
-									class="px-4 py-2 text-right {q.balance < 0 ? 'text-rose-300' : 'text-light-blue'}"
+									class="px-4 py-2 text-right {q.balance < 0 ? 'text-red-400' : 'text-light-blue'}"
 									>{euro.format(q.balance)}</td
 								>
 								<td
 									class="px-4 py-2 text-right font-medium {q.cumulative < 0
-										? 'text-rose-300'
+										? 'text-red-400'
 										: 'text-light-blue'}">{euro.format(q.cumulative)}</td
 								>
 							</tr>
@@ -131,7 +131,7 @@
 						<tr>
 							<td class="text-light-blue px-4 py-2 font-semibold" colspan="2">Exercice</td>
 							<td class="px-4 py-2 text-right text-emerald-300">{euro.format(yearTotal.credit)}</td>
-							<td class="px-4 py-2 text-right text-rose-300">{euro.format(yearTotal.debit)}</td>
+							<td class="px-4 py-2 text-right text-red-400">{euro.format(yearTotal.debit)}</td>
 							<td class="px-4 py-2 text-right font-semibold text-white" colspan="2"
 								>{euro.format(yearTotal.credit - yearTotal.debit)}</td
 							>

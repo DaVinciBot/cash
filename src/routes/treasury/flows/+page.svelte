@@ -89,7 +89,7 @@
 				></span
 			>
 			<span
-				>Dépenses <span class="font-semibold text-rose-300">{euro.format(totals.debit)}</span></span
+				>Dépenses <span class="font-semibold text-red-400">{euro.format(totals.debit)}</span></span
 			>
 		</p>
 	</form>
@@ -124,7 +124,7 @@
 					Montant TTC
 					<input
 						name="amount_ttc"
-						class="border-light-blue/30 bg-dark-blue/60 mt-1 block w-32 rounded-lg border p-2 text-sm text-white"
+						class="border-light-blue/30 bg-dark-blue/60 mt-1 block w-32 rounded-xl border p-2.5 text-sm"
 						inputmode="decimal"
 						required
 						value={flow ? flow.amountTtc.toFixed(2).replace('.', ',') : ''}
@@ -246,7 +246,7 @@
 						<span
 							class="ml-auto font-semibold {flow.direction === 'credit'
 								? 'text-emerald-300'
-								: 'text-rose-300'}">{euro.format(flow.amountTtc)}</span
+								: 'text-red-400'}">{euro.format(flow.amountTtc)}</span
 						>
 					</div>
 					<p class="text-dark-light-blue mt-1 text-sm">
@@ -272,7 +272,7 @@
 									{/if}
 									<form action="?/removeProof" method="POST" use:enhance>
 										<input name="proof" type="hidden" value={proof.id} />
-										<button class="text-rose-300 hover:underline" type="submit">retirer</button>
+										<button class="text-red-400 hover:underline" type="submit">retirer</button>
 									</form>
 								</li>
 							{/each}
@@ -333,7 +333,7 @@
 						<form action="?/delete" method="POST" use:enhance>
 							<input name="id" type="hidden" value={flow.id} />
 							<button
-								class="rounded-lg border border-rose-500/40 px-3 py-1 text-xs text-rose-300 hover:bg-rose-500/10"
+								class="border-light-blue/30 rounded-lg border px-3 py-1 text-xs text-red-400 hover:bg-red-500/10"
 								type="submit">Supprimer</button
 							>
 						</form>

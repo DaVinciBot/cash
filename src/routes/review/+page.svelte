@@ -1,4 +1,5 @@
 <script lang="ts">
+	import { Checkbox } from '@davincibot/components';
 	import { enhance } from '$app/forms';
 	import CampusBadge from '$lib/components/cash/CampusBadge.svelte';
 	import { REFUSAL_REASON_MIN_LENGTH, refusalReasonError } from '@davincibot/lib';
@@ -155,12 +156,7 @@
 				class="border-light-blue/20 bg-blue-gray/15 mb-3 flex flex-wrap items-center gap-3 rounded-lg border px-4 py-3"
 			>
 				<label class="text-dark-light-blue flex items-center gap-2 text-sm">
-					<input
-						class="border-light-blue/30 bg-dark-blue/60 size-4 rounded"
-						checked={allVisibleSelected}
-						onchange={toggleAll}
-						type="checkbox"
-					/>
+					<Checkbox checked={allVisibleSelected} className="size-4" onchange={toggleAll} />
 					Tout sélectionner
 				</label>
 				<span class="text-dark-light-blue text-sm">{selectedVisible.length} sélectionné(s)</span>
@@ -171,13 +167,13 @@
 							<input name="id" type="hidden" value={id} />
 						{/each}
 						<button
-							class="rounded-lg bg-emerald-600 px-3 py-1.5 text-sm font-medium text-white hover:bg-emerald-500 disabled:opacity-40"
+							class="bg-light-blue text-dark-blue rounded-xl px-3 py-1.5 text-sm font-semibold hover:bg-white disabled:opacity-40"
 							disabled={selectedVisible.length === 0}
 							type="submit">Valider la sélection</button
 						>
 					</form>
 					<button
-						class="rounded-lg border border-rose-500/40 px-3 py-1.5 text-sm text-rose-300 hover:bg-rose-500/10 disabled:opacity-40"
+						class="border-light-blue/30 rounded-xl border px-3 py-1.5 text-sm text-red-400 hover:bg-red-500/10 disabled:opacity-40"
 						disabled={selectedVisible.length === 0}
 						onclick={() => {
 							openRefusal(selectedVisible);
@@ -189,7 +185,7 @@
 
 			{#if refusing.length > 0}
 				<form
-					class="mb-4 rounded-lg border border-rose-500/40 bg-rose-500/5 p-4"
+					class="mb-4 rounded-xl border border-red-500/30 bg-red-500/10 p-4"
 					action="?/refuse"
 					method="POST"
 					use:enhance={() =>
@@ -202,7 +198,7 @@
 					{#each refusing as id (id)}
 						<input name="id" type="hidden" value={id} />
 					{/each}
-					<h2 class="text-sm font-semibold text-rose-200">
+					<h2 class="text-sm font-semibold text-red-300">
 						Refuser {refusing.length === 1 ? 'cet item' : `ces ${String(refusing.length)} items`}
 					</h2>
 					<p class="text-dark-light-blue mt-1 text-xs">
@@ -219,7 +215,7 @@
 						rows="3"
 						bind:value={reason}></textarea>
 					{#if reasonError}
-						<p class="mt-1 text-xs text-rose-300">{reasonError}</p>
+						<p class="mt-1 text-xs text-red-400">{reasonError}</p>
 					{:else}
 						<p class="text-dark-light-blue/70 mt-1 text-xs">
 							{REFUSAL_REASON_MIN_LENGTH} caractères minimum.
@@ -227,7 +223,7 @@
 					{/if}
 					<div class="mt-3 flex items-center gap-2">
 						<button
-							class="rounded-lg bg-rose-600 px-3 py-1.5 text-sm font-medium text-white hover:bg-rose-500 disabled:opacity-40"
+							class="rounded-xl border border-red-500/40 bg-red-500/15 px-3 py-1.5 text-sm font-semibold text-red-300 hover:bg-red-500/25 disabled:opacity-40"
 							disabled={reason.trim().length < REFUSAL_REASON_MIN_LENGTH}
 							type="submit">Confirmer le refus</button
 						>
@@ -244,13 +240,12 @@
 				{#each visible as item (item.id)}
 					<li class="border-light-blue/20 bg-blue-gray/15 rounded-2xl border p-4 sm:p-5">
 						<div class="flex flex-wrap items-start gap-3">
-							<input
-								class="border-light-blue/30 bg-dark-blue/60 mt-1 size-4 shrink-0 rounded"
+							<Checkbox
 								checked={selected.has(item.id)}
+								className="mt-1 size-4 shrink-0"
 								onchange={() => {
 									toggle(item.id);
 								}}
-								type="checkbox"
 							/>
 
 							<div class="min-w-0 flex-1">
@@ -295,12 +290,12 @@
 								<form action="?/approve" method="POST" use:enhance>
 									<input name="id" type="hidden" value={item.id} />
 									<button
-										class="rounded-lg bg-emerald-600 px-3 py-1.5 text-sm font-medium text-white hover:bg-emerald-500"
+										class="bg-light-blue text-dark-blue rounded-xl px-3 py-1.5 text-sm font-semibold hover:bg-white"
 										type="submit">Valider</button
 									>
 								</form>
 								<button
-									class="rounded-lg border border-rose-500/40 px-3 py-1.5 text-sm text-rose-300 hover:bg-rose-500/10"
+									class="border-light-blue/30 rounded-xl border px-3 py-1.5 text-sm text-red-400 hover:bg-red-500/10"
 									onclick={() => {
 										openRefusal([item.id]);
 									}}

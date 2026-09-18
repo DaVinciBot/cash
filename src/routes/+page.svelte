@@ -93,7 +93,7 @@
 			>
 		{/each}
 		<input
-			class="border-light-blue/30 bg-dark-blue/60 placeholder-dark-light-blue/50 ml-auto w-56 rounded-lg border p-2 text-sm text-white"
+			class="border-light-blue/30 bg-dark-blue/60 placeholder-dark-light-blue/50 ml-auto w-56 rounded-xl border p-2.5 text-sm"
 			placeholder="Rechercher…"
 			type="search"
 			bind:value={search}
@@ -144,7 +144,7 @@
 								</p>
 							{/if}
 							{#if item.refusedReason}
-								<p class="mt-2 rounded bg-rose-500/10 px-2 py-1 text-sm text-rose-200">
+								<p class="mt-2 rounded bg-red-500/10 px-2 py-1 text-sm text-red-300">
 									Motif du refus : {item.refusedReason}
 								</p>
 							{/if}
@@ -171,7 +171,7 @@
 								<form action="?/delete" method="POST" use:enhance>
 									<input name="id" type="hidden" value={item.id} />
 									<button
-										class="rounded-lg border border-rose-500/40 px-3 py-1.5 text-sm text-rose-300 hover:bg-rose-500/10"
+										class="border-light-blue/30 rounded-xl border px-3 py-1.5 text-sm text-red-400 hover:bg-red-500/10"
 										type="submit">Supprimer</button
 									>
 								</form>

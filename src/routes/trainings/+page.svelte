@@ -647,9 +647,9 @@ DVBisous ! :robot:`;
 		</p>
 	{:else if error}
 		<div class="rounded-xl bg-red-500/15 px-4 py-3 ring-1 ring-red-500/30">
-			<p class="text-sm text-rose-200">{error}</p>
+			<p class="text-sm text-red-300">{error}</p>
 			<button
-				class="mt-3 rounded-lg border border-rose-500/40 px-3 py-1.5 text-sm text-rose-200 hover:bg-rose-500/10"
+				class="border-light-blue/30 mt-3 rounded-lg border px-3 py-1.5 text-sm text-red-300 hover:bg-red-500/10"
 				onclick={loadData}
 				type="button">Réessayer</button
 			>

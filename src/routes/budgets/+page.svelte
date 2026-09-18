@@ -1,4 +1,5 @@
 <script lang="ts">
+	import { Checkbox } from '@davincibot/components';
 	import { enhance } from '$app/forms';
 	import type { ActionData, PageData } from './$types';
 
@@ -41,8 +42,8 @@
 
 	<!-- CMD-F-54 — le dépassement apparu après coup ne bloque rien mais reste visible -->
 	{#if data.overdrawn.length > 0}
-		<div class="mb-6 rounded-lg border border-rose-500/40 bg-rose-500/5 p-4">
-			<h2 class="text-sm font-semibold text-rose-200">
+		<div class="mb-6 rounded-xl border border-red-500/30 bg-red-500/10 p-4">
+			<h2 class="text-sm font-semibold text-red-300">
 				{data.overdrawn.length} budget(s) en dépassement
 			</h2>
 			<ul class="text-dark-light-blue mt-2 space-y-1 text-sm">
@@ -51,7 +52,7 @@
 						{budget.name} <span class="text-dark-light-blue/70 text-xs">({budget.year})</span> —
 						{euro.format(budget.consumedTtc)} consommés pour {euro.format(budget.allocatedTtc)}
 						alloués,
-						<span class="font-medium text-rose-200"
+						<span class="font-medium text-red-300"
 							>dépassé de {euro.format(budget.consumedTtc - budget.allocatedTtc)}</span
 						>
 					</li>
@@ -77,11 +78,7 @@
 			</label>
 		</form>
 		<label class="text-dark-light-blue mt-4 flex items-center gap-2 text-sm">
-			<input
-				class="border-light-blue/30 bg-dark-blue/60 size-4 rounded"
-				type="checkbox"
-				bind:checked={showArchived}
-			/>
+			<Checkbox className="size-4" bind:checked={showArchived} />
 			Afficher les archivés
 		</label>
 		<button
@@ -137,7 +134,7 @@
 				Montant TTC <span class="text-dark-light-blue/70">(feuille uniquement)</span>
 				<input
 					name="amount_ttc"
-					class="border-light-blue/30 bg-dark-blue/60 mt-1 block w-32 rounded-lg border p-2 text-sm text-white"
+					class="border-light-blue/30 bg-dark-blue/60 mt-1 block w-32 rounded-xl border p-2.5 text-sm"
 					inputmode="decimal"
 					placeholder="—"
 					value={node?.amountTtc === null || node === null
@@ -204,7 +201,7 @@
 							<span class="text-dark-light-blue">{euro.format(node.consumedTtc)}</span>
 							<span class="text-dark-light-blue/70"> consommés · </span>
 							<span
-								class={node.remainingTtc < 0 ? 'font-medium text-rose-300' : 'text-dark-light-blue'}
+								class={node.remainingTtc < 0 ? 'font-medium text-red-400' : 'text-dark-light-blue'}
 								>{euro.format(node.remainingTtc)}</span
 							>
 							<span class="text-dark-light-blue/70"> restants</span>
@@ -266,7 +263,7 @@
 						{/if}
 						<form action="?/remove" method="POST" use:enhance>
 							<input name="id" type="hidden" value={node.id} />
-							<button class="text-xs text-rose-400 underline hover:text-rose-200" type="submit"
+							<button class="text-xs text-red-400 underline hover:text-red-300" type="submit"
 								>supprimer</button
 							>
 						</form>

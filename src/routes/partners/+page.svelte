@@ -1,4 +1,5 @@
 <script lang="ts">
+	import { Checkbox } from '@davincibot/components';
 	import { enhance } from '$app/forms';
 	import type { ActionData, PageData } from './$types';
 
@@ -79,13 +80,7 @@
 					rows="2"></textarea>
 			</label>
 			<label class="text-dark-light-blue mt-3 flex items-center gap-2 text-sm">
-				<input
-					name="envelope"
-					class="border-light-blue/30 bg-dark-blue/60 size-4 rounded"
-					type="checkbox"
-					value="1"
-					bind:checked={withEnvelope}
-				/>
+				<Checkbox name="envelope" className="size-4" value="1" bind:checked={withEnvelope} />
 				Ce partenariat donne droit à une enveloppe à consommer chez lui
 			</label>
 			{#if withEnvelope}
@@ -93,7 +88,7 @@
 					Montant de l'enveloppe
 					<input
 						name="opening_balance"
-						class="border-light-blue/30 bg-dark-blue/60 mt-1 block w-32 rounded-lg border p-2 text-sm text-white"
+						class="border-light-blue/30 bg-dark-blue/60 mt-1 block w-32 rounded-xl border p-2.5 text-sm"
 						inputmode="decimal"
 						value="0,00"
 					/>

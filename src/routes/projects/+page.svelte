@@ -154,7 +154,7 @@
 					{#if project.itemCount === 0}
 						<form action="?/remove" method="POST" use:enhance>
 							<input name="id" type="hidden" value={project.id} />
-							<button class="text-xs text-rose-400 underline hover:text-rose-200" type="submit"
+							<button class="text-xs text-red-400 underline hover:text-red-300" type="submit"
 								>supprimer</button
 							>
 						</form>

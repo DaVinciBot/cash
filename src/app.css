@@ -3,3 +3,31 @@
 /* Obligatoire : Tailwind v4 ne scanne pas node_modules — sans cette ligne les
    classes utilisées par les composants packagés sont purgées. */
 @source '../node_modules/@davincibot/components/dist';
+
+@layer base {
+	/* Un <select> non stylé garde le widget du système : flèche dessinée par
+	   macOS, Windows ou GTK, hauteur imposée par la plateforme, et largeur calée
+	   sur l'option la plus longue — donc différente d'un écran à l'autre selon les
+	   données. On neutralise le rendu natif et on dessine la flèche nous-mêmes.
+
+	   La primitive FieldSelect du design system pose déjà son propre chevron : on
+	   l'exclut, sans quoi il y en aurait deux. */
+	select:not([data-slot='field-select']) {
+		appearance: none;
+		background-image: url("data:image/svg+xml;charset=utf-8,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16' viewBox='0 0 24 24' fill='none' stroke='%23b3c2ff' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='m6 9 6 6 6-6'/%3E%3C/svg%3E");
+		background-repeat: no-repeat;
+		background-position: right 0.75rem center;
+		background-size: 1rem;
+		padding-right: 2.25rem;
+		/* Un plancher de largeur, sans jamais déborder du parent : deux selects
+		   voisins cessent de se décaler parce que leurs options diffèrent. */
+		min-width: min(11rem, 100%);
+	}
+
+	/* Les options sont rendues par le système : sur les navigateurs qui les
+	   colorent, autant qu'elles ne virent pas au blanc sur blanc. */
+	select:not([data-slot='field-select']) option {
+		background-color: var(--color-surface-modal);
+		color: var(--color-light-blue);
+	}
+}

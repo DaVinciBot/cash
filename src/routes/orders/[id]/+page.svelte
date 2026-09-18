@@ -1,4 +1,5 @@
 <script lang="ts">
+	import { Checkbox } from '@davincibot/components';
 	import { enhance } from '$app/forms';
 	import { resolve } from '$app/paths';
 	import CampusBadge from '$lib/components/cash/CampusBadge.svelte';
@@ -129,7 +130,7 @@
 		{/if}
 		{#if isOrderCancelable(order.state)}
 			<button
-				class="rounded-lg border border-rose-500/40 px-4 py-2 text-sm text-rose-300 hover:bg-rose-500/10"
+				class="border-light-blue/30 rounded-lg border px-4 py-2 text-sm text-red-400 hover:bg-red-500/10"
 				onclick={() => (canceling = !canceling)}
 				type="button">Annuler la commande</button
 			>
@@ -164,7 +165,7 @@
 						>
 						<input
 							name="account_amount"
-							class="border-light-blue/30 bg-dark-blue/60 w-32 rounded-lg border p-2 text-sm text-white"
+							class="border-light-blue/30 bg-dark-blue/60 w-32 rounded-xl border p-2.5 text-sm"
 							inputmode="decimal"
 							placeholder="0,00"
 							bind:value={settlementRaw[index]}
@@ -172,7 +173,7 @@
 					</label>
 				{/each}
 			</div>
-			<p class="mt-2 text-xs {settlementError ? 'text-rose-300' : 'text-dark-light-blue/70'}">
+			<p class="mt-2 text-xs {settlementError ? 'text-red-400' : 'text-dark-light-blue/70'}">
 				Réparti : {euro.format(settlement)} sur {euro.format(total)}
 			</p>
 			<div class="mt-3 flex items-center gap-2">
@@ -193,7 +194,7 @@
 	<!-- TRESO-F-23 — la contrepassation est proposée, pas imposée -->
 	{#if canceling}
 		<form
-			class="mb-6 rounded-lg border border-rose-500/40 bg-rose-500/5 p-4"
+			class="mb-6 rounded-xl border border-red-500/30 bg-red-500/10 p-4"
 			action="?/cancel"
 			method="POST"
 			use:enhance={() =>
@@ -202,7 +203,7 @@
 					return update();
 				}}
 		>
-			<h2 class="text-sm font-semibold text-rose-200">Annuler la commande #{order.id}</h2>
+			<h2 class="text-sm font-semibold text-red-300">Annuler la commande #{order.id}</h2>
 			<p class="text-dark-light-blue mt-1 text-xs">
 				Les items non reçus repartent dans la file de regroupement.
 				{#if receivedCount > 0}
@@ -213,13 +214,7 @@
 				{/if}
 			</p>
 			<label class="text-dark-light-blue mt-3 flex items-center gap-2 text-sm">
-				<input
-					name="reverse"
-					class="border-light-blue/30 bg-dark-blue/60 size-4 rounded"
-					checked
-					type="checkbox"
-					value="1"
-				/>
+				<Checkbox name="reverse" checked className="size-4" value="1" />
 				Contrepasser le mouvement de trésorerie
 			</label>
 			<p class="text-dark-light-blue/70 mt-1 text-xs">
@@ -228,7 +223,7 @@
 			</p>
 			<div class="mt-3 flex items-center gap-2">
 				<button
-					class="rounded-lg bg-rose-600 px-4 py-2 text-sm font-medium text-white hover:bg-rose-500"
+					class="rounded-lg rounded-xl border border-red-500/40 bg-red-500/15 px-4 py-2 text-sm font-semibold text-red-300 hover:bg-red-500/25"
 					type="submit">Confirmer l'annulation</button
 				>
 				<button
@@ -251,13 +246,13 @@
 
 	<!-- CMD-F-53 — dépassement signalé avant le clic, avec les trois issues. -->
 	{#if overdrawn.length > 0}
-		<div class="mb-6 rounded-lg border border-rose-500/40 bg-rose-500/5 p-4">
-			<h2 class="text-sm font-semibold text-rose-200">Budget insuffisant</h2>
+		<div class="mb-6 rounded-xl border border-red-500/30 bg-red-500/10 p-4">
+			<h2 class="text-sm font-semibold text-red-300">Budget insuffisant</h2>
 			<ul class="text-dark-light-blue mt-2 space-y-1 text-sm">
 				{#each overdrawn as share (share.budgetId)}
 					<li>
 						{share.budgetPath} — dépassé de
-						<span class="font-medium text-rose-200">{euro.format(-share.remainingTtc)}</span>
+						<span class="font-medium text-red-300">{euro.format(-share.remainingTtc)}</span>
 					</li>
 				{/each}
 			</ul>
@@ -290,7 +285,7 @@
 						Nouveau montant de l'enveloppe
 						<input
 							name="amount_ttc"
-							class="border-light-blue/30 bg-dark-blue/60 mt-1 block w-40 rounded-lg border p-2 text-sm text-white"
+							class="border-light-blue/30 bg-dark-blue/60 mt-1 block w-40 rounded-xl border p-2.5 text-sm"
 							inputmode="decimal"
 							placeholder="0,00"
 							bind:value={raiseAmount}
@@ -326,7 +321,7 @@
 					Montant TTC
 					<input
 						name="shipping_cost_ttc"
-						class="border-light-blue/30 bg-dark-blue/60 mt-1 block w-32 rounded-lg border p-2 text-sm text-white"
+						class="border-light-blue/30 bg-dark-blue/60 mt-1 block w-32 rounded-xl border p-2.5 text-sm"
 						inputmode="decimal"
 						bind:value={shippingCost}
 					/>
@@ -418,7 +413,7 @@
 							<form action="?/receive" method="POST" use:enhance>
 								<input name="item" type="hidden" value={item.id} />
 								<button
-									class="rounded-lg bg-emerald-600 px-3 py-1.5 text-sm font-medium text-white hover:bg-emerald-500"
+									class="bg-light-blue text-dark-blue rounded-xl px-3 py-1.5 text-sm font-semibold hover:bg-white"
 									type="submit">Marquer reçu</button
 								>
 							</form>
@@ -469,7 +464,7 @@
 							>
 							<td
 								class="px-4 py-2 text-right {share.remainingTtc < 0
-									? 'text-rose-300'
+									? 'text-red-400'
 									: 'text-dark-light-blue'}">{euro.format(share.remainingTtc)}</td
 							>
 						</tr>

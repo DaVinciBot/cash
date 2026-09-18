@@ -86,7 +86,7 @@
 				<li class="flex items-center justify-between py-2 text-sm">
 					<span class="text-light-blue">{snapshot.name}</span>
 					<span class="text-dark-light-blue">{ACCOUNT_KIND_LABELS[snapshot.kind]}</span>
-					<span class="font-medium {snapshot.balance < 0 ? 'text-rose-300' : 'text-light-blue'}"
+					<span class="font-medium {snapshot.balance < 0 ? 'text-red-400' : 'text-light-blue'}"
 						>{euro.format(snapshot.balance)}</span
 					>
 				</li>
@@ -146,8 +146,7 @@
 				</p>
 				<p>
 					<span class="text-dark-light-blue block text-xs">Dépenses</span>
-					<span class="text-lg font-semibold text-rose-300"
-						>{euro.format(data.movements.debit)}</span
+					<span class="text-lg font-semibold text-red-400">{euro.format(data.movements.debit)}</span
 					>
 				</p>
 				<p>
@@ -208,7 +207,7 @@
 					Solde d'ouverture
 					<input
 						name="opening_balance"
-						class="border-light-blue/30 bg-dark-blue/60 mt-1 block w-32 rounded-lg border p-2 text-sm text-white"
+						class="border-light-blue/30 bg-dark-blue/60 mt-1 block w-32 rounded-xl border p-2.5 text-sm"
 						inputmode="decimal"
 						value="0,00"
 					/>

@@ -133,7 +133,7 @@
 				<input
 					id="unit_price_ttc"
 					name="unit_price_ttc"
-					class="border-light-blue/30 bg-dark-blue/60 mt-1 w-32 rounded-lg border p-2 text-sm text-white"
+					class="border-light-blue/30 bg-dark-blue/60 mt-1 w-32 rounded-xl border p-2.5 text-sm"
 					inputmode="decimal"
 					required
 					bind:value={unitPrice}
@@ -185,7 +185,7 @@
 						Part TTC
 						<input
 							name="amount"
-							class="border-light-blue/30 bg-dark-blue/60 mt-1 block w-28 rounded-lg border p-2 text-sm text-white"
+							class="border-light-blue/30 bg-dark-blue/60 mt-1 block w-28 rounded-xl border p-2.5 text-sm"
 							inputmode="decimal"
 							placeholder="0,00"
 							bind:value={line.amount}
@@ -212,7 +212,7 @@
 					onclick={fillFirst}
 					type="button">Tout sur le premier</button
 				>
-				<span class="text-xs {allocationMismatch ? 'text-rose-300' : 'text-dark-light-blue'}">
+				<span class="text-xs {allocationMismatch ? 'text-red-400' : 'text-dark-light-blue'}">
 					Imputé : {euro.format(allocated)} sur {euro.format(totalTtc)}
 				</span>
 			</div>

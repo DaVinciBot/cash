@@ -100,7 +100,7 @@
 									>{moment.format(new Date(row.occurredAt))}</td
 								>
 								<td class="px-4 py-2">
-									<span class="rounded bg-rose-500/15 px-1.5 py-0.5 font-mono text-xs text-rose-300"
+									<span class="rounded bg-red-500/15 px-1.5 py-0.5 font-mono text-xs text-red-400"
 										>{row.sqlstate}</span
 									>
 								</td>

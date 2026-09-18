@@ -40,8 +40,8 @@
 	{#if isItemRefused(item.state) && item.refusedReason}
 		<!-- CMD-F-29 — le motif est la seule chose que le membre lit pour
 		     comprendre la décision : il passe avant le reste. -->
-		<div class="mb-6 rounded-lg bg-rose-500/10 p-4 ring-1 ring-rose-500/30">
-			<p class="text-xs font-semibold tracking-wide text-rose-300 uppercase">Motif du refus</p>
+		<div class="mb-6 rounded-lg bg-red-500/10 p-4 ring-1 ring-red-500/30">
+			<p class="text-xs font-semibold tracking-wide text-red-400 uppercase">Motif du refus</p>
 			<p class="text-light-blue mt-1 text-sm">{item.refusedReason}</p>
 		</div>
 	{/if}

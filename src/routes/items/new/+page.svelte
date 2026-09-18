@@ -317,7 +317,7 @@
 								)}
 							</span>
 							<button
-								class="text-sm text-rose-300 hover:underline"
+								class="text-sm text-red-400 hover:underline"
 								onclick={() => {
 									removeLine(line.id);
 								}}

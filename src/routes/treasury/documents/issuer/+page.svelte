@@ -1,4 +1,5 @@
 <script lang="ts">
+	import { Checkbox } from '@davincibot/components';
 	// Identité de l'émetteur — un écran, un seul objet.
 	//
 	// Elle était auparavant un panneau dépliant sur l'écran des documents, à côté
@@ -204,11 +205,10 @@
 
 		<div class="mt-4 rounded-lg border border-amber-500/40 bg-amber-500/5 p-3">
 			<label class="flex items-center gap-2 text-sm text-amber-200">
-				<input
+				<Checkbox
 					name="tax_receipts_allowed"
-					class="border-light-blue/30 bg-dark-blue/60 size-4 rounded"
 					checked={data.organization.taxReceiptsAllowed}
-					type="checkbox"
+					className="size-4"
 					value="1"
 				/>
 				L'association relève du mécénat et peut émettre des reçus fiscaux

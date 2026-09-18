@@ -554,7 +554,7 @@
 									</div>
 								{:else if field.type === 'checkbox'}
 									<label
-										class="border-light-blue/30 bg-dark-blue/60 flex cursor-pointer items-center gap-2.5 rounded-lg border p-2 text-sm text-white"
+										class="border-light-blue/30 bg-dark-blue/60 text-light-blue flex cursor-pointer items-center gap-2.5 rounded-xl border p-2.5 text-sm"
 										for={fieldId(field)}
 									>
 										<Checkbox
