@@ -143,7 +143,7 @@
 					href={resolve('/')}>Annuler</a
 				>
 				<button
-					class="bg-primary-600 hover:bg-primary-800 rounded-lg px-4 py-2 text-sm font-medium text-white disabled:opacity-50"
+					class="bg-light-blue text-dark-blue rounded-xl px-4 py-2.5 text-sm font-semibold hover:bg-white disabled:opacity-50"
 					disabled={submitting}
 					type="submit">{submitting ? 'Enregistrement…' : 'Enregistrer'}</button
 				>

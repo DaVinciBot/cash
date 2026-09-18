@@ -708,7 +708,7 @@
 			</div>
 
 			<button
-				class="bg-light-blue text-dark-blue rounded-xl px-4 py-2 font-semibold hover:bg-white disabled:opacity-50"
+				class="bg-light-blue text-dark-blue rounded-xl px-4 py-2.5 text-sm font-semibold hover:bg-white disabled:opacity-50"
 				disabled={saving}
 				onclick={handleSave}
 			>
@@ -735,7 +735,7 @@
 			{#if !saving}
 				<div class="flex justify-end">
 					<button
-						class="bg-light-blue text-dark-blue rounded-xl px-4 py-2 font-semibold hover:bg-white"
+						class="bg-light-blue text-dark-blue rounded-xl px-4 py-2.5 text-sm font-semibold hover:bg-white"
 						onclick={() => (message = '')}>Fermer</button
 					>
 				</div>

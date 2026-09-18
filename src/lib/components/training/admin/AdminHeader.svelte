@@ -47,7 +47,7 @@
 	</div>
 	<div class="flex flex-wrap gap-2">
 		<button
-			class="bg-primary-600 hover:bg-primary-800 rounded-lg px-4 py-2 text-sm font-medium text-white"
+			class="bg-light-blue text-dark-blue rounded-xl px-4 py-2.5 text-sm font-semibold hover:bg-white"
 			onclick={onAddSlot}
 			type="button">Nouvelle session</button
 		>

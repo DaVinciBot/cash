@@ -385,7 +385,7 @@
 
 		<div class="flex items-center gap-3">
 			<button
-				class="bg-primary-600 hover:bg-primary-800 rounded-lg px-4 py-2 text-sm font-medium text-white disabled:opacity-40"
+				class="bg-light-blue text-dark-blue rounded-xl px-4 py-2.5 text-sm font-semibold hover:bg-white disabled:opacity-40"
 				disabled={data.missing.length > 0}
 				type="submit">Émettre</button
 			>

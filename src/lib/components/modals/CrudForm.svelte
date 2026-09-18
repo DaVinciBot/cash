@@ -148,7 +148,7 @@
 									<select
 										id={fieldId(field)}
 										name={fieldId(field)}
-										class="almarai-regular focus:border-primary-500 focus:ring-primary-500 border-light-blue/30 bg-dark-blue/60 placeholder-dark-light-blue/50 block w-full cursor-pointer rounded-lg border p-2.5 text-sm text-white"
+										class="almarai-regular focus:border-light-blue/70 border-light-blue/30 bg-dark-blue/60 placeholder-dark-light-blue/50 block w-full cursor-pointer rounded-lg border p-2.5 text-sm text-white"
 										disabled={field.readonly ?? false}
 										onchange={field.onChange ?? null}
 									>
@@ -175,7 +175,7 @@
 									<input
 										id={fieldId(field)}
 										name={fieldId(field)}
-										class=" focus:border-primary-500 focus:ring-primary-500 border-light-blue/30 bg-dark-blue/60 placeholder-dark-light-blue/50 block w-full rounded-lg border p-2.5 text-sm text-white"
+										class=" focus:border-light-blue/70 border-light-blue/30 bg-dark-blue/60 placeholder-dark-light-blue/50 block w-full rounded-lg border p-2.5 text-sm text-white"
 										max={field.max ?? 2000}
 										min={field.min ?? 0}
 										placeholder={field.placeholder ?? field.name.toLowerCase()}
@@ -189,7 +189,7 @@
 									<textarea
 										id={fieldId(field)}
 										name={fieldId(field)}
-										class=" focus:border-primary-500 focus:ring-primary-500 border-light-blue/30 bg-dark-blue/60 placeholder-dark-light-blue/50 block w-full rounded-lg border p-2.5 text-sm text-white"
+										class=" focus:border-light-blue/70 border-light-blue/30 bg-dark-blue/60 placeholder-dark-light-blue/50 block w-full rounded-lg border p-2.5 text-sm text-white"
 										placeholder={field.placeholder ?? field.name.toLowerCase()}
 										readonly={field.readonly ?? false}
 										required={field.required}
@@ -217,7 +217,7 @@
 										type="file"
 									/>
 									<label
-										class="focus:border-primary-500 focus:ring-primary-500 border-light-blue/30 bg-dark-blue/60 placeholder-dark-light-blue/50 flex h-12 w-full items-center justify-center rounded-lg border p-2.5 text-sm text-white"
+										class="focus:border-light-blue/70 border-light-blue/30 bg-dark-blue/60 placeholder-dark-light-blue/50 flex h-12 w-full items-center justify-center rounded-lg border p-2.5 text-sm text-white"
 										for={fieldId(field)}
 									>
 										{#if field.value}
@@ -349,7 +349,7 @@
 										type="file"
 									/>
 									<label
-										class="focus:border-primary-500 focus:ring-primary-500 border-light-blue/30 bg-dark-blue/60 placeholder-dark-light-blue/50 flex h-12 w-full items-center justify-center rounded-lg border p-2.5 text-sm text-white"
+										class="focus:border-light-blue/70 border-light-blue/30 bg-dark-blue/60 placeholder-dark-light-blue/50 flex h-12 w-full items-center justify-center rounded-lg border p-2.5 text-sm text-white"
 										for={fieldId(field)}
 									>
 										{#if field.value && field.data === 'image' && !field.multiple}
@@ -379,7 +379,7 @@
 								{:else if field.type === 'duplicate'}
 									<!--Duplicate is a + btn to replicate the last collumn -->
 									<button
-										class="focus:border-primary-500 focus:ring-primary-500 border-light-blue/30 bg-dark-blue/60 placeholder-dark-light-blue/50 flex h-8 w-full items-center justify-center rounded-lg border p-2.5 text-sm text-white"
+										class="focus:border-light-blue/70 border-light-blue/30 bg-dark-blue/60 placeholder-dark-light-blue/50 flex h-8 w-full items-center justify-center rounded-lg border p-2.5 text-sm text-white"
 										onclick={() => {
 											const clean_filter = fields.filter((el) => el.type !== 'duplicate');
 											let lasts: CrudField[] = []; // get the last full row, 1 if wide, 2 if not
@@ -430,7 +430,7 @@
 									{@const displayImage = autocompleteImages[fieldKey] ?? field.image}
 									<div class="relative w-full">
 										<div
-											class="focus:border-primary-500 focus:ring-primary-500 border-light-blue/30 bg-dark-blue/60 placeholder-dark-light-blue/50 flex w-full items-center justify-center rounded-lg border text-sm text-white"
+											class="focus:border-light-blue/70 border-light-blue/30 bg-dark-blue/60 placeholder-dark-light-blue/50 flex w-full items-center justify-center rounded-lg border text-sm text-white"
 										>
 											{#if displayImage}
 												<img
@@ -442,7 +442,7 @@
 											<input
 												id={fieldId(field)}
 												name={fieldId(field)}
-												class=" bordertext-sm focus:border-primary-500 focus:ring-primary-500 border-light-blue/30 bg-dark-blue/60 placeholder-dark-light-blue/50 block w-full rounded-lg p-2.5 text-white"
+												class=" bordertext-sm focus:border-light-blue/70 border-light-blue/30 bg-dark-blue/60 placeholder-dark-light-blue/50 block w-full rounded-lg p-2.5 text-white"
 												oninput={(
 													e: Event & {
 														currentTarget: EventTarget & HTMLInputElement;
@@ -500,7 +500,7 @@
 										</div>
 										{#if completion.length > 0}
 											<div
-												class="almarai-regular focus:border-primary-500 focus:ring-primary-500 border-light-blue/30 bg-dark-blue/60 absolute top-full left-0 z-50 mt-2 max-h-56 w-full overflow-y-auto rounded-lg border p-2 pl-4 text-sm text-white"
+												class="almarai-regular focus:border-light-blue/70 border-light-blue/30 bg-dark-blue/60 absolute top-full left-0 z-50 mt-2 max-h-56 w-full overflow-y-auto rounded-lg border p-2 pl-4 text-sm text-white"
 											>
 												{#each completion as c (completionKey(c))}
 													<button
@@ -582,7 +582,7 @@
 									<input
 										id={fieldId(field)}
 										name={fieldId(field)}
-										class="focus:border-primary-500 focus:ring-primary-500 border-light-blue/30 bg-dark-blue/60 placeholder-dark-light-blue/50 block w-full cursor-text rounded-lg border p-2.5 text-sm text-white"
+										class="focus:border-light-blue/70 border-light-blue/30 bg-dark-blue/60 placeholder-dark-light-blue/50 block w-full cursor-text rounded-lg border p-2.5 text-sm text-white"
 										placeholder={field.placeholder ?? field.name.toLowerCase()}
 										readonly={field.readonly ?? false}
 										required={field.required}
@@ -594,8 +594,8 @@
 						{/each}
 					</div>
 					<button
-						class={`bg-primary-600 focus:ring-primary-800 inline-flex items-center rounded-lg px-5 py-2.5 text-center text-sm font-medium text-white focus:ring-4 focus:outline-none ${
-							submitting ? 'cursor-not-allowed opacity-60' : 'hover:bg-primary-700'
+						class={`bg-light-blue text-dark-blue focus:ring-light-blue/60 inline-flex items-center rounded-lg px-5 py-2.5 text-center text-sm font-medium text-white focus:ring-4 focus:outline-none ${
+							submitting ? 'cursor-not-allowed opacity-60' : 'hover:bg-white'
 						}`}
 						disabled={submitting}
 						onclick={(e: MouseEvent) => {

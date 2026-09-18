@@ -814,7 +814,7 @@
 
 		const roleBadges = activeGlobalRoles.map((role) => ({
 			text: GLOBAL_ROLE_LABELS[role],
-			color: 'bg-primary-900 border border-primary-500 text-primary-100'
+			color: 'bg-dark-blue border border-light-blue/70 text-light-blue'
 		}));
 
 		const flatOverride = Object.values(OVERRIDE_PERMISSION_CATEGORIES).flat();

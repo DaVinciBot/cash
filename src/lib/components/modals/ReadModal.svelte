@@ -437,7 +437,7 @@
 				{#each actions as action, index (actionKey(action, index))}
 					{#if action.type === 'selector'}
 						<select
-							class="focus:border-primary-500 focus:ring-primary-500 border-light-blue/30 bg-dark-blue/60 placeholder-dark-light-blue/50 block w-full rounded-lg border p-2.5 text-sm text-white"
+							class="focus:border-light-blue/70 border-light-blue/30 bg-dark-blue/60 placeholder-dark-light-blue/50 block w-full rounded-lg border p-2.5 text-sm text-white"
 							onchange={action.handler}
 						>
 							<option disabled selected value="">Choisir une option</option>
@@ -448,7 +448,7 @@
 					{/if}
 					{#if action.type === 'edit'}
 						<button
-							class="bg-primary-600 hover:bg-primary-700 focus:ring-primary-800 inline-flex items-center rounded-lg px-5 py-2.5 text-center text-sm font-medium text-white focus:ring-4 focus:outline-none"
+							class="bg-light-blue text-dark-blue focus-visible:ring-light-blue/60 inline-flex items-center rounded-xl px-4 py-2.5 text-sm font-semibold hover:bg-white focus-visible:ring-2 focus-visible:outline-none"
 							onclick={action.handler}
 							type="button"
 						>
@@ -471,7 +471,7 @@
 					{/if}
 					{#if action.type === 'validate'}
 						<button
-							class="bg-primary-600 hover:bg-primary-700 focus:ring-primary-800 inline-flex items-center rounded-lg px-5 py-2.5 text-center text-sm font-medium text-white focus:ring-4 focus:outline-none"
+							class="bg-light-blue text-dark-blue focus-visible:ring-light-blue/60 inline-flex items-center rounded-xl px-4 py-2.5 text-sm font-semibold hover:bg-white focus-visible:ring-2 focus-visible:outline-none"
 							onclick={action.handler}
 							type="button"
 						>

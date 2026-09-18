@@ -700,7 +700,7 @@
 								<select
 									id={getFieldKey(field)}
 									name={getFieldKey(field)}
-									class=" focus:border-primary-500 focus:ring-primary-500 border-light-blue/30 bg-dark-blue/60 placeholder-dark-light-blue/50 block w-full rounded-lg border p-2.5 text-sm text-white"
+									class=" focus:border-light-blue/70 border-light-blue/30 bg-dark-blue/60 placeholder-dark-light-blue/50 block w-full rounded-lg border p-2.5 text-sm text-white"
 									disabled={field.readonly ?? false}
 									onchange={field.onChange ?? null}
 								>
@@ -726,7 +726,7 @@
 								<input
 									id={getFieldKey(field)}
 									name={getFieldKey(field)}
-									class=" focus:border-primary-500 focus:ring-primary-500 border-light-blue/30 bg-dark-blue/60 placeholder-dark-light-blue/50 block w-full rounded-lg border p-2.5 text-sm text-white"
+									class=" focus:border-light-blue/70 border-light-blue/30 bg-dark-blue/60 placeholder-dark-light-blue/50 block w-full rounded-lg border p-2.5 text-sm text-white"
 									max={field.max ?? 2000}
 									min={field.min ?? 0}
 									placeholder={field.placeholder ?? field.name.toLowerCase()}
@@ -740,7 +740,7 @@
 								<textarea
 									id={getFieldKey(field)}
 									name={getFieldKey(field)}
-									class=" focus:border-primary-500 focus:ring-primary-500 border-light-blue/30 bg-dark-blue/60 placeholder-dark-light-blue/50 block w-full rounded-lg border p-2.5 text-sm text-white"
+									class=" focus:border-light-blue/70 border-light-blue/30 bg-dark-blue/60 placeholder-dark-light-blue/50 block w-full rounded-lg border p-2.5 text-sm text-white"
 									placeholder={field.placeholder ?? field.name.toLowerCase()}
 									readonly={field.readonly ?? false}
 									required={field.required}
@@ -772,7 +772,7 @@
 									type="file"
 								/>
 								<label
-									class="focus:border-primary-500 focus:ring-primary-500 border-light-blue/30 bg-dark-blue/60 placeholder-dark-light-blue/50 flex h-12 w-full items-center justify-center rounded-lg border p-2.5 text-sm text-white"
+									class="focus:border-light-blue/70 border-light-blue/30 bg-dark-blue/60 placeholder-dark-light-blue/50 flex h-12 w-full items-center justify-center rounded-lg border p-2.5 text-sm text-white"
 									for={getFieldKey(field)}
 								>
 									{#if field.value}
@@ -904,7 +904,7 @@
 									type="file"
 								/>
 								<label
-									class="focus:border-primary-500 focus:ring-primary-500 border-light-blue/30 bg-dark-blue/60 placeholder-dark-light-blue/50 flex h-12 w-full items-center justify-center rounded-lg border p-2.5 text-sm text-white"
+									class="focus:border-light-blue/70 border-light-blue/30 bg-dark-blue/60 placeholder-dark-light-blue/50 flex h-12 w-full items-center justify-center rounded-lg border p-2.5 text-sm text-white"
 									for={getFieldKey(field)}
 								>
 									{#if field.value && field.data === 'image' && !field.multiple}
@@ -934,7 +934,7 @@
 							{:else if field.type === 'duplicate'}
 								<!--Duplicate is a + btn to replicate the last collumn -->
 								<button
-									class="focus:border-primary-500 focus:ring-primary-500 border-light-blue/30 bg-dark-blue/60 placeholder-dark-light-blue/50 flex h-8 w-full items-center justify-center rounded-lg border p-2.5 text-sm text-white"
+									class="focus:border-light-blue/70 border-light-blue/30 bg-dark-blue/60 placeholder-dark-light-blue/50 flex h-8 w-full items-center justify-center rounded-lg border p-2.5 text-sm text-white"
 									onclick={() => {
 										const clean_filter = fields.filter((el) => el.type !== 'duplicate');
 										let lasts: EditableField[] = []; // get the last full row, 1 if wide, 2 if not
@@ -982,7 +982,7 @@
 							{:else if field.type === 'autocomplete'}
 								{@const autocompleteCompletion = field.completion ?? []}
 								<div
-									class="focus:border-primary-500 focus:ring-primary-500 border-light-blue/30 bg-dark-blue/60 placeholder-dark-light-blue/50 relative flex w-full flex-row items-center justify-center rounded-lg border p-2.5 text-sm text-white"
+									class="focus:border-light-blue/70 border-light-blue/30 bg-dark-blue/60 placeholder-dark-light-blue/50 relative flex w-full flex-row items-center justify-center rounded-lg border p-2.5 text-sm text-white"
 								>
 									{#if field.image}
 										<img
@@ -994,7 +994,7 @@
 									<input
 										id={getFieldKey(field)}
 										name={getFieldKey(field)}
-										class=" bordertext-sm focus:border-primary-500 focus:ring-primary-500 border-light-blue/30 bg-dark-blue/60 placeholder-dark-light-blue/50 block w-full rounded-lg p-2.5 text-white"
+										class=" bordertext-sm focus:border-light-blue/70 border-light-blue/30 bg-dark-blue/60 placeholder-dark-light-blue/50 block w-full rounded-lg p-2.5 text-white"
 										oninput={async (
 											e: Event & {
 												currentTarget: EventTarget & HTMLInputElement;
@@ -1016,7 +1016,7 @@
 								</div>
 								{#if autocompleteCompletion.length > 0}
 									<div
-										class="focus:border-primary-500 focus:ring-primary-500 border-light-blue/30 bg-dark-blue/60 absolute z-10 mt-1 block w-full rounded-lg border p-2 pl-4 text-sm text-white"
+										class="focus:border-light-blue/70 border-light-blue/30 bg-dark-blue/60 absolute z-10 mt-1 block w-full rounded-lg border p-2 pl-4 text-sm text-white"
 									>
 										{#each autocompleteCompletion as c (completionKey(c))}
 											<button
@@ -1088,7 +1088,7 @@
 									<input
 										id={getFieldKey(field)}
 										name={getFieldKey(field)}
-										class="focus:border-primary-500 focus:ring-primary-500 border-light-blue/30 bg-dark-blue/60 placeholder-dark-light-blue/50 block w-full rounded-lg border p-2.5 text-sm text-white"
+										class="focus:border-light-blue/70 border-light-blue/30 bg-dark-blue/60 placeholder-dark-light-blue/50 block w-full rounded-lg border p-2.5 text-sm text-white"
 										oninput={async (
 											e: Event & {
 												currentTarget: EventTarget & HTMLInputElement;
@@ -1117,7 +1117,7 @@
 									/>
 									{#if autocompleteCompletion.length > 0}
 										<div
-											class="focus:border-primary-500 focus:ring-primary-500 border-light-blue/30 bg-dark-blue/60 absolute z-10 mt-1 block w-full rounded-lg border p-2 text-sm text-white"
+											class="focus:border-light-blue/70 border-light-blue/30 bg-dark-blue/60 absolute z-10 mt-1 block w-full rounded-lg border p-2 text-sm text-white"
 										>
 											{#each autocompleteCompletion as c (completionKey(c))}
 												{@const isSelected = selectedItems.some((v) => v.value === c.value)}
@@ -1188,7 +1188,7 @@
 											</p>
 											{#each packages as pack (pack.label)}
 												<button
-													class="hover:bg-primary-600 bg-dark-blue/60 rounded-md border border-gray-500 px-2 py-1 text-xs text-white transition-colors"
+													class="hover:bg-light-blue text-dark-blue bg-dark-blue/60 rounded-md border border-gray-500 px-2 py-1 text-xs text-white transition-colors"
 													onclick={() => {
 														setFieldValue(field, [...pack.perms]);
 													}}
@@ -1204,7 +1204,7 @@
 									<div class="flex flex-wrap items-center gap-2">
 										<input
 											id={`${groupKey}-search`}
-											class="focus:border-primary-500 focus:ring-primary-500 border-light-blue/30 bg-dark-blue/60 placeholder-dark-light-blue/50 min-w-0 flex-1 basis-48 rounded-lg border p-2 text-sm text-white"
+											class="focus:border-light-blue/70 border-light-blue/30 bg-dark-blue/60 placeholder-dark-light-blue/50 min-w-0 flex-1 basis-48 rounded-lg border p-2 text-sm text-white"
 											aria-label={`Rechercher dans ${field.name}`}
 											oninput={(e: Event) => {
 												const input = e.currentTarget;
@@ -1278,7 +1278,7 @@
 														<span
 															class={'shrink-0 rounded-full px-2 py-0.5 text-xs font-medium ' +
 																(selectedCount > 0
-																	? 'bg-primary-900 text-primary-100 border-primary-500 border'
+																	? 'bg-dark-blue text-light-blue border-light-blue/70 border'
 																	: 'border-light-blue/30 bg-dark-blue/60 text-dark-light-blue border')}
 														>
 															{selectedCount}/{perms.length}
@@ -1313,7 +1313,7 @@
 																>
 																	<input
 																		name={field.id ?? 'permissions'}
-																		class="text-primary-600 focus:ring-primary-600 bg-dark-blue/60 mt-0.5 h-4 w-4 shrink-0 cursor-pointer rounded border-gray-500 transition duration-200 focus:ring-2"
+																		class="text-light-blue focus:ring-primary-600 bg-dark-blue/60 mt-0.5 h-4 w-4 shrink-0 cursor-pointer rounded border-gray-500 transition duration-200 focus:ring-2"
 																		checked={permissionValues.includes(perm.value)}
 																		onchange={(e: Event) => {
 																			const input = e.currentTarget;
@@ -1344,7 +1344,7 @@
 									{#each rolesValue as item, idx (idx)}
 										<div class="flex flex-wrap items-center gap-2">
 											<select
-												class="focus:border-primary-500 focus:ring-primary-500 border-light-blue/30 bg-dark-blue/60 placeholder-dark-light-blue/50 block min-w-0 flex-1 basis-44 rounded-lg border p-2.5 text-sm text-white"
+												class="focus:border-light-blue/70 border-light-blue/30 bg-dark-blue/60 placeholder-dark-light-blue/50 block min-w-0 flex-1 basis-44 rounded-lg border p-2.5 text-sm text-white"
 												onchange={(e: Event) => {
 													const select = e.currentTarget;
 													if (!(select instanceof HTMLSelectElement)) {
@@ -1377,7 +1377,7 @@
 												{/each}
 											</select>
 											<select
-												class="focus:border-primary-500 focus:ring-primary-500 border-light-blue/30 bg-dark-blue/60 placeholder-dark-light-blue/50 block min-w-0 flex-1 basis-36 rounded-lg border p-2.5 text-sm text-white"
+												class="focus:border-light-blue/70 border-light-blue/30 bg-dark-blue/60 placeholder-dark-light-blue/50 block min-w-0 flex-1 basis-36 rounded-lg border p-2.5 text-sm text-white"
 												onchange={(e: Event) => {
 													const select = e.currentTarget;
 													if (!(select instanceof HTMLSelectElement)) {
@@ -1456,7 +1456,7 @@
 								<input
 									id={getFieldKey(field)}
 									name={getFieldKey(field)}
-									class="focus:border-primary-500 focus:ring-primary-500 border-light-blue/30 bg-dark-blue/60 placeholder-dark-light-blue/50 block w-full rounded-lg border p-2.5 text-sm text-white"
+									class="focus:border-light-blue/70 border-light-blue/30 bg-dark-blue/60 placeholder-dark-light-blue/50 block w-full rounded-lg border p-2.5 text-sm text-white"
 									checked={field.checked ?? false}
 									placeholder={field.placeholder ?? field.name.toLowerCase()}
 									readonly={field.readonly ?? false}
@@ -1468,7 +1468,7 @@
 								<input
 									id={getFieldKey(field)}
 									name={getFieldKey(field)}
-									class="focus:border-primary-500 focus:ring-primary-500 border-light-blue/30 bg-dark-blue/60 placeholder-dark-light-blue/50 block w-full rounded-lg border p-2.5 text-sm text-white"
+									class="focus:border-light-blue/70 border-light-blue/30 bg-dark-blue/60 placeholder-dark-light-blue/50 block w-full rounded-lg border p-2.5 text-sm text-white"
 									placeholder={field.placeholder ?? field.name.toLowerCase()}
 									readonly={field.readonly ?? false}
 									required={field.required}
@@ -1710,7 +1710,7 @@
 													<td class="flex justify-end gap-2 p-2">
 														{#if detail.onEdit}
 															<button
-																class="bg-primary-600 hover:bg-primary-700 focus:ring-primary-800 inline-flex items-center rounded-lg p-2 text-center text-sm font-medium text-white focus:ring-4 focus:outline-none"
+																class="bg-light-blue text-dark-blue focus:ring-light-blue/60 inline-flex items-center rounded-lg p-2 text-center text-sm font-medium text-white hover:bg-white focus:ring-4 focus:outline-none"
 																aria-label="Edit item"
 																onclick={() => {
 																	detail.onEdit?.(listItem);
@@ -1805,7 +1805,7 @@
 				>
 			{:else if fields.length > 0}
 				<button
-					class="bg-primary-600 hover:bg-primary-700 focus:ring-primary-800 inline-flex items-center rounded-lg px-5 py-2.5 text-center text-sm font-medium text-white focus:ring-4 focus:outline-none"
+					class="bg-light-blue text-dark-blue focus-visible:ring-light-blue/60 inline-flex items-center rounded-xl px-4 py-2.5 text-sm font-semibold hover:bg-white focus-visible:ring-2 focus-visible:outline-none"
 					onclick={() => {
 						isEditing = true;
 						parseValuesToFields();
@@ -1833,7 +1833,7 @@
 			{#each actions as action (actionKey(action))}
 				{#if action.type === 'selector'}
 					<select
-						class=" focus:border-primary-500 focus:ring-primary-500 border-light-blue/30 bg-dark-blue/60 placeholder-dark-light-blue/50 block w-full rounded-lg border p-2.5 text-sm text-white"
+						class=" focus:border-light-blue/70 border-light-blue/30 bg-dark-blue/60 placeholder-dark-light-blue/50 block w-full rounded-lg border p-2.5 text-sm text-white"
 						onchange={action.handler}
 					>
 						<option disabled selected value="">Choisir une option</option>

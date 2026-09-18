@@ -245,7 +245,7 @@
 		</div>
 		<div class="mb-6 flex items-center">
 			<svg
-				class="mr-2 h-5 w-5 {sharing ? 'text-primary-600' : 'text-dark-light-blue'}"
+				class="mr-2 h-5 w-5 {sharing ? 'text-light-blue' : 'text-dark-light-blue'}"
 				fill="none"
 				stroke={sharing ? 'blue' : 'gray'}
 				stroke-width="2"
@@ -266,7 +266,7 @@
 				Statut partage
 				<span
 					class="{sharing
-						? 'text-primary-600 font-semibold'
+						? 'text-light-blue font-semibold'
 						: 'text-dark-light-blue font-semibold'} pl-5"
 				>
 					{sharing ? 'En cours' : 'Non démarré'}
@@ -275,7 +275,7 @@
 		</div>
 		<div class="flex">
 			<button
-				class="bg-primary-600 hover:bg-primary-700 flex-1 rounded px-4 py-2 font-semibold text-white transition disabled:cursor-not-allowed disabled:opacity-50"
+				class="bg-light-blue text-dark-blue flex-1 rounded-xl px-4 py-2.5 text-sm font-semibold transition hover:bg-white disabled:cursor-not-allowed disabled:opacity-50"
 				disabled={!canCastSmartShare || is_busy || sharing}
 				onclick={startShare}
 			>

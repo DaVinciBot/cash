@@ -30,7 +30,7 @@
 				href={resolve('/treasury/documents/issuer')}>Identité de l'émetteur</a
 			>
 			<a
-				class="bg-primary-600 hover:bg-primary-800 rounded-lg px-4 py-2 text-sm font-medium text-white"
+				class="bg-light-blue text-dark-blue rounded-xl px-4 py-2.5 text-sm font-semibold hover:bg-white"
 				href={resolve('/treasury/documents/new')}>Nouveau document</a
 			>
 		</div>

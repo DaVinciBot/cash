@@ -165,8 +165,8 @@
 				{#each action as el (el.text)}
 					<button
 						class="rounded-lg px-3 py-2 text-center text-sm font-medium text-white {el.is_main
-							? 'bg-primary-600 hover:bg-primary-700'
-							: 'border border-white'} focus:ring-primary-900 focus:ring-4 focus:outline-none"
+							? 'bg-light-blue text-dark-blue hover:bg-white'
+							: 'border border-white'} focus:ring-light-blue/60 focus:ring-4 focus:outline-none"
 						onclick={(e: MouseEvent) => {
 							handleActionClick(el, e);
 						}}

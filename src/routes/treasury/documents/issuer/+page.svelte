@@ -254,7 +254,7 @@
 		</div>
 
 		<button
-			class="bg-primary-600 hover:bg-primary-800 mt-4 rounded-lg px-3 py-2 text-sm font-medium text-white"
+			class="bg-light-blue text-dark-blue mt-4 rounded-xl px-3 py-1.5 text-sm font-semibold hover:bg-white"
 			type="submit">Enregistrer</button
 		>
 	</form>

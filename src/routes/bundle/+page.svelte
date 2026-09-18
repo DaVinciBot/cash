@@ -134,7 +134,7 @@
 						<input name="id" type="hidden" value={item.id} />
 					{/each}
 					<button
-						class="bg-primary-600 hover:bg-primary-800 rounded-lg px-3 py-1.5 text-sm font-medium text-white disabled:opacity-40"
+						class="bg-light-blue text-dark-blue rounded-xl px-3 py-1.5 text-sm font-semibold hover:bg-white disabled:opacity-40"
 						disabled={selected.size === 0 || campusConflict}
 						type="submit">Créer une commande</button
 					>
