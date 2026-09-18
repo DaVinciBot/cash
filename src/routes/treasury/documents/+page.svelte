@@ -26,7 +26,7 @@
 		</div>
 		<div class="flex gap-2">
 			<a
-				class="border-light-blue/30 text-light-blue hover:bg-blue-gray/15 rounded-lg border px-4 py-2 text-sm"
+				class="border-light-blue/30 text-light-blue hover:bg-blue-gray/15 rounded-xl border px-4 py-2.5 text-sm"
 				href={resolve('/treasury/documents/issuer')}>Identité de l'émetteur</a
 			>
 			<a
@@ -66,7 +66,7 @@
 					<span class="text-light-blue ml-auto font-medium">{euro.format(doc.amountTtc)}</span>
 					<span class="text-dark-light-blue/70 text-xs">{day.format(new Date(doc.issuedOn))}</span>
 					<a
-						class="border-light-blue/30 text-light-blue hover:bg-blue-gray/15 rounded-lg border px-3 py-1 text-xs"
+						class="border-light-blue/30 text-light-blue hover:bg-blue-gray/15 rounded-xl border px-3 py-1.5 text-xs"
 						href={resolve('/treasury/documents/[id]', { id: String(doc.id) })}
 						>Ouvrir
 					</a>

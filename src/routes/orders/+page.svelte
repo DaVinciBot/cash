@@ -56,7 +56,7 @@
 			</p>
 		</div>
 		<a
-			class="border-light-blue/30 text-light-blue hover:bg-blue-gray/15 rounded-lg border px-4 py-2 text-sm"
+			class="border-light-blue/30 text-light-blue hover:bg-blue-gray/15 rounded-xl border px-4 py-2.5 text-sm"
 			href={resolve('/bundle')}>Items à regrouper</a
 		>
 	</header>

@@ -1132,7 +1132,7 @@
 			<div class="mb-4 flex items-center justify-between gap-3">
 				<h3 class="text-xl font-semibold text-white">Invitations en attente</h3>
 				<button
-					class="border-light-blue/30 text-light-blue hover:bg-blue-gray/15 rounded-lg border px-3 py-2 text-sm font-medium disabled:cursor-not-allowed disabled:opacity-50"
+					class="border-light-blue/30 text-light-blue hover:bg-blue-gray/15 rounded-xl border px-3 py-1.5 text-sm font-medium disabled:cursor-not-allowed disabled:opacity-50"
 					disabled={pendingInvitesLoading || reinvitingUserId !== null || cancelingUserId !== null}
 					onclick={() => {
 						void loadPendingInvites();

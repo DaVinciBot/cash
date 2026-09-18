@@ -224,7 +224,7 @@
 							/>
 						</label>
 						<button
-							class="border-light-blue/30 text-dark-light-blue hover:bg-blue-gray/15 rounded-lg border px-3 py-2 text-xs"
+							class="border-light-blue/30 text-dark-light-blue hover:bg-blue-gray/15 rounded-xl border px-3 py-1.5 text-xs"
 							onclick={() => {
 								removeExpense(expense.id);
 							}}
@@ -235,7 +235,7 @@
 
 				<div class="mt-2 flex flex-wrap items-center gap-3">
 					<button
-						class="border-light-blue/30 text-light-blue hover:bg-blue-gray/15 rounded-lg border px-3 py-1.5 text-xs"
+						class="border-light-blue/30 text-light-blue hover:bg-blue-gray/15 rounded-xl border px-3 py-1.5 text-xs"
 						onclick={addExpense}
 						type="button">Ajouter une dépense</button
 					>
@@ -282,7 +282,7 @@
 							/>
 						</label>
 						<button
-							class="border-light-blue/30 text-dark-light-blue hover:bg-blue-gray/15 rounded-lg border px-3 py-2 text-xs"
+							class="border-light-blue/30 text-dark-light-blue hover:bg-blue-gray/15 rounded-xl border px-3 py-1.5 text-xs"
 							onclick={() => {
 								removeLine(line.id);
 							}}
@@ -293,7 +293,7 @@
 
 				<div class="mt-2 flex flex-wrap items-center gap-3">
 					<button
-						class="border-light-blue/30 text-light-blue hover:bg-blue-gray/15 rounded-lg border px-3 py-1.5 text-xs"
+						class="border-light-blue/30 text-light-blue hover:bg-blue-gray/15 rounded-xl border px-3 py-1.5 text-xs"
 						onclick={addLine}
 						type="button">Ajouter une ligne</button
 					>

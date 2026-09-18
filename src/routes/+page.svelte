@@ -153,14 +153,14 @@
 							<!-- TRANS-NF-50 — le détail porte l'historique : qui a validé,
 							     qui a refusé, quand. La liste, elle, reste une liste. -->
 							<a
-								class="border-light-blue/30 text-light-blue hover:bg-blue-gray/15 rounded-lg border px-3 py-1.5 text-sm"
+								class="border-light-blue/30 text-light-blue hover:bg-blue-gray/15 rounded-xl border px-3 py-1.5 text-sm"
 								href={resolve('/items/[id]', { id: String(item.id) })}
 							>
 								Détail
 							</a>
 							{#if isItemEditableByMember(item.state)}
 								<a
-									class="border-light-blue/30 text-light-blue hover:bg-blue-gray/15 rounded-lg border px-3 py-1.5 text-sm"
+									class="border-light-blue/30 text-light-blue hover:bg-blue-gray/15 rounded-xl border px-3 py-1.5 text-sm"
 									href={resolve('/items/[id]/edit', { id: String(item.id) })}
 								>
 									Modifier

@@ -137,7 +137,7 @@
 			<span class="text-lg font-medium text-white">Total : {euro.format(total)}</span>
 			<div class="flex gap-3">
 				<a
-					class="border-light-blue/30 text-dark-light-blue hover:bg-blue-gray/15 rounded-lg border px-4 py-2 text-sm"
+					class="border-light-blue/30 text-dark-light-blue hover:bg-blue-gray/15 rounded-xl border px-4 py-2.5 text-sm"
 					href={resolve('/')}>Annuler</a
 				>
 				<button

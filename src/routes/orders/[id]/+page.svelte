@@ -181,7 +181,7 @@
 					type="submit">Confirmer le passage</button
 				>
 				<button
-					class="border-light-blue/30 text-dark-light-blue hover:bg-blue-gray/15 rounded-lg border px-4 py-2 text-sm"
+					class="border-light-blue/30 text-dark-light-blue hover:bg-blue-gray/15 rounded-xl border px-4 py-2.5 text-sm"
 					onclick={() => (passing = false)}
 					type="button">Annuler</button
 				>
@@ -231,7 +231,7 @@
 					type="submit">Confirmer l'annulation</button
 				>
 				<button
-					class="border-light-blue/30 text-dark-light-blue hover:bg-blue-gray/15 rounded-lg border px-4 py-2 text-sm"
+					class="border-light-blue/30 text-dark-light-blue hover:bg-blue-gray/15 rounded-xl border px-4 py-2.5 text-sm"
 					onclick={() => (canceling = false)}
 					type="button">Revenir</button
 				>
@@ -268,7 +268,7 @@
 			<div class="mt-3 flex flex-wrap items-center gap-2">
 				{#each overdrawn as share (share.budgetId)}
 					<button
-						class="border-light-blue/30 text-light-blue hover:bg-blue-gray/15 rounded-lg border px-3 py-1.5 text-xs"
+						class="border-light-blue/30 text-light-blue hover:bg-blue-gray/15 rounded-xl border px-3 py-1.5 text-xs"
 						onclick={() => {
 							raising = share.budgetId;
 							raiseAmount = '';
@@ -300,7 +300,7 @@
 						type="submit">Enregistrer</button
 					>
 					<button
-						class="border-light-blue/30 text-dark-light-blue hover:bg-blue-gray/15 rounded-lg border px-3 py-2 text-sm"
+						class="border-light-blue/30 text-dark-light-blue hover:bg-blue-gray/15 rounded-xl border px-3 py-1.5 text-sm"
 						onclick={() => {
 							raising = null;
 						}}
@@ -343,7 +343,7 @@
 					</select>
 				</label>
 				<button
-					class="border-light-blue/30 text-light-blue hover:bg-blue-gray/15 rounded-lg border px-3 py-2 text-sm"
+					class="border-light-blue/30 text-light-blue hover:bg-blue-gray/15 rounded-xl border px-3 py-1.5 text-sm"
 					type="submit">Enregistrer</button
 				>
 			</div>
@@ -405,7 +405,7 @@
 					<div class="flex shrink-0 flex-col items-end gap-2">
 						{#if editable}
 							<a
-								class="border-light-blue/30 text-light-blue hover:bg-blue-gray/15 rounded-lg border px-3 py-1.5 text-sm"
+								class="border-light-blue/30 text-light-blue hover:bg-blue-gray/15 rounded-xl border px-3 py-1.5 text-sm"
 								href={resolve('/orders/[id]/items/[itemId]', {
 									id: String(order.id),
 									itemId: String(item.id)
@@ -426,7 +426,7 @@
 							<form action="?/detach" method="POST" use:enhance>
 								<input name="item" type="hidden" value={item.id} />
 								<button
-									class="border-light-blue/30 text-dark-light-blue hover:bg-blue-gray/15 rounded-lg border px-3 py-1.5 text-sm"
+									class="border-light-blue/30 text-dark-light-blue hover:bg-blue-gray/15 rounded-xl border px-3 py-1.5 text-sm"
 									type="submit">Retirer</button
 								>
 							</form>

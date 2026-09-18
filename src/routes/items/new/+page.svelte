@@ -328,14 +328,14 @@
 
 			<div class="mt-4 flex flex-wrap items-center justify-between gap-3">
 				<button
-					class="border-light-blue/30 text-light-blue hover:bg-blue-gray/15 rounded-lg border px-4 py-2 text-sm"
+					class="border-light-blue/30 text-light-blue hover:bg-blue-gray/15 rounded-xl border px-4 py-2.5 text-sm"
 					onclick={addLine}
 					type="button">+ Ajouter un composant</button
 				>
 				<div class="flex items-center gap-4">
 					<span class="text-lg font-medium text-white">Total : {euro.format(total)}</span>
 					<a
-						class="border-light-blue/30 text-dark-light-blue hover:bg-blue-gray/15 rounded-lg border px-4 py-2 text-sm"
+						class="border-light-blue/30 text-dark-light-blue hover:bg-blue-gray/15 rounded-xl border px-4 py-2.5 text-sm"
 						href={resolve('/')}>Annuler</a
 					>
 					<button

@@ -192,7 +192,7 @@
 						/>
 					</label>
 					<button
-						class="border-light-blue/30 text-dark-light-blue hover:bg-blue-gray/15 rounded-lg border px-3 py-2 text-sm"
+						class="border-light-blue/30 text-dark-light-blue hover:bg-blue-gray/15 rounded-xl border px-3 py-1.5 text-sm"
 						onclick={() => {
 							removeLine(line.id);
 						}}
@@ -203,12 +203,12 @@
 
 			<div class="mt-3 flex flex-wrap items-center gap-2">
 				<button
-					class="border-light-blue/30 text-light-blue hover:bg-blue-gray/15 rounded-lg border px-3 py-1.5 text-sm"
+					class="border-light-blue/30 text-light-blue hover:bg-blue-gray/15 rounded-xl border px-3 py-1.5 text-sm"
 					onclick={addLine}
 					type="button">Répartir sur un budget de plus</button
 				>
 				<button
-					class="border-light-blue/30 text-light-blue hover:bg-blue-gray/15 rounded-lg border px-3 py-1.5 text-sm"
+					class="border-light-blue/30 text-light-blue hover:bg-blue-gray/15 rounded-xl border px-3 py-1.5 text-sm"
 					onclick={fillFirst}
 					type="button">Tout sur le premier</button
 				>
@@ -225,7 +225,7 @@
 				type="submit">Enregistrer</button
 			>
 			<a
-				class="border-light-blue/30 text-dark-light-blue hover:bg-blue-gray/15 rounded-lg border px-4 py-2 text-sm"
+				class="border-light-blue/30 text-dark-light-blue hover:bg-blue-gray/15 rounded-xl border px-4 py-2.5 text-sm"
 				href={resolve('/orders/[id]', { id: String(data.order.id) })}
 				>Annuler
 			</a>

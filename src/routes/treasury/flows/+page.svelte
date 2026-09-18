@@ -201,7 +201,7 @@
 					type="submit">Enregistrer</button
 				>
 				<button
-					class="border-light-blue/30 text-dark-light-blue hover:bg-blue-gray/15 rounded-lg border px-3 py-2 text-sm"
+					class="border-light-blue/30 text-dark-light-blue hover:bg-blue-gray/15 rounded-xl border px-3 py-1.5 text-sm"
 					onclick={() => (editing = null)}
 					type="button">Annuler</button
 				>
@@ -296,7 +296,7 @@
 								type="file"
 							/>
 							<button
-								class="border-light-blue/30 text-light-blue hover:bg-blue-gray/15 rounded-lg border px-3 py-1 text-xs"
+								class="border-light-blue/30 text-light-blue hover:bg-blue-gray/15 rounded-xl border px-3 py-1.5 text-xs"
 								type="submit">Déposer</button
 							>
 							<button
@@ -309,12 +309,12 @@
 
 					<div class="mt-3 flex flex-wrap items-center gap-2">
 						<button
-							class="border-light-blue/30 text-light-blue hover:bg-blue-gray/15 rounded-lg border px-3 py-1 text-xs"
+							class="border-light-blue/30 text-light-blue hover:bg-blue-gray/15 rounded-xl border px-3 py-1.5 text-xs"
 							onclick={() => (editing = editing === flow.id ? null : flow.id)}
 							type="button">Modifier</button
 						>
 						<button
-							class="border-light-blue/30 text-light-blue hover:bg-blue-gray/15 rounded-lg border px-3 py-1 text-xs"
+							class="border-light-blue/30 text-light-blue hover:bg-blue-gray/15 rounded-xl border px-3 py-1.5 text-xs"
 							onclick={() => (uploading = uploading === flow.id ? null : flow.id)}
 							type="button">Justificatif</button
 						>
@@ -322,7 +322,7 @@
 							<input name="id" type="hidden" value={flow.id} />
 							<input name="reconciled" type="hidden" value={flow.isReconciled ? '0' : '1'} />
 							<button
-								class="border-light-blue/30 text-light-blue hover:bg-blue-gray/15 rounded-lg border px-3 py-1 text-xs"
+								class="border-light-blue/30 text-light-blue hover:bg-blue-gray/15 rounded-xl border px-3 py-1.5 text-xs"
 								type="submit">{flow.isReconciled ? 'Dépointer' : 'Pointer'}</button
 							>
 						</form>

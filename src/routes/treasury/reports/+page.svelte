@@ -72,7 +72,7 @@
 			</select>
 		</label>
 		<button
-			class="border-light-blue/30 text-light-blue hover:bg-blue-gray/15 rounded-lg border px-3 py-2 text-sm"
+			class="border-light-blue/30 text-light-blue hover:bg-blue-gray/15 rounded-xl border px-3 py-1.5 text-sm"
 			type="submit">Afficher</button
 		>
 	</form>
@@ -86,7 +86,7 @@
 				</h2>
 				<!-- eslint-disable svelte/no-navigation-without-resolve -- route d'export, hors table de routage typée -->
 				<a
-					class="border-light-blue/30 text-light-blue hover:bg-blue-gray/15 rounded-lg border px-3 py-1.5 text-xs"
+					class="border-light-blue/30 text-light-blue hover:bg-blue-gray/15 rounded-xl border px-3 py-1.5 text-xs"
 					href="/admin/treasury/reports/export?kind=quarterly&fy={data.fiscalYearId}"
 					>Exporter en CSV</a
 				>
@@ -148,7 +148,7 @@
 			<h2 class="text-dark-light-blue text-sm font-semibold tracking-wide uppercase">Projets</h2>
 			<!-- eslint-disable svelte/no-navigation-without-resolve -- route d'export, hors table de routage typée -->
 			<a
-				class="border-light-blue/30 text-light-blue hover:bg-blue-gray/15 rounded-lg border px-3 py-1.5 text-xs"
+				class="border-light-blue/30 text-light-blue hover:bg-blue-gray/15 rounded-xl border px-3 py-1.5 text-xs"
 				href="/admin/treasury/reports/export?kind=projects&sy={data.schoolYearId}"
 				>Exporter en CSV</a
 			>

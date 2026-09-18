@@ -52,20 +52,20 @@
 			type="button">Nouvelle session</button
 		>
 		<button
-			class="border-light-blue/30 text-light-blue hover:bg-blue-gray/15 rounded-lg border px-4 py-2 text-sm"
+			class="border-light-blue/30 text-light-blue hover:bg-blue-gray/15 rounded-xl border px-4 py-2.5 text-sm"
 			onclick={onAddTraining}
 			type="button">Nouvelle formation</button
 		>
 		<!-- eslint-disable svelte/no-navigation-without-resolve -- liens résolus par l'appelant -->
 		{#if statsHref}
 			<a
-				class="border-light-blue/30 text-light-blue hover:bg-blue-gray/15 rounded-lg border px-4 py-2 text-sm"
+				class="border-light-blue/30 text-light-blue hover:bg-blue-gray/15 rounded-xl border px-4 py-2.5 text-sm"
 				href={statsHref}>Statistiques</a
 			>
 		{/if}
 		{#if calendarHref}
 			<a
-				class="border-light-blue/30 text-light-blue hover:bg-blue-gray/15 rounded-lg border px-4 py-2 text-sm"
+				class="border-light-blue/30 text-light-blue hover:bg-blue-gray/15 rounded-xl border px-4 py-2.5 text-sm"
 				href={calendarHref}>Calendrier public</a
 			>
 		{/if}

@@ -35,15 +35,15 @@
 		</div>
 		<div class="flex flex-wrap gap-2">
 			<a
-				class="border-light-blue/30 text-light-blue hover:bg-blue-gray/15 rounded-lg border px-4 py-2 text-sm"
+				class="border-light-blue/30 text-light-blue hover:bg-blue-gray/15 rounded-xl border px-4 py-2.5 text-sm"
 				href={resolve('/treasury/flows')}>Dépenses et recettes</a
 			>
 			<a
-				class="border-light-blue/30 text-light-blue hover:bg-blue-gray/15 rounded-lg border px-4 py-2 text-sm"
+				class="border-light-blue/30 text-light-blue hover:bg-blue-gray/15 rounded-xl border px-4 py-2.5 text-sm"
 				href={resolve('/treasury/reports')}>Rapports</a
 			>
 			<a
-				class="border-light-blue/30 text-light-blue hover:bg-blue-gray/15 rounded-lg border px-4 py-2 text-sm"
+				class="border-light-blue/30 text-light-blue hover:bg-blue-gray/15 rounded-xl border px-4 py-2.5 text-sm"
 				href={resolve('/treasury/documents')}>Documents</a
 			>
 		</div>
@@ -70,7 +70,7 @@
 			<input name="from" type="hidden" value={data.from} />
 			<input name="to" type="hidden" value={data.to} />
 			<button
-				class="border-light-blue/30 text-light-blue hover:bg-blue-gray/15 rounded-lg border px-3 py-2 text-sm"
+				class="border-light-blue/30 text-light-blue hover:bg-blue-gray/15 rounded-xl border px-3 py-1.5 text-sm"
 				type="submit">Recalculer</button
 			>
 			<p class="ml-auto text-right">
@@ -134,7 +134,7 @@
 				/>
 			</label>
 			<button
-				class="border-light-blue/30 text-light-blue hover:bg-blue-gray/15 rounded-lg border px-3 py-2 text-sm"
+				class="border-light-blue/30 text-light-blue hover:bg-blue-gray/15 rounded-xl border px-3 py-1.5 text-sm"
 				type="submit">Calculer</button
 			>
 			<div class="ml-auto flex gap-6 text-right">
@@ -168,7 +168,7 @@
 		<div class="mb-3 flex items-center justify-between">
 			<h2 class="text-dark-light-blue text-sm font-semibold tracking-wide uppercase">Comptes</h2>
 			<button
-				class="border-light-blue/30 text-light-blue hover:bg-blue-gray/15 rounded-lg border px-3 py-1.5 text-sm"
+				class="border-light-blue/30 text-light-blue hover:bg-blue-gray/15 rounded-xl border px-3 py-1.5 text-sm"
 				onclick={() => (openAccount = !openAccount)}
 				type="button">{openAccount ? 'Annuler' : 'Ouvrir un compte'}</button
 			>
@@ -238,13 +238,13 @@
 							<input name="id" type="hidden" value={account.id} />
 							<input name="archive" type="hidden" value="0" />
 							<button
-								class="border-light-blue/30 text-dark-light-blue hover:bg-blue-gray/15 rounded-lg border px-3 py-1 text-xs"
+								class="border-light-blue/30 text-dark-light-blue hover:bg-blue-gray/15 rounded-xl border px-3 py-1.5 text-xs"
 								type="submit">Réactiver</button
 							>
 						</form>
 					{:else}
 						<button
-							class="border-light-blue/30 text-dark-light-blue hover:bg-blue-gray/15 rounded-lg border px-3 py-1 text-xs"
+							class="border-light-blue/30 text-dark-light-blue hover:bg-blue-gray/15 rounded-xl border px-3 py-1.5 text-xs"
 							onclick={() => {
 								archiving = archiving === account.id ? null : account.id;
 							}}
@@ -289,7 +289,7 @@
 									type="submit">Confirmer l'archivage</button
 								>
 								<button
-									class="border-light-blue/30 text-dark-light-blue hover:bg-blue-gray/15 rounded-lg border px-3 py-1.5 text-xs"
+									class="border-light-blue/30 text-dark-light-blue hover:bg-blue-gray/15 rounded-xl border px-3 py-1.5 text-xs"
 									onclick={() => {
 										archiving = null;
 									}}
@@ -308,7 +308,7 @@
 		<div class="mb-3 flex items-center justify-between">
 			<h2 class="text-dark-light-blue text-sm font-semibold tracking-wide uppercase">Périodes</h2>
 			<button
-				class="border-light-blue/30 text-light-blue hover:bg-blue-gray/15 rounded-lg border px-3 py-1.5 text-sm"
+				class="border-light-blue/30 text-light-blue hover:bg-blue-gray/15 rounded-xl border px-3 py-1.5 text-sm"
 				onclick={() => (openPeriod = !openPeriod)}
 				type="button">{openPeriod ? 'Annuler' : 'Ouvrir une période'}</button
 			>
@@ -399,7 +399,7 @@
 									<input name="id" type="hidden" value={period.id} />
 									<input name="close" type="hidden" value={period.closedAt ? '0' : '1'} />
 									<button
-										class="border-light-blue/30 text-dark-light-blue hover:bg-blue-gray/15 rounded-lg border px-2 py-1 text-xs"
+										class="border-light-blue/30 text-dark-light-blue hover:bg-blue-gray/15 rounded-xl border px-3 py-1.5 text-xs"
 										type="submit">{period.closedAt ? 'Rouvrir' : 'Clore'}</button
 									>
 								</form>

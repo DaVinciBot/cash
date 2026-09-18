@@ -59,7 +59,7 @@
 			<p class="text-dark-light-blue/70 mt-1 text-xs">Planifiez, suivez et ajustez les sessions.</p>
 		</div>
 		<button
-			class="border-light-blue/30 text-light-blue hover:bg-blue-gray/15 rounded-lg border px-3 py-1.5 text-sm"
+			class="border-light-blue/30 text-light-blue hover:bg-blue-gray/15 rounded-xl border px-3 py-1.5 text-sm"
 			onclick={onAddSlot}
 			type="button">Ajouter</button
 		>
@@ -99,7 +99,7 @@
 								</p>
 							</div>
 							<button
-								class="border-light-blue/30 text-light-blue hover:bg-blue-gray/15 rounded-lg border px-3 py-1.5 text-sm"
+								class="border-light-blue/30 text-light-blue hover:bg-blue-gray/15 rounded-xl border px-3 py-1.5 text-sm"
 								onclick={() => {
 									onEditSlot(slot);
 								}}

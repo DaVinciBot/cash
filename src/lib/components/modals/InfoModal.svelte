@@ -86,7 +86,8 @@
 				<span class="sr-only">Close modal</span>
 			</button>
 			<div
-				class="h-12 w-12 rounded-full {type === 'success' ? 'bg-green-900' : ''} {type === 'error'
+				class="h-12 w-12 rounded-full {type === 'success' ? 'bg-emerald-500/15' : ''} {type ===
+				'error'
 					? 'bg-red-900'
 					: ''} {type === 'warning' ? 'bg-yellow-900' : ''} {type === 'info'
 					? 'bg-opacity-0'
@@ -94,7 +95,7 @@
 			>
 				{#if type === 'success'}
 					<svg
-						class="h-8text-green-400 w-8"
+						class="size-8 text-emerald-400"
 						aria-hidden="true"
 						fill="currentColor"
 						viewBox="0 0 20 20"

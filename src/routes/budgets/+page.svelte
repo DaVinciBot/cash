@@ -150,7 +150,7 @@
 				type="submit">Enregistrer</button
 			>
 			<button
-				class="border-light-blue/30 text-dark-light-blue hover:bg-blue-gray/15 rounded-lg border px-3 py-2 text-sm"
+				class="border-light-blue/30 text-dark-light-blue hover:bg-blue-gray/15 rounded-xl border px-3 py-1.5 text-sm"
 				onclick={() => {
 					editing = null;
 					creatingUnder = undefined;
