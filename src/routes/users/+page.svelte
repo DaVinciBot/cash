@@ -1,6 +1,6 @@
 <script lang="ts">
 	import { resolve } from '$app/paths';
-	import ReadDrawer from '$lib/components/drawers/ReadDrawer.svelte';
+	import RecordModal from '$lib/components/modals/RecordModal.svelte';
 	import SucessModal from '$lib/components/modals/InfoModal.svelte';
 	import { GLOBAL_ROLE_CATEGORIES, OVERRIDE_PERMISSION_CATEGORIES } from '$lib/rbacCatalog';
 	import {
@@ -85,14 +85,14 @@
 	// Recharger la table par son topic plutôt que la page entière : la recherche, les filtres, le
 	// tri et la page en cours survivent à une édition.
 	const usersTableTopic = 'users';
-	let drawerInstance: ReturnType<typeof mountClosable> | null = null;
+	let recordModalInstance: ReturnType<typeof mountClosable> | null = null;
 
 	function closeDrawer() {
-		if (!drawerInstance) {
+		if (!recordModalInstance) {
 			return;
 		}
-		void unmount(drawerInstance);
-		drawerInstance = null;
+		void unmount(recordModalInstance);
+		recordModalInstance = null;
 	}
 
 	/** Après une écriture : le tiroir se ferme et la table se recharge là où l'utilisateur en était. */
@@ -929,10 +929,9 @@
 					]
 				: [])
 		];
-		drawerInstance = mountClosable(ReadDrawer, {
+		recordModalInstance = mountClosable(RecordModal, {
 			target: document.body,
 			props: {
-				initialWidth: 560,
 				values,
 				fields,
 				onSubmit: async (
@@ -1056,13 +1055,13 @@
 		if (!confirm('Voulez-vous vraiment désactiver cet utilisateur ?')) {
 			return;
 		}
-		const drawer = document.querySelector('div[id^=drawer-]');
-		const drawerId = drawer instanceof HTMLElement ? drawer.id.split('drawer-')[1] : '';
-		if (!drawerId) {
+		const card = document.querySelector('div[id^=record-]');
+		const recordId = card instanceof HTMLElement ? card.id.split('record-')[1] : '';
+		if (!recordId) {
 			return;
 		}
 		try {
-			await deleteAuthUser(drawerId);
+			await deleteAuthUser(recordId);
 		} catch (error) {
 			alert((error as Error | null)?.message ?? 'Erreur lors de la désactivation du compte.');
 			return;
@@ -1079,13 +1078,13 @@
 		if (!confirm('Voulez-vous vraiment réactiver cet utilisateur ?')) {
 			return;
 		}
-		const drawer = document.querySelector('div[id^=drawer-]');
-		const drawerId = drawer instanceof HTMLElement ? drawer.id.split('drawer-')[1] : '';
-		if (!drawerId) {
+		const card = document.querySelector('div[id^=record-]');
+		const recordId = card instanceof HTMLElement ? card.id.split('record-')[1] : '';
+		if (!recordId) {
 			return;
 		}
 		try {
-			await updateAuthUserStatus(drawerId, 'active');
+			await updateAuthUserStatus(recordId, 'active');
 		} catch (error) {
 			alert((error as Error | null)?.message ?? 'Erreur lors de la réactivation du compte.');
 			return;
