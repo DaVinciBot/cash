@@ -63,7 +63,7 @@
 
 					<div class="flex flex-wrap items-baseline gap-x-2 gap-y-1 py-1.5 text-sm">
 						<span class="rounded px-1.5 py-0.5 text-xs font-medium {badge.className}"
-							>{badge.emoji} {badge.label}</span
+							>{badge.label}</span
 						>
 						<span class="text-light-blue">{summarizeActivity(entry)}</span>
 						<span class="text-dark-light-blue/70">par {actorLabel(entry)}</span>

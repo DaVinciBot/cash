@@ -123,17 +123,19 @@
 		{#if projects.length > 1}
 			<div class="mb-4 flex flex-wrap items-center gap-2">
 				<button
-					class="rounded-full px-3 py-1 text-xs font-medium {projectFilter === 'all'
-						? 'bg-light-blue text-dark-blue'
-						: 'bg-dark-blue/60 text-dark-light-blue hover:bg-blue-gray/25'}"
+					class="cursor-pointer rounded-full border px-3 py-1 text-xs font-medium transition-colors {projectFilter ===
+					'all'
+						? 'border-light-blue bg-light-blue text-dark-blue'
+						: 'border-light-blue/30 bg-dark-blue/60 text-dark-light-blue hover:border-light-blue/60 hover:text-light-blue'}"
 					onclick={() => (projectFilter = 'all')}
 					type="button">Tous les projets ({items.length})</button
 				>
 				{#each projects as project (project.id)}
 					<button
-						class="rounded-full px-3 py-1 text-xs font-medium {projectFilter === project.id
-							? 'bg-light-blue text-dark-blue'
-							: 'bg-dark-blue/60 text-dark-light-blue hover:bg-blue-gray/25'}"
+						class="cursor-pointer rounded-full border px-3 py-1 text-xs font-medium transition-colors {projectFilter ===
+						project.id
+							? 'border-light-blue bg-light-blue text-dark-blue'
+							: 'border-light-blue/30 bg-dark-blue/60 text-dark-light-blue hover:border-light-blue/60 hover:text-light-blue'}"
 						onclick={() => (projectFilter = project.id)}
 						type="button"
 						>{project.name} ({items.filter((i) => i.projectId === project.id).length})</button

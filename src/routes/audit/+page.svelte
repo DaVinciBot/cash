@@ -46,9 +46,10 @@
 	<nav class="mb-6 flex flex-wrap gap-2">
 		{#each TABS as tab (tab.id)}
 			<a
-				class="rounded-lg px-3 py-2 text-sm {data.tab === tab.id
-					? 'bg-light-blue text-dark-blue'
-					: 'bg-dark-blue/60 text-dark-light-blue hover:bg-blue-gray/25'}"
+				class="cursor-pointer rounded-xl border px-3 py-2 text-sm transition-colors {data.tab ===
+				tab.id
+					? 'border-light-blue bg-light-blue text-dark-blue'
+					: 'border-light-blue/30 bg-dark-blue/60 text-dark-light-blue hover:border-light-blue/60 hover:text-light-blue'}"
 				href={tabHref(tab.id)}
 				title={tab.hint}>{tab.label}</a
 			>
@@ -61,16 +62,17 @@
 		     vient chercher ici. -->
 		<div class="mb-4 flex flex-wrap items-center gap-2">
 			<a
-				class="rounded-full px-3 py-1 text-xs font-medium {data.sqlstate
-					? 'bg-dark-blue/60 text-dark-light-blue hover:bg-blue-gray/25'
-					: 'bg-light-blue text-dark-blue'}"
+				class="cursor-pointer rounded-full border px-3 py-1 text-xs font-medium transition-colors {data.sqlstate
+					? 'border-light-blue/30 bg-dark-blue/60 text-dark-light-blue hover:border-light-blue/60 hover:text-light-blue'
+					: 'border-light-blue bg-light-blue text-dark-blue'}"
 				href={tabHref('rejets')}>Tous ({data.rejected.length})</a
 			>
 			{#each codes as code (code)}
 				<a
-					class="rounded-full px-3 py-1 text-xs font-medium {data.sqlstate === code
-						? 'bg-light-blue text-dark-blue'
-						: 'bg-dark-blue/60 text-dark-light-blue hover:bg-blue-gray/25'}"
+					class="cursor-pointer rounded-full border px-3 py-1 text-xs font-medium transition-colors {data.sqlstate ===
+					code
+						? 'border-light-blue bg-light-blue text-dark-blue'
+						: 'border-light-blue/30 bg-dark-blue/60 text-dark-light-blue hover:border-light-blue/60 hover:text-light-blue'}"
 					href={tabHref('rejets', { code })}
 					title={CASH_ERROR_MESSAGES[code] ?? ''}>{code}</a
 				>
@@ -127,16 +129,17 @@
 	{:else}
 		<div class="mb-4 flex flex-wrap items-center gap-2">
 			<a
-				class="rounded-full px-3 py-1 text-xs font-medium {data.entityType
-					? 'bg-dark-blue/60 text-dark-light-blue hover:bg-blue-gray/25'
-					: 'bg-light-blue text-dark-blue'}"
+				class="cursor-pointer rounded-full border px-3 py-1 text-xs font-medium transition-colors {data.entityType
+					? 'border-light-blue/30 bg-dark-blue/60 text-dark-light-blue hover:border-light-blue/60 hover:text-light-blue'
+					: 'border-light-blue bg-light-blue text-dark-blue'}"
 				href={tabHref(data.tab)}>Tout</a
 			>
 			{#each Object.entries(entities) as [id, label] (id)}
 				<a
-					class="rounded-full px-3 py-1 text-xs font-medium {data.entityType === id
-						? 'bg-light-blue text-dark-blue'
-						: 'bg-dark-blue/60 text-dark-light-blue hover:bg-blue-gray/25'}"
+					class="cursor-pointer rounded-full border px-3 py-1 text-xs font-medium transition-colors {data.entityType ===
+					id
+						? 'border-light-blue bg-light-blue text-dark-blue'
+						: 'border-light-blue/30 bg-dark-blue/60 text-dark-light-blue hover:border-light-blue/60 hover:text-light-blue'}"
 					href={tabHref(data.tab, { entity: id })}>{label}</a
 				>
 			{/each}

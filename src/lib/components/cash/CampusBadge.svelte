@@ -1,5 +1,6 @@
 <script lang="ts">
 	import { CAMPUS_BADGES, type Campus } from '@davincibot/lib';
+	import { CAMPUS_ICONS } from './stateIcons';
 	import StateBadge from './StateBadge.svelte';
 
 	interface Props {
@@ -17,4 +18,4 @@
 	vue trésorier et arrive au jalon 5 ; côté membre il n'y a rien à copier, la
 	destination n'est qu'une information.
 -->
-<StateBadge class={className} badge={CAMPUS_BADGES[campus]} {compact} />
+<StateBadge class={className} badge={CAMPUS_BADGES[campus]} {compact} icon={CAMPUS_ICONS[campus]} />

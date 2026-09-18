@@ -172,7 +172,7 @@
 						>
 							<option disabled value="">À choisir…</option>
 							{#each Object.entries(CAMPUS_BADGES) as [value, badge] (value)}
-								<option {value}>{badge.emoji} {badge.label}</option>
+								<option {value}>{badge.label}</option>
 							{/each}
 						</select>
 						<p class="mt-1 text-xs text-amber-300">
@@ -278,9 +278,11 @@
 								<div class="flex flex-wrap gap-2">
 									{#each ITEM_TAGS as tag (tag)}
 										<button
-											class="rounded-full px-3 py-1 text-xs {line.tags.includes(tag)
-												? 'bg-light-blue text-dark-blue'
-												: 'bg-dark-blue/60 text-dark-light-blue hover:bg-blue-gray/25'}"
+											class="cursor-pointer rounded-full border px-3 py-1 text-xs transition-colors {line.tags.includes(
+												tag
+											)
+												? 'border-light-blue bg-light-blue text-dark-blue'
+												: 'border-light-blue/30 bg-dark-blue/60 text-dark-light-blue hover:border-light-blue/60 hover:text-light-blue'}"
 											onclick={() => {
 												toggleTag(line, tag);
 											}}

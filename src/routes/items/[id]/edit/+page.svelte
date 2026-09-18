@@ -111,9 +111,11 @@
 				<div class="flex flex-wrap gap-2 pt-1.5">
 					{#each ITEM_TAGS as tag (tag)}
 						<button
-							class="rounded-full px-3 py-1 text-xs {tags.includes(tag)
-								? 'bg-light-blue text-dark-blue'
-								: 'bg-dark-blue/60 text-dark-light-blue hover:bg-blue-gray/25'}"
+							class="cursor-pointer rounded-full border px-3 py-1 text-xs transition-colors {tags.includes(
+								tag
+							)
+								? 'border-light-blue bg-light-blue text-dark-blue'
+								: 'border-light-blue/30 bg-dark-blue/60 text-dark-light-blue hover:border-light-blue/60 hover:text-light-blue'}"
 							onclick={() => {
 								toggleTag(tag);
 							}}

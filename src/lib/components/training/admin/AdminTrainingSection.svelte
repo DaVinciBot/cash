@@ -1,6 +1,7 @@
 <script lang="ts">
 	import StateBadge from '$lib/components/cash/StateBadge.svelte';
 	import { categoryBadge, stateBadgeLabel } from '$lib/helpers/trainingTables';
+	import { TRAINING_CATEGORY_ICONS } from '$lib/helpers/trainingOptions';
 	import {
 		Table,
 		type DBInfo,
@@ -88,7 +89,10 @@
 							<div class="min-w-0 flex-1">
 								<div class="flex flex-wrap items-center gap-2">
 									<span class="font-medium text-white">{training.name}</span>
-									<StateBadge badge={categoryBadge(training.category)} />
+									<StateBadge
+										badge={categoryBadge(training.category)}
+										icon={TRAINING_CATEGORY_ICONS[training.category]}
+									/>
 								</div>
 								<p class="text-dark-light-blue mt-1 text-sm">
 									{training.description ?? 'Aucune description'}

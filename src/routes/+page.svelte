@@ -75,20 +75,21 @@
 
 	<div class="mb-4 flex flex-wrap items-center gap-2">
 		<button
-			class="rounded-full px-3 py-1 text-xs font-medium {stateFilter === 'all'
-				? 'bg-light-blue text-dark-blue'
-				: 'bg-dark-blue/60 text-dark-light-blue hover:bg-blue-gray/25'}"
+			class="cursor-pointer rounded-full border px-3 py-1 text-xs font-medium transition-colors {stateFilter ===
+			'all'
+				? 'border-light-blue bg-light-blue text-dark-blue'
+				: 'border-light-blue/30 bg-dark-blue/60 text-dark-light-blue hover:border-light-blue/60 hover:text-light-blue'}"
 			onclick={() => (stateFilter = 'all')}
 			type="button">Tous ({counts.all})</button
 		>
 		{#each ITEM_STATES as state (state)}
 			<button
-				class="rounded-full px-3 py-1 text-xs font-medium {stateFilter === state
-					? 'bg-light-blue text-dark-blue'
-					: 'bg-dark-blue/60 text-dark-light-blue hover:bg-blue-gray/25'}"
+				class="cursor-pointer rounded-full border px-3 py-1 text-xs font-medium transition-colors {stateFilter ===
+				state
+					? 'border-light-blue bg-light-blue text-dark-blue'
+					: 'border-light-blue/30 bg-dark-blue/60 text-dark-light-blue hover:border-light-blue/60 hover:text-light-blue'}"
 				onclick={() => (stateFilter = state)}
-				type="button"
-				>{ITEM_STATE_BADGES[state].emoji} {ITEM_STATE_BADGES[state].label} ({counts[state]})</button
+				type="button">{ITEM_STATE_BADGES[state].label} ({counts[state]})</button
 			>
 		{/each}
 		<input

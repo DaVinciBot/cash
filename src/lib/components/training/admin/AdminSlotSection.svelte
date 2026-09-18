@@ -1,6 +1,7 @@
 <script lang="ts">
 	import StateBadge from '$lib/components/cash/StateBadge.svelte';
 	import { statusBadge, stateBadgeLabel } from '$lib/helpers/trainingTables';
+	import { SLOT_STATUS_ICONS } from '$lib/helpers/trainingOptions';
 	import {
 		Table,
 		type DBInfo,
@@ -113,7 +114,7 @@
 								{/if}
 								{slot.trainer_username ?? 'À définir'}
 							</span>
-							<StateBadge badge={statusBadge(slot.status)} />
+							<StateBadge badge={statusBadge(slot.status)} icon={SLOT_STATUS_ICONS[slot.status]} />
 						</div>
 					</li>
 				{/each}

@@ -5,6 +5,7 @@
 	import HistoryTimeline from '$lib/components/cash/HistoryTimeline.svelte';
 	import ItemStateBadge from '$lib/components/cash/ItemStateBadge.svelte';
 	import StateBadge from '$lib/components/cash/StateBadge.svelte';
+	import { CAMPUS_ICONS, ORDER_STATE_ICONS } from '$lib/components/cash/stateIcons';
 	import {
 		CAMPUS_BADGES,
 		isOrderCancelable,
@@ -81,7 +82,7 @@
 
 	<header class="mt-3 mb-6 flex flex-wrap items-center gap-3">
 		<h1 class="text-2xl font-bold text-white">Commande #{order.id}</h1>
-		<StateBadge badge={ORDER_STATE_BADGES[order.state]} />
+		<StateBadge badge={ORDER_STATE_BADGES[order.state]} icon={ORDER_STATE_ICONS[order.state]} />
 		{#if order.campus}
 			<!-- CMD-F-41 — le badge campus est aussi le bouton qui copie l'adresse. -->
 			<button
@@ -90,7 +91,7 @@
 				title="Copier l'adresse de livraison"
 				type="button"
 			>
-				<StateBadge badge={CAMPUS_BADGES[order.campus]} />
+				<StateBadge badge={CAMPUS_BADGES[order.campus]} icon={CAMPUS_ICONS[order.campus]} />
 			</button>
 			{#if copied}
 				<span class="text-xs text-emerald-300">Adresse copiée</span>

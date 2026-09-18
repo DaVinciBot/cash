@@ -1,6 +1,8 @@
 <script lang="ts">
 	import { resolve } from '$app/paths';
+	import type { BadgeIcon } from '$lib/components/cash/stateIcons';
 	import { DOCUMENT_KIND_LABELS, DOCUMENT_KINDS } from '@davincibot/lib';
+	import { Euro, FileText, Gift, Receipt } from '@lucide/svelte';
 	import type { PageData } from './$types';
 
 	let { data }: { data: PageData } = $props();
@@ -14,11 +16,11 @@
 		tax_receipt: 'Attester un don reçu, pour que le donateur le déduise de ses impôts.'
 	};
 
-	const ICON: Record<string, string> = {
-		expense_report: '🧾',
-		quote: '📄',
-		invoice: '💶',
-		tax_receipt: '🎁'
+	const ICON: Record<string, BadgeIcon> = {
+		expense_report: Receipt,
+		quote: FileText,
+		invoice: Euro,
+		tax_receipt: Gift
 	};
 </script>
 
@@ -40,14 +42,15 @@
 	<ul class="grid gap-3 sm:grid-cols-2">
 		{#each DOCUMENT_KINDS as kind (kind)}
 			{@const missing = data.missingByKind[kind] ?? []}
+			{@const KindIcon = ICON[kind]}
 			<li>
 				<a
 					class="hover:bg-blue-gray/15 border-light-blue/20 bg-blue-gray/15 hover:border-light-blue/60 flex h-full flex-col rounded-lg border p-4 transition aria-disabled:pointer-events-none aria-disabled:opacity-50"
 					aria-disabled={missing.length > 0}
 					href={resolve('/treasury/documents/new/[kind]', { kind })}
 				>
-					<span class="text-2xl">{ICON[kind]}</span>
-					<span class="mt-2 font-medium text-white">{DOCUMENT_KIND_LABELS[kind]}</span>
+					<KindIcon class="text-dark-light-blue size-6 shrink-0" />
+					<span class="text-light-blue mt-2 font-medium">{DOCUMENT_KIND_LABELS[kind]}</span>
 					<span class="text-dark-light-blue mt-1 text-xs">{PURPOSE[kind]}</span>
 					{#if missing.length > 0}
 						<span class="mt-3 text-xs text-amber-300">

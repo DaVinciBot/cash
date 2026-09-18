@@ -2,6 +2,7 @@
 	import { enhance } from '$app/forms';
 	import { resolve } from '$app/paths';
 	import StateBadge from '$lib/components/cash/StateBadge.svelte';
+	import { FLOW_DIRECTION_ICONS } from '$lib/components/cash/stateIcons';
 	import { FLOW_DIRECTION_BADGES, isFlowGenerated } from '@davincibot/lib';
 	import type { ActionData, PageData } from './$types';
 
@@ -224,7 +225,10 @@
 			{#each data.flows as flow (flow.id)}
 				<li class="border-light-blue/20 bg-blue-gray/15 rounded-2xl border p-4 sm:p-5">
 					<div class="flex flex-wrap items-center gap-3">
-						<StateBadge badge={FLOW_DIRECTION_BADGES[flow.direction]} />
+						<StateBadge
+							badge={FLOW_DIRECTION_BADGES[flow.direction]}
+							icon={FLOW_DIRECTION_ICONS[flow.direction]}
+						/>
 						<span class="font-medium text-white">{flow.label}</span>
 						{#if flow.orderId !== null}
 							<a
