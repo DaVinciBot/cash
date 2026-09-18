@@ -50,13 +50,13 @@
 	<header class="mb-6 flex flex-wrap items-end justify-between gap-4">
 		<div>
 			<h1 class="text-2xl font-bold text-white">Commandes</h1>
-			<p class="mt-1 text-sm text-gray-400">
+			<p class="text-dark-light-blue mt-1 text-sm">
 				Triées par date de passation pour celles qui sont passées, par date de création pour les
 				autres.
 			</p>
 		</div>
 		<a
-			class="rounded-lg border border-gray-600 px-4 py-2 text-sm text-gray-200 hover:bg-gray-700"
+			class="border-light-blue/30 text-light-blue hover:bg-blue-gray/15 rounded-lg border px-4 py-2 text-sm"
 			href={resolve('/bundle')}>Items à regrouper</a
 		>
 	</header>
@@ -64,16 +64,16 @@
 	<div class="mb-4 flex flex-wrap items-center gap-2">
 		<button
 			class="rounded-full px-3 py-1 text-xs font-medium {stateFilter === 'all'
-				? 'bg-white text-gray-900'
-				: 'bg-gray-700 text-gray-300 hover:bg-gray-600'}"
+				? 'bg-light-blue text-dark-blue'
+				: 'bg-dark-blue/60 text-dark-light-blue hover:bg-blue-gray/25'}"
 			onclick={() => (stateFilter = 'all')}
 			type="button">Toutes ({counts.all})</button
 		>
 		{#each ORDER_STATES as state (state)}
 			<button
 				class="rounded-full px-3 py-1 text-xs font-medium {stateFilter === state
-					? 'bg-white text-gray-900'
-					: 'bg-gray-700 text-gray-300 hover:bg-gray-600'}"
+					? 'bg-light-blue text-dark-blue'
+					: 'bg-dark-blue/60 text-dark-light-blue hover:bg-blue-gray/25'}"
 				onclick={() => (stateFilter = state)}
 				type="button"
 				>{ORDER_STATE_BADGES[state].emoji}
@@ -83,7 +83,9 @@
 	</div>
 
 	{#if visible.length === 0}
-		<p class="rounded-lg border border-dashed border-gray-600 px-4 py-12 text-center text-gray-400">
+		<p
+			class="border-light-blue/30 text-dark-light-blue rounded-lg border border-dashed px-4 py-12 text-center"
+		>
 			{orders.length === 0
 				? 'Aucune commande. Constituez-en une depuis la file des items à regrouper.'
 				: 'Aucune commande ne correspond à ce filtre.'}
@@ -92,7 +94,7 @@
 		{#each years as year (year.id)}
 			<div class="mb-8">
 				<h2
-					class="mb-3 border-b border-gray-700 pb-1 text-sm font-semibold tracking-wide text-gray-300 uppercase"
+					class="border-light-blue/20 text-dark-light-blue mb-3 border-b pb-1 text-sm font-semibold tracking-wide uppercase"
 				>
 					Année scolaire {year.label}
 				</h2>
@@ -100,7 +102,7 @@
 					{#each year.orders as order (order.id)}
 						<li>
 							<a
-								class="block rounded-lg border border-gray-700 bg-gray-800 p-4 hover:border-gray-500"
+								class="border-light-blue/20 bg-blue-gray/15 hover:border-light-blue/60 block rounded-lg border p-4"
 								href={resolve('/orders/[id]', { id: String(order.id) })}
 							>
 								<div class="flex flex-wrap items-center gap-3">
@@ -109,11 +111,11 @@
 									{#if order.campus}
 										<CampusBadge campus={order.campus} />
 									{/if}
-									<span class="ml-auto font-medium text-gray-200">
+									<span class="text-light-blue ml-auto font-medium">
 										{euro.format(order.amountTtc + order.shippingCostTtc)}
 									</span>
 								</div>
-								<p class="mt-1 text-sm text-gray-400">
+								<p class="text-dark-light-blue mt-1 text-sm">
 									{order.itemCount} item(s)
 									{#if order.itemCount > 0 && order.state !== 'pending_treso'}
 										· {order.receivedCount} / {order.itemCount} reçus

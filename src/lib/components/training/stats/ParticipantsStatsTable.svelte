@@ -41,9 +41,9 @@
 	});
 </script>
 
-<div class="max-h-[28rem] overflow-auto rounded-lg border border-gray-700">
+<div class="border-light-blue/20 max-h-[28rem] overflow-auto rounded-lg border">
 	<table class={TABLE}>
-		<thead class="sticky top-0 bg-gray-800">
+		<thead class="bg-blue-gray/15 sticky top-0">
 			<tr>
 				<th class={HEAD_CELL} scope="col">Inscrit·e</th>
 				<th class={HEAD_CELL_NUMBER} scope="col">Nb de Fm</th>

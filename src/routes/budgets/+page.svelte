@@ -27,7 +27,7 @@
 <section class="mx-auto max-w-5xl">
 	<header class="mb-6">
 		<h1 class="text-2xl font-bold text-white">Budgets</h1>
-		<p class="mt-1 text-sm text-gray-400">
+		<p class="text-dark-light-blue mt-1 text-sm">
 			Un arbre autonome, par année scolaire. Seules les feuilles portent un montant ; celui d'un
 			nœud est la somme de ses descendants.
 		</p>
@@ -47,10 +47,10 @@
 			<h2 class="text-sm font-semibold text-rose-200">
 				{data.overdrawn.length} budget(s) en dépassement
 			</h2>
-			<ul class="mt-2 space-y-1 text-sm text-gray-300">
+			<ul class="text-dark-light-blue mt-2 space-y-1 text-sm">
 				{#each data.overdrawn as budget (budget.id)}
 					<li>
-						{budget.name} <span class="text-xs text-gray-500">({budget.year})</span> —
+						{budget.name} <span class="text-dark-light-blue/70 text-xs">({budget.year})</span> —
 						{euro.format(budget.consumedTtc)} consommés pour {euro.format(budget.allocatedTtc)}
 						alloués,
 						<span class="font-medium text-rose-200"
@@ -64,11 +64,11 @@
 
 	<div class="mb-4 flex flex-wrap items-center gap-3">
 		<form method="GET">
-			<label class="text-xs text-gray-300">
+			<label class="text-dark-light-blue text-xs">
 				Année scolaire
 				<select
 					name="year"
-					class="mt-1 block rounded-lg border border-gray-600 bg-gray-700 p-2 text-sm text-white"
+					class="border-light-blue/30 bg-dark-blue/60 mt-1 block rounded-lg border p-2 text-sm text-white"
 					onchange={(event) => event.currentTarget.form?.requestSubmit()}
 					value={data.schoolYearId ?? ''}
 				>
@@ -78,16 +78,16 @@
 				</select>
 			</label>
 		</form>
-		<label class="mt-4 flex items-center gap-2 text-sm text-gray-300">
+		<label class="text-dark-light-blue mt-4 flex items-center gap-2 text-sm">
 			<input
-				class="size-4 rounded border-gray-600 bg-gray-700"
+				class="border-light-blue/30 bg-dark-blue/60 size-4 rounded"
 				type="checkbox"
 				bind:checked={showArchived}
 			/>
 			Afficher les archivés
 		</label>
 		<button
-			class="mt-4 ml-auto rounded-lg border border-gray-600 px-3 py-1.5 text-sm text-gray-200 hover:bg-gray-700"
+			class="border-light-blue/30 text-light-blue hover:bg-blue-gray/15 mt-4 ml-auto rounded-lg border px-3 py-1.5 text-sm"
 			onclick={() => (creatingUnder = creatingUnder === null ? undefined : null)}
 			type="button">Ajouter une racine</button
 		>
@@ -95,7 +95,7 @@
 
 	{#snippet budgetForm(parentId: number | null, node: (typeof data.tree)[number] | null)}
 		<form
-			class="mb-2 flex flex-wrap items-end gap-3 rounded-lg border border-gray-600 bg-gray-900/60 p-3"
+			class="border-light-blue/30 bg-dark-blue/60 mb-2 flex flex-wrap items-end gap-3 rounded-lg border p-3"
 			action={node ? '?/update' : '?/create'}
 			method="POST"
 			use:enhance={() =>
@@ -111,21 +111,21 @@
 				<input name="school_year_id" type="hidden" value={data.schoolYearId} />
 				<input name="parent_id" type="hidden" value={parentId ?? ''} />
 			{/if}
-			<label class="text-xs text-gray-300">
+			<label class="text-dark-light-blue text-xs">
 				Nom
 				<input
 					name="name"
-					class="mt-1 block rounded-lg border border-gray-600 bg-gray-700 p-2 text-sm text-white"
+					class="border-light-blue/30 bg-dark-blue/60 mt-1 block rounded-lg border p-2 text-sm text-white"
 					required
 					value={node?.name ?? ''}
 				/>
 			</label>
 			{#if node}
-				<label class="text-xs text-gray-300">
+				<label class="text-dark-light-blue text-xs">
 					Parent
 					<select
 						name="parent_id"
-						class="mt-1 block rounded-lg border border-gray-600 bg-gray-700 p-2 text-sm text-white"
+						class="border-light-blue/30 bg-dark-blue/60 mt-1 block rounded-lg border p-2 text-sm text-white"
 						value={node.parentId ?? ''}
 					>
 						<option value="">— racine —</option>
@@ -135,11 +135,11 @@
 					</select>
 				</label>
 			{/if}
-			<label class="text-xs text-gray-300">
-				Montant TTC <span class="text-gray-500">(feuille uniquement)</span>
+			<label class="text-dark-light-blue text-xs">
+				Montant TTC <span class="text-dark-light-blue/70">(feuille uniquement)</span>
 				<input
 					name="amount_ttc"
-					class="mt-1 block w-32 rounded-lg border border-gray-600 bg-gray-700 p-2 text-sm text-white"
+					class="border-light-blue/30 bg-dark-blue/60 mt-1 block w-32 rounded-lg border p-2 text-sm text-white"
 					inputmode="decimal"
 					placeholder="—"
 					value={node?.amountTtc === null || node === null
@@ -152,7 +152,7 @@
 				type="submit">Enregistrer</button
 			>
 			<button
-				class="rounded-lg border border-gray-600 px-3 py-2 text-sm text-gray-300 hover:bg-gray-700"
+				class="border-light-blue/30 text-dark-light-blue hover:bg-blue-gray/15 rounded-lg border px-3 py-2 text-sm"
 				onclick={() => {
 					editing = null;
 					creatingUnder = undefined;
@@ -167,7 +167,9 @@
 	{/if}
 
 	{#if visible.length === 0}
-		<p class="rounded-lg border border-dashed border-gray-600 px-4 py-12 text-center text-gray-400">
+		<p
+			class="border-light-blue/30 text-dark-light-blue rounded-lg border border-dashed px-4 py-12 text-center"
+		>
 			Aucun budget sur cette année. Créez une racine, puis ses feuilles.
 		</p>
 	{:else}
@@ -176,9 +178,9 @@
 				<li>
 					<div
 						style="margin-left: {node.depth * 1.5}rem"
-						class="flex flex-wrap items-center gap-3 rounded-lg border border-gray-700 bg-gray-800 px-4 py-2.5 text-sm"
+						class="border-light-blue/20 bg-blue-gray/15 flex flex-wrap items-center gap-3 rounded-lg border px-4 py-2.5 text-sm"
 					>
-						<span class="font-medium {node.archivedAt ? 'text-gray-500' : 'text-white'}"
+						<span class="font-medium {node.archivedAt ? 'text-dark-light-blue/70' : 'text-white'}"
 							>{node.name}</span
 						>
 						{#if node.isDefault}
@@ -188,24 +190,26 @@
 							>
 						{/if}
 						{#if node.archivedAt}
-							<span class="rounded-full bg-gray-700 px-2 py-0.5 text-xs text-gray-400">archivé</span
+							<span class="bg-dark-blue/60 text-dark-light-blue rounded-full px-2 py-0.5 text-xs"
+								>archivé</span
 							>
 						{/if}
 						{#each node.projects as project (project)}
-							<span class="rounded-full bg-gray-700 px-2 py-0.5 text-xs text-gray-300"
+							<span class="bg-dark-blue/60 text-dark-light-blue rounded-full px-2 py-0.5 text-xs"
 								>{project}</span
 							>
 						{/each}
 
 						<span class="ml-auto text-right">
-							<span class="text-gray-300">{euro.format(node.allocatedTtc)}</span>
-							<span class="text-gray-500"> alloués · </span>
-							<span class="text-gray-300">{euro.format(node.consumedTtc)}</span>
-							<span class="text-gray-500"> consommés · </span>
-							<span class={node.remainingTtc < 0 ? 'font-medium text-rose-300' : 'text-gray-300'}
+							<span class="text-dark-light-blue">{euro.format(node.allocatedTtc)}</span>
+							<span class="text-dark-light-blue/70"> alloués · </span>
+							<span class="text-dark-light-blue">{euro.format(node.consumedTtc)}</span>
+							<span class="text-dark-light-blue/70"> consommés · </span>
+							<span
+								class={node.remainingTtc < 0 ? 'font-medium text-rose-300' : 'text-dark-light-blue'}
 								>{euro.format(node.remainingTtc)}</span
 							>
-							<span class="text-gray-500"> restants</span>
+							<span class="text-dark-light-blue/70"> restants</span>
 						</span>
 					</div>
 
@@ -214,13 +218,13 @@
 						class="mt-1 mb-2 flex flex-wrap items-center gap-2"
 					>
 						<button
-							class="text-xs text-gray-400 underline hover:text-gray-200"
+							class="text-dark-light-blue hover:text-light-blue text-xs underline"
 							onclick={() => (editing = editing === node.id ? null : node.id)}
 							type="button">modifier</button
 						>
 						{#if node.amountTtc === null && !node.archivedAt}
 							<button
-								class="text-xs text-gray-400 underline hover:text-gray-200"
+								class="text-dark-light-blue hover:text-light-blue text-xs underline"
 								onclick={() => (creatingUnder = creatingUnder === node.id ? undefined : node.id)}
 								type="button">ajouter dessous</button
 							>
@@ -229,7 +233,7 @@
 							<form action="?/split" method="POST" use:enhance>
 								<input name="id" type="hidden" value={node.id} />
 								<button
-									class="text-xs text-gray-400 underline hover:text-gray-200"
+									class="text-dark-light-blue hover:text-light-blue text-xs underline"
 									title="Crée {node.name}_default sous ce budget, qui reprend son montant et ses dépenses."
 									type="submit">transformer en parent</button
 								>
@@ -239,23 +243,26 @@
 							<form action="?/setDefault" method="POST" use:enhance>
 								<input name="id" type="hidden" value={node.id} />
 								<input name="parent_id" type="hidden" value={node.parentId ?? ''} />
-								<button class="text-xs text-gray-400 underline hover:text-gray-200" type="submit"
-									>marquer par défaut</button
+								<button
+									class="text-dark-light-blue hover:text-light-blue text-xs underline"
+									type="submit">marquer par défaut</button
 								>
 							</form>
 						{/if}
 						{#if node.archivedAt}
 							<form action="?/restore" method="POST" use:enhance>
 								<input name="id" type="hidden" value={node.id} />
-								<button class="text-xs text-gray-400 underline hover:text-gray-200" type="submit"
-									>réactiver</button
+								<button
+									class="text-dark-light-blue hover:text-light-blue text-xs underline"
+									type="submit">réactiver</button
 								>
 							</form>
 						{:else}
 							<form action="?/archive" method="POST" use:enhance>
 								<input name="id" type="hidden" value={node.id} />
-								<button class="text-xs text-gray-400 underline hover:text-gray-200" type="submit"
-									>archiver</button
+								<button
+									class="text-dark-light-blue hover:text-light-blue text-xs underline"
+									type="submit">archiver</button
 								>
 							</form>
 						{/if}

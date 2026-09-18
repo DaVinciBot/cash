@@ -611,7 +611,7 @@
 <div
 	id={'drawer-' + id}
 	style={`transform: translateX(0); width: ${String(clampedWidth)}px;`}
-	class="fixed top-0 right-0 z-50 flex h-full max-w-full flex-col bg-gray-800 shadow-lg transition-transform duration-300"
+	class="bg-blue-gray/15 fixed top-0 right-0 z-50 flex h-full max-w-full flex-col shadow-lg transition-transform duration-300"
 	tabindex="-1"
 >
 	<!-- Resize handle (left edge) -->
@@ -634,23 +634,23 @@
 		ontouchstart={onResizeTouchStart}
 		type="button"
 	>
-		<span class="absolute top-0 right-0 h-full w-1 bg-transparent group-hover:bg-gray-600/60"
+		<span class="group-hover:bg-blue-gray/25/60 absolute top-0 right-0 h-full w-1 bg-transparent"
 		></span>
 	</button>
 	<!-- Header -->
-	<div class="flex items-center justify-between gap-2 border-gray-700 p-4">
+	<div class="border-light-blue/20 flex items-center justify-between gap-2 p-4">
 		<div class="flex min-w-0 flex-col">
 			<span class="truncate text-lg font-semibold text-white" title={values.header.title}
 				>{values.header.title}</span
 			>
 			{#if values.header.sub}
-				<span class="truncate text-sm text-gray-400" title={values.header.sub}
+				<span class="text-dark-light-blue truncate text-sm" title={values.header.sub}
 					>{values.header.sub}</span
 				>
 			{/if}
 		</div>
 		<button
-			class="shrink-0 rounded-lg bg-transparent p-1.5 text-sm text-gray-400 hover:bg-gray-600 hover:text-white"
+			class="text-dark-light-blue hover:bg-blue-gray/25 shrink-0 rounded-lg bg-transparent p-1.5 text-sm hover:text-white"
 			onclick={__onClose}
 			type="button"
 		>
@@ -666,7 +666,7 @@
 	</div>
 	{#if values.header.stepper}
 		{@const stepper = values.header.stepper}
-		<div class="m-auto w-full border-b border-gray-700 px-4 pt-2 pb-4">
+		<div class="border-light-blue/20 m-auto w-full border-b px-4 pt-2 pb-4">
 			<Stepper steps={stepper} />
 		</div>
 	{/if}
@@ -700,7 +700,7 @@
 								<select
 									id={getFieldKey(field)}
 									name={getFieldKey(field)}
-									class=" focus:border-primary-500 focus:ring-primary-500 block w-full rounded-lg border border-gray-600 bg-gray-700 p-2.5 text-sm text-white placeholder-gray-400"
+									class=" focus:border-primary-500 focus:ring-primary-500 border-light-blue/30 bg-dark-blue/60 placeholder-dark-light-blue/50 block w-full rounded-lg border p-2.5 text-sm text-white"
 									disabled={field.readonly ?? false}
 									onchange={field.onChange ?? null}
 								>
@@ -718,7 +718,7 @@
 								</select>
 							{:else if field.type === 'info'}
 								<p
-									class="mb-2 block max-w-prose rounded-lg bg-gray-700 p-3 text-justify text-sm text-gray-200"
+									class="bg-dark-blue/60 text-light-blue mb-2 block max-w-prose rounded-lg p-3 text-justify text-sm"
 								>
 									{field.text}
 								</p>
@@ -726,7 +726,7 @@
 								<input
 									id={getFieldKey(field)}
 									name={getFieldKey(field)}
-									class=" focus:border-primary-500 focus:ring-primary-500 block w-full rounded-lg border border-gray-600 bg-gray-700 p-2.5 text-sm text-white placeholder-gray-400"
+									class=" focus:border-primary-500 focus:ring-primary-500 border-light-blue/30 bg-dark-blue/60 placeholder-dark-light-blue/50 block w-full rounded-lg border p-2.5 text-sm text-white"
 									max={field.max ?? 2000}
 									min={field.min ?? 0}
 									placeholder={field.placeholder ?? field.name.toLowerCase()}
@@ -740,7 +740,7 @@
 								<textarea
 									id={getFieldKey(field)}
 									name={getFieldKey(field)}
-									class=" focus:border-primary-500 focus:ring-primary-500 block w-full rounded-lg border border-gray-600 bg-gray-700 p-2.5 text-sm text-white placeholder-gray-400"
+									class=" focus:border-primary-500 focus:ring-primary-500 border-light-blue/30 bg-dark-blue/60 placeholder-dark-light-blue/50 block w-full rounded-lg border p-2.5 text-sm text-white"
 									placeholder={field.placeholder ?? field.name.toLowerCase()}
 									readonly={field.readonly ?? false}
 									required={field.required}
@@ -772,7 +772,7 @@
 									type="file"
 								/>
 								<label
-									class="focus:border-primary-500 focus:ring-primary-500 flex h-12 w-full items-center justify-center rounded-lg border border-gray-600 bg-gray-700 p-2.5 text-sm text-white placeholder-gray-400"
+									class="focus:border-primary-500 focus:ring-primary-500 border-light-blue/30 bg-dark-blue/60 placeholder-dark-light-blue/50 flex h-12 w-full items-center justify-center rounded-lg border p-2.5 text-sm text-white"
 									for={getFieldKey(field)}
 								>
 									{#if field.value}
@@ -784,7 +784,7 @@
 										/>
 									{:else}
 										<svg
-											class="h-6 w-6 fill-gray-400"
+											class="fill-dark-light-blue h-6 w-6"
 											viewBox="0 0 24 24"
 											xmlns="http://www.w3.org/2000/svg"
 											><path
@@ -798,10 +798,10 @@
 							{:else if field.type === 'document'}
 								{#if field.multiple}
 									<div
-										class="mb-2 flex w-full flex-col items-center justify-center rounded-lg border border-gray-600 bg-gray-700 p-2.5 text-sm text-white"
+										class="border-light-blue/30 bg-dark-blue/60 mb-2 flex w-full flex-col items-center justify-center rounded-lg border p-2.5 text-sm text-white"
 									>
 										{#each documentPreviews(field.value) as doc (doc.id ?? doc.name)}
-											<div class="flex w-full items-center gap-2 border-gray-600 py-1">
+											<div class="border-light-blue/30 flex w-full items-center gap-2 py-1">
 												<svg
 													class="octicon octicon-file"
 													aria-hidden="true"
@@ -819,7 +819,7 @@
 													{doc.name}
 												</p>
 												<button
-													class="hover: ml-auto inline-flex items-center rounded-lg bg-transparent p-1.5 text-sm text-gray-400 hover:bg-gray-600 hover:text-white"
+													class="hover: text-dark-light-blue hover:bg-blue-gray/25 ml-auto inline-flex items-center rounded-lg bg-transparent p-1.5 text-sm hover:text-white"
 													aria-label="Remove document"
 													onclick={async (e: MouseEvent) => {
 														field.value = documentPreviews(field.value).filter(
@@ -904,7 +904,7 @@
 									type="file"
 								/>
 								<label
-									class="focus:border-primary-500 focus:ring-primary-500 flex h-12 w-full items-center justify-center rounded-lg border border-gray-600 bg-gray-700 p-2.5 text-sm text-white placeholder-gray-400"
+									class="focus:border-primary-500 focus:ring-primary-500 border-light-blue/30 bg-dark-blue/60 placeholder-dark-light-blue/50 flex h-12 w-full items-center justify-center rounded-lg border p-2.5 text-sm text-white"
 									for={getFieldKey(field)}
 								>
 									{#if field.value && field.data === 'image' && !field.multiple}
@@ -920,7 +920,7 @@
 										</p>
 									{:else}
 										<svg
-											class="h-6 w-6 fill-gray-400"
+											class="fill-dark-light-blue h-6 w-6"
 											viewBox="0 0 24 24"
 											xmlns="http://www.w3.org/2000/svg"
 											><path
@@ -934,7 +934,7 @@
 							{:else if field.type === 'duplicate'}
 								<!--Duplicate is a + btn to replicate the last collumn -->
 								<button
-									class="focus:border-primary-500 focus:ring-primary-500 flex h-8 w-full items-center justify-center rounded-lg border border-gray-600 bg-gray-700 p-2.5 text-sm text-white placeholder-gray-400"
+									class="focus:border-primary-500 focus:ring-primary-500 border-light-blue/30 bg-dark-blue/60 placeholder-dark-light-blue/50 flex h-8 w-full items-center justify-center rounded-lg border p-2.5 text-sm text-white"
 									onclick={() => {
 										const clean_filter = fields.filter((el) => el.type !== 'duplicate');
 										let lasts: EditableField[] = []; // get the last full row, 1 if wide, 2 if not
@@ -982,7 +982,7 @@
 							{:else if field.type === 'autocomplete'}
 								{@const autocompleteCompletion = field.completion ?? []}
 								<div
-									class="focus:border-primary-500 focus:ring-primary-500 relative flex w-full flex-row items-center justify-center rounded-lg border border-gray-600 bg-gray-700 p-2.5 text-sm text-white placeholder-gray-400"
+									class="focus:border-primary-500 focus:ring-primary-500 border-light-blue/30 bg-dark-blue/60 placeholder-dark-light-blue/50 relative flex w-full flex-row items-center justify-center rounded-lg border p-2.5 text-sm text-white"
 								>
 									{#if field.image}
 										<img
@@ -994,7 +994,7 @@
 									<input
 										id={getFieldKey(field)}
 										name={getFieldKey(field)}
-										class=" bordertext-sm focus:border-primary-500 focus:ring-primary-500 block w-full rounded-lg border-gray-600 bg-gray-700 p-2.5 text-white placeholder-gray-400"
+										class=" bordertext-sm focus:border-primary-500 focus:ring-primary-500 border-light-blue/30 bg-dark-blue/60 placeholder-dark-light-blue/50 block w-full rounded-lg p-2.5 text-white"
 										oninput={async (
 											e: Event & {
 												currentTarget: EventTarget & HTMLInputElement;
@@ -1016,12 +1016,12 @@
 								</div>
 								{#if autocompleteCompletion.length > 0}
 									<div
-										class="focus:border-primary-500 focus:ring-primary-500 absolute z-10 mt-1 block w-full rounded-lg border border-gray-600 bg-gray-700 p-2 pl-4 text-sm text-white"
+										class="focus:border-primary-500 focus:ring-primary-500 border-light-blue/30 bg-dark-blue/60 absolute z-10 mt-1 block w-full rounded-lg border p-2 pl-4 text-sm text-white"
 									>
 										{#each autocompleteCompletion as c (completionKey(c))}
 											<button
-												class=" flex w-full
-												items-center rounded-lg border-b border-gray-700 {c.image ? 'p-1' : ''} cursor-pointer"
+												class=" border-light-blue/20 flex
+												w-full items-center rounded-lg border-b {c.image ? 'p-1' : ''} cursor-pointer"
 												onclick={async () => {
 													field.value = c.text;
 													field.data = c.value;
@@ -1061,7 +1061,7 @@
 												{/if}
 												<span>{item.text}</span>
 												<button
-													class="ml-2 text-white hover:text-gray-300"
+													class="hover:text-dark-light-blue ml-2 text-white"
 													aria-label={`Remove ${item.text}`}
 													onclick={async () => {
 														const nextValue = selectedItems.filter((v) => v.value !== item.value);
@@ -1088,7 +1088,7 @@
 									<input
 										id={getFieldKey(field)}
 										name={getFieldKey(field)}
-										class="focus:border-primary-500 focus:ring-primary-500 block w-full rounded-lg border border-gray-600 bg-gray-700 p-2.5 text-sm text-white placeholder-gray-400"
+										class="focus:border-primary-500 focus:ring-primary-500 border-light-blue/30 bg-dark-blue/60 placeholder-dark-light-blue/50 block w-full rounded-lg border p-2.5 text-sm text-white"
 										oninput={async (
 											e: Event & {
 												currentTarget: EventTarget & HTMLInputElement;
@@ -1117,15 +1117,15 @@
 									/>
 									{#if autocompleteCompletion.length > 0}
 										<div
-											class="focus:border-primary-500 focus:ring-primary-500 absolute z-10 mt-1 block w-full rounded-lg border border-gray-600 bg-gray-700 p-2 text-sm text-white"
+											class="focus:border-primary-500 focus:ring-primary-500 border-light-blue/30 bg-dark-blue/60 absolute z-10 mt-1 block w-full rounded-lg border p-2 text-sm text-white"
 										>
 											{#each autocompleteCompletion as c (completionKey(c))}
 												{@const isSelected = selectedItems.some((v) => v.value === c.value)}
 												{#if !isSelected}
 													<button
-														class="flex w-full items-center rounded-lg border-b border-gray-700 {c.image
+														class="border-light-blue/20 flex w-full items-center rounded-lg border-b {c.image
 															? 'p-1'
-															: ''} cursor-pointer hover:bg-gray-600"
+															: ''} hover:bg-blue-gray/25 cursor-pointer"
 														onclick={async (e: MouseEvent) => {
 															// Add selected item to value array
 															field.value = [
@@ -1181,14 +1181,14 @@
 								<div class="mb-4 space-y-3">
 									{#if packages.length > 0}
 										<div
-											class="flex flex-wrap gap-2 rounded-lg border border-gray-600 bg-gray-900 p-3"
+											class="border-light-blue/30 bg-dark-blue/60 flex flex-wrap gap-2 rounded-lg border p-3"
 										>
-											<p class="mb-1 w-full text-xs font-semibold text-gray-400">
+											<p class="text-dark-light-blue mb-1 w-full text-xs font-semibold">
 												Packs pré-définis :
 											</p>
 											{#each packages as pack (pack.label)}
 												<button
-													class="hover:bg-primary-600 rounded-md border border-gray-500 bg-gray-700 px-2 py-1 text-xs text-white transition-colors"
+													class="hover:bg-primary-600 bg-dark-blue/60 rounded-md border border-gray-500 px-2 py-1 text-xs text-white transition-colors"
 													onclick={() => {
 														setFieldValue(field, [...pack.perms]);
 													}}
@@ -1204,7 +1204,7 @@
 									<div class="flex flex-wrap items-center gap-2">
 										<input
 											id={`${groupKey}-search`}
-											class="focus:border-primary-500 focus:ring-primary-500 min-w-0 flex-1 basis-48 rounded-lg border border-gray-600 bg-gray-700 p-2 text-sm text-white placeholder-gray-400"
+											class="focus:border-primary-500 focus:ring-primary-500 border-light-blue/30 bg-dark-blue/60 placeholder-dark-light-blue/50 min-w-0 flex-1 basis-48 rounded-lg border p-2 text-sm text-white"
 											aria-label={`Rechercher dans ${field.name}`}
 											oninput={(e: Event) => {
 												const input = e.currentTarget;
@@ -1216,11 +1216,11 @@
 											type="search"
 											value={permissionSearch[groupKey] ?? ''}
 										/>
-										<span class="text-xs whitespace-nowrap text-gray-400">
+										<span class="text-dark-light-blue text-xs whitespace-nowrap">
 											Sélection : {permissionValues.length}
 										</span>
 										<button
-											class="rounded-md border border-gray-600 px-2 py-1 text-xs text-gray-300 hover:bg-gray-700 hover:text-white disabled:cursor-not-allowed disabled:opacity-40"
+											class="border-light-blue/30 text-dark-light-blue hover:bg-blue-gray/15 rounded-md border px-2 py-1 text-xs hover:text-white disabled:cursor-not-allowed disabled:opacity-40"
 											disabled={permissionValues.length === 0}
 											onclick={() => {
 												setFieldValue(field, []);
@@ -1233,7 +1233,7 @@
 
 									{#if categories.length === 0}
 										<p
-											class="rounded-lg border border-gray-700 bg-gray-800 p-3 text-sm text-gray-400"
+											class="border-light-blue/20 bg-blue-gray/15 text-dark-light-blue rounded-lg border p-3 text-sm"
 										>
 											Aucune entrée ne correspond à cette recherche.
 										</p>
@@ -1245,10 +1245,12 @@
 												permissionValues.includes(perm.value)
 											).length}
 											{@const open = isCategoryOpen(groupKey, catName, search !== '')}
-											<div class="overflow-hidden rounded-lg border border-gray-700 bg-gray-800">
+											<div
+												class="border-light-blue/20 bg-blue-gray/15 overflow-hidden rounded-lg border"
+											>
 												<h4>
 													<button
-														class="flex w-full items-center gap-2 px-3 py-2 text-left hover:bg-gray-700/60"
+														class="hover:bg-blue-gray/15/60 flex w-full items-center gap-2 px-3 py-2 text-left"
 														aria-expanded={open}
 														onclick={() => {
 															toggleCategory(groupKey, catName);
@@ -1256,7 +1258,7 @@
 														type="button"
 													>
 														<svg
-															class={'h-4 w-4 shrink-0 text-gray-400 transition-transform ' +
+															class={'text-dark-light-blue h-4 w-4 shrink-0 transition-transform ' +
 																(open ? 'rotate-90' : '')}
 															aria-hidden="true"
 															fill="none"
@@ -1277,14 +1279,14 @@
 															class={'shrink-0 rounded-full px-2 py-0.5 text-xs font-medium ' +
 																(selectedCount > 0
 																	? 'bg-primary-900 text-primary-100 border-primary-500 border'
-																	: 'border border-gray-600 bg-gray-900 text-gray-400')}
+																	: 'border-light-blue/30 bg-dark-blue/60 text-dark-light-blue border')}
 														>
 															{selectedCount}/{perms.length}
 														</span>
 													</button>
 												</h4>
 												{#if open}
-													<div class="border-t border-gray-700 p-3">
+													<div class="border-light-blue/20 border-t p-3">
 														{#if field.bulkActions !== false}
 															<div class="mb-2 flex flex-wrap justify-end gap-3 text-xs">
 																<button
@@ -1295,7 +1297,7 @@
 																	type="button">Tout cocher</button
 																>
 																<button
-																	class="text-gray-400 underline hover:text-gray-200"
+																	class="text-dark-light-blue hover:text-light-blue underline"
 																	onclick={() => {
 																		togglePermissions(field, perms, false);
 																	}}
@@ -1311,7 +1313,7 @@
 																>
 																	<input
 																		name={field.id ?? 'permissions'}
-																		class="text-primary-600 focus:ring-primary-600 mt-0.5 h-4 w-4 shrink-0 cursor-pointer rounded border-gray-500 bg-gray-900 transition duration-200 focus:ring-2"
+																		class="text-primary-600 focus:ring-primary-600 bg-dark-blue/60 mt-0.5 h-4 w-4 shrink-0 cursor-pointer rounded border-gray-500 transition duration-200 focus:ring-2"
 																		checked={permissionValues.includes(perm.value)}
 																		onchange={(e: Event) => {
 																			const input = e.currentTarget;
@@ -1324,7 +1326,7 @@
 																		value={perm.value}
 																	/>
 																	<span
-																		class="min-w-0 text-sm text-gray-300 transition-colors group-hover:text-white"
+																		class="text-dark-light-blue min-w-0 text-sm transition-colors group-hover:text-white"
 																		>{perm.label}</span
 																	>
 																</label>
@@ -1342,7 +1344,7 @@
 									{#each rolesValue as item, idx (idx)}
 										<div class="flex flex-wrap items-center gap-2">
 											<select
-												class="focus:border-primary-500 focus:ring-primary-500 block min-w-0 flex-1 basis-44 rounded-lg border border-gray-600 bg-gray-700 p-2.5 text-sm text-white placeholder-gray-400"
+												class="focus:border-primary-500 focus:ring-primary-500 border-light-blue/30 bg-dark-blue/60 placeholder-dark-light-blue/50 block min-w-0 flex-1 basis-44 rounded-lg border p-2.5 text-sm text-white"
 												onchange={(e: Event) => {
 													const select = e.currentTarget;
 													if (!(select instanceof HTMLSelectElement)) {
@@ -1375,7 +1377,7 @@
 												{/each}
 											</select>
 											<select
-												class="focus:border-primary-500 focus:ring-primary-500 block min-w-0 flex-1 basis-36 rounded-lg border border-gray-600 bg-gray-700 p-2.5 text-sm text-white placeholder-gray-400"
+												class="focus:border-primary-500 focus:ring-primary-500 border-light-blue/30 bg-dark-blue/60 placeholder-dark-light-blue/50 block min-w-0 flex-1 basis-36 rounded-lg border p-2.5 text-sm text-white"
 												onchange={(e: Event) => {
 													const select = e.currentTarget;
 													if (!(select instanceof HTMLSelectElement)) {
@@ -1394,7 +1396,7 @@
 												{/each}
 											</select>
 											<button
-												class="rounded-lg bg-transparent p-2 text-red-500 hover:bg-gray-700 hover:text-red-400"
+												class="hover:bg-blue-gray/15 rounded-lg bg-transparent p-2 text-red-500 hover:text-red-400"
 												aria-label="Supprimer ce projet"
 												onclick={() => {
 													setFieldValue(
@@ -1419,7 +1421,7 @@
 										</div>
 									{/each}
 									<button
-										class="text-primary-500 mt-2 flex w-full items-center justify-center gap-2 rounded-lg border border-dashed border-gray-600 p-2 text-sm hover:bg-gray-700"
+										class="text-primary-500 border-light-blue/30 hover:bg-blue-gray/15 mt-2 flex w-full items-center justify-center gap-2 rounded-lg border border-dashed p-2 text-sm"
 										onclick={() => {
 											setFieldValue(field, [
 												...rolesValue,
@@ -1454,7 +1456,7 @@
 								<input
 									id={getFieldKey(field)}
 									name={getFieldKey(field)}
-									class="focus:border-primary-500 focus:ring-primary-500 block w-full rounded-lg border border-gray-600 bg-gray-700 p-2.5 text-sm text-white placeholder-gray-400"
+									class="focus:border-primary-500 focus:ring-primary-500 border-light-blue/30 bg-dark-blue/60 placeholder-dark-light-blue/50 block w-full rounded-lg border p-2.5 text-sm text-white"
 									checked={field.checked ?? false}
 									placeholder={field.placeholder ?? field.name.toLowerCase()}
 									readonly={field.readonly ?? false}
@@ -1466,7 +1468,7 @@
 								<input
 									id={getFieldKey(field)}
 									name={getFieldKey(field)}
-									class="focus:border-primary-500 focus:ring-primary-500 block w-full rounded-lg border border-gray-600 bg-gray-700 p-2.5 text-sm text-white placeholder-gray-400"
+									class="focus:border-primary-500 focus:ring-primary-500 border-light-blue/30 bg-dark-blue/60 placeholder-dark-light-blue/50 block w-full rounded-lg border p-2.5 text-sm text-white"
 									placeholder={field.placeholder ?? field.name.toLowerCase()}
 									readonly={field.readonly ?? false}
 									required={field.required}
@@ -1484,7 +1486,7 @@
 					<h3 class="mb-2 text-lg font-semibold text-white">Pièces jointes</h3>
 					<div class="mb-2 flex items-center">
 						<button
-							class="rounded-lg bg-transparent p-1.5 text-sm text-gray-400 hover:bg-gray-600 hover:text-white"
+							class="text-dark-light-blue hover:bg-blue-gray/25 rounded-lg bg-transparent p-1.5 text-sm hover:text-white"
 							aria-label="Previous file"
 							onclick={() => {
 								if (current_file_index > 0) {
@@ -1502,11 +1504,11 @@
 								></path></svg
 							>
 						</button>
-						<p class="flex-1 text-center text-sm text-gray-400">
+						<p class="text-dark-light-blue flex-1 text-center text-sm">
 							{current_file || 'Chargement'} - {current_file_index + 1}/{files.length}
 						</p>
 						<button
-							class="rounded-lg bg-transparent p-1.5 text-sm text-gray-400 hover:bg-gray-600 hover:text-white"
+							class="text-dark-light-blue hover:bg-blue-gray/25 rounded-lg bg-transparent p-1.5 text-sm hover:text-white"
 							aria-label="Next file"
 							onclick={() => {
 								if (current_file_index < files.length - 1) {
@@ -1556,7 +1558,7 @@
 					{#if detail}
 						{#if detail.type === 'updates'}
 							<dd class="mt-8 ml-4">
-								<ol class="relative ml-2 border-l border-gray-700">
+								<ol class="border-light-blue/20 relative ml-2 border-l">
 									{#each detail.list as value (`${value.type}-${value.date ?? ''}`)}
 										{@const isPositive = [
 											'review-treso-approved',
@@ -1577,7 +1579,7 @@
 
 										<li class="mb-10 ml-6">
 											<span
-												class={'absolute -left-2.5 flex h-5 w-5 items-center justify-center rounded-full ring-8 ring-gray-700 ' +
+												class={'ring-light-blue/20 absolute -left-2.5 flex h-5 w-5 items-center justify-center rounded-full ring-8 ' +
 													dotBg}
 											>
 												<span
@@ -1592,12 +1594,12 @@
 											</span>
 											{#if value.date}
 												<span
-													class={'inline-flex items-center rounded px-2.5 py-0.5 text-xs font-medium text-gray-100 ' +
+													class={'text-light-blue inline-flex items-center rounded px-2.5 py-0.5 text-xs font-medium ' +
 														(isPositive
 															? 'bg-primary-800'
 															: isNegative
 																? '  bg-red-900'
-																: '  bg-gray-800')}
+																: '  bg-blue-gray/15')}
 												>
 													<svg
 														class="mr-1 h-3 w-3"
@@ -1619,11 +1621,11 @@
 													{value.date}
 												</span>
 											{/if}
-											<h3 class="mt-2 mb-0.5 text-base font-semibold text-gray-300">
+											<h3 class="text-dark-light-blue mt-2 mb-0.5 text-base font-semibold">
 												{value.message ?? updateText[value.type] ?? value.type}
 											</h3>
 											{#if value.user}
-												<p class="text-sm font-normal text-gray-400">
+												<p class="text-dark-light-blue text-sm font-normal">
 													Par {value.user}
 												</p>
 											{/if}
@@ -1634,13 +1636,13 @@
 						{:else if detail.type === 'badges'}
 							<dd class="mb-4">
 								{#if detail.list.length === 0}
-									<p class="mt-1 text-sm text-gray-500">Aucune</p>
+									<p class="text-dark-light-blue/70 mt-1 text-sm">Aucune</p>
 								{:else}
 									<div class="mt-1 flex flex-wrap gap-1">
 										{#each detail.list as badge (badge.text)}
 											<span
 												class="rounded-md px-2 py-1 text-xs font-medium break-words shadow-sm {badge.color ??
-													'border border-gray-600 bg-gray-700 text-gray-200'}"
+													'border-light-blue/30 bg-dark-blue/60 text-light-blue border'}"
 											>
 												{badge.text}
 											</span>
@@ -1649,7 +1651,7 @@
 								{/if}
 							</dd>
 						{:else if detail.type === 'items'}
-							<dd class="mb-4 ml-2 font-light text-gray-400">
+							<dd class="text-dark-light-blue mb-4 ml-2 font-light">
 								<table class="w-full border-separate">
 									<thead class="font-bold">
 										<tr>
@@ -1664,7 +1666,7 @@
 									<tbody>
 										{#each detail.list as listItem (listItem.id)}
 											<tr data-utils={String(listItem.id)}>
-												<td class="fill-gray-400 p-2 hover:fill-gray-200"
+												<td class="fill-dark-light-blue p-2 hover:fill-gray-200"
 													><button
 														class="text-left"
 														onclick={() => {
@@ -1775,7 +1777,9 @@
 							</dd>
 						{/if}
 					{:else}
-						<dd class="mb-4 font-light text-gray-400 transition-colors hover:text-gray-300">
+						<dd
+							class="text-dark-light-blue hover:text-dark-light-blue mb-4 font-light transition-colors"
+						>
 							{stringValue(item.value)}
 						</dd>
 					{/if}
@@ -1785,7 +1789,7 @@
 	</div>
 
 	<!-- Actions -->
-	<div class="flex flex-wrap items-center justify-between gap-2 border-t border-gray-700 p-4">
+	<div class="border-light-blue/20 flex flex-wrap items-center justify-between gap-2 border-t p-4">
 		<div class="flex min-w-0 flex-wrap items-center gap-2">
 			<!-- toggle edit mode if fields provided -->
 			{#if isEditing}
@@ -1795,7 +1799,7 @@
 					type="submit">Sauvegarder</button
 				>
 				<button
-					class="rounded-lg bg-gray-700 px-5 py-2.5 text-sm font-medium text-gray-300 hover:bg-gray-600 hover:text-white"
+					class="bg-dark-blue/60 text-dark-light-blue hover:bg-blue-gray/25 rounded-lg px-5 py-2.5 text-sm font-medium hover:text-white"
 					onclick={handleCancel}
 					type="button">Annuler</button
 				>
@@ -1829,7 +1833,7 @@
 			{#each actions as action (actionKey(action))}
 				{#if action.type === 'selector'}
 					<select
-						class=" focus:border-primary-500 focus:ring-primary-500 block w-full rounded-lg border border-gray-600 bg-gray-700 p-2.5 text-sm text-white placeholder-gray-400"
+						class=" focus:border-primary-500 focus:ring-primary-500 border-light-blue/30 bg-dark-blue/60 placeholder-dark-light-blue/50 block w-full rounded-lg border p-2.5 text-sm text-white"
 						onchange={action.handler}
 					>
 						<option disabled selected value="">Choisir une option</option>

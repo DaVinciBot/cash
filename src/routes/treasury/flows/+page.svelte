@@ -42,12 +42,14 @@
 <svelte:head><title>Dépenses et recettes — DaVinciBot</title></svelte:head>
 
 <section class="mx-auto max-w-5xl">
-	<a class="text-sm text-gray-400 hover:text-gray-200" href={resolve('/treasury')}>← Trésorerie</a>
+	<a class="text-dark-light-blue hover:text-light-blue text-sm" href={resolve('/treasury')}
+		>← Trésorerie</a
+	>
 
 	<header class="mt-3 mb-6 flex flex-wrap items-end justify-between gap-4">
 		<div>
 			<h1 class="text-2xl font-bold text-white">Dépenses et recettes</h1>
-			<p class="mt-1 text-sm text-gray-400">
+			<p class="text-dark-light-blue mt-1 text-sm">
 				Les mouvements de l'exercice. Ceux qui portent un numéro de commande ont été générés au
 				passage de celle-ci.
 			</p>
@@ -69,11 +71,11 @@
 
 	<!-- CMD-F-82 — délimitation par exercice fiscal -->
 	<form class="mb-4 flex flex-wrap items-center gap-3" method="GET">
-		<label class="text-xs text-gray-300">
+		<label class="text-dark-light-blue text-xs">
 			Exercice
 			<select
 				name="year"
-				class="mt-1 block rounded-lg border border-gray-600 bg-gray-700 p-2 text-sm text-white"
+				class="border-light-blue/30 bg-dark-blue/60 mt-1 block rounded-lg border p-2 text-sm text-white"
 				onchange={(event) => event.currentTarget.form?.requestSubmit()}
 				value={data.fiscalYearId ?? ''}
 			>
@@ -95,7 +97,7 @@
 
 	{#snippet flowForm(flow: (typeof data.flows)[number] | null)}
 		<form
-			class="mb-3 rounded-lg border border-gray-700 bg-gray-800 p-4"
+			class="border-light-blue/20 bg-blue-gray/15 mb-3 rounded-lg border p-4"
 			action={flow ? '?/update' : '?/create'}
 			method="POST"
 			use:enhance={() =>
@@ -108,53 +110,53 @@
 				<input name="id" type="hidden" value={flow.id} />
 			{/if}
 			<div class="flex flex-wrap items-end gap-3">
-				<label class="text-xs text-gray-300">
+				<label class="text-dark-light-blue text-xs">
 					Sens
 					<select
 						name="direction"
-						class="mt-1 block rounded-lg border border-gray-600 bg-gray-700 p-2 text-sm text-white"
+						class="border-light-blue/30 bg-dark-blue/60 mt-1 block rounded-lg border p-2 text-sm text-white"
 						value={flow?.direction ?? 'debit'}
 					>
 						<option value="debit">Dépense (débit)</option>
 						<option value="credit">Recette (crédit)</option>
 					</select>
 				</label>
-				<label class="text-xs text-gray-300">
+				<label class="text-dark-light-blue text-xs">
 					Montant TTC
 					<input
 						name="amount_ttc"
-						class="mt-1 block w-32 rounded-lg border border-gray-600 bg-gray-700 p-2 text-sm text-white"
+						class="border-light-blue/30 bg-dark-blue/60 mt-1 block w-32 rounded-lg border p-2 text-sm text-white"
 						inputmode="decimal"
 						required
 						value={flow ? flow.amountTtc.toFixed(2).replace('.', ',') : ''}
 					/>
 				</label>
-				<label class="text-xs text-gray-300">
+				<label class="text-dark-light-blue text-xs">
 					Date
 					<input
 						name="occurred_on"
-						class="mt-1 block rounded-lg border border-gray-600 bg-gray-700 p-2 text-sm text-white"
+						class="border-light-blue/30 bg-dark-blue/60 mt-1 block rounded-lg border p-2 text-sm text-white"
 						required
 						type="date"
 						value={flow?.occurredOn ?? today}
 					/>
 				</label>
-				<label class="flex-1 text-xs text-gray-300">
+				<label class="text-dark-light-blue flex-1 text-xs">
 					Libellé
 					<input
 						name="label"
-						class="mt-1 block w-full rounded-lg border border-gray-600 bg-gray-700 p-2 text-sm text-white"
+						class="border-light-blue/30 bg-dark-blue/60 mt-1 block w-full rounded-lg border p-2 text-sm text-white"
 						required
 						value={flow?.label ?? ''}
 					/>
 				</label>
 			</div>
 			<div class="mt-3 flex flex-wrap items-end gap-3">
-				<label class="text-xs text-gray-300">
+				<label class="text-dark-light-blue text-xs">
 					Compte
 					<select
 						name="account_id"
-						class="mt-1 block rounded-lg border border-gray-600 bg-gray-700 p-2 text-sm text-white"
+						class="border-light-blue/30 bg-dark-blue/60 mt-1 block rounded-lg border p-2 text-sm text-white"
 						value={flow?.accountId ?? data.accounts.at(0)?.id}
 					>
 						{#each data.accounts as account (account.id)}
@@ -162,11 +164,11 @@
 						{/each}
 					</select>
 				</label>
-				<label class="text-xs text-gray-300">
+				<label class="text-dark-light-blue text-xs">
 					Exercice
 					<select
 						name="fiscal_year_id"
-						class="mt-1 block rounded-lg border border-gray-600 bg-gray-700 p-2 text-sm text-white"
+						class="border-light-blue/30 bg-dark-blue/60 mt-1 block rounded-lg border p-2 text-sm text-white"
 						value={flow?.fiscalYearId ?? openYear?.id}
 					>
 						{#each data.periods.fiscalYears as year (year.id)}
@@ -174,11 +176,11 @@
 						{/each}
 					</select>
 				</label>
-				<label class="flex-1 text-xs text-gray-300">
+				<label class="text-dark-light-blue flex-1 text-xs">
 					Budget imputé
 					<select
 						name="budget_id"
-						class="mt-1 block w-full rounded-lg border border-gray-600 bg-gray-700 p-2 text-sm text-white"
+						class="border-light-blue/30 bg-dark-blue/60 mt-1 block w-full rounded-lg border p-2 text-sm text-white"
 						disabled={flow !== null && isFlowGenerated(flow.origin)}
 						value={flow?.budgetId ?? ''}
 					>
@@ -190,7 +192,7 @@
 				</label>
 			</div>
 			{#if flow && isFlowGenerated(flow.origin)}
-				<p class="mt-2 text-xs text-gray-500">
+				<p class="text-dark-light-blue/70 mt-2 text-xs">
 					Ce mouvement vient de la commande #{flow.orderId} : sa ventilation budgétaire se lit dans la
 					répartition de la commande, pas sur le mouvement.
 				</p>
@@ -201,7 +203,7 @@
 					type="submit">Enregistrer</button
 				>
 				<button
-					class="rounded-lg border border-gray-600 px-3 py-2 text-sm text-gray-300 hover:bg-gray-700"
+					class="border-light-blue/30 text-dark-light-blue hover:bg-blue-gray/15 rounded-lg border px-3 py-2 text-sm"
 					onclick={() => (editing = null)}
 					type="button">Annuler</button
 				>
@@ -214,26 +216,28 @@
 	{/if}
 
 	{#if data.flows.length === 0}
-		<p class="rounded-lg border border-dashed border-gray-600 px-4 py-12 text-center text-gray-400">
+		<p
+			class="border-light-blue/30 text-dark-light-blue rounded-lg border border-dashed px-4 py-12 text-center"
+		>
 			Aucun mouvement sur cet exercice.
 		</p>
 	{:else}
 		<ul class="space-y-2">
 			{#each data.flows as flow (flow.id)}
-				<li class="rounded-lg border border-gray-700 bg-gray-800 p-4">
+				<li class="border-light-blue/20 bg-blue-gray/15 rounded-lg border p-4">
 					<div class="flex flex-wrap items-center gap-3">
 						<StateBadge badge={FLOW_DIRECTION_BADGES[flow.direction]} />
 						<span class="font-medium text-white">{flow.label}</span>
 						{#if flow.orderId !== null}
 							<a
-								class="text-xs text-gray-400 underline hover:text-gray-200"
+								class="text-dark-light-blue hover:text-light-blue text-xs underline"
 								href={resolve('/orders/[id]', { id: String(flow.orderId) })}
 							>
 								commande #{flow.orderId}
 							</a>
 						{/if}
 						{#if flow.reversesFlowId !== null}
-							<span class="rounded-full bg-gray-700 px-2 py-0.5 text-xs text-gray-300"
+							<span class="bg-dark-blue/60 text-dark-light-blue rounded-full px-2 py-0.5 text-xs"
 								>contrepassation</span
 							>
 						{/if}
@@ -243,7 +247,7 @@
 								: 'text-rose-300'}">{euro.format(flow.amountTtc)}</span
 						>
 					</div>
-					<p class="mt-1 text-sm text-gray-400">
+					<p class="text-dark-light-blue mt-1 text-sm">
 						{day.format(new Date(flow.occurredOn))} · {flow.accountName} · {flow.fiscalYearLabel}
 						{#if flow.budgetName}· {flow.budgetName}{/if}
 						{#if flow.isReconciled}· <span class="text-emerald-300">pointé</span>{/if}
@@ -253,7 +257,7 @@
 						<ul class="mt-2 flex flex-wrap gap-2">
 							{#each flow.proofs as proof (proof.id)}
 								<li
-									class="flex items-center gap-2 rounded border border-gray-600 px-2 py-1 text-xs text-gray-300"
+									class="border-light-blue/30 text-dark-light-blue flex items-center gap-2 rounded border px-2 py-1 text-xs"
 								>
 									{#if proof.url}
 										<!-- eslint-disable svelte/no-navigation-without-resolve -- URL signée du bucket de stockage -->
@@ -288,17 +292,17 @@
 							<input name="id" type="hidden" value={flow.id} />
 							<input
 								name="file"
-								class="text-xs text-gray-300"
+								class="text-dark-light-blue text-xs"
 								accept="image/png,image/jpeg,application/pdf"
 								required
 								type="file"
 							/>
 							<button
-								class="rounded-lg border border-gray-600 px-3 py-1 text-xs text-gray-200 hover:bg-gray-700"
+								class="border-light-blue/30 text-light-blue hover:bg-blue-gray/15 rounded-lg border px-3 py-1 text-xs"
 								type="submit">Déposer</button
 							>
 							<button
-								class="text-xs text-gray-400 hover:text-gray-200"
+								class="text-dark-light-blue hover:text-light-blue text-xs"
 								onclick={() => (uploading = null)}
 								type="button">annuler</button
 							>
@@ -307,12 +311,12 @@
 
 					<div class="mt-3 flex flex-wrap items-center gap-2">
 						<button
-							class="rounded-lg border border-gray-600 px-3 py-1 text-xs text-gray-200 hover:bg-gray-700"
+							class="border-light-blue/30 text-light-blue hover:bg-blue-gray/15 rounded-lg border px-3 py-1 text-xs"
 							onclick={() => (editing = editing === flow.id ? null : flow.id)}
 							type="button">Modifier</button
 						>
 						<button
-							class="rounded-lg border border-gray-600 px-3 py-1 text-xs text-gray-200 hover:bg-gray-700"
+							class="border-light-blue/30 text-light-blue hover:bg-blue-gray/15 rounded-lg border px-3 py-1 text-xs"
 							onclick={() => (uploading = uploading === flow.id ? null : flow.id)}
 							type="button">Justificatif</button
 						>
@@ -320,7 +324,7 @@
 							<input name="id" type="hidden" value={flow.id} />
 							<input name="reconciled" type="hidden" value={flow.isReconciled ? '0' : '1'} />
 							<button
-								class="rounded-lg border border-gray-600 px-3 py-1 text-xs text-gray-200 hover:bg-gray-700"
+								class="border-light-blue/30 text-light-blue hover:bg-blue-gray/15 rounded-lg border px-3 py-1 text-xs"
 								type="submit">{flow.isReconciled ? 'Dépointer' : 'Pointer'}</button
 							>
 						</form>
@@ -334,7 +338,7 @@
 					</div>
 
 					{#if flow.orderId !== null && !flow.isReconciled && flow.reversesFlowId === null}
-						<p class="mt-2 text-xs text-gray-500">
+						<p class="text-dark-light-blue/70 mt-2 text-xs">
 							Non pointé : ce montant suivra automatiquement toute correction de la commande. Le
 							pointer le fige.
 						</p>

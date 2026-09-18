@@ -92,7 +92,7 @@
 <section class="mx-auto max-w-6xl">
 	<header class="mb-6">
 		<h1 class="text-2xl font-bold text-white">Items à valider</h1>
-		<p class="mt-1 text-sm text-gray-400">
+		<p class="text-dark-light-blue mt-1 text-sm">
 			Les demandes en attente sur {projects.length > 1 ? 'vos projets' : 'votre projet'}, de la plus
 			ancienne à la plus récente. Un item validé part aussitôt dans la file du trésorier ; un item
 			refusé sort du circuit avec son motif, visible par son auteur.
@@ -116,7 +116,9 @@
 	{/if}
 
 	{#if projects.length === 0}
-		<p class="rounded-lg border border-dashed border-gray-600 px-4 py-12 text-center text-gray-400">
+		<p
+			class="border-light-blue/30 text-dark-light-blue rounded-lg border border-dashed px-4 py-12 text-center"
+		>
 			Vous n'êtes chef de projet d'aucun projet actif : il n'y a rien à revoir ici.
 		</p>
 	{:else}
@@ -124,16 +126,16 @@
 			<div class="mb-4 flex flex-wrap items-center gap-2">
 				<button
 					class="rounded-full px-3 py-1 text-xs font-medium {projectFilter === 'all'
-						? 'bg-white text-gray-900'
-						: 'bg-gray-700 text-gray-300 hover:bg-gray-600'}"
+						? 'bg-light-blue text-dark-blue'
+						: 'bg-dark-blue/60 text-dark-light-blue hover:bg-blue-gray/25'}"
 					onclick={() => (projectFilter = 'all')}
 					type="button">Tous les projets ({items.length})</button
 				>
 				{#each projects as project (project.id)}
 					<button
 						class="rounded-full px-3 py-1 text-xs font-medium {projectFilter === project.id
-							? 'bg-white text-gray-900'
-							: 'bg-gray-700 text-gray-300 hover:bg-gray-600'}"
+							? 'bg-light-blue text-dark-blue'
+							: 'bg-dark-blue/60 text-dark-light-blue hover:bg-blue-gray/25'}"
 						onclick={() => (projectFilter = project.id)}
 						type="button"
 						>{project.name} ({items.filter((i) => i.projectId === project.id).length})</button
@@ -144,24 +146,24 @@
 
 		{#if visible.length === 0}
 			<p
-				class="rounded-lg border border-dashed border-gray-600 px-4 py-12 text-center text-gray-400"
+				class="border-light-blue/30 text-dark-light-blue rounded-lg border border-dashed px-4 py-12 text-center"
 			>
 				Aucune demande en attente. Tout est à jour.
 			</p>
 		{:else}
 			<div
-				class="mb-3 flex flex-wrap items-center gap-3 rounded-lg border border-gray-700 bg-gray-800/60 px-4 py-3"
+				class="border-light-blue/20 bg-blue-gray/15 mb-3 flex flex-wrap items-center gap-3 rounded-lg border px-4 py-3"
 			>
-				<label class="flex items-center gap-2 text-sm text-gray-300">
+				<label class="text-dark-light-blue flex items-center gap-2 text-sm">
 					<input
-						class="size-4 rounded border-gray-600 bg-gray-700"
+						class="border-light-blue/30 bg-dark-blue/60 size-4 rounded"
 						checked={allVisibleSelected}
 						onchange={toggleAll}
 						type="checkbox"
 					/>
 					Tout sélectionner
 				</label>
-				<span class="text-sm text-gray-400">{selectedVisible.length} sélectionné(s)</span>
+				<span class="text-dark-light-blue text-sm">{selectedVisible.length} sélectionné(s)</span>
 
 				<div class="ml-auto flex flex-wrap items-center gap-2">
 					<form action="?/approve" method="POST" use:enhance>
@@ -203,23 +205,23 @@
 					<h2 class="text-sm font-semibold text-rose-200">
 						Refuser {refusing.length === 1 ? 'cet item' : `ces ${String(refusing.length)} items`}
 					</h2>
-					<p class="mt-1 text-xs text-gray-400">
+					<p class="text-dark-light-blue mt-1 text-xs">
 						{refusedItems.map((i) => i.name).join(' · ')}
 					</p>
-					<label class="mt-3 block text-sm text-gray-300" for="refusal-reason">
+					<label class="text-dark-light-blue mt-3 block text-sm" for="refusal-reason">
 						Motif — il sera lu par {refusedItems.length === 1 ? 'son auteur' : 'leurs auteurs'}
 					</label>
 					<textarea
 						id="refusal-reason"
 						name="reason"
-						class="mt-1 w-full rounded-lg border border-gray-600 bg-gray-700 p-2 text-sm text-white placeholder-gray-400"
+						class="border-light-blue/30 bg-dark-blue/60 placeholder-dark-light-blue/50 mt-1 w-full rounded-lg border p-2 text-sm text-white"
 						placeholder="Ex. : hors budget ce trimestre, à représenter en septembre."
 						rows="3"
 						bind:value={reason}></textarea>
 					{#if reasonError}
 						<p class="mt-1 text-xs text-rose-300">{reasonError}</p>
 					{:else}
-						<p class="mt-1 text-xs text-gray-500">
+						<p class="text-dark-light-blue/70 mt-1 text-xs">
 							{REFUSAL_REASON_MIN_LENGTH} caractères minimum.
 						</p>
 					{/if}
@@ -230,7 +232,7 @@
 							type="submit">Confirmer le refus</button
 						>
 						<button
-							class="rounded-lg border border-gray-600 px-3 py-1.5 text-sm text-gray-300 hover:bg-gray-700"
+							class="border-light-blue/30 text-dark-light-blue hover:bg-blue-gray/15 rounded-lg border px-3 py-1.5 text-sm"
 							onclick={closeRefusal}
 							type="button">Annuler</button
 						>
@@ -240,10 +242,10 @@
 
 			<ul class="space-y-3">
 				{#each visible as item (item.id)}
-					<li class="rounded-lg border border-gray-700 bg-gray-800 p-4">
+					<li class="border-light-blue/20 bg-blue-gray/15 rounded-lg border p-4">
 						<div class="flex flex-wrap items-start gap-3">
 							<input
-								class="mt-1 size-4 shrink-0 rounded border-gray-600 bg-gray-700"
+								class="border-light-blue/30 bg-dark-blue/60 mt-1 size-4 shrink-0 rounded"
 								checked={selected.has(item.id)}
 								onchange={() => {
 									toggle(item.id);
@@ -267,13 +269,13 @@
 									{/if}
 									<CampusBadge campus={item.campus} />
 								</div>
-								<p class="mt-1 text-sm text-gray-400">
+								<p class="text-dark-light-blue mt-1 text-sm">
 									{item.projectName} · demandé par
-									<span class="text-gray-200">{item.requesterName}</span>
+									<span class="text-light-blue">{item.requesterName}</span>
 									· {item.quantity} × {euro.format(item.unitPriceTtc)} =
-									<span class="font-medium text-gray-200">{euro.format(item.totalTtc)}</span>
+									<span class="text-light-blue font-medium">{euro.format(item.totalTtc)}</span>
 								</p>
-								<p class="mt-1 text-xs text-gray-500">
+								<p class="text-dark-light-blue/70 mt-1 text-xs">
 									{day.format(new Date(item.createdAt))}
 									{#if waitingDays(item.createdAt) >= 1}
 										· en attente depuis {waitingDays(item.createdAt)} jour(s)
@@ -283,7 +285,7 @@
 									{/if}
 								</p>
 								{#if item.note}
-									<p class="mt-2 rounded bg-gray-700/50 px-2 py-1 text-sm text-gray-300">
+									<p class="bg-dark-blue/40 text-dark-light-blue mt-2 rounded px-2 py-1 text-sm">
 										{item.note}
 									</p>
 								{/if}

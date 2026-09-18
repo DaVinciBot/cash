@@ -537,13 +537,13 @@
 	</div>
 	<div class="grid grid-cols-1 gap-4 md:grid-cols-3">
 		<!-- Editor -->
-		<div class="rounded-lg border border-gray-700 bg-gray-800/40 p-3 md:col-span-2">
+		<div class="border-light-blue/20 bg-blue-gray/15 rounded-lg border p-3 md:col-span-2">
 			<div class="mb-2 flex items-center justify-between">
 				<div class="text-sm">Contenu</div>
 				<label class="flex items-center gap-2 text-xs">
 					<span class="opacity-80">Ajouter un fichier</span>
 					<input
-						class="text-xs file:mr-4 file:rounded file:border-0 file:bg-gray-700 file:px-2 file:py-1 file:text-xs file:text-white hover:file:bg-gray-600"
+						class="file:bg-dark-blue/60 hover:file:bg-blue-gray/30 text-xs file:mr-4 file:rounded file:border-0 file:px-2 file:py-1 file:text-xs file:text-white"
 						onchange={handleUpload}
 						type="file"
 					/>
@@ -552,29 +552,29 @@
 			<CartaEditor {carta} bind:value={body} />
 		</div>
 		<!-- Sidebar -->
-		<div class="flex flex-col gap-4 rounded-lg border border-gray-700 bg-gray-800/40 p-3">
+		<div class="border-light-blue/20 bg-blue-gray/15 flex flex-col gap-4 rounded-lg border p-3">
 			<div>
 				<label class="mb-1 block text-sm" for="search">Rechercher par titre</label>
 				<input
 					id="search"
-					class="w-full rounded border border-gray-700 bg-gray-900 px-3 py-2"
+					class="border-light-blue/20 bg-dark-blue/60 w-full rounded border px-3 py-2"
 					placeholder="Rechercher..."
 					bind:value={search}
 				/>
 			</div>
-			<div class="max-h-64 overflow-auto rounded border border-gray-700">
+			<div class="border-light-blue/20 max-h-64 overflow-auto rounded border">
 				{#if loadingList}
-					<div class="p-3 text-sm text-gray-400">Chargement…</div>
+					<div class="text-dark-light-blue p-3 text-sm">Chargement…</div>
 				{:else if !articles.length}
-					<div class="p-3 text-sm text-gray-400">Aucun article</div>
+					<div class="text-dark-light-blue p-3 text-sm">Aucun article</div>
 				{:else}
-					<ul class="divide-y divide-gray-700">
+					<ul class="divide-light-blue/10 divide-y">
 						{#each articles.filter((a) => (a.title ?? '')
 								.toLowerCase()
 								.includes(search.toLowerCase())) as a (a.slug)}
 							<li>
 								<button
-									class={`w-full cursor-pointer rounded p-2 text-left hover:bg-gray-700/40 ${a.slug === selectedSlug ? 'bg-gray-700/30' : ''}`}
+									class={`hover:bg-blue-gray/15 w-full cursor-pointer rounded p-2 text-left ${a.slug === selectedSlug ? 'bg-dark-blue/40' : ''}`}
 									onclick={() => {
 										if (a.slug) {
 											void loadArticle(a.slug);
@@ -584,13 +584,13 @@
 								>
 									<div class="text-sm font-medium">{a.title}</div>
 									<div class="flex items-center justify-between gap-2">
-										<div class="truncate text-xs text-gray-400">{a.slug}</div>
+										<div class="text-dark-light-blue truncate text-xs">{a.slug}</div>
 										<span
 											class="rounded-full px-1.5 py-0.5 text-[10px] {a.state === 'published'
 												? 'border border-green-800 bg-green-900/50 text-green-300'
 												: a.state === 'deleted'
 													? 'border border-red-800 bg-red-900/50 text-red-300'
-													: 'border border-gray-600 bg-gray-700 text-gray-300'}"
+													: 'border-light-blue/30 bg-dark-blue/60 text-dark-light-blue border'}"
 										>
 											{a.state === 'published'
 												? 'Publié'
@@ -600,7 +600,7 @@
 										</span>
 									</div>
 									{#if a.date}
-										<div class="text-[10px] text-gray-500">
+										<div class="text-dark-light-blue/70 text-[10px]">
 											{new Date(a.date).toLocaleDateString('fr-FR')}
 										</div>
 									{/if}
@@ -614,7 +614,7 @@
 				<label class="mb-1 block text-sm" for="title">Titre</label>
 				<input
 					id="title"
-					class="w-full rounded border border-gray-700 bg-gray-900 px-3 py-2"
+					class="border-light-blue/20 bg-dark-blue/60 w-full rounded border px-3 py-2"
 					oninput={() => (slug = toSlug(title))}
 					bind:value={title}
 				/>
@@ -623,7 +623,7 @@
 				<label class="mb-1 block text-sm" for="slug">Slug</label>
 				<input
 					id="slug"
-					class="w-full rounded border border-gray-700 bg-gray-900 px-3 py-2"
+					class="border-light-blue/20 bg-dark-blue/60 w-full rounded border px-3 py-2"
 					bind:value={slug}
 				/>
 			</div>
@@ -631,7 +631,7 @@
 				<label class="mb-1 block text-sm" for="state">État</label>
 				<select
 					id="state"
-					class="w-full rounded border border-gray-700 bg-gray-900 px-3 py-2"
+					class="border-light-blue/20 bg-dark-blue/60 w-full rounded border px-3 py-2"
 					bind:value={articleState}
 				>
 					<option value="draft">Brouillon</option>
@@ -643,7 +643,7 @@
 				<label class="mb-1 block text-sm" for="excerpt">Extrait</label>
 				<textarea
 					id="excerpt"
-					class="w-full rounded border border-gray-700 bg-gray-900 px-3 py-2"
+					class="border-light-blue/20 bg-dark-blue/60 w-full rounded border px-3 py-2"
 					rows="3"
 					bind:value={meta.excerpt}></textarea>
 			</div>
@@ -653,7 +653,7 @@
 				>
 				<input
 					id="tags"
-					class="w-full rounded border border-gray-700 bg-gray-900 px-3 py-2"
+					class="border-light-blue/20 bg-dark-blue/60 w-full rounded border px-3 py-2"
 					bind:value={meta.tag}
 				/>
 			</div>
@@ -661,19 +661,19 @@
 				<label class="mb-1 block text-sm" for="heroImage">Image de couverture (URL)</label>
 				<input
 					id="heroImage"
-					class="w-full rounded border border-gray-700 bg-gray-900 px-3 py-2"
+					class="border-light-blue/20 bg-dark-blue/60 w-full rounded border px-3 py-2"
 					bind:value={meta.heroImage}
 				/>
 				<div class="mt-2 flex items-center gap-2">
 					<input
-						class="text-xs file:mr-4 file:rounded file:border-0 file:bg-gray-700 file:px-2 file:py-1 file:text-xs file:text-white hover:file:bg-gray-600"
+						class="file:bg-dark-blue/60 hover:file:bg-blue-gray/30 text-xs file:mr-4 file:rounded file:border-0 file:px-2 file:py-1 file:text-xs file:text-white"
 						accept="image/*"
 						onchange={handleCoverUpload}
 						type="file"
 					/>
 					{#if meta.heroImage}
 						<img
-							class="h-10 w-10 rounded border border-gray-700 object-cover"
+							class="border-light-blue/20 h-10 w-10 rounded border object-cover"
 							alt="couverture"
 							src={meta.heroImage}
 						/>
@@ -684,7 +684,7 @@
 				<label class="mb-1 block text-sm" for="heroAlt">Texte alternatif</label>
 				<input
 					id="heroAlt"
-					class="w-full rounded border border-gray-700 bg-gray-900 px-3 py-2"
+					class="border-light-blue/20 bg-dark-blue/60 w-full rounded border px-3 py-2"
 					bind:value={meta.heroAlt}
 				/>
 			</div>
@@ -693,7 +693,7 @@
 					<label class="mb-1 block text-sm" for="authorName">Auteur</label>
 					<input
 						id="authorName"
-						class="w-full rounded border border-gray-700 bg-gray-900 px-3 py-2"
+						class="border-light-blue/20 bg-dark-blue/60 w-full rounded border px-3 py-2"
 						bind:value={meta.author.name}
 					/>
 				</div>
@@ -701,7 +701,7 @@
 					<label class="mb-1 block text-sm" for="authorRole">Rôle</label>
 					<input
 						id="authorRole"
-						class="w-full rounded border border-gray-700 bg-gray-900 px-3 py-2"
+						class="border-light-blue/20 bg-dark-blue/60 w-full rounded border px-3 py-2"
 						bind:value={meta.author.role}
 					/>
 				</div>
@@ -720,7 +720,9 @@
 
 {#if saving || message}
 	<div class="fixed inset-0 z-50 flex items-center justify-center bg-black/50">
-		<div class="w-full max-w-sm rounded-lg border border-gray-700 bg-gray-800 p-6 shadow-xl">
+		<div
+			class="border-light-blue/20 bg-blue-gray/15 w-full max-w-sm rounded-lg border p-6 shadow-xl"
+		>
 			{#if saveSteps.length > 0}
 				<div class="mb-4">
 					<Stepper steps={saveSteps} />
@@ -729,7 +731,7 @@
 			<div class="mb-4 text-lg font-semibold text-white">
 				{saving ? 'Enregistrement en cours...' : 'Information'}
 			</div>
-			<div class="mb-4 text-gray-300">{message}</div>
+			<div class="text-dark-light-blue mb-4">{message}</div>
 			{#if !saving}
 				<div class="flex justify-end">
 					<button

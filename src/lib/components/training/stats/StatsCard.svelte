@@ -20,12 +20,12 @@
 </script>
 
 <section class="mb-8">
-	<h2 class="mb-1 text-sm font-semibold tracking-wide text-gray-300 uppercase">{title}</h2>
+	<h2 class="text-dark-light-blue mb-1 text-sm font-semibold tracking-wide uppercase">{title}</h2>
 	{#if hint}
-		<p class="mb-3 text-xs text-gray-500">{hint}</p>
+		<p class="text-dark-light-blue/70 mb-3 text-xs">{hint}</p>
 	{/if}
 	{#if boxed}
-		<div class="rounded-lg border border-gray-700 bg-gray-800 p-4">
+		<div class="border-light-blue/20 bg-blue-gray/15 rounded-lg border p-4">
 			{@render children()}
 		</div>
 	{:else}

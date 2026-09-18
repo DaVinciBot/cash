@@ -36,7 +36,7 @@
 <section class="mx-auto max-w-3xl">
 	<header class="mb-6">
 		<h1 class="text-2xl font-bold text-white">Modifier un item</h1>
-		<p class="mt-1 flex flex-wrap items-center gap-2 text-sm text-gray-400">
+		<p class="text-dark-light-blue mt-1 flex flex-wrap items-center gap-2 text-sm">
 			<span>{data.projectName}</span>
 			<CampusBadge campus={data.item.campus} />
 			<span>
@@ -55,7 +55,7 @@
 	{/if}
 
 	<form
-		class="rounded-lg border border-gray-700 bg-gray-800 p-6"
+		class="border-light-blue/20 bg-blue-gray/15 rounded-lg border p-6"
 		method="POST"
 		use:enhance={() => {
 			submitting = true;
@@ -67,28 +67,28 @@
 	>
 		<div class="grid gap-4 sm:grid-cols-12">
 			<label class="sm:col-span-6">
-				<span class="mb-1 block text-sm text-gray-300">Nom</span>
+				<span class="text-dark-light-blue mb-1 block text-sm">Nom</span>
 				<input
 					name="name"
-					class="w-full rounded-lg border border-gray-600 bg-gray-700 p-2.5 text-white"
+					class="border-light-blue/30 bg-dark-blue/60 w-full rounded-lg border p-2.5 text-white"
 					required
 					bind:value={name}
 				/>
 			</label>
 			<label class="sm:col-span-6">
-				<span class="mb-1 block text-sm text-gray-300">Lien</span>
+				<span class="text-dark-light-blue mb-1 block text-sm">Lien</span>
 				<input
 					name="link"
-					class="w-full rounded-lg border border-gray-600 bg-gray-700 p-2.5 text-white"
+					class="border-light-blue/30 bg-dark-blue/60 w-full rounded-lg border p-2.5 text-white"
 					type="url"
 					bind:value={link}
 				/>
 			</label>
 			<label class="sm:col-span-3">
-				<span class="mb-1 block text-sm text-gray-300">Prix unitaire TTC</span>
+				<span class="text-dark-light-blue mb-1 block text-sm">Prix unitaire TTC</span>
 				<input
 					name="unit_price_ttc"
-					class="w-full rounded-lg border border-gray-600 bg-gray-700 p-2.5 text-white"
+					class="border-light-blue/30 bg-dark-blue/60 w-full rounded-lg border p-2.5 text-white"
 					min="0"
 					required
 					step="0.01"
@@ -97,10 +97,10 @@
 				/>
 			</label>
 			<label class="sm:col-span-3">
-				<span class="mb-1 block text-sm text-gray-300">Quantité</span>
+				<span class="text-dark-light-blue mb-1 block text-sm">Quantité</span>
 				<input
 					name="quantity"
-					class="w-full rounded-lg border border-gray-600 bg-gray-700 p-2.5 text-white"
+					class="border-light-blue/30 bg-dark-blue/60 w-full rounded-lg border p-2.5 text-white"
 					min="1"
 					required
 					step="1"
@@ -109,13 +109,13 @@
 				/>
 			</label>
 			<div class="sm:col-span-6">
-				<span class="mb-1 block text-sm text-gray-300">Tags</span>
+				<span class="text-dark-light-blue mb-1 block text-sm">Tags</span>
 				<div class="flex flex-wrap gap-2 pt-1.5">
 					{#each ITEM_TAGS as tag (tag)}
 						<button
 							class="rounded-full px-3 py-1 text-xs {tags.includes(tag)
-								? 'bg-white text-gray-900'
-								: 'bg-gray-700 text-gray-300 hover:bg-gray-600'}"
+								? 'bg-light-blue text-dark-blue'
+								: 'bg-dark-blue/60 text-dark-light-blue hover:bg-blue-gray/25'}"
 							onclick={() => {
 								toggleTag(tag);
 							}}
@@ -126,10 +126,10 @@
 				<input name="tags" type="hidden" value={JSON.stringify(tags)} />
 			</div>
 			<label class="sm:col-span-12">
-				<span class="mb-1 block text-sm text-gray-300">Note</span>
+				<span class="text-dark-light-blue mb-1 block text-sm">Note</span>
 				<textarea
 					name="note"
-					class="w-full rounded-lg border border-gray-600 bg-gray-700 p-2.5 text-white"
+					class="border-light-blue/30 bg-dark-blue/60 w-full rounded-lg border p-2.5 text-white"
 					rows="2"
 					bind:value={note}></textarea>
 			</label>
@@ -139,7 +139,7 @@
 			<span class="text-lg font-medium text-white">Total : {euro.format(total)}</span>
 			<div class="flex gap-3">
 				<a
-					class="rounded-lg border border-gray-600 px-4 py-2 text-sm text-gray-300 hover:bg-gray-700"
+					class="border-light-blue/30 text-dark-light-blue hover:bg-blue-gray/15 rounded-lg border px-4 py-2 text-sm"
 					href={resolve('/')}>Annuler</a
 				>
 				<button

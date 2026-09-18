@@ -33,13 +33,13 @@
 
 <section>
 	{#if title}
-		<h2 class="mb-3 text-sm font-semibold tracking-wide text-gray-400 uppercase">{title}</h2>
+		<h2 class="text-dark-light-blue mb-3 text-sm font-semibold tracking-wide uppercase">{title}</h2>
 	{/if}
 
 	{#if entries.length === 0}
-		<p class="text-sm text-gray-500">{empty}</p>
+		<p class="text-dark-light-blue/70 text-sm">{empty}</p>
 	{:else}
-		<ol class="relative space-y-1 border-l border-gray-700 pl-4">
+		<ol class="border-light-blue/20 relative space-y-1 border-l pl-4">
 			{#each entries as entry (entry.id)}
 				{@const badge = ACTIVITY_BADGES[entry.kind]}
 				{@const detailed = entry.changes.length > 0}
@@ -57,7 +57,7 @@
 					}}
 				>
 					<span
-						class="absolute top-2.5 -left-5.25 size-2 rounded-full bg-gray-600"
+						class="bg-blue-gray/30 absolute top-2.5 -left-5.25 size-2 rounded-full"
 						aria-hidden="true"
 					></span>
 
@@ -65,14 +65,15 @@
 						<span class="rounded px-1.5 py-0.5 text-xs font-medium {badge.className}"
 							>{badge.emoji} {badge.label}</span
 						>
-						<span class="text-gray-200">{summarizeActivity(entry)}</span>
-						<span class="text-gray-500">par {actorLabel(entry)}</span>
-						<time class="ml-auto shrink-0 text-xs text-gray-500" datetime={entry.occurredAt}
-							>{moment.format(new Date(entry.occurredAt))}</time
+						<span class="text-light-blue">{summarizeActivity(entry)}</span>
+						<span class="text-dark-light-blue/70">par {actorLabel(entry)}</span>
+						<time
+							class="text-dark-light-blue/70 ml-auto shrink-0 text-xs"
+							datetime={entry.occurredAt}>{moment.format(new Date(entry.occurredAt))}</time
 						>
 						{#if detailed}
 							<button
-								class="text-xs text-gray-400 underline decoration-dotted hover:text-gray-200"
+								class="text-dark-light-blue hover:text-light-blue text-xs underline decoration-dotted"
 								aria-expanded={open === entry.id}
 								onclick={() => (open = open === entry.id ? null : entry.id)}
 								type="button">{open === entry.id ? 'masquer' : 'détail'}</button
@@ -81,20 +82,20 @@
 					</div>
 
 					{#if detailed && open === entry.id}
-						<dl class="mb-2 rounded-lg bg-gray-800/60 p-3 text-xs ring-1 ring-gray-700">
+						<dl class="bg-blue-gray/15 ring-light-blue/20 mb-2 rounded-lg p-3 text-xs ring-1">
 							{#each entry.changes as change (change.field)}
 								<div class="flex flex-wrap items-baseline gap-2 py-0.5">
-									<dt class="w-44 shrink-0 text-gray-400">{fieldLabel(change.field)}</dt>
-									<dd class="text-gray-200">
+									<dt class="text-dark-light-blue w-44 shrink-0">{fieldLabel(change.field)}</dt>
+									<dd class="text-light-blue">
 										{#if isOpaqueField(change.field)}
 											<!-- Un identifiant brut n'apprend rien : « projet 12 → projet 7 »
 											     ne dit que ce que le nom du champ dit déjà. -->
-											<span class="text-gray-500">modifié</span>
+											<span class="text-dark-light-blue/70">modifié</span>
 										{:else}
-											<span class="text-gray-500 line-through"
+											<span class="text-dark-light-blue/70 line-through"
 												>{formatJournalValue(change.old)}</span
 											>
-											<span class="mx-1 text-gray-600">→</span>
+											<span class="text-dark-light-blue/70 mx-1">→</span>
 											<span>{formatJournalValue(change.new)}</span>
 										{/if}
 									</dd>

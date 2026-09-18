@@ -36,7 +36,7 @@
 <section class="mx-auto max-w-5xl">
 	<header class="mb-6">
 		<h1 class="text-2xl font-bold text-white">Audit</h1>
-		<p class="mt-1 text-sm text-gray-400">
+		<p class="text-dark-light-blue mt-1 text-sm">
 			Ce qui a changé, qui l'a changé, et ce que les règles ont refusé. L'historique d'une ligne
 			précise, lui, se lit sur la ligne elle-même.
 		</p>
@@ -47,8 +47,8 @@
 		{#each TABS as tab (tab.id)}
 			<a
 				class="rounded-lg px-3 py-2 text-sm {data.tab === tab.id
-					? 'bg-white text-gray-900'
-					: 'bg-gray-700 text-gray-300 hover:bg-gray-600'}"
+					? 'bg-light-blue text-dark-blue'
+					: 'bg-dark-blue/60 text-dark-light-blue hover:bg-blue-gray/25'}"
 				href={tabHref(tab.id)}
 				title={tab.hint}>{tab.label}</a
 			>
@@ -62,15 +62,15 @@
 		<div class="mb-4 flex flex-wrap items-center gap-2">
 			<a
 				class="rounded-full px-3 py-1 text-xs font-medium {data.sqlstate
-					? 'bg-gray-700 text-gray-300 hover:bg-gray-600'
-					: 'bg-white text-gray-900'}"
+					? 'bg-dark-blue/60 text-dark-light-blue hover:bg-blue-gray/25'
+					: 'bg-light-blue text-dark-blue'}"
 				href={tabHref('rejets')}>Tous ({data.rejected.length})</a
 			>
 			{#each codes as code (code)}
 				<a
 					class="rounded-full px-3 py-1 text-xs font-medium {data.sqlstate === code
-						? 'bg-white text-gray-900'
-						: 'bg-gray-700 text-gray-300 hover:bg-gray-600'}"
+						? 'bg-light-blue text-dark-blue'
+						: 'bg-dark-blue/60 text-dark-light-blue hover:bg-blue-gray/25'}"
 					href={tabHref('rejets', { code })}
 					title={CASH_ERROR_MESSAGES[code] ?? ''}>{code}</a
 				>
@@ -78,11 +78,11 @@
 		</div>
 
 		{#if data.rejected.length === 0}
-			<p class="text-sm text-gray-500">Aucune écriture rejetée enregistrée.</p>
+			<p class="text-dark-light-blue/70 text-sm">Aucune écriture rejetée enregistrée.</p>
 		{:else}
-			<div class="overflow-x-auto rounded-lg ring-1 ring-gray-700">
+			<div class="ring-light-blue/20 overflow-x-auto rounded-lg ring-1">
 				<table class="w-full min-w-3xl text-left text-sm">
-					<thead class="bg-gray-800 text-xs text-gray-400 uppercase">
+					<thead class="bg-blue-gray/15 text-dark-light-blue text-xs uppercase">
 						<tr>
 							<th class="px-4 py-2">Quand</th>
 							<th class="px-4 py-2">Code</th>
@@ -91,10 +91,10 @@
 							<th class="px-4 py-2">Auteur</th>
 						</tr>
 					</thead>
-					<tbody class="divide-y divide-gray-700">
+					<tbody class="divide-light-blue/10 divide-y">
 						{#each data.rejected as row (row.id)}
-							<tr class="hover:bg-gray-800/50">
-								<td class="px-4 py-2 text-xs whitespace-nowrap text-gray-400"
+							<tr class="hover:bg-blue-gray/15">
+								<td class="text-dark-light-blue px-4 py-2 text-xs whitespace-nowrap"
 									>{moment.format(new Date(row.occurredAt))}</td
 								>
 								<td class="px-4 py-2">
@@ -102,18 +102,20 @@
 										>{row.sqlstate}</span
 									>
 								</td>
-								<td class="px-4 py-2 text-gray-200">
+								<td class="text-light-blue px-4 py-2">
 									{CASH_ERROR_MESSAGES[row.sqlstate] ?? row.message}
 								</td>
-								<td class="px-4 py-2 text-xs text-gray-400">
+								<td class="text-dark-light-blue px-4 py-2 text-xs">
 									{#if row.entityType}
 										{CASH_ENTITY_LABELS[row.entityType] ?? row.entityType}
-										{#if row.entityId}<span class="text-gray-600"> n° {row.entityId}</span>{/if}
+										{#if row.entityId}<span class="text-dark-light-blue/70">
+												n° {row.entityId}</span
+											>{/if}
 									{:else}
 										—
 									{/if}
 								</td>
-								<td class="px-4 py-2 text-xs text-gray-400"
+								<td class="text-dark-light-blue px-4 py-2 text-xs"
 									>{row.actorName ?? (row.actorId ? 'Compte supprimé' : 'Système')}</td
 								>
 							</tr>
@@ -126,29 +128,29 @@
 		<div class="mb-4 flex flex-wrap items-center gap-2">
 			<a
 				class="rounded-full px-3 py-1 text-xs font-medium {data.entityType
-					? 'bg-gray-700 text-gray-300 hover:bg-gray-600'
-					: 'bg-white text-gray-900'}"
+					? 'bg-dark-blue/60 text-dark-light-blue hover:bg-blue-gray/25'
+					: 'bg-light-blue text-dark-blue'}"
 				href={tabHref(data.tab)}>Tout</a
 			>
 			{#each Object.entries(entities) as [id, label] (id)}
 				<a
 					class="rounded-full px-3 py-1 text-xs font-medium {data.entityType === id
-						? 'bg-white text-gray-900'
-						: 'bg-gray-700 text-gray-300 hover:bg-gray-600'}"
+						? 'bg-light-blue text-dark-blue'
+						: 'bg-dark-blue/60 text-dark-light-blue hover:bg-blue-gray/25'}"
 					href={tabHref(data.tab, { entity: id })}>{label}</a
 				>
 			{/each}
 		</div>
 
 		{#if entries.length === 0}
-			<p class="text-sm text-gray-500">Aucun mouvement enregistré.</p>
+			<p class="text-dark-light-blue/70 text-sm">Aucun mouvement enregistré.</p>
 		{:else}
 			<ul class="space-y-3">
 				{#each entries as entry (entry.id)}
-					<li class="rounded-lg bg-gray-800/40 p-3 ring-1 ring-gray-700">
-						<p class="mb-1 text-xs text-gray-500">
+					<li class="bg-blue-gray/15 ring-light-blue/20 rounded-lg p-3 ring-1">
+						<p class="text-dark-light-blue/70 mb-1 text-xs">
 							{entities[entry.entityType] ?? entry.entityType}
-							<span class="text-gray-600">n° {entry.entityId}</span>
+							<span class="text-dark-light-blue/70">n° {entry.entityId}</span>
 						</p>
 						<HistoryTimeline entries={[entry]} title="" />
 					</li>

@@ -26,13 +26,14 @@
 
 <!-- Barre d'action : elle n'existe qu'à l'écran, jamais sur le papier. -->
 <div class="no-print mx-auto mb-4 flex max-w-[21cm] flex-wrap items-center gap-3">
-	<a class="text-sm text-gray-400 hover:text-gray-200" href={resolve('/treasury/documents')}
-		>← Documents</a
+	<a
+		class="text-dark-light-blue hover:text-light-blue text-sm"
+		href={resolve('/treasury/documents')}>← Documents</a
 	>
 	<!-- Le téléchargement passe par le serveur : lui seul peut imposer le nom du fichier.
        Le bouton d'impression reste pour qui veut sortir la pièce sur papier. -->
 	<button
-		class="ml-auto rounded-lg border border-gray-600 px-4 py-2 text-sm text-gray-200 hover:bg-gray-700"
+		class="border-light-blue/30 text-light-blue hover:bg-blue-gray/15 ml-auto rounded-lg border px-4 py-2 text-sm"
 		onclick={() => {
 			window.print();
 		}}

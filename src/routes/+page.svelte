@@ -56,7 +56,7 @@
 	<header class="mb-6 flex flex-wrap items-end justify-between gap-4">
 		<div>
 			<h1 class="text-2xl font-bold text-white">Mes items</h1>
-			<p class="mt-1 text-sm text-gray-400">
+			<p class="text-dark-light-blue mt-1 text-sm">
 				Chaque composant que vous demandez suit son propre cycle, de la revue du chef de projet
 				jusqu'à la réception.
 			</p>
@@ -78,23 +78,23 @@
 	<div class="mb-4 flex flex-wrap items-center gap-2">
 		<button
 			class="rounded-full px-3 py-1 text-xs font-medium {stateFilter === 'all'
-				? 'bg-white text-gray-900'
-				: 'bg-gray-700 text-gray-300 hover:bg-gray-600'}"
+				? 'bg-light-blue text-dark-blue'
+				: 'bg-dark-blue/60 text-dark-light-blue hover:bg-blue-gray/25'}"
 			onclick={() => (stateFilter = 'all')}
 			type="button">Tous ({counts.all})</button
 		>
 		{#each ITEM_STATES as state (state)}
 			<button
 				class="rounded-full px-3 py-1 text-xs font-medium {stateFilter === state
-					? 'bg-white text-gray-900'
-					: 'bg-gray-700 text-gray-300 hover:bg-gray-600'}"
+					? 'bg-light-blue text-dark-blue'
+					: 'bg-dark-blue/60 text-dark-light-blue hover:bg-blue-gray/25'}"
 				onclick={() => (stateFilter = state)}
 				type="button"
 				>{ITEM_STATE_BADGES[state].emoji} {ITEM_STATE_BADGES[state].label} ({counts[state]})</button
 			>
 		{/each}
 		<input
-			class="ml-auto w-56 rounded-lg border border-gray-600 bg-gray-700 p-2 text-sm text-white placeholder-gray-400"
+			class="border-light-blue/30 bg-dark-blue/60 placeholder-dark-light-blue/50 ml-auto w-56 rounded-lg border p-2 text-sm text-white"
 			placeholder="Rechercher…"
 			type="search"
 			bind:value={search}
@@ -102,7 +102,9 @@
 	</div>
 
 	{#if visible.length === 0}
-		<p class="rounded-lg border border-dashed border-gray-600 px-4 py-12 text-center text-gray-400">
+		<p
+			class="border-light-blue/30 text-dark-light-blue rounded-lg border border-dashed px-4 py-12 text-center"
+		>
 			{items.length === 0
 				? "Vous n'avez encore demandé aucun composant."
 				: 'Aucun item ne correspond à ce filtre.'}
@@ -110,7 +112,7 @@
 	{:else}
 		<ul class="space-y-3">
 			{#each visible as item (item.id)}
-				<li class="rounded-lg border border-gray-700 bg-gray-800 p-4">
+				<li class="border-light-blue/20 bg-blue-gray/15 rounded-lg border p-4">
 					<div class="flex flex-wrap items-start justify-between gap-3">
 						<div class="min-w-0 flex-1">
 							<div class="flex flex-wrap items-center gap-2">
@@ -129,16 +131,16 @@
 								<ItemStateBadge state={item.state} />
 								<CampusBadge campus={item.campus} />
 							</div>
-							<p class="mt-1 text-sm text-gray-400">
+							<p class="text-dark-light-blue mt-1 text-sm">
 								{item.projectName} · {item.quantity} × {euro.format(item.unitPriceTtc)} =
-								<span class="font-medium text-gray-200">{euro.format(item.totalTtc)}</span>
+								<span class="text-light-blue font-medium">{euro.format(item.totalTtc)}</span>
 								· demandé le {day.format(new Date(item.createdAt))}
 							</p>
 							{#if item.tags.length > 0}
-								<p class="mt-1 text-xs text-gray-500">{item.tags.join(' · ')}</p>
+								<p class="text-dark-light-blue/70 mt-1 text-xs">{item.tags.join(' · ')}</p>
 							{/if}
 							{#if item.note}
-								<p class="mt-2 rounded bg-gray-700/50 px-2 py-1 text-sm text-gray-300">
+								<p class="bg-dark-blue/40 text-dark-light-blue mt-2 rounded px-2 py-1 text-sm">
 									{item.note}
 								</p>
 							{/if}
@@ -153,14 +155,14 @@
 							<!-- TRANS-NF-50 — le détail porte l'historique : qui a validé,
 							     qui a refusé, quand. La liste, elle, reste une liste. -->
 							<a
-								class="rounded-lg border border-gray-600 px-3 py-1.5 text-sm text-gray-200 hover:bg-gray-700"
+								class="border-light-blue/30 text-light-blue hover:bg-blue-gray/15 rounded-lg border px-3 py-1.5 text-sm"
 								href={resolve('/items/[id]', { id: String(item.id) })}
 							>
 								Détail
 							</a>
 							{#if isItemEditableByMember(item.state)}
 								<a
-									class="rounded-lg border border-gray-600 px-3 py-1.5 text-sm text-gray-200 hover:bg-gray-700"
+									class="border-light-blue/30 text-light-blue hover:bg-blue-gray/15 rounded-lg border px-3 py-1.5 text-sm"
 									href={resolve('/items/[id]/edit', { id: String(item.id) })}
 								>
 									Modifier

@@ -142,7 +142,7 @@
 
 <!-- Info Button (top right, outside layout) -->
 <button
-	class="fixed top-20 right-4 z-20 rounded-full p-2 hover:bg-gray-600 focus:outline-none"
+	class="hover:bg-blue-gray/25 fixed top-20 right-4 z-20 rounded-full p-2 focus:outline-none"
 	aria-label="Afficher les instructions"
 	onclick={(e: MouseEvent) => {
 		e.stopPropagation();
@@ -200,7 +200,7 @@
 </div>
 
 <div class="h-page flex flex-col items-center justify-center px-4">
-	<div class="w-full max-w-md rounded-xl bg-gray-800 p-8 shadow-lg">
+	<div class="bg-blue-gray/15 w-full max-w-md rounded-xl p-8 shadow-lg">
 		<div class="mb-6 flex items-center">
 			<svg
 				class="mr-3 h-8 w-8 text-white"
@@ -222,7 +222,7 @@
 				<path d="M8 20h8" stroke="currentColor" stroke-linecap="round" stroke-width="2" />
 				<path d="M12 16v4" stroke="currentColor" stroke-linecap="round" stroke-width="2" />
 			</svg>
-			<h1 class="text-2xl font-bold text-gray-200">SmartShare</h1>
+			<h1 class="text-light-blue text-2xl font-bold">SmartShare</h1>
 		</div>
 		<div class="mb-4 flex items-center">
 			<svg
@@ -234,7 +234,7 @@
 			>
 				<circle cx="12" cy="12" fill="currentColor" r="10" stroke="white" stroke-width="2" />
 			</svg>
-			<p class="text-gray-300">
+			<p class="text-dark-light-blue">
 				Statut WebSocket
 				<span
 					class="{connected ? 'font-semibold text-green-600' : 'font-semibold text-red-600'} pl-5"
@@ -245,7 +245,7 @@
 		</div>
 		<div class="mb-6 flex items-center">
 			<svg
-				class="mr-2 h-5 w-5 {sharing ? 'text-primary-600' : 'text-gray-400'}"
+				class="mr-2 h-5 w-5 {sharing ? 'text-primary-600' : 'text-dark-light-blue'}"
 				fill="none"
 				stroke={sharing ? 'blue' : 'gray'}
 				stroke-width="2"
@@ -262,10 +262,12 @@
 					y="7"
 				/>
 			</svg>
-			<p class="text-gray-300">
+			<p class="text-dark-light-blue">
 				Statut partage
 				<span
-					class="{sharing ? 'text-primary-600 font-semibold' : 'font-semibold text-gray-400'} pl-5"
+					class="{sharing
+						? 'text-primary-600 font-semibold'
+						: 'text-dark-light-blue font-semibold'} pl-5"
 				>
 					{sharing ? 'En cours' : 'Non démarré'}
 				</span>

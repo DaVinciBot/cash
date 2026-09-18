@@ -46,19 +46,21 @@
 <div class="mb-8">
 	<div class="mb-3 flex flex-wrap items-center justify-between gap-3">
 		<div>
-			<h2 class="text-sm font-semibold tracking-wide text-gray-300 uppercase">Formations types</h2>
-			<p class="mt-1 text-xs text-gray-500">
+			<h2 class="text-dark-light-blue text-sm font-semibold tracking-wide uppercase">
+				Formations types
+			</h2>
+			<p class="text-dark-light-blue/70 mt-1 text-xs">
 				Les contenus de référence dont héritent les sessions.
 			</p>
 		</div>
 		<button
-			class="rounded-lg border border-gray-600 px-3 py-1.5 text-sm text-gray-200 hover:bg-gray-700"
+			class="border-light-blue/30 text-light-blue hover:bg-blue-gray/15 rounded-lg border px-3 py-1.5 text-sm"
 			onclick={onAddTraining}
 			type="button">Ajouter</button
 		>
 	</div>
 
-	<div class="hidden rounded-lg border border-gray-700 bg-gray-800 md:block">
+	<div class="border-light-blue/20 bg-blue-gray/15 hidden rounded-lg border md:block">
 		<Table
 			{columns}
 			dbInfo={trainingDbInfo}
@@ -74,26 +76,26 @@
 	<div class="md:hidden">
 		{#if trainings.length === 0}
 			<p
-				class="rounded-lg border border-dashed border-gray-600 px-4 py-12 text-center text-gray-400"
+				class="border-light-blue/30 text-dark-light-blue rounded-lg border border-dashed px-4 py-12 text-center"
 			>
 				Aucune formation
 			</p>
 		{:else}
 			<ul class="space-y-2">
 				{#each trainings as training (training.training_id)}
-					<li class="rounded-lg border border-gray-700 bg-gray-800 p-4">
+					<li class="border-light-blue/20 bg-blue-gray/15 rounded-lg border p-4">
 						<div class="flex flex-wrap items-start justify-between gap-3">
 							<div class="min-w-0 flex-1">
 								<div class="flex flex-wrap items-center gap-2">
 									<span class="font-medium text-white">{training.name}</span>
 									<StateBadge badge={categoryBadge(training.category)} />
 								</div>
-								<p class="mt-1 text-sm text-gray-400">
+								<p class="text-dark-light-blue mt-1 text-sm">
 									{training.description ?? 'Aucune description'}
 								</p>
 							</div>
 							<button
-								class="rounded-lg border border-gray-600 px-3 py-1.5 text-sm text-gray-200 hover:bg-gray-700"
+								class="border-light-blue/30 text-light-blue hover:bg-blue-gray/15 rounded-lg border px-3 py-1.5 text-sm"
 								onclick={() => {
 									onEditTraining(training);
 								}}

@@ -87,7 +87,7 @@
 <section class="mx-auto max-w-6xl">
 	<header class="mb-6">
 		<h1 class="text-2xl font-bold text-white">Items à regrouper</h1>
-		<p class="mt-1 text-sm text-gray-400">
+		<p class="text-dark-light-blue mt-1 text-sm">
 			Les items validés par leur chef de projet, du plus anciennement validé au plus récent. Cochez
 			ce qui part chez un même marchand, pour un même campus.
 		</p>
@@ -109,22 +109,24 @@
 	{/if}
 
 	{#if items.length === 0}
-		<p class="rounded-lg border border-dashed border-gray-600 px-4 py-12 text-center text-gray-400">
+		<p
+			class="border-light-blue/30 text-dark-light-blue rounded-lg border border-dashed px-4 py-12 text-center"
+		>
 			Aucun item validé en attente de regroupement.
 		</p>
 	{:else}
 		<div
-			class="mb-3 flex flex-wrap items-center gap-3 rounded-lg border border-gray-700 bg-gray-800/60 px-4 py-3"
+			class="border-light-blue/20 bg-blue-gray/15 mb-3 flex flex-wrap items-center gap-3 rounded-lg border px-4 py-3"
 		>
-			<label class="flex items-center gap-2 text-sm text-gray-300">
+			<label class="text-dark-light-blue flex items-center gap-2 text-sm">
 				<input
-					class="size-4 rounded border-gray-600 bg-gray-700"
+					class="border-light-blue/30 bg-dark-blue/60 size-4 rounded"
 					type="checkbox"
 					bind:checked={groupByDomain}
 				/>
 				Grouper par marchand
 			</label>
-			<span class="text-sm text-gray-400">
+			<span class="text-dark-light-blue text-sm">
 				{selected.size} sélectionné(s) · {euro.format(chosenTotal)}
 			</span>
 
@@ -179,17 +181,17 @@
 				<h2 class="text-sm font-semibold text-rose-200">
 					Refuser {refusing.length === 1 ? 'cet item' : `ces ${String(refusing.length)} items`}
 				</h2>
-				<p class="mt-1 text-xs text-gray-400">
+				<p class="text-dark-light-blue mt-1 text-xs">
 					Le refus est terminal et se distingue de celui du chef de projet : le membre saura que la
 					décision est financière.
 				</p>
-				<label class="mt-3 block text-sm text-gray-300" for="treso-reason">
+				<label class="text-dark-light-blue mt-3 block text-sm" for="treso-reason">
 					Motif — il sera lu par le membre
 				</label>
 				<textarea
 					id="treso-reason"
 					name="reason"
-					class="mt-1 w-full rounded-lg border border-gray-600 bg-gray-700 p-2 text-sm text-white placeholder-gray-400"
+					class="border-light-blue/30 bg-dark-blue/60 placeholder-dark-light-blue/50 mt-1 w-full rounded-lg border p-2 text-sm text-white"
 					placeholder="Ex. : dépense reportée au prochain exercice, enveloppe épuisée."
 					rows="3"
 					bind:value={reason}></textarea>
@@ -203,7 +205,7 @@
 						type="submit">Confirmer le refus</button
 					>
 					<button
-						class="rounded-lg border border-gray-600 px-3 py-1.5 text-sm text-gray-300 hover:bg-gray-700"
+						class="border-light-blue/30 text-dark-light-blue hover:bg-blue-gray/15 rounded-lg border px-3 py-1.5 text-sm"
 						onclick={() => {
 							refusing = [];
 						}}
@@ -216,10 +218,12 @@
 		{#each groups as group (group.key)}
 			<div class="mb-5">
 				<div class="mb-2 flex items-center gap-3">
-					<h2 class="text-sm font-semibold tracking-wide text-gray-300 uppercase">{group.key}</h2>
-					<span class="text-xs text-gray-500">{group.items.length} item(s)</span>
+					<h2 class="text-dark-light-blue text-sm font-semibold tracking-wide uppercase">
+						{group.key}
+					</h2>
+					<span class="text-dark-light-blue/70 text-xs">{group.items.length} item(s)</span>
 					<button
-						class="text-xs text-gray-400 underline hover:text-gray-200"
+						class="text-dark-light-blue hover:text-light-blue text-xs underline"
 						onclick={() => {
 							selectGroup(group.items.map((i) => i.id));
 						}}
@@ -228,10 +232,10 @@
 				</div>
 				<ul class="space-y-2">
 					{#each group.items as item (item.id)}
-						<li class="rounded-lg border border-gray-700 bg-gray-800 p-3">
+						<li class="border-light-blue/20 bg-blue-gray/15 rounded-lg border p-3">
 							<div class="flex flex-wrap items-start gap-3">
 								<input
-									class="mt-1 size-4 shrink-0 rounded border-gray-600 bg-gray-700"
+									class="border-light-blue/30 bg-dark-blue/60 mt-1 size-4 shrink-0 rounded"
 									checked={selected.has(item.id)}
 									onchange={() => {
 										toggle(item.id);
@@ -254,14 +258,14 @@
 										{/if}
 										<CampusBadge campus={item.campus} />
 									</div>
-									<p class="mt-1 text-sm text-gray-400">
+									<p class="text-dark-light-blue mt-1 text-sm">
 										{item.projectName} · {item.requesterName} · {item.quantity} × {euro.format(
 											item.unitPriceTtc
 										)} =
-										<span class="font-medium text-gray-200">{euro.format(item.totalTtc)}</span>
+										<span class="text-light-blue font-medium">{euro.format(item.totalTtc)}</span>
 									</p>
 									{#if item.cdpApprovedAt}
-										<p class="mt-1 text-xs text-gray-500">
+										<p class="text-dark-light-blue/70 mt-1 text-xs">
 											validé le {day.format(new Date(item.cdpApprovedAt))}
 											{#if (waitingDays(item.cdpApprovedAt) ?? 0) >= 1}
 												· en attente depuis {waitingDays(item.cdpApprovedAt)} jour(s)
@@ -272,7 +276,7 @@
 										</p>
 									{/if}
 									{#if item.note}
-										<p class="mt-2 rounded bg-gray-700/50 px-2 py-1 text-sm text-gray-300">
+										<p class="bg-dark-blue/40 text-dark-light-blue mt-2 rounded px-2 py-1 text-sm">
 											{item.note}
 										</p>
 									{/if}

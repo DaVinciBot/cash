@@ -17,7 +17,7 @@
 <svelte:head><title>{item.name} — DaVinciBot</title></svelte:head>
 
 <section class="mx-auto max-w-3xl">
-	<a class="text-sm text-gray-400 hover:text-gray-200" href={resolve('/')}>← Mes items</a>
+	<a class="text-dark-light-blue hover:text-light-blue text-sm" href={resolve('/')}>← Mes items</a>
 
 	<header class="mt-3 mb-6 flex flex-wrap items-start justify-between gap-4">
 		<div>
@@ -25,12 +25,12 @@
 			<div class="mt-2 flex flex-wrap items-center gap-2">
 				<ItemStateBadge state={item.state} />
 				<CampusBadge campus={item.campus} />
-				<span class="text-sm text-gray-400">{item.projectName}</span>
+				<span class="text-dark-light-blue text-sm">{item.projectName}</span>
 			</div>
 		</div>
 		{#if item.isMine && isItemEditableByMember(item.state)}
 			<a
-				class="rounded-lg border border-gray-600 px-4 py-2 text-sm text-gray-200 hover:bg-gray-700"
+				class="border-light-blue/30 text-light-blue hover:bg-blue-gray/15 rounded-lg border px-4 py-2 text-sm"
 				href={resolve('/items/[id]/edit', { id: String(item.id) })}
 				>Modifier
 			</a>
@@ -42,48 +42,50 @@
 		     comprendre la décision : il passe avant le reste. -->
 		<div class="mb-6 rounded-lg bg-rose-500/10 p-4 ring-1 ring-rose-500/30">
 			<p class="text-xs font-semibold tracking-wide text-rose-300 uppercase">Motif du refus</p>
-			<p class="mt-1 text-sm text-gray-200">{item.refusedReason}</p>
+			<p class="text-light-blue mt-1 text-sm">{item.refusedReason}</p>
 		</div>
 	{/if}
 
 	<dl class="mb-8 grid grid-cols-2 gap-x-6 gap-y-3 text-sm sm:grid-cols-3">
 		<div>
-			<dt class="text-xs text-gray-500">Prix unitaire TTC</dt>
-			<dd class="text-gray-200">{euro.format(item.unitPriceTtc)}</dd>
+			<dt class="text-dark-light-blue/70 text-xs">Prix unitaire TTC</dt>
+			<dd class="text-light-blue">{euro.format(item.unitPriceTtc)}</dd>
 		</div>
 		<div>
-			<dt class="text-xs text-gray-500">Quantité</dt>
-			<dd class="text-gray-200">{item.quantity}</dd>
+			<dt class="text-dark-light-blue/70 text-xs">Quantité</dt>
+			<dd class="text-light-blue">{item.quantity}</dd>
 		</div>
 		<div>
-			<dt class="text-xs text-gray-500">Total TTC</dt>
+			<dt class="text-dark-light-blue/70 text-xs">Total TTC</dt>
 			<dd class="font-medium text-white">{euro.format(item.totalTtc)}</dd>
 		</div>
 		<div>
-			<dt class="text-xs text-gray-500">Demandeur</dt>
-			<dd class="text-gray-200">{item.requesterName}</dd>
+			<dt class="text-dark-light-blue/70 text-xs">Demandeur</dt>
+			<dd class="text-light-blue">{item.requesterName}</dd>
 		</div>
 		<div>
-			<dt class="text-xs text-gray-500">Marchand</dt>
-			<dd class="text-gray-200">{item.domain ?? '—'}</dd>
+			<dt class="text-dark-light-blue/70 text-xs">Marchand</dt>
+			<dd class="text-light-blue">{item.domain ?? '—'}</dd>
 		</div>
 		<div>
-			<dt class="text-xs text-gray-500">Demandé le</dt>
-			<dd class="text-gray-200">{moment.format(new Date(item.createdAt))}</dd>
+			<dt class="text-dark-light-blue/70 text-xs">Demandé le</dt>
+			<dd class="text-light-blue">{moment.format(new Date(item.createdAt))}</dd>
 		</div>
 		{#if item.tags.length > 0}
 			<div class="col-span-2 sm:col-span-3">
-				<dt class="text-xs text-gray-500">Tags</dt>
+				<dt class="text-dark-light-blue/70 text-xs">Tags</dt>
 				<dd class="mt-1 flex flex-wrap gap-1">
 					{#each item.tags as tag (tag)}
-						<span class="rounded-full bg-gray-700 px-2 py-0.5 text-xs text-gray-200">{tag}</span>
+						<span class="bg-dark-blue/60 text-light-blue rounded-full px-2 py-0.5 text-xs"
+							>{tag}</span
+						>
 					{/each}
 				</dd>
 			</div>
 		{/if}
 		{#if item.link}
 			<div class="col-span-2 sm:col-span-3">
-				<dt class="text-xs text-gray-500">Lien</dt>
+				<dt class="text-dark-light-blue/70 text-xs">Lien</dt>
 				<dd class="truncate">
 					<!-- eslint-disable svelte/no-navigation-without-resolve -- URL marchande externe -->
 					<a
@@ -98,13 +100,13 @@
 		{/if}
 		{#if item.note}
 			<div class="col-span-2 sm:col-span-3">
-				<dt class="text-xs text-gray-500">Note</dt>
-				<dd class="whitespace-pre-line text-gray-200">{item.note}</dd>
+				<dt class="text-dark-light-blue/70 text-xs">Note</dt>
+				<dd class="text-light-blue whitespace-pre-line">{item.note}</dd>
 			</div>
 		{/if}
 		{#if item.orderId !== null}
 			<div class="col-span-2 sm:col-span-3">
-				<dt class="text-xs text-gray-500">Commande</dt>
+				<dt class="text-dark-light-blue/70 text-xs">Commande</dt>
 				<dd>
 					<a
 						class="text-sky-400 hover:underline"

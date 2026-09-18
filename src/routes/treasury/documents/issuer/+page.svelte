@@ -18,13 +18,14 @@
 <svelte:head><title>Identité de l'émetteur — DaVinciBot</title></svelte:head>
 
 <section class="mx-auto max-w-3xl">
-	<a class="text-sm text-gray-400 hover:text-gray-200" href={resolve('/treasury/documents')}
-		>← Documents</a
+	<a
+		class="text-dark-light-blue hover:text-light-blue text-sm"
+		href={resolve('/treasury/documents')}>← Documents</a
 	>
 
 	<header class="mt-3 mb-6">
 		<h1 class="text-2xl font-bold text-white">Identité de l'émetteur</h1>
-		<p class="mt-1 text-sm text-gray-400">
+		<p class="text-dark-light-blue mt-1 text-sm">
 			Ces mentions figurent sur chaque document et y sont <strong>figées à l'émission</strong> : les corriger
 			ici ne réécrit pas les documents déjà partis.
 		</p>
@@ -46,22 +47,22 @@
 	{/if}
 
 	<form
-		class="rounded-lg border border-gray-700 bg-gray-800 p-4"
+		class="border-light-blue/20 bg-blue-gray/15 rounded-lg border p-4"
 		action="?/save"
 		method="POST"
 		use:enhance
 	>
-		<h2 class="mb-1 text-sm font-semibold text-gray-200">Identité de l'émetteur</h2>
-		<p class="mb-3 text-xs text-gray-500">
+		<h2 class="text-light-blue mb-1 text-sm font-semibold">Identité de l'émetteur</h2>
+		<p class="text-dark-light-blue/70 mb-3 text-xs">
 			Ces mentions figurent sur chaque document et y sont figées à l'émission : les corriger ici ne
 			réécrit pas les documents déjà partis.
 		</p>
 		<div class="grid gap-3 md:grid-cols-2">
-			<label class="text-xs text-gray-300">
+			<label class="text-dark-light-blue text-xs">
 				Genre de la présidence
 				<select
 					name="president_gender"
-					class="mt-1 block w-full rounded-lg border border-gray-600 bg-gray-700 p-2 text-sm text-white"
+					class="border-light-blue/30 bg-dark-blue/60 mt-1 block w-full rounded-lg border p-2 text-sm text-white"
 					value={data.organization.presidentGender}
 				>
 					{#each OFFICER_GENDERS as g (g)}
@@ -69,19 +70,19 @@
 					{/each}
 				</select>
 			</label>
-			<label class="text-xs text-gray-300">
+			<label class="text-dark-light-blue text-xs">
 				Présidence
 				<input
 					name="president_name"
-					class="mt-1 block w-full rounded-lg border border-gray-600 bg-gray-700 p-2 text-sm text-white"
+					class="border-light-blue/30 bg-dark-blue/60 mt-1 block w-full rounded-lg border p-2 text-sm text-white"
 					value={data.organization.presidentName ?? ''}
 				/>
 			</label>
-			<label class="text-xs text-gray-300">
+			<label class="text-dark-light-blue text-xs">
 				Genre de la trésorerie
 				<select
 					name="treasurer_gender"
-					class="mt-1 block w-full rounded-lg border border-gray-600 bg-gray-700 p-2 text-sm text-white"
+					class="border-light-blue/30 bg-dark-blue/60 mt-1 block w-full rounded-lg border p-2 text-sm text-white"
 					value={data.organization.treasurerGender}
 				>
 					{#each OFFICER_GENDERS as g (g)}
@@ -89,115 +90,115 @@
 					{/each}
 				</select>
 			</label>
-			<label class="text-xs text-gray-300">
+			<label class="text-dark-light-blue text-xs">
 				Trésorerie
 				<input
 					name="treasurer_name"
-					class="mt-1 block w-full rounded-lg border border-gray-600 bg-gray-700 p-2 text-sm text-white"
+					class="border-light-blue/30 bg-dark-blue/60 mt-1 block w-full rounded-lg border p-2 text-sm text-white"
 					value={data.organization.treasurerName ?? ''}
 				/>
 			</label>
-			<label class="text-xs text-gray-300">
+			<label class="text-dark-light-blue text-xs">
 				Nom légal
 				<input
 					name="legal_name"
-					class="mt-1 block w-full rounded-lg border border-gray-600 bg-gray-700 p-2 text-sm text-white"
+					class="border-light-blue/30 bg-dark-blue/60 mt-1 block w-full rounded-lg border p-2 text-sm text-white"
 					value={data.organization.legalName ?? ''}
 				/>
 			</label>
-			<label class="text-xs text-gray-300">
+			<label class="text-dark-light-blue text-xs">
 				Adresse du siège
 				<input
 					name="address_line"
-					class="mt-1 block w-full rounded-lg border border-gray-600 bg-gray-700 p-2 text-sm text-white"
+					class="border-light-blue/30 bg-dark-blue/60 mt-1 block w-full rounded-lg border p-2 text-sm text-white"
 					value={data.organization.addressLine ?? ''}
 				/>
 			</label>
-			<label class="text-xs text-gray-300">
+			<label class="text-dark-light-blue text-xs">
 				Code postal
 				<input
 					name="postal_code"
-					class="mt-1 block w-full rounded-lg border border-gray-600 bg-gray-700 p-2 text-sm text-white"
+					class="border-light-blue/30 bg-dark-blue/60 mt-1 block w-full rounded-lg border p-2 text-sm text-white"
 					value={data.organization.postalCode ?? ''}
 				/>
 			</label>
-			<label class="text-xs text-gray-300">
+			<label class="text-dark-light-blue text-xs">
 				Ville
 				<input
 					name="city"
-					class="mt-1 block w-full rounded-lg border border-gray-600 bg-gray-700 p-2 text-sm text-white"
+					class="border-light-blue/30 bg-dark-blue/60 mt-1 block w-full rounded-lg border p-2 text-sm text-white"
 					value={data.organization.city ?? ''}
 				/>
 			</label>
-			<label class="text-xs text-gray-300">
+			<label class="text-dark-light-blue text-xs">
 				Pays
 				<input
 					name="country"
-					class="mt-1 block w-full rounded-lg border border-gray-600 bg-gray-700 p-2 text-sm text-white"
+					class="border-light-blue/30 bg-dark-blue/60 mt-1 block w-full rounded-lg border p-2 text-sm text-white"
 					value={data.organization.country}
 				/>
 			</label>
-			<label class="text-xs text-gray-300">
-				RNA <span class="text-gray-500">(W + 9 chiffres)</span>
+			<label class="text-dark-light-blue text-xs">
+				RNA <span class="text-dark-light-blue/70">(W + 9 chiffres)</span>
 				<input
 					name="rna"
-					class="mt-1 block w-full rounded-lg border border-gray-600 bg-gray-700 p-2 text-sm text-white"
+					class="border-light-blue/30 bg-dark-blue/60 mt-1 block w-full rounded-lg border p-2 text-sm text-white"
 					value={data.organization.rna ?? ''}
 				/>
 			</label>
-			<label class="text-xs text-gray-300">
+			<label class="text-dark-light-blue text-xs">
 				SIRET
 				<input
 					name="siret"
-					class="mt-1 block w-full rounded-lg border border-gray-600 bg-gray-700 p-2 text-sm text-white"
+					class="border-light-blue/30 bg-dark-blue/60 mt-1 block w-full rounded-lg border p-2 text-sm text-white"
 					value={data.organization.siret ?? ''}
 				/>
 			</label>
-			<label class="text-xs text-gray-300">
+			<label class="text-dark-light-blue text-xs">
 				Banque
 				<input
 					name="bank_name"
-					class="mt-1 block w-full rounded-lg border border-gray-600 bg-gray-700 p-2 text-sm text-white"
+					class="border-light-blue/30 bg-dark-blue/60 mt-1 block w-full rounded-lg border p-2 text-sm text-white"
 					value={data.organization.bankName ?? ''}
 				/>
 			</label>
-			<label class="text-xs text-gray-300">
+			<label class="text-dark-light-blue text-xs">
 				IBAN
 				<input
 					name="iban"
-					class="mt-1 block w-full rounded-lg border border-gray-600 bg-gray-700 p-2 font-mono text-sm text-white"
+					class="border-light-blue/30 bg-dark-blue/60 mt-1 block w-full rounded-lg border p-2 font-mono text-sm text-white"
 					value={data.organization.iban ?? ''}
 				/>
 			</label>
-			<label class="text-xs text-gray-300">
+			<label class="text-dark-light-blue text-xs">
 				BIC
 				<input
 					name="bic"
-					class="mt-1 block w-full rounded-lg border border-gray-600 bg-gray-700 p-2 font-mono text-sm text-white"
+					class="border-light-blue/30 bg-dark-blue/60 mt-1 block w-full rounded-lg border p-2 font-mono text-sm text-white"
 					value={data.organization.bic ?? ''}
 				/>
 			</label>
-			<label class="text-xs text-gray-300">
-				N° TVA <span class="text-gray-500">(vide si non assujettie)</span>
+			<label class="text-dark-light-blue text-xs">
+				N° TVA <span class="text-dark-light-blue/70">(vide si non assujettie)</span>
 				<input
 					name="vat_number"
-					class="mt-1 block w-full rounded-lg border border-gray-600 bg-gray-700 p-2 text-sm text-white"
+					class="border-light-blue/30 bg-dark-blue/60 mt-1 block w-full rounded-lg border p-2 text-sm text-white"
 					value={data.organization.vatNumber ?? ''}
 				/>
 			</label>
-			<label class="text-xs text-gray-300">
+			<label class="text-dark-light-blue text-xs">
 				Courriel
 				<input
 					name="email"
-					class="mt-1 block w-full rounded-lg border border-gray-600 bg-gray-700 p-2 text-sm text-white"
+					class="border-light-blue/30 bg-dark-blue/60 mt-1 block w-full rounded-lg border p-2 text-sm text-white"
 					value={data.organization.email ?? ''}
 				/>
 			</label>
-			<label class="text-xs text-gray-300">
+			<label class="text-dark-light-blue text-xs">
 				Site
 				<input
 					name="website"
-					class="mt-1 block w-full rounded-lg border border-gray-600 bg-gray-700 p-2 text-sm text-white"
+					class="border-light-blue/30 bg-dark-blue/60 mt-1 block w-full rounded-lg border p-2 text-sm text-white"
 					value={data.organization.website ?? ''}
 				/>
 			</label>
@@ -207,47 +208,47 @@
 			<label class="flex items-center gap-2 text-sm text-amber-200">
 				<input
 					name="tax_receipts_allowed"
-					class="size-4 rounded border-gray-600 bg-gray-700"
+					class="border-light-blue/30 bg-dark-blue/60 size-4 rounded"
 					checked={data.organization.taxReceiptsAllowed}
 					type="checkbox"
 					value="1"
 				/>
 				L'association relève du mécénat et peut émettre des reçus fiscaux
 			</label>
-			<p class="mt-1 text-xs text-gray-400">
+			<p class="text-dark-light-blue mt-1 text-xs">
 				Cette déclaration engage l'association : un reçu fiscal émis à tort expose à une amende
 				égale au montant de la réduction d'impôt indûment obtenue. Elle ne se déduit d'aucune donnée
 				— c'est au bureau de la porter.
 			</p>
 			<div class="mt-3 grid gap-3 md:grid-cols-2">
-				<label class="text-xs text-gray-300">
-					Catégorie d'organisme <span class="text-gray-500">(Cerfa 11580)</span>
+				<label class="text-dark-light-blue text-xs">
+					Catégorie d'organisme <span class="text-dark-light-blue/70">(Cerfa 11580)</span>
 					<input
 						name="tax_category"
-						class="mt-1 block w-full rounded-lg border border-gray-600 bg-gray-700 p-2 text-sm text-white"
+						class="border-light-blue/30 bg-dark-blue/60 mt-1 block w-full rounded-lg border p-2 text-sm text-white"
 						placeholder="Œuvre ou organisme d'intérêt général"
 						value={data.organization.taxCategory ?? ''}
 					/>
 				</label>
-				<label class="text-xs text-gray-300">
+				<label class="text-dark-light-blue text-xs">
 					Articles du CGI applicables
 					<input
 						name="tax_articles"
-						class="mt-1 block w-full rounded-lg border border-gray-600 bg-gray-700 p-2 text-sm text-white"
+						class="border-light-blue/30 bg-dark-blue/60 mt-1 block w-full rounded-lg border p-2 text-sm text-white"
 						placeholder="Articles 200 et 238 bis du CGI"
 						value={data.organization.taxArticles ?? ''}
 					/>
 				</label>
 			</div>
-			<label class="mt-3 block text-xs text-gray-300">
-				Objet de l'association <span class="text-gray-500">(statuts)</span>
+			<label class="text-dark-light-blue mt-3 block text-xs">
+				Objet de l'association <span class="text-dark-light-blue/70">(statuts)</span>
 				<textarea
 					name="purpose"
-					class="mt-1 block w-full rounded-lg border border-gray-600 bg-gray-700 p-2 text-sm text-white"
+					class="border-light-blue/30 bg-dark-blue/60 mt-1 block w-full rounded-lg border p-2 text-sm text-white"
 					rows="5">{data.organization.purpose ?? ''}</textarea
 				>
 			</label>
-			<p class="mt-1 text-xs text-gray-400">
+			<p class="text-dark-light-blue mt-1 text-xs">
 				Reproduit tel quel sur le reçu fiscal : c'est l'objet qui range l'association parmi les
 				organismes d'intérêt général, et le donateur n'a rien d'autre sous les yeux pour le
 				constater.

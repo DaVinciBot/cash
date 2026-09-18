@@ -10,19 +10,20 @@
 
 	let { range }: Props = $props();
 
-	const field = 'mt-1 block rounded-lg border border-gray-600 bg-gray-700 p-2 text-sm text-white';
+	const field =
+		'mt-1 block rounded-lg border border-light-blue/30 bg-dark-blue/60 p-2 text-sm text-white';
 </script>
 
 <form class="flex flex-wrap items-end gap-3" method="GET">
-	<label class="text-xs text-gray-300">
+	<label class="text-dark-light-blue text-xs">
 		Du
 		<input name="from" class={field} max={range.to} type="date" value={range.from} />
 	</label>
-	<label class="text-xs text-gray-300">
+	<label class="text-dark-light-blue text-xs">
 		Au
 		<input name="to" class={field} min={range.from} type="date" value={range.to} />
 	</label>
-	<label class="text-xs text-gray-300">
+	<label class="text-dark-light-blue text-xs">
 		Période (jours)
 		<input
 			name="period"
@@ -35,7 +36,7 @@
 		/>
 	</label>
 	<button
-		class="rounded-lg border border-gray-600 px-3 py-2 text-sm text-gray-200 hover:bg-gray-700"
+		class="border-light-blue/30 text-light-blue hover:bg-blue-gray/15 rounded-lg border px-3 py-2 text-sm"
 		type="submit">Afficher</button
 	>
 </form>

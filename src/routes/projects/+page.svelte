@@ -25,7 +25,7 @@
 	<header class="mb-6 flex flex-wrap items-end justify-between gap-4">
 		<div>
 			<h1 class="text-2xl font-bold text-white">Projets</h1>
-			<p class="mt-1 text-sm text-gray-400">
+			<p class="text-dark-light-blue mt-1 text-sm">
 				Chaque projet désigne un nœud de l'arbre budgétaire, à la profondeur qui lui convient. Le
 				campus du projet sert à résoudre la destination des items qu'on y rattache.
 			</p>
@@ -46,7 +46,7 @@
 	{/if}
 
 	{#if data.schoolYear}
-		<p class="mb-4 text-xs text-gray-500">
+		<p class="text-dark-light-blue/70 mb-4 text-xs">
 			Arbre de l'année {data.schoolYear.label}. L'arbre appartient à une année scolaire : le budget
 			visé par un projet est à redésigner à chaque rentrée.
 		</p>
@@ -61,7 +61,7 @@
 
 	{#snippet projectForm(project: (typeof data.projects)[number] | null)}
 		<form
-			class="mb-3 flex flex-wrap items-end gap-3 rounded-lg border border-gray-600 bg-gray-900/60 p-3"
+			class="border-light-blue/30 bg-dark-blue/60 mb-3 flex flex-wrap items-end gap-3 rounded-lg border p-3"
 			action={project ? '?/update' : '?/create'}
 			method="POST"
 			use:enhance={() =>
@@ -74,20 +74,20 @@
 			{#if project}
 				<input name="id" type="hidden" value={project.id} />
 			{/if}
-			<label class="text-xs text-gray-300">
+			<label class="text-dark-light-blue text-xs">
 				Nom
 				<input
 					name="name"
-					class="mt-1 block rounded-lg border border-gray-600 bg-gray-700 p-2 text-sm text-white"
+					class="border-light-blue/30 bg-dark-blue/60 mt-1 block rounded-lg border p-2 text-sm text-white"
 					required
 					value={project?.name ?? ''}
 				/>
 			</label>
-			<label class="text-xs text-gray-300">
+			<label class="text-dark-light-blue text-xs">
 				Campus
 				<select
 					name="campus"
-					class="mt-1 block rounded-lg border border-gray-600 bg-gray-700 p-2 text-sm text-white"
+					class="border-light-blue/30 bg-dark-blue/60 mt-1 block rounded-lg border p-2 text-sm text-white"
 					value={project?.campus ?? ''}
 				>
 					<option value="">— aucun —</option>
@@ -96,11 +96,11 @@
 					{/each}
 				</select>
 			</label>
-			<label class="flex-1 text-xs text-gray-300">
+			<label class="text-dark-light-blue flex-1 text-xs">
 				Budget désigné
 				<select
 					name="budget_id"
-					class="mt-1 block w-full rounded-lg border border-gray-600 bg-gray-700 p-2 text-sm text-white"
+					class="border-light-blue/30 bg-dark-blue/60 mt-1 block w-full rounded-lg border p-2 text-sm text-white"
 					value={project?.budgetId ?? ''}
 				>
 					<option value="">— aucun —</option>
@@ -122,7 +122,7 @@
 
 	<ul class="space-y-2">
 		{#each active as project (project.id)}
-			<li class="rounded-lg border border-gray-700 bg-gray-800 p-4">
+			<li class="border-light-blue/20 bg-blue-gray/15 rounded-lg border p-4">
 				<div class="flex flex-wrap items-center gap-3">
 					<span class="font-medium text-white">{project.name}</span>
 					{#if project.campus}
@@ -130,26 +130,27 @@
 					{:else}
 						<span class="text-xs text-amber-300">sans campus</span>
 					{/if}
-					<span class="text-sm text-gray-400">
+					<span class="text-dark-light-blue text-sm">
 						{#if project.budgetPath}
 							{project.budgetPath}
 						{:else}
 							<span class="text-amber-300">aucun budget désigné</span>
 						{/if}
 					</span>
-					<span class="ml-auto text-xs text-gray-500">{project.itemCount} item(s)</span>
+					<span class="text-dark-light-blue/70 ml-auto text-xs">{project.itemCount} item(s)</span>
 				</div>
 				<div class="mt-3 flex flex-wrap items-center gap-2">
 					<button
-						class="text-xs text-gray-400 underline hover:text-gray-200"
+						class="text-dark-light-blue hover:text-light-blue text-xs underline"
 						onclick={() => (editing = editing === project.id ? null : project.id)}
 						type="button">modifier</button
 					>
 					<form action="?/toggleArchive" method="POST" use:enhance>
 						<input name="id" type="hidden" value={project.id} />
 						<input name="archive" type="hidden" value="1" />
-						<button class="text-xs text-gray-400 underline hover:text-gray-200" type="submit"
-							>archiver</button
+						<button
+							class="text-dark-light-blue hover:text-light-blue text-xs underline"
+							type="submit">archiver</button
 						>
 					</form>
 					{#if project.itemCount === 0}
@@ -169,17 +170,20 @@
 	</ul>
 
 	{#if archived.length > 0}
-		<h2 class="mt-8 mb-2 text-sm font-semibold tracking-wide text-gray-400 uppercase">Archivés</h2>
+		<h2 class="text-dark-light-blue mt-8 mb-2 text-sm font-semibold tracking-wide uppercase">
+			Archivés
+		</h2>
 		<ul class="space-y-1">
 			{#each archived as project (project.id)}
-				<li class="flex items-center gap-3 text-sm text-gray-500">
+				<li class="text-dark-light-blue/70 flex items-center gap-3 text-sm">
 					<span>{project.name}</span>
 					<span class="text-xs">{project.itemCount} item(s)</span>
 					<form action="?/toggleArchive" method="POST" use:enhance>
 						<input name="id" type="hidden" value={project.id} />
 						<input name="archive" type="hidden" value="0" />
-						<button class="text-xs text-gray-400 underline hover:text-gray-200" type="submit"
-							>réactiver</button
+						<button
+							class="text-dark-light-blue hover:text-light-blue text-xs underline"
+							type="submit">réactiver</button
 						>
 					</form>
 				</li>
@@ -187,9 +191,9 @@
 		</ul>
 	{/if}
 
-	<p class="mt-8 text-xs text-gray-500">
+	<p class="text-dark-light-blue/70 mt-8 text-xs">
 		La consommation budgétaire de chaque projet se lit sur <a
-			class="underline hover:text-gray-300"
+			class="hover:text-dark-light-blue underline"
 			href={resolve('/budgets')}>l'arbre des budgets</a
 		>, où elle est calculée nœud par nœud.
 	</p>

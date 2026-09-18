@@ -25,13 +25,14 @@
 <svelte:head><title>Nouveau document — DaVinciBot</title></svelte:head>
 
 <section class="mx-auto max-w-3xl">
-	<a class="text-sm text-gray-400 hover:text-gray-200" href={resolve('/treasury/documents')}
-		>← Documents</a
+	<a
+		class="text-dark-light-blue hover:text-light-blue text-sm"
+		href={resolve('/treasury/documents')}>← Documents</a
 	>
 
 	<header class="mt-3 mb-6">
 		<h1 class="text-2xl font-bold text-white">Quel document ?</h1>
-		<p class="mt-1 text-sm text-gray-400">
+		<p class="text-dark-light-blue mt-1 text-sm">
 			Le type commande la suite : les champs à remplir ne sont pas les mêmes.
 		</p>
 	</header>
@@ -41,13 +42,13 @@
 			{@const missing = data.missingByKind[kind] ?? []}
 			<li>
 				<a
-					class="hover:bg-gray-750 flex h-full flex-col rounded-lg border border-gray-700 bg-gray-800 p-4 transition hover:border-gray-500 aria-disabled:pointer-events-none aria-disabled:opacity-50"
+					class="hover:bg-blue-gray/15 border-light-blue/20 bg-blue-gray/15 hover:border-light-blue/60 flex h-full flex-col rounded-lg border p-4 transition aria-disabled:pointer-events-none aria-disabled:opacity-50"
 					aria-disabled={missing.length > 0}
 					href={resolve('/treasury/documents/new/[kind]', { kind })}
 				>
 					<span class="text-2xl">{ICON[kind]}</span>
 					<span class="mt-2 font-medium text-white">{DOCUMENT_KIND_LABELS[kind]}</span>
-					<span class="mt-1 text-xs text-gray-400">{PURPOSE[kind]}</span>
+					<span class="text-dark-light-blue mt-1 text-xs">{PURPOSE[kind]}</span>
 					{#if missing.length > 0}
 						<span class="mt-3 text-xs text-amber-300">
 							Indisponible : il manque {missing.join(', ')} à l'identité de l'émetteur.
@@ -67,7 +68,7 @@
 		</p>
 	{/if}
 
-	<p class="mt-6 text-xs text-gray-500">
+	<p class="text-dark-light-blue/70 mt-6 text-xs">
 		Un document émis fige son montant, son destinataire et l'identité de l'émetteur : il se rejoue à
 		l'identique, indéfiniment. C'est aussi pourquoi il consomme un numéro de série, qui ne se
 		réattribue pas.

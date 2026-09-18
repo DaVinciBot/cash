@@ -75,7 +75,7 @@
 <svelte:head><title>Commande #{order.id} — DaVinciBot</title></svelte:head>
 
 <section class="mx-auto max-w-5xl">
-	<a class="text-sm text-gray-400 hover:text-gray-200" href={resolve('/orders')}
+	<a class="text-dark-light-blue hover:text-light-blue text-sm" href={resolve('/orders')}
 		>← Toutes les commandes</a
 	>
 
@@ -107,7 +107,7 @@
 		</p>
 	{/if}
 
-	<p class="mb-6 text-sm text-gray-400">
+	<p class="text-dark-light-blue mb-6 text-sm">
 		Année scolaire {order.schoolYearLabel} · créée le {day.format(new Date(order.createdAt))}
 		{#if order.orderedAt}· passée le {day.format(new Date(order.orderedAt))}{/if}
 		{#if order.deliveredAt}· livrée le {day.format(new Date(order.deliveredAt))}{/if}
@@ -116,7 +116,7 @@
 
 	{#if data.address}
 		<pre
-			class="mb-6 rounded-lg border border-gray-700 bg-gray-800/60 px-4 py-3 text-sm whitespace-pre-wrap text-gray-300">{data.address}</pre>
+			class="border-light-blue/20 bg-blue-gray/15 text-dark-light-blue mb-6 rounded-lg border px-4 py-3 text-sm whitespace-pre-wrap">{data.address}</pre>
 	{/if}
 
 	<!-- Actions de cycle de vie -->
@@ -150,22 +150,22 @@
 				}}
 		>
 			<h2 class="text-sm font-semibold text-emerald-200">Régler {euro.format(total)}</h2>
-			<p class="mt-1 text-xs text-gray-400">
+			<p class="text-dark-light-blue mt-1 text-xs">
 				Laissez les montants à zéro pour régler entièrement sur le compte courant. Une enveloppe
 				partenaire ne couvre que ce qu'elle contient — le complément se met sur un autre compte.
 			</p>
 			<div class="mt-3 space-y-2">
 				{#each data.accounts as account, index (account.id)}
-					<label class="flex flex-wrap items-center gap-2 text-sm text-gray-300">
+					<label class="text-dark-light-blue flex flex-wrap items-center gap-2 text-sm">
 						<input name="account_id" type="hidden" value={account.id} />
 						<span class="w-56">{account.name}</span>
-						<span class="w-32 text-xs text-gray-500"
+						<span class="text-dark-light-blue/70 w-32 text-xs"
 							>solde {euro.format(account.balance)}
 							{#if !account.countsTowardTreasury}· enveloppe{/if}</span
 						>
 						<input
 							name="account_amount"
-							class="w-32 rounded-lg border border-gray-600 bg-gray-700 p-2 text-sm text-white"
+							class="border-light-blue/30 bg-dark-blue/60 w-32 rounded-lg border p-2 text-sm text-white"
 							inputmode="decimal"
 							placeholder="0,00"
 							bind:value={settlementRaw[index]}
@@ -173,7 +173,7 @@
 					</label>
 				{/each}
 			</div>
-			<p class="mt-2 text-xs {settlementError ? 'text-rose-300' : 'text-gray-500'}">
+			<p class="mt-2 text-xs {settlementError ? 'text-rose-300' : 'text-dark-light-blue/70'}">
 				Réparti : {euro.format(settlement)} sur {euro.format(total)}
 			</p>
 			<div class="mt-3 flex items-center gap-2">
@@ -183,7 +183,7 @@
 					type="submit">Confirmer le passage</button
 				>
 				<button
-					class="rounded-lg border border-gray-600 px-4 py-2 text-sm text-gray-300 hover:bg-gray-700"
+					class="border-light-blue/30 text-dark-light-blue hover:bg-blue-gray/15 rounded-lg border px-4 py-2 text-sm"
 					onclick={() => (passing = false)}
 					type="button">Annuler</button
 				>
@@ -204,7 +204,7 @@
 				}}
 		>
 			<h2 class="text-sm font-semibold text-rose-200">Annuler la commande #{order.id}</h2>
-			<p class="mt-1 text-xs text-gray-400">
+			<p class="text-dark-light-blue mt-1 text-xs">
 				Les items non reçus repartent dans la file de regroupement.
 				{#if receivedCount > 0}
 					<span class="text-amber-300">
@@ -213,17 +213,17 @@
 					</span>
 				{/if}
 			</p>
-			<label class="mt-3 flex items-center gap-2 text-sm text-gray-300">
+			<label class="text-dark-light-blue mt-3 flex items-center gap-2 text-sm">
 				<input
 					name="reverse"
-					class="size-4 rounded border-gray-600 bg-gray-700"
+					class="border-light-blue/30 bg-dark-blue/60 size-4 rounded"
 					checked
 					type="checkbox"
 					value="1"
 				/>
 				Contrepasser le mouvement de trésorerie
 			</label>
-			<p class="mt-1 text-xs text-gray-500">
+			<p class="text-dark-light-blue/70 mt-1 text-xs">
 				À décocher si l'argent est réellement parti : annuler la commande ici ne rappelle pas un
 				virement.
 			</p>
@@ -233,7 +233,7 @@
 					type="submit">Confirmer l'annulation</button
 				>
 				<button
-					class="rounded-lg border border-gray-600 px-4 py-2 text-sm text-gray-300 hover:bg-gray-700"
+					class="border-light-blue/30 text-dark-light-blue hover:bg-blue-gray/15 rounded-lg border px-4 py-2 text-sm"
 					onclick={() => (canceling = false)}
 					type="button">Revenir</button
 				>
@@ -254,7 +254,7 @@
 	{#if overdrawn.length > 0}
 		<div class="mb-6 rounded-lg border border-rose-500/40 bg-rose-500/5 p-4">
 			<h2 class="text-sm font-semibold text-rose-200">Budget insuffisant</h2>
-			<ul class="mt-2 space-y-1 text-sm text-gray-300">
+			<ul class="text-dark-light-blue mt-2 space-y-1 text-sm">
 				{#each overdrawn as share (share.budgetId)}
 					<li>
 						{share.budgetPath} — dépassé de
@@ -262,7 +262,7 @@
 					</li>
 				{/each}
 			</ul>
-			<p class="mt-3 text-xs text-gray-400">
+			<p class="text-dark-light-blue mt-3 text-xs">
 				Trois issues : imputer l'item sur un autre budget, le répartir sur plusieurs budgets — les
 				deux depuis l'édition de l'item —, ou porter l'enveloppe au montant nécessaire si elle était
 				sous-évaluée.
@@ -270,7 +270,7 @@
 			<div class="mt-3 flex flex-wrap items-center gap-2">
 				{#each overdrawn as share (share.budgetId)}
 					<button
-						class="rounded-lg border border-gray-600 px-3 py-1.5 text-xs text-gray-200 hover:bg-gray-700"
+						class="border-light-blue/30 text-light-blue hover:bg-blue-gray/15 rounded-lg border px-3 py-1.5 text-xs"
 						onclick={() => {
 							raising = share.budgetId;
 							raiseAmount = '';
@@ -287,11 +287,11 @@
 					use:enhance
 				>
 					<input name="budget" type="hidden" value={raising} />
-					<label class="text-xs text-gray-300">
+					<label class="text-dark-light-blue text-xs">
 						Nouveau montant de l'enveloppe
 						<input
 							name="amount_ttc"
-							class="mt-1 block w-40 rounded-lg border border-gray-600 bg-gray-700 p-2 text-sm text-white"
+							class="border-light-blue/30 bg-dark-blue/60 mt-1 block w-40 rounded-lg border p-2 text-sm text-white"
 							inputmode="decimal"
 							placeholder="0,00"
 							bind:value={raiseAmount}
@@ -302,7 +302,7 @@
 						type="submit">Enregistrer</button
 					>
 					<button
-						class="rounded-lg border border-gray-600 px-3 py-2 text-sm text-gray-300 hover:bg-gray-700"
+						class="border-light-blue/30 text-dark-light-blue hover:bg-blue-gray/15 rounded-lg border px-3 py-2 text-sm"
 						onclick={() => {
 							raising = null;
 						}}
@@ -316,27 +316,27 @@
 	<!-- Frais de port (CMD-F-12, §7.2) -->
 	{#if editable}
 		<form
-			class="mb-6 rounded-lg border border-gray-700 bg-gray-800 p-4"
+			class="border-light-blue/20 bg-blue-gray/15 mb-6 rounded-lg border p-4"
 			action="?/shipping"
 			method="POST"
 			use:enhance
 		>
-			<h2 class="mb-3 text-sm font-semibold text-gray-200">Frais de port</h2>
+			<h2 class="text-light-blue mb-3 text-sm font-semibold">Frais de port</h2>
 			<div class="flex flex-wrap items-end gap-3">
-				<label class="text-xs text-gray-300">
+				<label class="text-dark-light-blue text-xs">
 					Montant TTC
 					<input
 						name="shipping_cost_ttc"
-						class="mt-1 block w-32 rounded-lg border border-gray-600 bg-gray-700 p-2 text-sm text-white"
+						class="border-light-blue/30 bg-dark-blue/60 mt-1 block w-32 rounded-lg border p-2 text-sm text-white"
 						inputmode="decimal"
 						bind:value={shippingCost}
 					/>
 				</label>
-				<label class="text-xs text-gray-300">
+				<label class="text-dark-light-blue text-xs">
 					Répartition entre les budgets
 					<select
 						name="shipping_allocation"
-						class="mt-1 block rounded-lg border border-gray-600 bg-gray-700 p-2 text-sm text-white"
+						class="border-light-blue/30 bg-dark-blue/60 mt-1 block rounded-lg border p-2 text-sm text-white"
 						bind:value={shippingMode}
 					>
 						{#each SHIPPING_ALLOCATIONS as mode (mode)}
@@ -345,7 +345,7 @@
 					</select>
 				</label>
 				<button
-					class="rounded-lg border border-gray-600 px-3 py-2 text-sm text-gray-200 hover:bg-gray-700"
+					class="border-light-blue/30 text-light-blue hover:bg-blue-gray/15 rounded-lg border px-3 py-2 text-sm"
 					type="submit">Enregistrer</button
 				>
 			</div>
@@ -353,12 +353,12 @@
 	{/if}
 
 	<!-- Items -->
-	<h2 class="mb-3 text-sm font-semibold tracking-wide text-gray-300 uppercase">
+	<h2 class="text-dark-light-blue mb-3 text-sm font-semibold tracking-wide uppercase">
 		Items ({order.items.length})
 	</h2>
 	<ul class="mb-8 space-y-2">
 		{#each order.items as item (item.id)}
-			<li class="rounded-lg border border-gray-700 bg-gray-800 p-4">
+			<li class="border-light-blue/20 bg-blue-gray/15 rounded-lg border p-4">
 				<div class="flex flex-wrap items-start justify-between gap-3">
 					<div class="min-w-0 flex-1">
 						<div class="flex flex-wrap items-center gap-2">
@@ -377,18 +377,20 @@
 							<ItemStateBadge state={item.state} />
 							<CampusBadge campus={item.campus} />
 						</div>
-						<p class="mt-1 text-sm text-gray-400">
+						<p class="text-dark-light-blue mt-1 text-sm">
 							{item.projectName} · {item.requesterName} · {item.quantity} × {euro.format(
 								item.unitPriceTtc
 							)} =
-							<span class="font-medium text-gray-200">{euro.format(item.totalTtc)}</span>
+							<span class="text-light-blue font-medium">{euro.format(item.totalTtc)}</span>
 						</p>
 						<!-- CMD-F-0B — la note reste visible sans déplier : c'est par elle
 						     que passe une demande de livraison exceptionnelle. -->
 						{#if item.note}
-							<p class="mt-2 rounded bg-gray-700/50 px-2 py-1 text-sm text-gray-300">{item.note}</p>
+							<p class="bg-dark-blue/40 text-dark-light-blue mt-2 rounded px-2 py-1 text-sm">
+								{item.note}
+							</p>
 						{/if}
-						<p class="mt-2 text-xs text-gray-500">
+						<p class="text-dark-light-blue/70 mt-2 text-xs">
 							{#if item.allocations.length === 0}
 								<span class="text-amber-300">Aucune imputation budgétaire</span>
 							{:else}
@@ -405,7 +407,7 @@
 					<div class="flex shrink-0 flex-col items-end gap-2">
 						{#if editable}
 							<a
-								class="rounded-lg border border-gray-600 px-3 py-1.5 text-sm text-gray-200 hover:bg-gray-700"
+								class="border-light-blue/30 text-light-blue hover:bg-blue-gray/15 rounded-lg border px-3 py-1.5 text-sm"
 								href={resolve('/orders/[id]/items/[itemId]', {
 									id: String(order.id),
 									itemId: String(item.id)
@@ -426,7 +428,7 @@
 							<form action="?/detach" method="POST" use:enhance>
 								<input name="item" type="hidden" value={item.id} />
 								<button
-									class="rounded-lg border border-gray-600 px-3 py-1.5 text-sm text-gray-300 hover:bg-gray-700"
+									class="border-light-blue/30 text-dark-light-blue hover:bg-blue-gray/15 rounded-lg border px-3 py-1.5 text-sm"
 									type="submit">Retirer</button
 								>
 							</form>
@@ -439,12 +441,12 @@
 
 	<!-- Quotes-parts par budget (§7.2, CMD-F-51) -->
 	{#if order.shares.length > 0}
-		<h2 class="mb-3 text-sm font-semibold tracking-wide text-gray-300 uppercase">
+		<h2 class="text-dark-light-blue mb-3 text-sm font-semibold tracking-wide uppercase">
 			Répartition budgétaire
 		</h2>
-		<div class="overflow-x-auto rounded-lg border border-gray-700">
+		<div class="border-light-blue/20 overflow-x-auto rounded-lg border">
 			<table class="w-full text-sm">
-				<thead class="bg-gray-800 text-left text-xs text-gray-400 uppercase">
+				<thead class="bg-blue-gray/15 text-dark-light-blue text-left text-xs uppercase">
 					<tr>
 						<th class="px-4 py-2">Budget</th>
 						<th class="px-4 py-2 text-right">Items</th>
@@ -453,19 +455,23 @@
 						<th class="px-4 py-2 text-right">Reste</th>
 					</tr>
 				</thead>
-				<tbody class="divide-y divide-gray-700">
+				<tbody class="divide-light-blue/10 divide-y">
 					{#each order.shares as share (share.budgetId)}
 						<tr>
-							<td class="px-4 py-2 text-gray-200">{share.budgetPath}</td>
-							<td class="px-4 py-2 text-right text-gray-300">{euro.format(share.itemsSubtotal)}</td>
-							<td class="px-4 py-2 text-right text-gray-300">{euro.format(share.shippingShare)}</td>
-							<td class="px-4 py-2 text-right font-medium text-gray-100"
+							<td class="text-light-blue px-4 py-2">{share.budgetPath}</td>
+							<td class="text-dark-light-blue px-4 py-2 text-right"
+								>{euro.format(share.itemsSubtotal)}</td
+							>
+							<td class="text-dark-light-blue px-4 py-2 text-right"
+								>{euro.format(share.shippingShare)}</td
+							>
+							<td class="text-light-blue px-4 py-2 text-right font-medium"
 								>{euro.format(share.totalShare)}</td
 							>
 							<td
 								class="px-4 py-2 text-right {share.remainingTtc < 0
 									? 'text-rose-300'
-									: 'text-gray-300'}">{euro.format(share.remainingTtc)}</td
+									: 'text-dark-light-blue'}">{euro.format(share.remainingTtc)}</td
 							>
 						</tr>
 					{/each}

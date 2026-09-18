@@ -1111,7 +1111,7 @@
 	</div>
 </div>
 <div class="w-full py-2 sm:px-8 lg:px-16">
-	<div class="rounded-lg bg-gray-800">
+	<div class="bg-blue-gray/15 rounded-lg">
 		<Table
 			addNew={canImportMembers ? addNew : null}
 			{columns}
@@ -1128,11 +1128,11 @@
 
 {#if canReinvite}
 	<div class="w-full py-2 sm:px-8 lg:px-16">
-		<div class="rounded-lg bg-gray-800 p-4">
+		<div class="bg-blue-gray/15 rounded-lg p-4">
 			<div class="mb-4 flex items-center justify-between gap-3">
 				<h3 class="text-xl font-semibold text-white">Invitations en attente</h3>
 				<button
-					class="rounded-lg border border-gray-600 px-3 py-2 text-sm font-medium text-gray-200 hover:bg-gray-700 disabled:cursor-not-allowed disabled:opacity-50"
+					class="border-light-blue/30 text-light-blue hover:bg-blue-gray/15 rounded-lg border px-3 py-2 text-sm font-medium disabled:cursor-not-allowed disabled:opacity-50"
 					disabled={pendingInvitesLoading || reinvitingUserId !== null || cancelingUserId !== null}
 					onclick={() => {
 						void loadPendingInvites();
@@ -1152,13 +1152,15 @@
 			{/if}
 
 			{#if pendingInvitesLoading}
-				<p class="text-sm text-gray-300">Chargement des invitations en attente...</p>
+				<p class="text-dark-light-blue text-sm">Chargement des invitations en attente...</p>
 			{:else if pendingInvites.length === 0}
-				<p class="text-sm text-gray-300">Aucune invitation expirée/en attente détectée.</p>
+				<p class="text-dark-light-blue text-sm">Aucune invitation expirée/en attente détectée.</p>
 			{:else}
 				<div class="overflow-x-auto">
-					<table class="w-full text-left text-sm text-gray-300">
-						<thead class="border-b border-gray-700 text-xs tracking-wide text-gray-400 uppercase">
+					<table class="text-dark-light-blue w-full text-left text-sm">
+						<thead
+							class="border-light-blue/20 text-dark-light-blue border-b text-xs tracking-wide uppercase"
+						>
 							<tr>
 								<th class="px-3 py-2">Email</th>
 								<th class="px-3 py-2">Invité le</th>
@@ -1168,7 +1170,7 @@
 						</thead>
 						<tbody>
 							{#each pendingInvites as authUser (authUser.id)}
-								<tr class="border-b border-gray-700">
+								<tr class="border-light-blue/20 border-b">
 									<td class="px-3 py-2 text-white">{authUser.email}</td>
 									<td class="px-3 py-2">{formatDate(authUser.invited_at)}</td>
 									<td class="px-3 py-2">{formatDate(authUser.last_sign_in_at)}</td>

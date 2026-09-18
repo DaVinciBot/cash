@@ -97,14 +97,16 @@
 <section class="mx-auto max-w-5xl">
 	<header class="mb-6">
 		<h1 class="text-2xl font-bold text-white">Faire une commande</h1>
-		<p class="mt-1 text-sm text-gray-400">
+		<p class="text-dark-light-blue mt-1 text-sm">
 			Ajoutez autant de lignes que nécessaire et envoyez le tout en une fois. Chaque ligne devient
 			un item indépendant, que vous suivrez depuis « Mes items ».
 		</p>
 	</header>
 
 	{#if data.projects.length === 0}
-		<p class="rounded-lg border border-dashed border-gray-600 px-4 py-12 text-center text-gray-400">
+		<p
+			class="border-light-blue/30 text-dark-light-blue rounded-lg border border-dashed px-4 py-12 text-center"
+		>
 			Vous n'êtes rattaché à aucun projet. Demandez à votre chef de projet de vous ajouter.
 		</p>
 	{:else}
@@ -139,10 +141,10 @@
 		>
 			<div class="mb-4 grid gap-4 sm:grid-cols-2">
 				<label class="block">
-					<span class="mb-1 block text-sm font-medium text-gray-300">Projet</span>
+					<span class="text-dark-light-blue mb-1 block text-sm font-medium">Projet</span>
 					<select
 						name="project_id"
-						class="w-full rounded-lg border border-gray-600 bg-gray-700 p-2.5 text-white"
+						class="border-light-blue/30 bg-dark-blue/60 w-full rounded-lg border p-2.5 text-white"
 						required
 						bind:value={projectId}
 					>
@@ -153,7 +155,9 @@
 				</label>
 
 				<div class="block">
-					<span class="mb-1 block text-sm font-medium text-gray-300">Campus de livraison</span>
+					<span class="text-dark-light-blue mb-1 block text-sm font-medium"
+						>Campus de livraison</span
+					>
 					{#if needsCampusChoice}
 						<!--
 							CMD-F-46 : la divergence n'est pas arbitrée par une règle. La question va à la
@@ -162,7 +166,7 @@
 						-->
 						<select
 							name="campus"
-							class="w-full rounded-lg border border-amber-500/50 bg-gray-700 p-2.5 text-white"
+							class="bg-dark-blue/60 w-full rounded-lg border border-amber-500/50 p-2.5 text-white"
 							required
 							bind:value={chosenCampus}
 						>
@@ -183,7 +187,7 @@
 							<CampusBadge campus={effectiveCampus} />
 						</div>
 						<input name="campus" type="hidden" value={effectiveCampus} />
-						<p class="mt-1 text-xs text-gray-500">Déduit du projet et de votre profil.</p>
+						<p class="text-dark-light-blue/70 mt-1 text-xs">Déduit du projet et de votre profil.</p>
 					{/if}
 				</div>
 			</div>
@@ -193,7 +197,7 @@
 				<div
 					class="mb-4 rounded-lg px-4 py-3 text-sm {overBudget
 						? 'bg-amber-500/15 text-amber-200 ring-1 ring-amber-500/30'
-						: 'bg-gray-800 text-gray-300 ring-1 ring-gray-700'}"
+						: 'bg-blue-gray/15 text-dark-light-blue ring-light-blue/20 ring-1'}"
 				>
 					<div class="flex flex-wrap items-center justify-between gap-2">
 						<span>
@@ -216,25 +220,25 @@
 
 			<div class="space-y-3">
 				{#each lines as line, index (line.id)}
-					<fieldset class="rounded-lg border border-gray-700 bg-gray-800 p-4">
-						<legend class="px-2 text-xs text-gray-500">Composant {index + 1}</legend>
+					<fieldset class="border-light-blue/20 bg-blue-gray/15 rounded-lg border p-4">
+						<legend class="text-dark-light-blue/70 px-2 text-xs">Composant {index + 1}</legend>
 
 						<div class="grid gap-3 sm:grid-cols-12">
 							<label class="sm:col-span-5">
-								<span class="mb-1 block text-xs text-gray-400">Nom</span>
+								<span class="text-dark-light-blue mb-1 block text-xs">Nom</span>
 								<input
 									name="name"
-									class="w-full rounded-lg border border-gray-600 bg-gray-700 p-2 text-white"
+									class="border-light-blue/30 bg-dark-blue/60 w-full rounded-lg border p-2 text-white"
 									placeholder="Résistance 10 kΩ 1 %"
 									required
 									bind:value={line.name}
 								/>
 							</label>
 							<label class="sm:col-span-4">
-								<span class="mb-1 block text-xs text-gray-400">Lien</span>
+								<span class="text-dark-light-blue mb-1 block text-xs">Lien</span>
 								<input
 									name="link"
-									class="w-full rounded-lg border border-gray-600 bg-gray-700 p-2 text-white"
+									class="border-light-blue/30 bg-dark-blue/60 w-full rounded-lg border p-2 text-white"
 									placeholder="https://eu.mouser.com/…"
 									type="url"
 									bind:value={line.link}
@@ -242,10 +246,10 @@
 							</label>
 							<label class="sm:col-span-2">
 								<!-- CMD-F-37 : le membre recopie le prix affiché sur le site, TTC, sans conversion. -->
-								<span class="mb-1 block text-xs text-gray-400">Prix unitaire TTC</span>
+								<span class="text-dark-light-blue mb-1 block text-xs">Prix unitaire TTC</span>
 								<input
 									name="unit_price_ttc"
-									class="w-full rounded-lg border border-gray-600 bg-gray-700 p-2 text-white"
+									class="border-light-blue/30 bg-dark-blue/60 w-full rounded-lg border p-2 text-white"
 									min="0"
 									placeholder="0,00"
 									required
@@ -255,10 +259,10 @@
 								/>
 							</label>
 							<label class="sm:col-span-1">
-								<span class="mb-1 block text-xs text-gray-400">Qté</span>
+								<span class="text-dark-light-blue mb-1 block text-xs">Qté</span>
 								<input
 									name="quantity"
-									class="w-full rounded-lg border border-gray-600 bg-gray-700 p-2 text-white"
+									class="border-light-blue/30 bg-dark-blue/60 w-full rounded-lg border p-2 text-white"
 									min="1"
 									required
 									step="1"
@@ -270,13 +274,13 @@
 
 						<div class="mt-3 grid gap-3 sm:grid-cols-12">
 							<div class="sm:col-span-4">
-								<span class="mb-1 block text-xs text-gray-400">Tags</span>
+								<span class="text-dark-light-blue mb-1 block text-xs">Tags</span>
 								<div class="flex flex-wrap gap-2">
 									{#each ITEM_TAGS as tag (tag)}
 										<button
 											class="rounded-full px-3 py-1 text-xs {line.tags.includes(tag)
-												? 'bg-white text-gray-900'
-												: 'bg-gray-700 text-gray-300 hover:bg-gray-600'}"
+												? 'bg-light-blue text-dark-blue'
+												: 'bg-dark-blue/60 text-dark-light-blue hover:bg-blue-gray/25'}"
 											onclick={() => {
 												toggleTag(line, tag);
 											}}
@@ -292,20 +296,20 @@
 									autre adresse que celle du campus. Une destination utilisée une seule
 									fois n'a rien à gagner à être structurée.
 								-->
-								<span class="mb-1 block text-xs text-gray-400">
+								<span class="text-dark-light-blue mb-1 block text-xs">
 									Note (référence exacte, urgence, variante acceptable, adresse de livraison
 									exceptionnelle…)
 								</span>
 								<input
 									name="note"
-									class="w-full rounded-lg border border-gray-600 bg-gray-700 p-2 text-white"
+									class="border-light-blue/30 bg-dark-blue/60 w-full rounded-lg border p-2 text-white"
 									bind:value={line.note}
 								/>
 							</label>
 						</div>
 
 						<div class="mt-3 flex items-center justify-between">
-							<span class="text-sm text-gray-400">
+							<span class="text-dark-light-blue text-sm">
 								Total ligne : {euro.format(
 									(Number(line.unitPrice.replace(',', '.')) || 0) * (Number(line.quantity) || 0)
 								)}
@@ -324,14 +328,14 @@
 
 			<div class="mt-4 flex flex-wrap items-center justify-between gap-3">
 				<button
-					class="rounded-lg border border-gray-600 px-4 py-2 text-sm text-gray-200 hover:bg-gray-700"
+					class="border-light-blue/30 text-light-blue hover:bg-blue-gray/15 rounded-lg border px-4 py-2 text-sm"
 					onclick={addLine}
 					type="button">+ Ajouter un composant</button
 				>
 				<div class="flex items-center gap-4">
 					<span class="text-lg font-medium text-white">Total : {euro.format(total)}</span>
 					<a
-						class="rounded-lg border border-gray-600 px-4 py-2 text-sm text-gray-300 hover:bg-gray-700"
+						class="border-light-blue/30 text-dark-light-blue hover:bg-blue-gray/15 rounded-lg border px-4 py-2 text-sm"
 						href={resolve('/')}>Annuler</a
 					>
 					<button

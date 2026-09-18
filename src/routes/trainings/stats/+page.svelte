@@ -20,13 +20,13 @@
 <svelte:head><title>Statistiques des formations — DaVinciBot</title></svelte:head>
 
 <section class="mx-auto max-w-5xl">
-	<a class="text-sm text-gray-400 hover:text-gray-200" href={resolve('/trainings')}
+	<a class="text-dark-light-blue hover:text-light-blue text-sm" href={resolve('/trainings')}
 		>← Pilotage des formations</a
 	>
 
 	<header class="mt-3 mb-6">
 		<h1 class="text-2xl font-bold text-white">Statistiques</h1>
-		<p class="mt-1 text-sm text-gray-400">
+		<p class="text-dark-light-blue mt-1 text-sm">
 			Formations tenues et inscriptions confirmées, {formatRangeLabel(data.range)}.
 		</p>
 	</header>
@@ -42,7 +42,7 @@
 		</p>
 	{:else if empty}
 		<p
-			class="mb-6 rounded-lg border border-dashed border-gray-600 px-4 py-8 text-center text-gray-400"
+			class="border-light-blue/30 text-dark-light-blue mb-6 rounded-lg border border-dashed px-4 py-8 text-center"
 		>
 			Aucune formation terminée sur cette plage : élargissez les dates pour voir des chiffres.
 		</p>

@@ -64,7 +64,7 @@
 		<Bar {data} {options} />
 	{:else}
 		<!-- Sans JavaScript le canevas reste vide : la liste, elle, se lit. -->
-		<ul class="space-y-1 text-xs text-gray-400">
+		<ul class="text-dark-light-blue space-y-1 text-xs">
 			{#each shown as row (row.label)}
 				<li class="flex justify-between gap-3">
 					<span class="truncate">{row.label}</span>

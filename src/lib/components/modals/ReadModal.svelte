@@ -246,14 +246,14 @@
 		<!-- Modal content -->
 		<div
 			id="popup-{id}"
-			class="modal relative m-auto max-w-[80%] min-w-96 rounded-lg bg-gray-800 p-4 sm:p-5 md:max-w-[75%] lg:max-w-[70%] xl:max-w-[65%] 2xl:max-w-[55%]"
+			class="modal bg-blue-gray/15 relative m-auto max-w-[80%] min-w-96 rounded-lg p-4 sm:p-5 md:max-w-[75%] lg:max-w-[70%] xl:max-w-[65%] 2xl:max-w-[55%]"
 		>
 			<!-- Modal header -->
 			<div class="mb-4 flex justify-between rounded-t sm:mb-5">
 				<div class="flex w-full text-lg text-white md:text-xl">
 					<h3 class="mr-2 font-semibold">{values.header.title}</h3>
 					{#if values.header.sub}
-						<p class="font-semibold text-gray-400">- {values.header.sub}</p>
+						<p class="text-dark-light-blue font-semibold">- {values.header.sub}</p>
 					{/if}
 					{#if values.header.stepper}
 						<Stepper></Stepper>
@@ -261,7 +261,7 @@
 				</div>
 				<div>
 					<button
-						class="inline-flex rounded-lg bg-transparent p-1.5 text-sm text-gray-400 hover:bg-gray-600 hover:text-white"
+						class="text-dark-light-blue hover:bg-blue-gray/25 inline-flex rounded-lg bg-transparent p-1.5 text-sm hover:text-white"
 						data-modal-toggle={id}
 						data-toggle="true"
 						onclick={__onClose}
@@ -293,7 +293,7 @@
 							<div class="mt-2 mb-2 flex w-full justify-between">
 								<button
 									class="
-									inline-flex rounded-lg bg-transparent p-1.5 text-sm text-gray-400 hover:bg-gray-600 hover:text-white"
+									text-dark-light-blue hover:bg-blue-gray/25 inline-flex rounded-lg bg-transparent p-1.5 text-sm hover:text-white"
 									aria-label="Pièce jointe précédente"
 									onclick={() => {
 										moveFile(-1);
@@ -313,13 +313,13 @@
 										></path></svg
 									>
 								</button>
-								<p class="items-center self-center text-center text-sm text-gray-400">
+								<p class="text-dark-light-blue items-center self-center text-center text-sm">
 									{current_file || 'Chargement'} - {current_file_index + 1}/{attachmentPaths()
 										.length}
 								</p>
 								<button
 									class="
-								inline-flex rounded-lg bg-transparent p-1.5 text-sm text-gray-400 hover:bg-gray-600 hover:text-white"
+								text-dark-light-blue hover:bg-blue-gray/25 inline-flex rounded-lg bg-transparent p-1.5 text-sm hover:text-white"
 									aria-label="Pièce jointe suivante"
 									onclick={() => {
 										moveFile(1);
@@ -369,7 +369,7 @@
 					{#each values.body as { label, value } (label)}
 						<dt class="mb-2 leading-none font-semibold text-white">{label}</dt>
 						{#if Array.isArray(value)}
-							<dd class="mb-4 ml-2 font-light text-gray-400 sm:mb-5">
+							<dd class="text-dark-light-blue mb-4 ml-2 font-light sm:mb-5">
 								<table class="w-full border-separate">
 									<thead class="font-bold">
 										<tr>
@@ -425,7 +425,7 @@
 							</dd>
 						{:else}
 							<dd
-								class="mb-4 font-light text-gray-400 transition-colors hover:text-gray-300 sm:mb-5"
+								class="text-dark-light-blue hover:text-dark-light-blue mb-4 font-light transition-colors sm:mb-5"
 							>
 								{value}
 							</dd>
@@ -437,7 +437,7 @@
 				{#each actions as action, index (actionKey(action, index))}
 					{#if action.type === 'selector'}
 						<select
-							class="focus:border-primary-500 focus:ring-primary-500 block w-full rounded-lg border border-gray-600 bg-gray-700 p-2.5 text-sm text-white placeholder-gray-400"
+							class="focus:border-primary-500 focus:ring-primary-500 border-light-blue/30 bg-dark-blue/60 placeholder-dark-light-blue/50 block w-full rounded-lg border p-2.5 text-sm text-white"
 							onchange={action.handler}
 						>
 							<option disabled selected value="">Choisir une option</option>

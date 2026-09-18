@@ -102,7 +102,7 @@
 
 <button
 	id="user-menu-button"
-	class="mx-3 flex rounded-full bg-gray-800 text-sm focus:ring-3 focus:ring-gray-700 md:mr-0"
+	class="bg-blue-gray/15 focus:ring-light-blue/60 mx-3 flex rounded-full text-sm focus:ring-3 md:mr-0"
 	aria-expanded="false"
 	onclick={(e: MouseEvent) => {
 		const dropdown = getDropdown();
@@ -123,16 +123,16 @@
 	id="dropdown"
 	class="{fixed
 		? 'fixed'
-		: 'absolute'} bg-opacity-20 z-50 my-4 hidden w-56 list-none divide-y divide-gray-700 overflow-hidden rounded-xl border border-gray-700 bg-gray-900 text-base shadow backdrop-blur-lg"
+		: 'absolute'} bg-opacity-20 divide-light-blue/10 border-light-blue/20 bg-dark-blue/60 z-50 my-4 hidden w-56 list-none divide-y overflow-hidden rounded-xl border text-base shadow backdrop-blur-lg"
 >
 	<div class="px-4 py-3">
 		<span class="block text-sm font-semibold text-white">{displayUser.name}</span>
 		<span class="block truncate text-sm text-white">{displayUser.email}</span>
 	</div>
-	<ul class="py-1 text-gray-300" aria-labelledby="dropdown">
+	<ul class="text-dark-light-blue py-1" aria-labelledby="dropdown">
 		<li>
 			<button
-				class="bg-opacity-80 block w-full px-4 py-2 text-left text-sm hover:cursor-pointer hover:bg-gray-700 hover:text-white"
+				class="bg-opacity-80 hover:bg-blue-gray/15 block w-full px-4 py-2 text-left text-sm hover:cursor-pointer hover:text-white"
 				onclick={() => {
 					// fermer le dropdown avant d'ouvrir le modal : il vit en fin de body
 					// et passerait au-dessus à z-index égal

@@ -22,7 +22,7 @@
 	<header class="mb-6 flex flex-wrap items-end justify-between gap-4">
 		<div>
 			<h1 class="text-2xl font-bold text-white">Partenariats</h1>
-			<p class="mt-1 text-sm text-gray-400">
+			<p class="text-dark-light-blue mt-1 text-sm">
 				Les domaines servent à reconnaître le partenaire dans le lien d'un item. Seule une
 				<strong>enveloppe de crédit</strong> se modélise : une remise n'a pas de solde à décompter.
 			</p>
@@ -44,7 +44,7 @@
 
 	{#if creating}
 		<form
-			class="mb-4 rounded-lg border border-gray-700 bg-gray-800 p-4"
+			class="border-light-blue/20 bg-blue-gray/15 mb-4 rounded-lg border p-4"
 			action="?/create"
 			method="POST"
 			use:enhance={() =>
@@ -56,34 +56,34 @@
 		>
 			<input name="school_year_id" type="hidden" value={data.schoolYearId} />
 			<div class="flex flex-wrap items-end gap-3">
-				<label class="text-xs text-gray-300">
+				<label class="text-dark-light-blue text-xs">
 					Nom
 					<input
 						name="name"
-						class="mt-1 block rounded-lg border border-gray-600 bg-gray-700 p-2 text-sm text-white"
+						class="border-light-blue/30 bg-dark-blue/60 mt-1 block rounded-lg border p-2 text-sm text-white"
 						required
 					/>
 				</label>
-				<label class="flex-1 text-xs text-gray-300">
+				<label class="text-dark-light-blue flex-1 text-xs">
 					Domaines
 					<input
 						name="domains"
-						class="mt-1 block w-full rounded-lg border border-gray-600 bg-gray-700 p-2 text-sm text-white"
+						class="border-light-blue/30 bg-dark-blue/60 mt-1 block w-full rounded-lg border p-2 text-sm text-white"
 						placeholder="mouser"
 					/>
 				</label>
 			</div>
-			<label class="mt-3 block text-xs text-gray-300">
+			<label class="text-dark-light-blue mt-3 block text-xs">
 				Notes
 				<textarea
 					name="notes"
-					class="mt-1 block w-full rounded-lg border border-gray-600 bg-gray-700 p-2 text-sm text-white"
+					class="border-light-blue/30 bg-dark-blue/60 mt-1 block w-full rounded-lg border p-2 text-sm text-white"
 					rows="2"></textarea>
 			</label>
-			<label class="mt-3 flex items-center gap-2 text-sm text-gray-300">
+			<label class="text-dark-light-blue mt-3 flex items-center gap-2 text-sm">
 				<input
 					name="envelope"
-					class="size-4 rounded border-gray-600 bg-gray-700"
+					class="border-light-blue/30 bg-dark-blue/60 size-4 rounded"
 					type="checkbox"
 					value="1"
 					bind:checked={withEnvelope}
@@ -91,16 +91,16 @@
 				Ce partenariat donne droit à une enveloppe à consommer chez lui
 			</label>
 			{#if withEnvelope}
-				<label class="mt-2 block text-xs text-gray-300">
+				<label class="text-dark-light-blue mt-2 block text-xs">
 					Montant de l'enveloppe
 					<input
 						name="opening_balance"
-						class="mt-1 block w-32 rounded-lg border border-gray-600 bg-gray-700 p-2 text-sm text-white"
+						class="border-light-blue/30 bg-dark-blue/60 mt-1 block w-32 rounded-lg border p-2 text-sm text-white"
 						inputmode="decimal"
 						value="0,00"
 					/>
 				</label>
-				<p class="mt-1 text-xs text-gray-500">
+				<p class="text-dark-light-blue/70 mt-1 text-xs">
 					Un compte dédié sera créé. Il n'entre jamais dans le solde de trésorerie : c'est un avoir
 					chez un tiers, pas de l'argent en banque.
 				</p>
@@ -113,18 +113,20 @@
 	{/if}
 
 	{#if active.length === 0}
-		<p class="rounded-lg border border-dashed border-gray-600 px-4 py-12 text-center text-gray-400">
+		<p
+			class="border-light-blue/30 text-dark-light-blue rounded-lg border border-dashed px-4 py-12 text-center"
+		>
 			Aucun partenariat actif.
 		</p>
 	{:else}
 		<ul class="space-y-2">
 			{#each active as partner (partner.id)}
-				<li class="rounded-lg border border-gray-700 bg-gray-800 p-4">
+				<li class="border-light-blue/20 bg-blue-gray/15 rounded-lg border p-4">
 					<div class="flex flex-wrap items-center gap-3">
 						<span class="font-medium text-white">{partner.name}</span>
-						<span class="text-xs text-gray-500">{partner.schoolYearLabel}</span>
+						<span class="text-dark-light-blue/70 text-xs">{partner.schoolYearLabel}</span>
 						{#each partner.domains as domain (domain)}
-							<span class="rounded-full bg-gray-700 px-2 py-0.5 text-xs text-gray-300"
+							<span class="bg-dark-blue/60 text-dark-light-blue rounded-full px-2 py-0.5 text-xs"
 								>{domain}</span
 							>
 						{/each}
@@ -133,35 +135,36 @@
 						{/if}
 						{#if partner.accountName}
 							<span class="ml-auto text-sm">
-								<span class="text-gray-400">{partner.accountName} :</span>
-								<span class="font-medium text-gray-100"
+								<span class="text-dark-light-blue">{partner.accountName} :</span>
+								<span class="text-light-blue font-medium"
 									>{euro.format(partner.accountBalance ?? 0)}</span
 								>
 							</span>
 						{/if}
 					</div>
 					{#if partner.notes}
-						<p class="mt-2 rounded bg-gray-700/50 px-2 py-1 text-sm text-gray-300">
+						<p class="bg-dark-blue/40 text-dark-light-blue mt-2 rounded px-2 py-1 text-sm">
 							{partner.notes}
 						</p>
 					{/if}
 					<div class="mt-3 flex flex-wrap items-center gap-2">
 						<button
-							class="text-xs text-gray-400 underline hover:text-gray-200"
+							class="text-dark-light-blue hover:text-light-blue text-xs underline"
 							onclick={() => (editing = editing === partner.id ? null : partner.id)}
 							type="button">modifier</button
 						>
 						<form action="?/archive" method="POST" use:enhance>
 							<input name="id" type="hidden" value={partner.id} />
-							<button class="text-xs text-gray-400 underline hover:text-gray-200" type="submit"
-								>archiver</button
+							<button
+								class="text-dark-light-blue hover:text-light-blue text-xs underline"
+								type="submit">archiver</button
 							>
 						</form>
 					</div>
 
 					{#if editing === partner.id}
 						<form
-							class="mt-3 rounded-lg border border-gray-600 bg-gray-900/60 p-3"
+							class="border-light-blue/30 bg-dark-blue/60 mt-3 rounded-lg border p-3"
 							action="?/update"
 							method="POST"
 							use:enhance={() =>
@@ -172,29 +175,29 @@
 						>
 							<input name="id" type="hidden" value={partner.id} />
 							<div class="flex flex-wrap items-end gap-3">
-								<label class="text-xs text-gray-300">
+								<label class="text-dark-light-blue text-xs">
 									Nom
 									<input
 										name="name"
-										class="mt-1 block rounded-lg border border-gray-600 bg-gray-700 p-2 text-sm text-white"
+										class="border-light-blue/30 bg-dark-blue/60 mt-1 block rounded-lg border p-2 text-sm text-white"
 										required
 										value={partner.name}
 									/>
 								</label>
-								<label class="flex-1 text-xs text-gray-300">
+								<label class="text-dark-light-blue flex-1 text-xs">
 									Domaines
 									<input
 										name="domains"
-										class="mt-1 block w-full rounded-lg border border-gray-600 bg-gray-700 p-2 text-sm text-white"
+										class="border-light-blue/30 bg-dark-blue/60 mt-1 block w-full rounded-lg border p-2 text-sm text-white"
 										value={partner.domains.join(', ')}
 									/>
 								</label>
 							</div>
-							<label class="mt-3 block text-xs text-gray-300">
+							<label class="text-dark-light-blue mt-3 block text-xs">
 								Notes
 								<textarea
 									name="notes"
-									class="mt-1 block w-full rounded-lg border border-gray-600 bg-gray-700 p-2 text-sm text-white"
+									class="border-light-blue/30 bg-dark-blue/60 mt-1 block w-full rounded-lg border p-2 text-sm text-white"
 									rows="2">{partner.notes ?? ''}</textarea
 								>
 							</label>
@@ -210,8 +213,10 @@
 	{/if}
 
 	{#if archived.length > 0}
-		<h2 class="mt-8 mb-2 text-sm font-semibold tracking-wide text-gray-400 uppercase">Archivés</h2>
-		<ul class="space-y-1 text-sm text-gray-500">
+		<h2 class="text-dark-light-blue mt-8 mb-2 text-sm font-semibold tracking-wide uppercase">
+			Archivés
+		</h2>
+		<ul class="text-dark-light-blue/70 space-y-1 text-sm">
 			{#each archived as partner (partner.id)}
 				<li>{partner.name} · {partner.domains.join(', ') || 'aucun domaine'}</li>
 			{/each}

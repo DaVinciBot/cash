@@ -64,10 +64,10 @@
 		<!-- Modal content -->
 		<div
 			id="MultiPopup"
-			class="relative m-auto rounded-lg bg-gray-800 p-4 text-center shadow sm:p-5"
+			class="bg-blue-gray/15 relative m-auto rounded-lg p-4 text-center shadow sm:p-5"
 		>
 			<button
-				class="absolute top-2.5 right-2.5 ml-auto inline-flex items-center rounded-lg bg-transparent p-1.5 text-sm text-gray-400 hover:bg-gray-600 hover:text-white"
+				class="text-dark-light-blue hover:bg-blue-gray/25 absolute top-2.5 right-2.5 ml-auto inline-flex items-center rounded-lg bg-transparent p-1.5 text-sm hover:text-white"
 				onclick={close}
 				type="button"
 			>
@@ -141,7 +141,7 @@
 					</svg>
 				{:else if type === 'info'}
 					<svg
-						class="h-8 w-8 text-gray-400"
+						class="text-dark-light-blue h-8 w-8"
 						fill="none"
 						height="24"
 						viewBox="0 0 24 24"

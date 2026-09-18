@@ -12,19 +12,21 @@
 <svelte:head><title>Documents — DaVinciBot</title></svelte:head>
 
 <section class="mx-auto max-w-5xl">
-	<a class="text-sm text-gray-400 hover:text-gray-200" href={resolve('/treasury')}>← Trésorerie</a>
+	<a class="text-dark-light-blue hover:text-light-blue text-sm" href={resolve('/treasury')}
+		>← Trésorerie</a
+	>
 
 	<header class="mt-3 mb-6 flex flex-wrap items-end justify-between gap-4">
 		<div>
 			<h1 class="text-2xl font-bold text-white">Documents</h1>
-			<p class="mt-1 text-sm text-gray-400">
+			<p class="text-dark-light-blue mt-1 text-sm">
 				Notes de frais, devis, factures et reçus fiscaux. Un document émis fige son montant, son
 				destinataire et l'identité de l'émetteur : il se rejoue à l'identique, indéfiniment.
 			</p>
 		</div>
 		<div class="flex gap-2">
 			<a
-				class="rounded-lg border border-gray-600 px-4 py-2 text-sm text-gray-200 hover:bg-gray-700"
+				class="border-light-blue/30 text-light-blue hover:bg-blue-gray/15 rounded-lg border px-4 py-2 text-sm"
 				href={resolve('/treasury/documents/issuer')}>Identité de l'émetteur</a
 			>
 			<a
@@ -44,23 +46,27 @@
 	{/if}
 
 	{#if data.documents.length === 0}
-		<p class="rounded-lg border border-dashed border-gray-600 px-4 py-12 text-center text-gray-400">
+		<p
+			class="border-light-blue/30 text-dark-light-blue rounded-lg border border-dashed px-4 py-12 text-center"
+		>
 			Aucun document émis.
 		</p>
 	{:else}
 		<ul class="space-y-2">
 			{#each data.documents as doc (doc.id)}
 				<li
-					class="flex flex-wrap items-center gap-3 rounded-lg border border-gray-700 bg-gray-800 px-4 py-3 text-sm"
+					class="border-light-blue/20 bg-blue-gray/15 flex flex-wrap items-center gap-3 rounded-lg border px-4 py-3 text-sm"
 				>
-					<span class="font-mono text-xs text-gray-400">{doc.number}</span>
+					<span class="text-dark-light-blue font-mono text-xs">{doc.number}</span>
 					<span class="font-medium text-white">{DOCUMENT_KIND_LABELS[doc.kind]}</span>
-					<span class="text-gray-300">{doc.recipientName}</span>
-					{#if doc.subject}<span class="truncate text-xs text-gray-500">{doc.subject}</span>{/if}
-					<span class="ml-auto font-medium text-gray-100">{euro.format(doc.amountTtc)}</span>
-					<span class="text-xs text-gray-500">{day.format(new Date(doc.issuedOn))}</span>
+					<span class="text-dark-light-blue">{doc.recipientName}</span>
+					{#if doc.subject}<span class="text-dark-light-blue/70 truncate text-xs"
+							>{doc.subject}</span
+						>{/if}
+					<span class="text-light-blue ml-auto font-medium">{euro.format(doc.amountTtc)}</span>
+					<span class="text-dark-light-blue/70 text-xs">{day.format(new Date(doc.issuedOn))}</span>
 					<a
-						class="rounded-lg border border-gray-600 px-3 py-1 text-xs text-gray-200 hover:bg-gray-700"
+						class="border-light-blue/30 text-light-blue hover:bg-blue-gray/15 rounded-lg border px-3 py-1 text-xs"
 						href={resolve('/treasury/documents/[id]', { id: String(doc.id) })}
 						>Ouvrir
 					</a>

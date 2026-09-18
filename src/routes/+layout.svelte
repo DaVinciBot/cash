@@ -80,7 +80,7 @@
 </svelte:head>
 
 <!-- Une seule coquille : le fond de marque était jusqu'ici intégralement masqué
-	 par un bg-gray-900 posé sur le div enfant. -->
+	 par un bg-dark-blue/60 posé sur le div enfant. -->
 <div
 	class="bg-dark-blue text-light-blue min-h-screen min-w-screen overflow-hidden font-['Almarai'] antialiased"
 >
