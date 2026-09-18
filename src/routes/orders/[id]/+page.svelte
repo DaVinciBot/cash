@@ -100,9 +100,7 @@
 	</header>
 
 	{#if failure}
-		<p
-			class="mb-4 rounded-lg bg-rose-500/15 px-4 py-3 text-sm text-rose-200 ring-1 ring-rose-500/30"
-		>
+		<p class="mb-4 rounded-xl bg-red-500/15 px-4 py-3 text-sm text-red-300 ring-1 ring-red-500/30">
 			{failure}
 		</p>
 	{/if}
@@ -243,7 +241,7 @@
 
 	{#if unallocated.length > 0 && isOrderPassable(order.state)}
 		<p
-			class="mb-4 rounded-lg bg-amber-500/15 px-4 py-3 text-sm text-amber-200 ring-1 ring-amber-500/30"
+			class="mb-4 rounded-xl bg-amber-500/15 px-4 py-3 text-sm text-amber-300 ring-1 ring-amber-500/30"
 		>
 			{unallocated.length} item(s) ne sont imputés sur aucun budget : la commande ne peut pas être passée
 			tant qu'ils n'ont pas de poste de dépense.

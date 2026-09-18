@@ -61,7 +61,7 @@
 
 	{#if DOCUMENT_KINDS.some((k) => (data.missingByKind[k] ?? []).length > 0)}
 		<p
-			class="mt-4 rounded-lg bg-amber-500/15 px-4 py-3 text-sm text-amber-200 ring-1 ring-amber-500/30"
+			class="mt-4 rounded-xl bg-amber-500/15 px-4 py-3 text-sm text-amber-300 ring-1 ring-amber-500/30"
 		>
 			Certaines pièces sont indisponibles tant que l'identité de l'émetteur est incomplète.
 			<a class="underline" href={resolve('/treasury/documents/issuer')}>La compléter</a>

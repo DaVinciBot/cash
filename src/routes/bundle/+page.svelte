@@ -94,15 +94,13 @@
 	</header>
 
 	{#if failure}
-		<p
-			class="mb-4 rounded-lg bg-rose-500/15 px-4 py-3 text-sm text-rose-200 ring-1 ring-rose-500/30"
-		>
+		<p class="mb-4 rounded-xl bg-red-500/15 px-4 py-3 text-sm text-red-300 ring-1 ring-red-500/30">
 			{failure}
 		</p>
 	{/if}
 	{#if outcome}
 		<p
-			class="mb-4 rounded-lg bg-emerald-500/15 px-4 py-3 text-sm text-emerald-200 ring-1 ring-emerald-500/30"
+			class="mb-4 rounded-xl bg-emerald-500/15 px-4 py-3 text-sm text-emerald-300 ring-1 ring-emerald-500/30"
 		>
 			{outcome}
 		</p>
@@ -155,7 +153,7 @@
 
 		{#if campusConflict}
 			<p
-				class="mb-4 rounded-lg bg-amber-500/15 px-4 py-3 text-sm text-amber-200 ring-1 ring-amber-500/30"
+				class="mb-4 rounded-xl bg-amber-500/15 px-4 py-3 text-sm text-amber-300 ring-1 ring-amber-500/30"
 			>
 				Une commande n'a qu'une destination. Votre sélection mélange deux campus : retirez-en un
 				avant de créer la commande (CMD-F-45).

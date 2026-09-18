@@ -38,7 +38,7 @@
 
 	{#if !data.issuerReady}
 		<p
-			class="mb-4 rounded-lg bg-amber-500/15 px-4 py-3 text-sm text-amber-200 ring-1 ring-amber-500/30"
+			class="mb-4 rounded-xl bg-amber-500/15 px-4 py-3 text-sm text-amber-300 ring-1 ring-amber-500/30"
 		>
 			L'identité de l'émetteur est incomplète : certaines pièces ne peuvent pas être émises.
 			<a class="underline" href={resolve('/treasury/documents/issuer')}>La compléter</a>

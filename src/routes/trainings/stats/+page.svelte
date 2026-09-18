@@ -34,9 +34,7 @@
 	<div class="mb-6"><StatsRangeForm range={data.range} /></div>
 
 	{#if data.failed}
-		<p
-			class="mb-6 rounded-lg bg-rose-500/15 px-4 py-3 text-sm text-rose-200 ring-1 ring-rose-500/30"
-		>
+		<p class="mb-6 rounded-xl bg-red-500/15 px-4 py-3 text-sm text-red-300 ring-1 ring-red-500/30">
 			Impossible de lire les formations. Il manque probablement le droit de lecture sur les créneaux
 			ou les inscriptions.
 		</p>

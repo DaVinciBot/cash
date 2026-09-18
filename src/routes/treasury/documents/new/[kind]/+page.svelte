@@ -115,16 +115,14 @@
 	</header>
 
 	{#if failure}
-		<p
-			class="mb-4 rounded-lg bg-rose-500/15 px-4 py-3 text-sm text-rose-200 ring-1 ring-rose-500/30"
-		>
+		<p class="mb-4 rounded-xl bg-red-500/15 px-4 py-3 text-sm text-red-300 ring-1 ring-red-500/30">
 			{failure}
 		</p>
 	{/if}
 
 	{#if data.missing.length > 0}
 		<p
-			class="mb-4 rounded-lg bg-amber-500/15 px-4 py-3 text-sm text-amber-200 ring-1 ring-amber-500/30"
+			class="mb-4 rounded-xl bg-amber-500/15 px-4 py-3 text-sm text-amber-300 ring-1 ring-amber-500/30"
 		>
 			Il manque {data.missing.join(', ')} à l'identité de l'émetteur.
 			<a class="underline" href={resolve('/treasury/documents/issuer')}>La compléter</a>

@@ -607,9 +607,7 @@ DVBisous ! :robot:`;
 	/>
 
 	{#if formError}
-		<p
-			class="mb-4 rounded-lg bg-rose-500/15 px-4 py-3 text-sm text-rose-200 ring-1 ring-rose-500/30"
-		>
+		<p class="mb-4 rounded-xl bg-red-500/15 px-4 py-3 text-sm text-red-300 ring-1 ring-red-500/30">
 			{formError}
 		</p>
 	{/if}
@@ -634,7 +632,7 @@ DVBisous ! :robot:`;
 		</div>
 		{#if summaryError}
 			<p
-				class="mt-3 rounded-lg bg-rose-500/15 px-4 py-3 text-sm text-rose-200 ring-1 ring-rose-500/30"
+				class="mt-3 rounded-xl bg-red-500/15 px-4 py-3 text-sm text-red-300 ring-1 ring-red-500/30"
 			>
 				{summaryError}
 			</p>
@@ -648,7 +646,7 @@ DVBisous ! :robot:`;
 			Chargement des formations…
 		</p>
 	{:else if error}
-		<div class="rounded-lg bg-rose-500/15 px-4 py-3 ring-1 ring-rose-500/30">
+		<div class="rounded-xl bg-red-500/15 px-4 py-3 ring-1 ring-red-500/30">
 			<p class="text-sm text-rose-200">{error}</p>
 			<button
 				class="mt-3 rounded-lg border border-rose-500/40 px-3 py-1.5 text-sm text-rose-200 hover:bg-rose-500/10"
