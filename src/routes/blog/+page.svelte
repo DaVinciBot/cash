@@ -531,7 +531,7 @@
 	<div class="mb-4 flex items-center justify-between">
 		<h1 class="text-2xl font-bold">Articles</h1>
 		<button
-			class="bg-primary-600 hover:bg-primary-700 rounded px-3 py-1.5 text-sm text-white"
+			class="bg-light-blue text-dark-blue rounded-xl px-3 py-1.5 text-sm font-semibold hover:bg-white"
 			onclick={newArticle}>Nouvel article</button
 		>
 	</div>
@@ -543,7 +543,7 @@
 				<label class="flex items-center gap-2 text-xs">
 					<span class="opacity-80">Ajouter un fichier</span>
 					<input
-						class="file:bg-dark-blue/60 hover:file:bg-blue-gray/30 text-xs file:mr-4 file:rounded file:border-0 file:px-2 file:py-1 file:text-xs file:text-white"
+						class="file:bg-dark-blue/60 hover:file:bg-blue-gray/30 text-xs file:mr-4 file:rounded-lg file:border-0 file:px-2 file:py-1 file:text-xs file:text-white"
 						onchange={handleUpload}
 						type="file"
 					/>
@@ -562,7 +562,7 @@
 					bind:value={search}
 				/>
 			</div>
-			<div class="border-light-blue/20 max-h-64 overflow-auto rounded border">
+			<div class="border-light-blue/20 max-h-64 overflow-auto rounded-xl border">
 				{#if loadingList}
 					<div class="text-dark-light-blue p-3 text-sm">Chargement…</div>
 				{:else if !articles.length}
@@ -574,7 +574,7 @@
 								.includes(search.toLowerCase())) as a (a.slug)}
 							<li>
 								<button
-									class={`hover:bg-blue-gray/15 w-full cursor-pointer rounded p-2 text-left ${a.slug === selectedSlug ? 'bg-dark-blue/40' : ''}`}
+									class={`hover:bg-blue-gray/15 w-full cursor-pointer rounded-xl p-2 text-left ${a.slug === selectedSlug ? 'bg-dark-blue/40' : ''}`}
 									onclick={() => {
 										if (a.slug) {
 											void loadArticle(a.slug);
@@ -587,9 +587,9 @@
 										<div class="text-dark-light-blue truncate text-xs">{a.slug}</div>
 										<span
 											class="rounded-full px-1.5 py-0.5 text-[10px] {a.state === 'published'
-												? 'border border-green-800 bg-green-900/50 text-green-300'
+												? 'bg-emerald-500/15 text-emerald-300 ring-1 ring-emerald-500/30'
 												: a.state === 'deleted'
-													? 'border border-red-800 bg-red-900/50 text-red-300'
+													? 'bg-red-500/15 text-red-300 ring-1 ring-red-500/30'
 													: 'border-light-blue/30 bg-dark-blue/60 text-dark-light-blue border'}"
 										>
 											{a.state === 'published'
@@ -666,14 +666,14 @@
 				/>
 				<div class="mt-2 flex items-center gap-2">
 					<input
-						class="file:bg-dark-blue/60 hover:file:bg-blue-gray/30 text-xs file:mr-4 file:rounded file:border-0 file:px-2 file:py-1 file:text-xs file:text-white"
+						class="file:bg-dark-blue/60 hover:file:bg-blue-gray/30 text-xs file:mr-4 file:rounded-lg file:border-0 file:px-2 file:py-1 file:text-xs file:text-white"
 						accept="image/*"
 						onchange={handleCoverUpload}
 						type="file"
 					/>
 					{#if meta.heroImage}
 						<img
-							class="border-light-blue/20 h-10 w-10 rounded border object-cover"
+							class="border-light-blue/20 h-10 w-10 rounded-lg border object-cover"
 							alt="couverture"
 							src={meta.heroImage}
 						/>
@@ -708,7 +708,7 @@
 			</div>
 
 			<button
-				class="bg-primary-600 hover:bg-primary-700 rounded px-4 py-2 text-white disabled:opacity-50"
+				class="bg-light-blue text-dark-blue rounded-xl px-4 py-2 font-semibold hover:bg-white disabled:opacity-50"
 				disabled={saving}
 				onclick={handleSave}
 			>
@@ -735,7 +735,7 @@
 			{#if !saving}
 				<div class="flex justify-end">
 					<button
-						class="bg-primary-600 hover:bg-primary-700 rounded px-4 py-2 text-white"
+						class="bg-light-blue text-dark-blue rounded-xl px-4 py-2 font-semibold hover:bg-white"
 						onclick={() => (message = '')}>Fermer</button
 					>
 				</div>

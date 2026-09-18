@@ -165,7 +165,7 @@
 <!-- Info Toolbox (top right, outside layout) -->
 <div
 	id="infoToolbox"
-	class="fixed top-16 right-4 z-20 mb-6 flex w-[400px] max-w-full items-start rounded border-l-4 border-blue-500 bg-blue-100 p-4 text-blue-900 shadow-lg transition-transform md:w-[500px] {showToolbox
+	class="border-light-blue/20 bg-surface-modal text-light-blue border-l-light-blue fixed top-16 right-4 z-20 mb-6 flex w-[400px] max-w-full items-start rounded-xl border border-l-4 p-4 shadow-lg transition-transform md:w-[500px] {showToolbox
 		? ''
 		: 'translate-x-[120%]'}"
 >
@@ -226,7 +226,7 @@
 		</div>
 		<div class="mb-4 flex items-center">
 			<svg
-				class="mr-2 h-5 w-5 {connected ? 'text-green-600' : 'text-red-600'}"
+				class="mr-2 h-5 w-5 {connected ? 'text-emerald-400' : 'text-red-400'}"
 				fill="none"
 				stroke={connected ? 'green' : 'red'}
 				stroke-width="2"
@@ -237,7 +237,7 @@
 			<p class="text-dark-light-blue">
 				Statut WebSocket
 				<span
-					class="{connected ? 'font-semibold text-green-600' : 'font-semibold text-red-600'} pl-5"
+					class="{connected ? 'font-semibold text-emerald-400' : 'font-semibold text-red-400'} pl-5"
 				>
 					{connected ? 'Connecté' : 'Déconnecté'}
 				</span>
@@ -303,7 +303,7 @@
 			</button>
 			{#if canManageTraining}
 				<button
-					class="ml-4 flex-1 rounded bg-red-500 px-4 py-2 font-semibold text-white transition hover:bg-red-600"
+					class="border-light-blue/30 ml-4 flex-1 rounded-xl border bg-transparent px-4 py-2 font-semibold text-red-400 transition hover:bg-red-500/10"
 					onclick={sendKill}
 				>
 					<svg

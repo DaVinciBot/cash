@@ -1098,10 +1098,10 @@
 
 <div class="w-full py-2 sm:px-8 lg:px-16">
 	<div class="mb-4 flex flex-wrap items-center gap-3">
-		<h2 class="text-4xl font-bold tracking-tight text-white">Utilisateurs</h2>
+		<h1 class="text-light-blue m-0 text-2xl font-bold">Utilisateurs</h1>
 		{#if canReinvite}
 			<span
-				class="inline-flex items-center rounded-full border border-amber-500/60 bg-amber-900/40 px-3 py-1 text-xs font-semibold tracking-wide text-amber-200 uppercase"
+				class="inline-flex items-center rounded-full border-amber-500/30 bg-amber-500/15 px-3 py-1 text-xs font-semibold tracking-wide text-amber-300 uppercase ring-1 ring-amber-500/30"
 			>
 				{pendingInvitesLoading
 					? 'Chargement...'
@@ -1145,7 +1145,7 @@
 
 			{#if pendingInvitesError}
 				<p
-					class="mb-3 rounded-lg border border-red-600 bg-red-900/30 px-3 py-2 text-sm text-red-100"
+					class="mb-3 rounded-xl bg-red-500/15 px-4 py-3 text-sm text-red-300 ring-1 ring-red-500/30"
 				>
 					{pendingInvitesError}
 				</p>
@@ -1177,7 +1177,7 @@
 									<td class="px-3 py-2 text-right">
 										<div class="flex flex-wrap justify-end gap-2">
 											<button
-												class="bg-primary-700 hover:bg-primary-800 rounded-lg px-3 py-1.5 text-sm font-medium text-white disabled:cursor-not-allowed disabled:opacity-50"
+												class="bg-light-blue text-dark-blue rounded-xl px-3 py-1.5 text-sm font-semibold hover:bg-white disabled:cursor-not-allowed disabled:opacity-50"
 												disabled={reinvitingUserId !== null || cancelingUserId !== null}
 												onclick={() => {
 													void reinvitePendingUser(authUser);
@@ -1187,7 +1187,7 @@
 												{reinvitingUserId === authUser.id ? 'Envoi...' : 'Réinviter'}
 											</button>
 											<button
-												class="rounded-lg border border-red-600 px-3 py-1.5 text-sm font-medium text-red-200 hover:bg-red-900/40 disabled:cursor-not-allowed disabled:opacity-50"
+												class="border-light-blue/30 rounded-xl border px-3 py-1.5 text-sm font-medium text-red-400 hover:bg-red-500/10 disabled:cursor-not-allowed disabled:opacity-50"
 												disabled={reinvitingUserId !== null || cancelingUserId !== null}
 												onclick={() => {
 													void cancelPendingInvite(authUser);
