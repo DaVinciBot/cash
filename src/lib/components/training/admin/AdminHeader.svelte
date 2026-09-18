@@ -75,7 +75,7 @@
 
 <div class="mb-6 grid gap-4 sm:grid-cols-3">
 	{#each tiles as tile (tile.key)}
-		<div class="border-light-blue/20 bg-blue-gray/15 rounded-lg border p-4">
+		<div class="border-light-blue/20 bg-blue-gray/15 rounded-2xl border p-4 sm:p-5">
 			<p class="text-dark-light-blue text-xs">{tile.label}</p>
 			<p class="mt-1 text-2xl font-bold text-white">{tile.value}</p>
 			<p class="text-dark-light-blue/70 mt-1 text-xs">{tile.hint}</p>

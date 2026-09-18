@@ -105,7 +105,7 @@
 
 	{#if data.projects.length === 0}
 		<p
-			class="border-light-blue/30 text-dark-light-blue rounded-lg border border-dashed px-4 py-12 text-center"
+			class="border-light-blue/20 text-dark-light-blue/70 rounded-xl border border-dashed px-4 py-12 text-center"
 		>
 			Vous n'êtes rattaché à aucun projet. Demandez à votre chef de projet de vous ajouter.
 		</p>
@@ -144,7 +144,7 @@
 					<span class="text-dark-light-blue mb-1 block text-sm font-medium">Projet</span>
 					<select
 						name="project_id"
-						class="border-light-blue/30 bg-dark-blue/60 w-full rounded-lg border p-2.5 text-white"
+						class="border-light-blue/30 bg-dark-blue/60 text-light-blue placeholder:text-dark-light-blue/50 focus:border-light-blue/70 w-full rounded-xl border p-2.5 focus:outline-none disabled:opacity-50"
 						required
 						bind:value={projectId}
 					>
@@ -220,7 +220,7 @@
 
 			<div class="space-y-3">
 				{#each lines as line, index (line.id)}
-					<fieldset class="border-light-blue/20 bg-blue-gray/15 rounded-lg border p-4">
+					<fieldset class="border-light-blue/20 bg-blue-gray/15 rounded-2xl border p-4 sm:p-5">
 						<legend class="text-dark-light-blue/70 px-2 text-xs">Composant {index + 1}</legend>
 
 						<div class="grid gap-3 sm:grid-cols-12">

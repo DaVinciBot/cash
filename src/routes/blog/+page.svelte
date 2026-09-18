@@ -557,7 +557,7 @@
 				<label class="mb-1 block text-sm" for="search">Rechercher par titre</label>
 				<input
 					id="search"
-					class="border-light-blue/20 bg-dark-blue/60 w-full rounded border px-3 py-2"
+					class="border-light-blue/30 bg-dark-blue/60 text-light-blue placeholder:text-dark-light-blue/50 focus:border-light-blue/70 w-full rounded-xl border p-2.5 text-sm focus:outline-none disabled:opacity-50"
 					placeholder="Rechercher..."
 					bind:value={search}
 				/>
@@ -614,7 +614,7 @@
 				<label class="mb-1 block text-sm" for="title">Titre</label>
 				<input
 					id="title"
-					class="border-light-blue/20 bg-dark-blue/60 w-full rounded border px-3 py-2"
+					class="border-light-blue/30 bg-dark-blue/60 text-light-blue placeholder:text-dark-light-blue/50 focus:border-light-blue/70 w-full rounded-xl border p-2.5 text-sm focus:outline-none disabled:opacity-50"
 					oninput={() => (slug = toSlug(title))}
 					bind:value={title}
 				/>
@@ -623,7 +623,7 @@
 				<label class="mb-1 block text-sm" for="slug">Slug</label>
 				<input
 					id="slug"
-					class="border-light-blue/20 bg-dark-blue/60 w-full rounded border px-3 py-2"
+					class="border-light-blue/30 bg-dark-blue/60 text-light-blue placeholder:text-dark-light-blue/50 focus:border-light-blue/70 w-full rounded-xl border p-2.5 text-sm focus:outline-none disabled:opacity-50"
 					bind:value={slug}
 				/>
 			</div>
@@ -631,7 +631,7 @@
 				<label class="mb-1 block text-sm" for="state">État</label>
 				<select
 					id="state"
-					class="border-light-blue/20 bg-dark-blue/60 w-full rounded border px-3 py-2"
+					class="border-light-blue/30 bg-dark-blue/60 text-light-blue placeholder:text-dark-light-blue/50 focus:border-light-blue/70 w-full rounded-xl border p-2.5 text-sm focus:outline-none disabled:opacity-50"
 					bind:value={articleState}
 				>
 					<option value="draft">Brouillon</option>
@@ -643,7 +643,7 @@
 				<label class="mb-1 block text-sm" for="excerpt">Extrait</label>
 				<textarea
 					id="excerpt"
-					class="border-light-blue/20 bg-dark-blue/60 w-full rounded border px-3 py-2"
+					class="border-light-blue/30 bg-dark-blue/60 text-light-blue placeholder:text-dark-light-blue/50 focus:border-light-blue/70 w-full rounded-xl border p-2.5 text-sm focus:outline-none disabled:opacity-50"
 					rows="3"
 					bind:value={meta.excerpt}></textarea>
 			</div>
@@ -653,7 +653,7 @@
 				>
 				<input
 					id="tags"
-					class="border-light-blue/20 bg-dark-blue/60 w-full rounded border px-3 py-2"
+					class="border-light-blue/30 bg-dark-blue/60 text-light-blue placeholder:text-dark-light-blue/50 focus:border-light-blue/70 w-full rounded-xl border p-2.5 text-sm focus:outline-none disabled:opacity-50"
 					bind:value={meta.tag}
 				/>
 			</div>
@@ -661,7 +661,7 @@
 				<label class="mb-1 block text-sm" for="heroImage">Image de couverture (URL)</label>
 				<input
 					id="heroImage"
-					class="border-light-blue/20 bg-dark-blue/60 w-full rounded border px-3 py-2"
+					class="border-light-blue/30 bg-dark-blue/60 text-light-blue placeholder:text-dark-light-blue/50 focus:border-light-blue/70 w-full rounded-xl border p-2.5 text-sm focus:outline-none disabled:opacity-50"
 					bind:value={meta.heroImage}
 				/>
 				<div class="mt-2 flex items-center gap-2">
@@ -684,7 +684,7 @@
 				<label class="mb-1 block text-sm" for="heroAlt">Texte alternatif</label>
 				<input
 					id="heroAlt"
-					class="border-light-blue/20 bg-dark-blue/60 w-full rounded border px-3 py-2"
+					class="border-light-blue/30 bg-dark-blue/60 text-light-blue placeholder:text-dark-light-blue/50 focus:border-light-blue/70 w-full rounded-xl border p-2.5 text-sm focus:outline-none disabled:opacity-50"
 					bind:value={meta.heroAlt}
 				/>
 			</div>
@@ -693,7 +693,7 @@
 					<label class="mb-1 block text-sm" for="authorName">Auteur</label>
 					<input
 						id="authorName"
-						class="border-light-blue/20 bg-dark-blue/60 w-full rounded border px-3 py-2"
+						class="border-light-blue/30 bg-dark-blue/60 text-light-blue placeholder:text-dark-light-blue/50 focus:border-light-blue/70 w-full rounded-xl border p-2.5 text-sm focus:outline-none disabled:opacity-50"
 						bind:value={meta.author.name}
 					/>
 				</div>
@@ -701,7 +701,7 @@
 					<label class="mb-1 block text-sm" for="authorRole">Rôle</label>
 					<input
 						id="authorRole"
-						class="border-light-blue/20 bg-dark-blue/60 w-full rounded border px-3 py-2"
+						class="border-light-blue/30 bg-dark-blue/60 text-light-blue placeholder:text-dark-light-blue/50 focus:border-light-blue/70 w-full rounded-xl border p-2.5 text-sm focus:outline-none disabled:opacity-50"
 						bind:value={meta.author.role}
 					/>
 				</div>

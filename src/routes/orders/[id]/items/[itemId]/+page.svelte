@@ -160,7 +160,7 @@
 		</div>
 
 		<!-- CMD-F-18 / CMD-F-19 — imputation, éventuellement répartie. -->
-		<fieldset class="border-light-blue/20 bg-blue-gray/15 rounded-lg border p-4">
+		<fieldset class="border-light-blue/20 bg-blue-gray/15 rounded-2xl border p-4 sm:p-5">
 			<legend class="text-light-blue px-1 text-sm font-semibold">Imputation budgétaire</legend>
 			<p class="text-dark-light-blue mb-3 text-xs">
 				Seules les feuilles actives de l'année scolaire sont proposées. La somme des parts doit
@@ -173,7 +173,7 @@
 						Budget
 						<select
 							name="budget"
-							class="border-light-blue/30 bg-dark-blue/60 mt-1 block w-full rounded-lg border p-2 text-sm text-white"
+							class="border-light-blue/30 bg-dark-blue/60 text-light-blue placeholder:text-dark-light-blue/50 focus:border-light-blue/70 mt-1 block w-full rounded-xl border p-2.5 text-sm focus:outline-none disabled:opacity-50"
 							bind:value={line.budgetId}
 						>
 							<option value={null}>— aucun —</option>

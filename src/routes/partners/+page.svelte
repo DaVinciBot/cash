@@ -60,7 +60,7 @@
 					Nom
 					<input
 						name="name"
-						class="border-light-blue/30 bg-dark-blue/60 mt-1 block rounded-lg border p-2 text-sm text-white"
+						class="border-light-blue/30 bg-dark-blue/60 text-light-blue placeholder:text-dark-light-blue/50 focus:border-light-blue/70 mt-1 block rounded-xl border p-2.5 text-sm focus:outline-none disabled:opacity-50"
 						required
 					/>
 				</label>
@@ -68,7 +68,7 @@
 					Domaines
 					<input
 						name="domains"
-						class="border-light-blue/30 bg-dark-blue/60 mt-1 block w-full rounded-lg border p-2 text-sm text-white"
+						class="border-light-blue/30 bg-dark-blue/60 text-light-blue placeholder:text-dark-light-blue/50 focus:border-light-blue/70 mt-1 block w-full rounded-xl border p-2.5 text-sm focus:outline-none disabled:opacity-50"
 						placeholder="mouser"
 					/>
 				</label>
@@ -77,7 +77,7 @@
 				Notes
 				<textarea
 					name="notes"
-					class="border-light-blue/30 bg-dark-blue/60 mt-1 block w-full rounded-lg border p-2 text-sm text-white"
+					class="border-light-blue/30 bg-dark-blue/60 text-light-blue placeholder:text-dark-light-blue/50 focus:border-light-blue/70 mt-1 block w-full rounded-xl border p-2.5 text-sm focus:outline-none disabled:opacity-50"
 					rows="2"></textarea>
 			</label>
 			<label class="text-dark-light-blue mt-3 flex items-center gap-2 text-sm">
@@ -114,14 +114,14 @@
 
 	{#if active.length === 0}
 		<p
-			class="border-light-blue/30 text-dark-light-blue rounded-lg border border-dashed px-4 py-12 text-center"
+			class="border-light-blue/20 text-dark-light-blue/70 rounded-xl border border-dashed px-4 py-12 text-center"
 		>
 			Aucun partenariat actif.
 		</p>
 	{:else}
 		<ul class="space-y-2">
 			{#each active as partner (partner.id)}
-				<li class="border-light-blue/20 bg-blue-gray/15 rounded-lg border p-4">
+				<li class="border-light-blue/20 bg-blue-gray/15 rounded-2xl border p-4 sm:p-5">
 					<div class="flex flex-wrap items-center gap-3">
 						<span class="font-medium text-white">{partner.name}</span>
 						<span class="text-dark-light-blue/70 text-xs">{partner.schoolYearLabel}</span>
@@ -179,7 +179,7 @@
 									Nom
 									<input
 										name="name"
-										class="border-light-blue/30 bg-dark-blue/60 mt-1 block rounded-lg border p-2 text-sm text-white"
+										class="border-light-blue/30 bg-dark-blue/60 text-light-blue placeholder:text-dark-light-blue/50 focus:border-light-blue/70 mt-1 block rounded-xl border p-2.5 text-sm focus:outline-none disabled:opacity-50"
 										required
 										value={partner.name}
 									/>
@@ -188,7 +188,7 @@
 									Domaines
 									<input
 										name="domains"
-										class="border-light-blue/30 bg-dark-blue/60 mt-1 block w-full rounded-lg border p-2 text-sm text-white"
+										class="border-light-blue/30 bg-dark-blue/60 text-light-blue placeholder:text-dark-light-blue/50 focus:border-light-blue/70 mt-1 block w-full rounded-xl border p-2.5 text-sm focus:outline-none disabled:opacity-50"
 										value={partner.domains.join(', ')}
 									/>
 								</label>
@@ -197,7 +197,7 @@
 								Notes
 								<textarea
 									name="notes"
-									class="border-light-blue/30 bg-dark-blue/60 mt-1 block w-full rounded-lg border p-2 text-sm text-white"
+									class="border-light-blue/30 bg-dark-blue/60 text-light-blue placeholder:text-dark-light-blue/50 focus:border-light-blue/70 mt-1 block w-full rounded-xl border p-2.5 text-sm focus:outline-none disabled:opacity-50"
 									rows="2">{partner.notes ?? ''}</textarea
 								>
 							</label>

@@ -103,7 +103,7 @@
 
 	{#if visible.length === 0}
 		<p
-			class="border-light-blue/30 text-dark-light-blue rounded-lg border border-dashed px-4 py-12 text-center"
+			class="border-light-blue/20 text-dark-light-blue/70 rounded-xl border border-dashed px-4 py-12 text-center"
 		>
 			{items.length === 0
 				? "Vous n'avez encore demandé aucun composant."
@@ -112,7 +112,7 @@
 	{:else}
 		<ul class="space-y-3">
 			{#each visible as item (item.id)}
-				<li class="border-light-blue/20 bg-blue-gray/15 rounded-lg border p-4">
+				<li class="border-light-blue/20 bg-blue-gray/15 rounded-2xl border p-4 sm:p-5">
 					<div class="flex flex-wrap items-start justify-between gap-3">
 						<div class="min-w-0 flex-1">
 							<div class="flex flex-wrap items-center gap-2">

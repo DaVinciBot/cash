@@ -132,7 +132,7 @@
 	{/if}
 
 	<form class="space-y-5" method="POST" use:enhance>
-		<fieldset class="border-light-blue/20 bg-blue-gray/15 rounded-lg border p-4">
+		<fieldset class="border-light-blue/20 bg-blue-gray/15 rounded-2xl border p-4 sm:p-5">
 			<legend class="text-dark-light-blue px-1 text-xs font-semibold">Qui et quand</legend>
 
 			<div class="grid gap-3 md:grid-cols-2">
@@ -183,7 +183,7 @@
 			{/if}
 		</fieldset>
 
-		<fieldset class="border-light-blue/20 bg-blue-gray/15 rounded-lg border p-4">
+		<fieldset class="border-light-blue/20 bg-blue-gray/15 rounded-2xl border p-4 sm:p-5">
 			<legend class="text-dark-light-blue px-1 text-xs font-semibold">
 				{detailed ? 'Détail' : 'Montant'}
 			</legend>
@@ -327,7 +327,7 @@
 			{/if}
 		</fieldset>
 
-		<fieldset class="border-light-blue/20 bg-blue-gray/15 rounded-lg border p-4">
+		<fieldset class="border-light-blue/20 bg-blue-gray/15 rounded-2xl border p-4 sm:p-5">
 			<legend class="text-dark-light-blue px-1 text-xs font-semibold">
 				{kind === 'tax_receipt' ? 'Le don' : 'Précisions'}
 			</legend>

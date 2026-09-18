@@ -78,7 +78,7 @@
 				Nom
 				<input
 					name="name"
-					class="border-light-blue/30 bg-dark-blue/60 mt-1 block rounded-lg border p-2 text-sm text-white"
+					class="border-light-blue/30 bg-dark-blue/60 text-light-blue placeholder:text-dark-light-blue/50 focus:border-light-blue/70 mt-1 block rounded-xl border p-2.5 text-sm focus:outline-none disabled:opacity-50"
 					required
 					value={project?.name ?? ''}
 				/>
@@ -87,7 +87,7 @@
 				Campus
 				<select
 					name="campus"
-					class="border-light-blue/30 bg-dark-blue/60 mt-1 block rounded-lg border p-2 text-sm text-white"
+					class="border-light-blue/30 bg-dark-blue/60 text-light-blue placeholder:text-dark-light-blue/50 focus:border-light-blue/70 mt-1 block rounded-xl border p-2.5 text-sm focus:outline-none disabled:opacity-50"
 					value={project?.campus ?? ''}
 				>
 					<option value="">— aucun —</option>
@@ -100,7 +100,7 @@
 				Budget désigné
 				<select
 					name="budget_id"
-					class="border-light-blue/30 bg-dark-blue/60 mt-1 block w-full rounded-lg border p-2 text-sm text-white"
+					class="border-light-blue/30 bg-dark-blue/60 text-light-blue placeholder:text-dark-light-blue/50 focus:border-light-blue/70 mt-1 block w-full rounded-xl border p-2.5 text-sm focus:outline-none disabled:opacity-50"
 					value={project?.budgetId ?? ''}
 				>
 					<option value="">— aucun —</option>
@@ -122,7 +122,7 @@
 
 	<ul class="space-y-2">
 		{#each active as project (project.id)}
-			<li class="border-light-blue/20 bg-blue-gray/15 rounded-lg border p-4">
+			<li class="border-light-blue/20 bg-blue-gray/15 rounded-2xl border p-4 sm:p-5">
 				<div class="flex flex-wrap items-center gap-3">
 					<span class="font-medium text-white">{project.name}</span>
 					{#if project.campus}

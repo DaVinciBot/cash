@@ -616,7 +616,7 @@ DVBisous ! :robot:`;
 
 	<!-- La synthèse part d'abord sur le webhook de test, et n'atteint le salon
 	     réel qu'après confirmation : un ping de masse ne se rattrape pas. -->
-	<div class="border-light-blue/20 bg-blue-gray/15 mb-8 rounded-lg border p-4">
+	<div class="border-light-blue/20 bg-blue-gray/15 mb-8 rounded-2xl border p-4 sm:p-5">
 		<div class="flex flex-wrap items-center justify-between gap-3">
 			<div>
 				<h2 class="text-light-blue text-sm font-semibold">Synthèse Discord</h2>
@@ -643,7 +643,7 @@ DVBisous ! :robot:`;
 
 	{#if loading}
 		<p
-			class="border-light-blue/30 text-dark-light-blue rounded-lg border border-dashed px-4 py-12 text-center"
+			class="border-light-blue/20 text-dark-light-blue/70 rounded-xl border border-dashed px-4 py-12 text-center"
 		>
 			Chargement des formations…
 		</p>

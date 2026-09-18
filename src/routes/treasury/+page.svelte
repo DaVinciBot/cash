@@ -58,13 +58,13 @@
 	{/if}
 
 	<!-- TRESO-F-51 — solde à un instant donné -->
-	<div class="border-light-blue/20 bg-blue-gray/15 mb-6 rounded-lg border p-4">
+	<div class="border-light-blue/20 bg-blue-gray/15 mb-6 rounded-2xl border p-4 sm:p-5">
 		<form class="mb-4 flex flex-wrap items-end gap-3" method="GET">
 			<label class="text-dark-light-blue text-xs">
 				Solde au
 				<input
 					name="on"
-					class="border-light-blue/30 bg-dark-blue/60 mt-1 block rounded-lg border p-2 text-sm text-white"
+					class="border-light-blue/30 bg-dark-blue/60 text-light-blue placeholder:text-dark-light-blue/50 focus:border-light-blue/70 mt-1 block rounded-xl border p-2.5 text-sm focus:outline-none disabled:opacity-50"
 					type="date"
 					value={data.on}
 				/>
@@ -113,7 +113,7 @@
 	</div>
 
 	<!-- TRESO-F-52 — crédits et débits entre deux dates -->
-	<div class="border-light-blue/20 bg-blue-gray/15 mb-8 rounded-lg border p-4">
+	<div class="border-light-blue/20 bg-blue-gray/15 mb-8 rounded-2xl border p-4 sm:p-5">
 		<h2 class="text-light-blue mb-3 text-sm font-semibold">Mouvements sur une période</h2>
 		<form class="flex flex-wrap items-end gap-3" method="GET">
 			<input name="on" type="hidden" value={data.on} />
@@ -121,7 +121,7 @@
 				Du
 				<input
 					name="from"
-					class="border-light-blue/30 bg-dark-blue/60 mt-1 block rounded-lg border p-2 text-sm text-white"
+					class="border-light-blue/30 bg-dark-blue/60 text-light-blue placeholder:text-dark-light-blue/50 focus:border-light-blue/70 mt-1 block rounded-xl border p-2.5 text-sm focus:outline-none disabled:opacity-50"
 					type="date"
 					value={data.from}
 				/>
@@ -130,7 +130,7 @@
 				Au
 				<input
 					name="to"
-					class="border-light-blue/30 bg-dark-blue/60 mt-1 block rounded-lg border p-2 text-sm text-white"
+					class="border-light-blue/30 bg-dark-blue/60 text-light-blue placeholder:text-dark-light-blue/50 focus:border-light-blue/70 mt-1 block rounded-xl border p-2.5 text-sm focus:outline-none disabled:opacity-50"
 					type="date"
 					value={data.to}
 				/>
@@ -191,7 +191,7 @@
 					Nom
 					<input
 						name="name"
-						class="border-light-blue/30 bg-dark-blue/60 mt-1 block rounded-lg border p-2 text-sm text-white"
+						class="border-light-blue/30 bg-dark-blue/60 text-light-blue placeholder:text-dark-light-blue/50 focus:border-light-blue/70 mt-1 block rounded-xl border p-2.5 text-sm focus:outline-none disabled:opacity-50"
 						required
 					/>
 				</label>
@@ -199,7 +199,7 @@
 					Type
 					<select
 						name="kind"
-						class="border-light-blue/30 bg-dark-blue/60 mt-1 block rounded-lg border p-2 text-sm text-white"
+						class="border-light-blue/30 bg-dark-blue/60 text-light-blue placeholder:text-dark-light-blue/50 focus:border-light-blue/70 mt-1 block rounded-xl border p-2.5 text-sm focus:outline-none disabled:opacity-50"
 					>
 						{#each ACCOUNT_KINDS as kind (kind)}
 							<option value={kind}>{ACCOUNT_KIND_LABELS[kind]}</option>
@@ -337,7 +337,7 @@
 					Découpage
 					<select
 						name="kind"
-						class="border-light-blue/30 bg-dark-blue/60 mt-1 block rounded-lg border p-2 text-sm text-white"
+						class="border-light-blue/30 bg-dark-blue/60 text-light-blue placeholder:text-dark-light-blue/50 focus:border-light-blue/70 mt-1 block rounded-xl border p-2.5 text-sm focus:outline-none disabled:opacity-50"
 					>
 						<option value="school">Année scolaire</option>
 						<option value="fiscal">Exercice fiscal</option>
@@ -347,7 +347,7 @@
 					Libellé
 					<input
 						name="label"
-						class="border-light-blue/30 bg-dark-blue/60 mt-1 block rounded-lg border p-2 text-sm text-white"
+						class="border-light-blue/30 bg-dark-blue/60 text-light-blue placeholder:text-dark-light-blue/50 focus:border-light-blue/70 mt-1 block rounded-xl border p-2.5 text-sm focus:outline-none disabled:opacity-50"
 						placeholder="2026/2027"
 						required
 					/>
@@ -356,7 +356,7 @@
 					Début
 					<input
 						name="starts_on"
-						class="border-light-blue/30 bg-dark-blue/60 mt-1 block rounded-lg border p-2 text-sm text-white"
+						class="border-light-blue/30 bg-dark-blue/60 text-light-blue placeholder:text-dark-light-blue/50 focus:border-light-blue/70 mt-1 block rounded-xl border p-2.5 text-sm focus:outline-none disabled:opacity-50"
 						required
 						type="date"
 					/>
@@ -365,7 +365,7 @@
 					Fin
 					<input
 						name="ends_on"
-						class="border-light-blue/30 bg-dark-blue/60 mt-1 block rounded-lg border p-2 text-sm text-white"
+						class="border-light-blue/30 bg-dark-blue/60 text-light-blue placeholder:text-dark-light-blue/50 focus:border-light-blue/70 mt-1 block rounded-xl border p-2.5 text-sm focus:outline-none disabled:opacity-50"
 						required
 						type="date"
 					/>
@@ -379,7 +379,7 @@
 
 		<div class="grid gap-4 md:grid-cols-2">
 			{#each [{ kind: 'school', title: 'Années scolaires', rows: data.periods.schoolYears }, { kind: 'fiscal', title: 'Exercices fiscaux', rows: data.periods.fiscalYears }] as group (group.kind)}
-				<div class="border-light-blue/20 bg-blue-gray/15 rounded-lg border p-4">
+				<div class="border-light-blue/20 bg-blue-gray/15 rounded-2xl border p-4 sm:p-5">
 					<h3 class="text-dark-light-blue mb-2 text-xs font-semibold tracking-wide uppercase">
 						{group.title}
 					</h3>

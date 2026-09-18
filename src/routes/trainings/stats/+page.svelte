@@ -42,7 +42,7 @@
 		</p>
 	{:else if empty}
 		<p
-			class="border-light-blue/30 text-dark-light-blue mb-6 rounded-lg border border-dashed px-4 py-8 text-center"
+			class="border-light-blue/20 text-dark-light-blue/70 mb-6 rounded-xl border border-dashed px-4 py-8 text-center"
 		>
 			Aucune formation terminée sur cette plage : élargissez les dates pour voir des chiffres.
 		</p>

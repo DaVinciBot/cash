@@ -51,7 +51,7 @@
 			Exercice fiscal
 			<select
 				name="fy"
-				class="border-light-blue/30 bg-dark-blue/60 mt-1 block rounded-lg border p-2 text-sm text-white"
+				class="border-light-blue/30 bg-dark-blue/60 text-light-blue placeholder:text-dark-light-blue/50 focus:border-light-blue/70 mt-1 block rounded-xl border p-2.5 text-sm focus:outline-none disabled:opacity-50"
 				value={data.fiscalYearId ?? ''}
 			>
 				{#each data.periods.fiscalYears as year (year.id)}
@@ -63,7 +63,7 @@
 			Année scolaire
 			<select
 				name="sy"
-				class="border-light-blue/30 bg-dark-blue/60 mt-1 block rounded-lg border p-2 text-sm text-white"
+				class="border-light-blue/30 bg-dark-blue/60 text-light-blue placeholder:text-dark-light-blue/50 focus:border-light-blue/70 mt-1 block rounded-xl border p-2.5 text-sm focus:outline-none disabled:opacity-50"
 				value={data.schoolYearId ?? ''}
 			>
 				{#each data.periods.schoolYears as year (year.id)}
@@ -163,7 +163,7 @@
 
 		{#if data.projects.length === 0}
 			<p
-				class="border-light-blue/30 text-dark-light-blue rounded-lg border border-dashed px-4 py-8 text-center"
+				class="border-light-blue/20 text-dark-light-blue/70 rounded-xl border border-dashed px-4 py-8 text-center"
 			>
 				Aucun item sur cette année scolaire.
 			</p>
@@ -222,7 +222,7 @@
 			Statistiques
 		</h2>
 		<div class="grid gap-4 md:grid-cols-2">
-			<div class="border-light-blue/20 bg-blue-gray/15 rounded-lg border p-4">
+			<div class="border-light-blue/20 bg-blue-gray/15 rounded-2xl border p-4 sm:p-5">
 				<h3 class="text-light-blue mb-3 text-sm font-medium">Solde cumulé, mois par mois</h3>
 				<TrendChart
 					format={euroFormat}
@@ -231,7 +231,7 @@
 				/>
 			</div>
 
-			<div class="border-light-blue/20 bg-blue-gray/15 rounded-lg border p-4">
+			<div class="border-light-blue/20 bg-blue-gray/15 rounded-2xl border p-4 sm:p-5">
 				<h3 class="text-light-blue mb-3 text-sm font-medium">Recettes et dépenses par mois</h3>
 				<GroupedBarsChart
 					format={euroFormat}
@@ -244,7 +244,7 @@
 				/>
 			</div>
 
-			<div class="border-light-blue/20 bg-blue-gray/15 rounded-lg border p-4">
+			<div class="border-light-blue/20 bg-blue-gray/15 rounded-2xl border p-4 sm:p-5">
 				<h3 class="text-light-blue mb-3 text-sm font-medium">Budget par branche</h3>
 				<GroupedBarsChart
 					format={euroFormat}
@@ -258,12 +258,12 @@
 				/>
 			</div>
 
-			<div class="border-light-blue/20 bg-blue-gray/15 rounded-lg border p-4">
+			<div class="border-light-blue/20 bg-blue-gray/15 rounded-2xl border p-4 sm:p-5">
 				<h3 class="text-light-blue mb-3 text-sm font-medium">Dépenses par projet</h3>
 				<RankingChart format={euroFormat} rows={data.charts.byProject} seriesLabel="Engagé" />
 			</div>
 
-			<div class="border-light-blue/20 bg-blue-gray/15 rounded-lg border p-4 md:col-span-2">
+			<div class="border-light-blue/20 bg-blue-gray/15 rounded-2xl border p-4 sm:p-5 md:col-span-2">
 				<h3 class="text-light-blue mb-3 text-sm font-medium">Dépenses par marchand</h3>
 				<p class="text-dark-light-blue/70 mb-3 text-xs">
 					Le marchand est déduit du lien de chaque item, sans référentiel de fournisseurs.

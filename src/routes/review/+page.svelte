@@ -117,7 +117,7 @@
 
 	{#if projects.length === 0}
 		<p
-			class="border-light-blue/30 text-dark-light-blue rounded-lg border border-dashed px-4 py-12 text-center"
+			class="border-light-blue/20 text-dark-light-blue/70 rounded-xl border border-dashed px-4 py-12 text-center"
 		>
 			Vous n'êtes chef de projet d'aucun projet actif : il n'y a rien à revoir ici.
 		</p>
@@ -146,7 +146,7 @@
 
 		{#if visible.length === 0}
 			<p
-				class="border-light-blue/30 text-dark-light-blue rounded-lg border border-dashed px-4 py-12 text-center"
+				class="border-light-blue/20 text-dark-light-blue/70 rounded-xl border border-dashed px-4 py-12 text-center"
 			>
 				Aucune demande en attente. Tout est à jour.
 			</p>
@@ -242,7 +242,7 @@
 
 			<ul class="space-y-3">
 				{#each visible as item (item.id)}
-					<li class="border-light-blue/20 bg-blue-gray/15 rounded-lg border p-4">
+					<li class="border-light-blue/20 bg-blue-gray/15 rounded-2xl border p-4 sm:p-5">
 						<div class="flex flex-wrap items-start gap-3">
 							<input
 								class="border-light-blue/30 bg-dark-blue/60 mt-1 size-4 shrink-0 rounded"

@@ -25,7 +25,7 @@
 		<p class="text-dark-light-blue/70 mb-3 text-xs">{hint}</p>
 	{/if}
 	{#if boxed}
-		<div class="border-light-blue/20 bg-blue-gray/15 rounded-lg border p-4">
+		<div class="border-light-blue/20 bg-blue-gray/15 rounded-2xl border p-4 sm:p-5">
 			{@render children()}
 		</div>
 	{:else}

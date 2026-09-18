@@ -68,7 +68,7 @@
 				Année scolaire
 				<select
 					name="year"
-					class="border-light-blue/30 bg-dark-blue/60 mt-1 block rounded-lg border p-2 text-sm text-white"
+					class="border-light-blue/30 bg-dark-blue/60 text-light-blue placeholder:text-dark-light-blue/50 focus:border-light-blue/70 mt-1 block rounded-xl border p-2.5 text-sm focus:outline-none disabled:opacity-50"
 					onchange={(event) => event.currentTarget.form?.requestSubmit()}
 					value={data.schoolYearId ?? ''}
 				>
@@ -115,7 +115,7 @@
 				Nom
 				<input
 					name="name"
-					class="border-light-blue/30 bg-dark-blue/60 mt-1 block rounded-lg border p-2 text-sm text-white"
+					class="border-light-blue/30 bg-dark-blue/60 text-light-blue placeholder:text-dark-light-blue/50 focus:border-light-blue/70 mt-1 block rounded-xl border p-2.5 text-sm focus:outline-none disabled:opacity-50"
 					required
 					value={node?.name ?? ''}
 				/>
@@ -125,7 +125,7 @@
 					Parent
 					<select
 						name="parent_id"
-						class="border-light-blue/30 bg-dark-blue/60 mt-1 block rounded-lg border p-2 text-sm text-white"
+						class="border-light-blue/30 bg-dark-blue/60 text-light-blue placeholder:text-dark-light-blue/50 focus:border-light-blue/70 mt-1 block rounded-xl border p-2.5 text-sm focus:outline-none disabled:opacity-50"
 						value={node.parentId ?? ''}
 					>
 						<option value="">— racine —</option>
@@ -168,7 +168,7 @@
 
 	{#if visible.length === 0}
 		<p
-			class="border-light-blue/30 text-dark-light-blue rounded-lg border border-dashed px-4 py-12 text-center"
+			class="border-light-blue/20 text-dark-light-blue/70 rounded-xl border border-dashed px-4 py-12 text-center"
 		>
 			Aucun budget sur cette année. Créez une racine, puis ses feuilles.
 		</p>
