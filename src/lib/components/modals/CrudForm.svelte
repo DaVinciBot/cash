@@ -88,20 +88,22 @@
 
 <div
 	{id}
-	class="fixed top-0 right-0 left-0 z-50 h-full w-full items-center justify-center overflow-x-hidden overflow-y-auto md:inset-0"
+	class="fixed inset-0 z-50 flex items-center justify-center p-4"
+	aria-modal="true"
+	role="dialog"
 	tabindex="-1"
 >
 	<OverlayBackdrop />
-	<div class="relative m-auto flex h-full w-full p-4">
+	<div class="relative flex max-h-full w-full items-center justify-center">
 		<!-- Modal content -->
 		<div
 			id="CrudPopup"
-			class="bg-blue-gray/15 relative m-auto max-h-[calc(100vh-2rem)] max-w-[calc(100vw-2rem)] overflow-hidden rounded-lg shadow sm:min-w-96"
+			class="border-light-blue/20 bg-surface-modal relative flex max-h-[min(85dvh,720px)] w-full max-w-[min(48rem,100%)] flex-col overflow-hidden rounded-2xl border shadow-[0_26px_70px_rgba(2,6,30,0.6)] sm:min-w-96"
 		>
-			<div class="max-h-[calc(100vh-2rem)] overflow-y-auto p-4 sm:p-5">
+			<div class="min-h-0 flex-1 overflow-y-auto p-4 sm:p-6">
 				<!-- Modal header -->
 				<div class="mb-4 flex justify-between rounded-t sm:mb-5">
-					<h3 class="text-lg font-semibold text-white">
+					<h3 class="text-light-blue m-0 text-lg font-semibold">
 						{title}
 					</h3>
 					<button

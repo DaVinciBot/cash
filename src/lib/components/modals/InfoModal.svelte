@@ -56,15 +56,17 @@
 
 <div
 	{id}
-	class="fixed top-0 right-0 left-0 z-50 h-full w-full items-center justify-center overflow-x-hidden overflow-y-auto md:inset-0"
+	class="fixed inset-0 z-50 flex items-center justify-center p-4"
+	aria-modal="true"
+	role="dialog"
 	tabindex="-1"
 >
 	<OverlayBackdrop />
-	<div class="relative m-auto flex h-full w-full max-w-md p-4">
+	<div class="relative flex max-h-full w-full max-w-md items-center justify-center">
 		<!-- Modal content -->
 		<div
 			id="MultiPopup"
-			class="bg-blue-gray/15 relative m-auto rounded-lg p-4 text-center shadow sm:p-5"
+			class="border-light-blue/20 bg-surface-modal relative flex max-h-[min(85dvh,720px)] w-full flex-col overflow-y-auto rounded-2xl border p-4 text-center shadow-[0_26px_70px_rgba(2,6,30,0.6)] sm:p-6"
 		>
 			<button
 				class="text-dark-light-blue hover:bg-blue-gray/25 absolute top-2.5 right-2.5 ml-auto inline-flex items-center rounded-lg bg-transparent p-1.5 text-sm hover:text-white"

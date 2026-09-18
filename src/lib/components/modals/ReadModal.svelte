@@ -236,17 +236,19 @@
 
 <div
 	{id}
-	class="fixed top-0 right-0 left-0 z-50 h-full w-full items-center justify-center overflow-x-hidden overflow-y-auto md:inset-0"
+	class="fixed inset-0 z-50 flex items-center justify-center p-4"
 	aria-hidden="true"
+	aria-modal="true"
 	data-toggle="true"
+	role="dialog"
 	tabindex="-1"
 >
 	<OverlayBackdrop />
-	<div class="relative m-auto flex h-full w-full p-4">
+	<div class="relative flex max-h-full w-full items-center justify-center">
 		<!-- Modal content -->
 		<div
 			id="popup-{id}"
-			class="modal bg-blue-gray/15 relative m-auto max-w-[80%] min-w-96 rounded-lg p-4 sm:p-5 md:max-w-[75%] lg:max-w-[70%] xl:max-w-[65%] 2xl:max-w-[55%]"
+			class="modal border-light-blue/20 bg-surface-modal relative flex max-h-[min(85dvh,720px)] w-full max-w-[min(64rem,100%)] flex-col overflow-y-auto rounded-2xl border p-4 shadow-[0_26px_70px_rgba(2,6,30,0.6)] sm:p-6 md:w-[75%] lg:w-[70%] xl:w-[65%] 2xl:w-[55%]"
 		>
 			<!-- Modal header -->
 			<div class="mb-4 flex justify-between rounded-t sm:mb-5">
@@ -289,7 +291,7 @@
 					<!-- Make a carousel -->
 					<div class="mb-2">
 						<div class="header">
-							<h3 class="text-lg font-semibold text-white">Pièces jointes</h3>
+							<h3 class="text-light-blue m-0 text-lg font-semibold">Pièces jointes</h3>
 							<div class="mt-2 mb-2 flex w-full justify-between">
 								<button
 									class="
