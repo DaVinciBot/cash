@@ -1,5 +1,5 @@
 <script lang="ts">
-	import { OverlayBackdrop } from '@davincibot/components';
+	import { Button, OverlayBackdrop } from '@davincibot/components';
 	import {
 		logOut,
 		REPORT_CATEGORY,
@@ -79,14 +79,15 @@
 			<h2 id="settings-modal-title" class="text-light-blue m-0 text-xl font-semibold">
 				Paramètres
 			</h2>
-			<button
-				class="border-light-blue/30 text-light-blue hover:border-light-blue/60 flex size-9 shrink-0 cursor-pointer items-center justify-center rounded-full border transition"
+			<Button
+				class="shrink-0 items-center justify-center"
 				aria-label="Fermer"
 				onclick={onClose}
-				type="button"
+				size="icon"
+				variant="icon"
 			>
 				<X class="size-5" />
-			</button>
+			</Button>
 		</header>
 
 		<div class="flex min-h-0 flex-1">
@@ -99,6 +100,9 @@
 			>
 				{#each SETTINGS_CATEGORIES as category (category.id)}
 					{@const Icon = CATEGORY_ICONS[category.id]}
+					<!-- Item de navigation : volontairement hors du système de boutons. Il porte
+						 un état sélectionné et occupe toute la largeur du panneau, deux choses
+						 qu'aucune variante n'exprime. -->
 					<button
 						class="flex w-full cursor-pointer items-center justify-between gap-3 rounded-xl border px-3 py-2.5 text-left transition {activeCategory ===
 						category.id
@@ -120,6 +124,9 @@
 
 				<div class="border-light-blue/20 my-1 border-t" role="separator"></div>
 
+				<!-- Item de navigation : volontairement hors du système de boutons. Il porte
+					 un état sélectionné et occupe toute la largeur du panneau, deux choses
+					 qu'aucune variante n'exprime. -->
 				<button
 					class="flex w-full cursor-pointer items-center justify-between gap-3 rounded-xl border px-3 py-2.5 text-left transition {activeCategory ===
 					REPORT_CATEGORY.id
@@ -137,6 +144,9 @@
 					</span>
 					<ChevronRight class="size-4 shrink-0 md:hidden" />
 				</button>
+				<!-- Volontairement hors du système de boutons, comme les items de menu
+					 au-dessus : c'est la dernière ligne de la même colonne de navigation,
+					 et une variante en ferait une action posée là par accident. -->
 				<button
 					class="flex w-full cursor-pointer items-center gap-2.5 rounded-xl border border-transparent px-3 py-2.5 text-left text-red-400 transition hover:bg-red-500/10 hover:text-red-300"
 					onclick={() => {
@@ -153,6 +163,9 @@
 				id="settings-panel"
 				class="{mobilePanelOpen ? 'flex' : 'hidden'} min-h-0 w-full flex-1 flex-col md:flex"
 			>
+				<!-- Volontairement hors du système de boutons : c'est la barre de retour
+					 du panneau mobile, une bande pleine largeur soulignée d'un filet, pas
+					 un bouton posé dans une mise en page. -->
 				<button
 					class="border-light-blue/20 text-dark-light-blue hover:text-light-blue flex shrink-0 cursor-pointer items-center gap-2 border-b px-4 py-3 text-sm font-semibold md:hidden"
 					onclick={() => {

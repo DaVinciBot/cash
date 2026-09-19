@@ -161,15 +161,16 @@
 					</p>
 				</div>
 				{#if emailMethod}
-					<button
+					<Button
 						id="mfa-disable-email"
-						class="ml-auto shrink-0 cursor-pointer rounded-lg border-0 bg-transparent px-2 py-1 text-sm text-red-400 hover:bg-red-500/10 disabled:cursor-not-allowed disabled:opacity-50"
+						class="ml-auto shrink-0"
 						disabled={busy}
 						onclick={() => void handleDisable(emailMethod.id, 'Code par e-mail', 'disable-email')}
-						type="button"
+						size="sm"
+						variant="danger-ghost"
 					>
 						{busyAction === 'disable-email' ? 'Chargement…' : 'Désactiver'}
-					</button>
+					</Button>
 				{:else}
 					<div class="ml-auto shrink-0">
 						<Button
@@ -196,16 +197,17 @@
 					</p>
 				</div>
 				{#if totpMethod}
-					<button
+					<Button
 						id="mfa-disable-totp"
-						class="ml-auto shrink-0 cursor-pointer rounded-lg border-0 bg-transparent px-2 py-1 text-sm text-red-400 hover:bg-red-500/10 disabled:cursor-not-allowed disabled:opacity-50"
+						class="ml-auto shrink-0"
 						disabled={busy}
 						onclick={() =>
 							void handleDisable(totpMethod.id, "Application d'authentification", 'disable-totp')}
-						type="button"
+						size="sm"
+						variant="danger-ghost"
 					>
 						{busyAction === 'disable-totp' ? 'Chargement…' : 'Désactiver'}
-					</button>
+					</Button>
 				{:else}
 					<div class="ml-auto shrink-0">
 						<Button

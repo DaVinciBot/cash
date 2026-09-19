@@ -194,44 +194,29 @@
 					{#if errorMessage}
 						<Button onclick={() => void open()} size="sm" variant="secondary">Réessayer</Button>
 					{/if}
-					<button
-						class="text-dark-light-blue cursor-pointer rounded-lg border-0 bg-transparent px-2 py-1 text-sm hover:underline"
-						onclick={cancel}
-						type="button"
-					>
-						Annuler
-					</button>
+					<Button onclick={cancel} size="sm" variant="ghost">Annuler</Button>
 				</div>
 			{:else if chooserOpen}
 				<p class="text-light-blue m-0 mb-4 text-sm">Choisis une autre méthode de vérification.</p>
 				<div class="grid gap-2">
 					{#each otherModes as option (option.id)}
-						<button
-							class="border-light-blue/30 text-light-blue hover:border-light-blue/70 w-full cursor-pointer rounded-xl border bg-transparent px-4 py-2.5 text-left text-sm font-medium"
+						<Button
+							class="w-full"
 							onclick={() => {
 								chooseMode(option.id);
 							}}
-							type="button"
+							size="md"
+							variant="secondary"
 						>
 							{option.label}
-						</button>
+						</Button>
 					{/each}
 				</div>
 				<div class="mt-4 flex items-center justify-between gap-2">
-					<button
-						class="text-dark-light-blue cursor-pointer rounded-lg border-0 bg-transparent p-0 text-left text-sm hover:underline"
-						onclick={() => (chooserOpen = false)}
-						type="button"
-					>
+					<Button onclick={() => (chooserOpen = false)} size="sm" variant="ghost">
 						Retour à la saisie
-					</button>
-					<button
-						class="text-dark-light-blue cursor-pointer rounded-lg border-0 bg-transparent px-2 py-1 text-sm hover:underline"
-						onclick={cancel}
-						type="button"
-					>
-						Annuler
-					</button>
+					</Button>
+					<Button onclick={cancel} size="sm" variant="ghost">Annuler</Button>
 				</div>
 			{:else}
 				<p class="text-light-blue m-0 mb-4 text-sm">
@@ -277,18 +262,18 @@
 						<div class="grid gap-2">
 							<CodeInput id="step-up-code" disabled={busy} bind:value={code} />
 							{#if mode === 'email'}
-								<button
-									class="text-dark-light-blue cursor-pointer rounded-lg border-0 bg-transparent p-0 text-left text-xs hover:underline disabled:cursor-not-allowed disabled:no-underline disabled:opacity-50"
+								<Button
 									disabled={busy || resending || resendCooldown > 0}
 									onclick={() => void requestEmailChallenge()}
-									type="button"
+									size="sm"
+									variant="ghost"
 								>
 									{resending
 										? 'Envoi…'
 										: resendCooldown > 0
 											? `Renvoyer le code (${String(resendCooldown)}s)`
 											: 'Renvoyer le code'}
-								</button>
+								</Button>
 							{/if}
 						</div>
 					{/if}
@@ -299,25 +284,19 @@
 
 					<div class="flex flex-col gap-2 sm:flex-row sm:items-center">
 						{#if mode !== 'password'}
-							<button
-								class="text-dark-light-blue cursor-pointer rounded-lg border-0 bg-transparent p-0 text-left text-sm hover:underline"
+							<Button
 								onclick={() => {
 									chooserOpen = true;
 									errorMessage = null;
 								}}
-								type="button"
+								size="sm"
+								variant="ghost"
 							>
 								Utiliser une autre méthode
-							</button>
+							</Button>
 						{/if}
 						<div class="flex items-center justify-end gap-2 sm:ml-auto">
-							<button
-								class="text-dark-light-blue cursor-pointer rounded-lg border-0 bg-transparent px-2 py-1 text-sm hover:underline"
-								onclick={cancel}
-								type="button"
-							>
-								Annuler
-							</button>
+							<Button onclick={cancel} size="sm" variant="ghost">Annuler</Button>
 							<Button
 								id={mode === 'webauthn' ? 'step-up-passkey' : 'step-up-confirm'}
 								disabled={busy}

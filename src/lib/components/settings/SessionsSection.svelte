@@ -105,32 +105,33 @@
 						</p>
 					</div>
 					{#if !session.is_current}
-						<button
+						<Button
 							id={`session-revoke-${session.id}`}
-							class="shrink-0 cursor-pointer rounded-lg border-0 bg-transparent p-2 text-red-400 hover:bg-red-500/10 disabled:cursor-not-allowed disabled:opacity-50"
+							class="shrink-0"
 							aria-label="Déconnecter cet appareil"
 							disabled={busy}
 							onclick={() => void handleRevoke(session)}
+							size="icon"
 							title="Déconnecter cet appareil"
-							type="button"
+							variant="danger-ghost"
 						>
 							<LogOut class="size-4" />
-						</button>
+						</Button>
 					{/if}
 				</li>
 			{/each}
 		</ul>
 		{#if otherSessions.length > 0}
 			<div class="mt-3 flex justify-end">
-				<button
+				<Button
 					id="sessions-revoke-all"
-					class="cursor-pointer rounded-lg border-0 bg-transparent px-2 py-1 text-sm text-red-400 hover:bg-red-500/10 disabled:cursor-not-allowed disabled:opacity-50"
 					disabled={busy}
 					onclick={() => void handleRevokeAll()}
-					type="button"
+					size="sm"
+					variant="danger-ghost"
 				>
 					Déconnecter tous les autres appareils
-				</button>
+				</Button>
 			</div>
 		{:else}
 			<p class="text-dark-light-blue/70 m-0 mt-3 text-xs">Aucun autre appareil connecté.</p>

@@ -176,17 +176,18 @@
 							alt="Aperçu {index + 1}"
 							src={image.preview}
 						/>
-						<button
-							class="bg-dark-blue border-light-blue/30 text-light-blue hover:border-light-blue/60 absolute -top-1.5 -right-1.5 flex size-5 cursor-pointer items-center justify-center rounded-full border transition"
+						<Button
+							class="absolute items-center justify-center"
 							aria-label="Retirer l'image {index + 1}"
 							disabled={submitting}
 							onclick={() => {
 								removeImage(index);
 							}}
-							type="button"
+							size="icon"
+							variant="icon"
 						>
 							<X class="size-3.5" />
-						</button>
+						</Button>
 					</div>
 				{/each}
 				{#if images.length < MAX_REPORT_IMAGES}

@@ -77,17 +77,18 @@
 							</p>
 						{/if}
 					</div>
-					<button
+					<Button
 						id={`connection-revoke-${connection.client_id}`}
-						class="shrink-0 cursor-pointer rounded-lg border-0 bg-transparent p-2 text-red-400 hover:bg-red-500/10 disabled:cursor-not-allowed disabled:opacity-50"
+						class="shrink-0"
 						aria-label="Révoquer l'accès de cette application"
 						disabled={busy}
 						onclick={() => void handleRevoke(connection)}
+						size="icon"
 						title="Révoquer l'accès de cette application"
-						type="button"
+						variant="danger-ghost"
 					>
 						<Unlink class="size-4" />
-					</button>
+					</Button>
 				</li>
 			{/each}
 		</ul>
