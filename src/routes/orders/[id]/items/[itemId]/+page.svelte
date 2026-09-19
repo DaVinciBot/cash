@@ -1,4 +1,5 @@
 <script lang="ts">
+	import { Button } from '@davincibot/components';
 	import { enhance } from '$app/forms';
 	import { resolve } from '$app/paths';
 	import HistoryTimeline from '$lib/components/cash/HistoryTimeline.svelte';
@@ -191,27 +192,21 @@
 							bind:value={line.amount}
 						/>
 					</label>
-					<button
-						class="border-light-blue/30 text-dark-light-blue hover:bg-blue-gray/15 rounded-xl border px-3 py-1.5 text-sm"
+					<Button
 						onclick={() => {
 							removeLine(line.id);
 						}}
-						type="button">Retirer</button
+						size="sm"
+						variant="secondary">Retirer</Button
 					>
 				</div>
 			{/each}
 
 			<div class="mt-3 flex flex-wrap items-center gap-2">
-				<button
-					class="border-light-blue/30 text-light-blue hover:bg-blue-gray/15 rounded-xl border px-3 py-1.5 text-sm"
-					onclick={addLine}
-					type="button">Répartir sur un budget de plus</button
+				<Button onclick={addLine} size="sm" variant="secondary"
+					>Répartir sur un budget de plus</Button
 				>
-				<button
-					class="border-light-blue/30 text-light-blue hover:bg-blue-gray/15 rounded-xl border px-3 py-1.5 text-sm"
-					onclick={fillFirst}
-					type="button">Tout sur le premier</button
-				>
+				<Button onclick={fillFirst} size="sm" variant="secondary">Tout sur le premier</Button>
 				<span class="text-xs {allocationMismatch ? 'text-red-400' : 'text-dark-light-blue'}">
 					Imputé : {euro.format(allocated)} sur {euro.format(totalTtc)}
 				</span>
@@ -219,16 +214,15 @@
 		</fieldset>
 
 		<div class="flex items-center gap-2">
-			<button
-				class="bg-light-blue text-dark-blue rounded-xl px-4 py-2.5 text-sm font-semibold hover:bg-white disabled:opacity-40"
-				disabled={allocationMismatch}
-				type="submit">Enregistrer</button
+			<Button disabled={allocationMismatch} size="md" type="submit" variant="primary"
+				>Enregistrer</Button
 			>
-			<a
-				class="border-light-blue/30 text-dark-light-blue hover:bg-blue-gray/15 rounded-xl border px-4 py-2.5 text-sm"
+			<Button
 				href={resolve('/orders/[id]', { id: String(data.order.id) })}
+				size="md"
+				variant="secondary"
 				>Annuler
-			</a>
+			</Button>
 		</div>
 	</form>
 	<!-- CMD-F-60 — qui a corrigé le prix, et quand. Le trésorier édite ici : la

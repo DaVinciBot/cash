@@ -1,5 +1,5 @@
 <script lang="ts">
-	import { Checkbox, FilterChip } from '@davincibot/components';
+	import { Button, Checkbox, FilterChip } from '@davincibot/components';
 	import { enhance } from '$app/forms';
 	import CampusBadge from '$lib/components/cash/CampusBadge.svelte';
 	import { REFUSAL_REASON_MIN_LENGTH, refusalReasonError } from '@davincibot/lib';
@@ -158,19 +158,20 @@
 						{#each selectedVisible as id (id)}
 							<input name="id" type="hidden" value={id} />
 						{/each}
-						<button
-							class="bg-light-blue text-dark-blue rounded-xl px-3 py-1.5 text-sm font-semibold hover:bg-white disabled:opacity-40"
+						<Button
 							disabled={selectedVisible.length === 0}
-							type="submit">Valider la sélection</button
+							size="sm"
+							type="submit"
+							variant="primary">Valider la sélection</Button
 						>
 					</form>
-					<button
-						class="border-light-blue/30 rounded-xl border px-3 py-1.5 text-sm text-red-400 hover:bg-red-500/10 disabled:opacity-40"
+					<Button
 						disabled={selectedVisible.length === 0}
 						onclick={() => {
 							openRefusal(selectedVisible);
 						}}
-						type="button">Refuser la sélection</button
+						size="sm"
+						variant="danger">Refuser la sélection</Button
 					>
 				</div>
 			</div>
@@ -214,16 +215,13 @@
 						</p>
 					{/if}
 					<div class="mt-3 flex items-center gap-2">
-						<button
-							class="rounded-xl border border-red-500/40 bg-red-500/15 px-3 py-1.5 text-sm font-semibold text-red-300 hover:bg-red-500/25 disabled:opacity-40"
+						<Button
 							disabled={reason.trim().length < REFUSAL_REASON_MIN_LENGTH}
-							type="submit">Confirmer le refus</button
+							size="sm"
+							type="submit"
+							variant="danger">Confirmer le refus</Button
 						>
-						<button
-							class="border-light-blue/30 text-dark-light-blue hover:bg-blue-gray/15 rounded-xl border px-3 py-1.5 text-sm"
-							onclick={closeRefusal}
-							type="button">Annuler</button
-						>
+						<Button onclick={closeRefusal} size="sm" variant="secondary">Annuler</Button>
 					</div>
 				</form>
 			{/if}
@@ -281,17 +279,14 @@
 							<div class="flex shrink-0 items-center gap-2">
 								<form action="?/approve" method="POST" use:enhance>
 									<input name="id" type="hidden" value={item.id} />
-									<button
-										class="bg-light-blue text-dark-blue rounded-xl px-3 py-1.5 text-sm font-semibold hover:bg-white"
-										type="submit">Valider</button
-									>
+									<Button size="sm" type="submit" variant="primary">Valider</Button>
 								</form>
-								<button
-									class="border-light-blue/30 rounded-xl border px-3 py-1.5 text-sm text-red-400 hover:bg-red-500/10"
+								<Button
 									onclick={() => {
 										openRefusal([item.id]);
 									}}
-									type="button">Refuser</button
+									size="sm"
+									variant="danger">Refuser</Button
 								>
 							</div>
 						</div>

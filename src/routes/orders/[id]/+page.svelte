@@ -86,14 +86,14 @@
 		<StateBadge badge={ORDER_STATE_BADGES[order.state]} icon={ORDER_STATE_ICONS[order.state]} />
 		{#if order.campus}
 			<!-- CMD-F-41 — le badge campus est aussi le bouton qui copie l'adresse. -->
-			<button
-				class="cursor-pointer border-0 bg-transparent p-0"
+			<Button
 				onclick={copyAddress}
+				size="icon"
 				title="Copier l'adresse de livraison"
-				type="button"
+				variant="icon"
 			>
 				<StateBadge badge={CAMPUS_BADGES[order.campus]} icon={CAMPUS_ICONS[order.campus]} />
-			</button>
+			</Button>
 			{#if copied}
 				<span class="text-xs text-emerald-300">Adresse copiée</span>
 			{/if}
@@ -127,10 +127,8 @@
 			</Button>
 		{/if}
 		{#if isOrderCancelable(order.state)}
-			<button
-				class="border-light-blue/30 rounded-lg border px-4 py-2 text-sm text-red-400 hover:bg-red-500/10"
-				onclick={() => (canceling = !canceling)}
-				type="button">Annuler la commande</button
+			<Button onclick={() => (canceling = !canceling)} size="sm" variant="danger"
+				>Annuler la commande</Button
 			>
 		{/if}
 	</div>
@@ -178,11 +176,7 @@
 				<Button disabled={settlementError} size="md" type="submit" variant="primary">
 					Confirmer le passage
 				</Button>
-				<button
-					class="border-light-blue/30 text-dark-light-blue hover:bg-blue-gray/15 rounded-xl border px-4 py-2.5 text-sm"
-					onclick={() => (passing = false)}
-					type="button">Annuler</button
-				>
+				<Button onclick={() => (passing = false)} size="md" variant="secondary">Annuler</Button>
 			</div>
 		</form>
 	{/if}
@@ -218,15 +212,8 @@
 				virement.
 			</p>
 			<div class="mt-3 flex items-center gap-2">
-				<button
-					class="rounded-lg rounded-xl border border-red-500/40 bg-red-500/15 px-4 py-2 text-sm font-semibold text-red-300 hover:bg-red-500/25"
-					type="submit">Confirmer l'annulation</button
-				>
-				<button
-					class="border-light-blue/30 text-dark-light-blue hover:bg-blue-gray/15 rounded-xl border px-4 py-2.5 text-sm"
-					onclick={() => (canceling = false)}
-					type="button">Revenir</button
-				>
+				<Button size="sm" type="submit" variant="danger">Confirmer l'annulation</Button>
+				<Button onclick={() => (canceling = false)} size="md" variant="secondary">Revenir</Button>
 			</div>
 		</form>
 	{/if}
@@ -259,13 +246,13 @@
 			</p>
 			<div class="mt-3 flex flex-wrap items-center gap-2">
 				{#each overdrawn as share (share.budgetId)}
-					<button
-						class="border-light-blue/30 text-light-blue hover:bg-blue-gray/15 rounded-xl border px-3 py-1.5 text-xs"
+					<Button
 						onclick={() => {
 							raising = share.budgetId;
 							raiseAmount = '';
 						}}
-						type="button">Augmenter {share.budgetPath}</button
+						size="sm"
+						variant="secondary">Augmenter {share.budgetPath}</Button
 					>
 				{/each}
 			</div>
@@ -288,12 +275,12 @@
 						/>
 					</label>
 					<Button size="sm" type="submit" variant="primary">Enregistrer</Button>
-					<button
-						class="border-light-blue/30 text-dark-light-blue hover:bg-blue-gray/15 rounded-xl border px-3 py-1.5 text-sm"
+					<Button
 						onclick={() => {
 							raising = null;
 						}}
-						type="button">Annuler</button
+						size="sm"
+						variant="secondary">Annuler</Button
 					>
 				</form>
 			{/if}
@@ -331,10 +318,7 @@
 						{/each}
 					</select>
 				</label>
-				<button
-					class="border-light-blue/30 text-light-blue hover:bg-blue-gray/15 rounded-xl border px-3 py-1.5 text-sm"
-					type="submit">Enregistrer</button
-				>
+				<Button size="sm" type="submit" variant="secondary">Enregistrer</Button>
 			</div>
 		</form>
 	{/if}
@@ -393,31 +377,26 @@
 
 					<div class="flex shrink-0 flex-col items-end gap-2">
 						{#if editable}
-							<a
-								class="border-light-blue/30 text-light-blue hover:bg-blue-gray/15 rounded-xl border px-3 py-1.5 text-sm"
+							<Button
 								href={resolve('/orders/[id]/items/[itemId]', {
 									id: String(order.id),
 									itemId: String(item.id)
 								})}
+								size="sm"
+								variant="secondary"
 								>Modifier
-							</a>
+							</Button>
 						{/if}
 						{#if item.state === 'bundled' && order.state === 'pending_delivery'}
 							<form action="?/receive" method="POST" use:enhance>
 								<input name="item" type="hidden" value={item.id} />
-								<button
-									class="bg-light-blue text-dark-blue rounded-xl px-3 py-1.5 text-sm font-semibold hover:bg-white"
-									type="submit">Marquer reçu</button
-								>
+								<Button size="sm" type="submit" variant="primary">Marquer reçu</Button>
 							</form>
 						{/if}
 						{#if item.state === 'bundled' && order.state === 'pending_treso'}
 							<form action="?/detach" method="POST" use:enhance>
 								<input name="item" type="hidden" value={item.id} />
-								<button
-									class="border-light-blue/30 text-dark-light-blue hover:bg-blue-gray/15 rounded-xl border px-3 py-1.5 text-sm"
-									type="submit">Retirer</button
-								>
+								<Button size="sm" type="submit" variant="secondary">Retirer</Button>
 							</form>
 						{/if}
 					</div>

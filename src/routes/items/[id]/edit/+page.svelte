@@ -1,5 +1,5 @@
 <script lang="ts">
-	import { FilterChip } from '@davincibot/components';
+	import { Button, FilterChip } from '@davincibot/components';
 	import { enhance } from '$app/forms';
 	import { resolve } from '$app/paths';
 	import CampusBadge from '$lib/components/cash/CampusBadge.svelte';
@@ -136,14 +136,9 @@
 		<div class="mt-6 flex flex-wrap items-center justify-between gap-3">
 			<span class="text-lg font-medium text-white">Total : {euro.format(total)}</span>
 			<div class="flex gap-3">
-				<a
-					class="border-light-blue/30 text-dark-light-blue hover:bg-blue-gray/15 rounded-xl border px-4 py-2.5 text-sm"
-					href={resolve('/')}>Annuler</a
-				>
-				<button
-					class="bg-light-blue text-dark-blue rounded-xl px-4 py-2.5 text-sm font-semibold hover:bg-white disabled:opacity-50"
-					disabled={submitting}
-					type="submit">{submitting ? 'Enregistrement…' : 'Enregistrer'}</button
+				<Button href={resolve('/')} size="md" variant="secondary">Annuler</Button>
+				<Button disabled={submitting} size="md" type="submit" variant="primary"
+					>{submitting ? 'Enregistrement…' : 'Enregistrer'}</Button
 				>
 			</div>
 		</div>

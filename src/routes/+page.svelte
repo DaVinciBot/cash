@@ -1,5 +1,5 @@
 <script lang="ts">
-	import { FilterChip } from '@davincibot/components';
+	import { Button, FilterChip } from '@davincibot/components';
 	import { enhance } from '$app/forms';
 	import { resolve } from '$app/paths';
 	import CampusBadge from '$lib/components/cash/CampusBadge.svelte';
@@ -62,10 +62,7 @@
 				jusqu'à la réception.
 			</p>
 		</div>
-		<a
-			class="bg-light-blue text-dark-blue rounded-xl px-4 py-2.5 text-sm font-semibold hover:bg-white"
-			href={resolve('/items/new')}>Faire une commande</a
-		>
+		<Button href={resolve('/items/new')} size="md" variant="primary">Faire une commande</Button>
 	</header>
 
 	{#if form?.message}
@@ -144,27 +141,26 @@
 						<div class="flex shrink-0 items-center gap-2">
 							<!-- TRANS-NF-50 — le détail porte l'historique : qui a validé,
 							     qui a refusé, quand. La liste, elle, reste une liste. -->
-							<a
-								class="border-light-blue/30 text-light-blue hover:bg-blue-gray/15 rounded-xl border px-3 py-1.5 text-sm"
+							<Button
 								href={resolve('/items/[id]', { id: String(item.id) })}
+								size="sm"
+								variant="secondary"
 							>
 								Détail
-							</a>
+							</Button>
 							{#if isItemEditableByMember(item.state)}
-								<a
-									class="border-light-blue/30 text-light-blue hover:bg-blue-gray/15 rounded-xl border px-3 py-1.5 text-sm"
+								<Button
 									href={resolve('/items/[id]/edit', { id: String(item.id) })}
+									size="sm"
+									variant="secondary"
 								>
 									Modifier
-								</a>
+								</Button>
 							{/if}
 							{#if isItemDeletableByMember(item.state)}
 								<form action="?/delete" method="POST" use:enhance>
 									<input name="id" type="hidden" value={item.id} />
-									<button
-										class="border-light-blue/30 rounded-xl border px-3 py-1.5 text-sm text-red-400 hover:bg-red-500/10"
-										type="submit">Supprimer</button
-									>
+									<Button size="sm" type="submit" variant="danger">Supprimer</Button>
 								</form>
 							{/if}
 						</div>

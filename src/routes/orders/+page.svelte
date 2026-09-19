@@ -1,5 +1,5 @@
 <script lang="ts">
-	import { FilterChip } from '@davincibot/components';
+	import { Button, FilterChip } from '@davincibot/components';
 	import { resolve } from '$app/paths';
 	import CampusBadge from '$lib/components/cash/CampusBadge.svelte';
 	import StateBadge from '$lib/components/cash/StateBadge.svelte';
@@ -57,10 +57,7 @@
 				autres.
 			</p>
 		</div>
-		<a
-			class="border-light-blue/30 text-light-blue hover:bg-blue-gray/15 rounded-xl border px-4 py-2.5 text-sm"
-			href={resolve('/bundle')}>Items à regrouper</a
-		>
+		<Button href={resolve('/bundle')} size="md" variant="secondary">Items à regrouper</Button>
 	</header>
 
 	<div class="mb-4 flex flex-wrap items-center gap-2">

@@ -1,4 +1,5 @@
 <script lang="ts">
+	import { Button } from '@davincibot/components';
 	import { resolve } from '$app/paths';
 	import CampusBadge from '$lib/components/cash/CampusBadge.svelte';
 	import HistoryTimeline from '$lib/components/cash/HistoryTimeline.svelte';
@@ -29,11 +30,11 @@
 			</div>
 		</div>
 		{#if item.isMine && isItemEditableByMember(item.state)}
-			<a
-				class="border-light-blue/30 text-light-blue hover:bg-blue-gray/15 rounded-xl border px-4 py-2.5 text-sm"
+			<Button
 				href={resolve('/items/[id]/edit', { id: String(item.id) })}
-				>Modifier
-			</a>
+				size="md"
+				variant="secondary">Modifier</Button
+			>
 		{/if}
 	</header>
 

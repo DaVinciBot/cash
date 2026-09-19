@@ -1,5 +1,5 @@
 <script lang="ts">
-	import { Checkbox } from '@davincibot/components';
+	import { Button, Checkbox } from '@davincibot/components';
 	import { enhance } from '$app/forms';
 	import CampusBadge from '$lib/components/cash/CampusBadge.svelte';
 	import { REFUSAL_REASON_MIN_LENGTH, refusalReasonError } from '@davincibot/lib';
@@ -130,20 +130,21 @@
 					{#each chosen as item (item.id)}
 						<input name="id" type="hidden" value={item.id} />
 					{/each}
-					<button
-						class="bg-light-blue text-dark-blue rounded-xl px-3 py-1.5 text-sm font-semibold hover:bg-white disabled:opacity-40"
+					<Button
 						disabled={selected.size === 0 || campusConflict}
-						type="submit">Créer une commande</button
+						size="sm"
+						type="submit"
+						variant="primary">Créer une commande</Button
 					>
 				</form>
-				<button
-					class="border-light-blue/30 rounded-xl border px-3 py-1.5 text-sm text-red-400 hover:bg-red-500/10 disabled:opacity-40"
+				<Button
 					disabled={selected.size === 0}
 					onclick={() => {
 						refusing = chosen.map((i) => i.id);
 						reason = '';
 					}}
-					type="button">Refuser la sélection</button
+					size="sm"
+					variant="danger">Refuser la sélection</Button
 				>
 			</div>
 		</div>
@@ -194,17 +195,18 @@
 					<p class="mt-1 text-xs text-red-400">{reasonError}</p>
 				{/if}
 				<div class="mt-3 flex items-center gap-2">
-					<button
-						class="rounded-xl border border-red-500/40 bg-red-500/15 px-3 py-1.5 text-sm font-semibold text-red-300 hover:bg-red-500/25 disabled:opacity-40"
+					<Button
 						disabled={reason.trim().length < REFUSAL_REASON_MIN_LENGTH}
-						type="submit">Confirmer le refus</button
+						size="sm"
+						type="submit"
+						variant="danger">Confirmer le refus</Button
 					>
-					<button
-						class="border-light-blue/30 text-dark-light-blue hover:bg-blue-gray/15 rounded-xl border px-3 py-1.5 text-sm"
+					<Button
 						onclick={() => {
 							refusing = [];
 						}}
-						type="button">Annuler</button
+						size="sm"
+						variant="secondary">Annuler</Button
 					>
 				</div>
 			</form>
@@ -217,12 +219,12 @@
 						{group.key}
 					</h2>
 					<span class="text-dark-light-blue/70 text-xs">{group.items.length} item(s)</span>
-					<button
-						class="text-dark-light-blue hover:text-light-blue text-xs underline"
+					<Button
 						onclick={() => {
 							selectGroup(group.items.map((i) => i.id));
 						}}
-						type="button">Tout cocher</button
+						size="sm"
+						variant="ghost">Tout cocher</Button
 					>
 				</div>
 				<ul class="space-y-2">
