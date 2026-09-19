@@ -132,8 +132,10 @@
 		</div>
 	</nav>
 
-	<!-- Sidebar -->
-	<SideBar menu={__menu} {open} />
+	<!-- La SideBar publiée a ses défauts en gris Tailwind. `bgClass` et
+		 `activeClass` existent précisément pour ça : on lui passe les couleurs de
+		 marque au lieu d'attendre la prochaine release de la lib. -->
+	<SideBar activeClass="hover:bg-blue-gray/15" bgClass="bg-surface-modal" menu={__menu} {open} />
 
 	<main class="min-h-screen p-4 pt-20 md:ml-64">
 		{@render children?.()}
