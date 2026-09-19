@@ -1,4 +1,5 @@
 <script lang="ts">
+	import { Button } from '@davincibot/components';
 	// La page ne fait qu'aiguiller : chaque type de pièce a son composant.
 	import { resolve } from '$app/paths';
 	import ExpenseReportSheet from '$lib/components/cash/documents/ExpenseReportSheet.svelte';
@@ -32,19 +33,21 @@
 	>
 	<!-- Le téléchargement passe par le serveur : lui seul peut imposer le nom du fichier.
        Le bouton d'impression reste pour qui veut sortir la pièce sur papier. -->
-	<button
-		class="border-light-blue/30 text-light-blue hover:bg-blue-gray/15 ml-auto rounded-lg border px-4 py-2 text-sm"
+	<Button
+		class="ml-auto"
 		onclick={() => {
 			window.print();
 		}}
-		type="button">Imprimer</button
+		size="sm"
+		variant="secondary">Imprimer</Button
 	>
-	<a
-		class="bg-light-blue text-dark-blue rounded-xl px-4 py-2.5 text-sm font-semibold hover:bg-white"
+	<Button
 		href={resolve('/treasury/documents/[id]/pdf', { id: String(doc.id) })}
+		size="md"
+		variant="primary"
 	>
 		Télécharger le PDF
-	</a>
+	</Button>
 </div>
 
 {#if doc.kind === 'invoice'}

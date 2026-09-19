@@ -1,4 +1,5 @@
 <script lang="ts">
+	import { Button } from '@davincibot/components';
 	import { resolve } from '$app/paths';
 	import { euroFormat } from '$lib/components/charts/chartjs';
 	import GroupedBarsChart from '$lib/components/charts/GroupedBarsChart.svelte';
@@ -71,10 +72,7 @@
 				{/each}
 			</select>
 		</label>
-		<button
-			class="border-light-blue/30 text-light-blue hover:bg-blue-gray/15 rounded-xl border px-3 py-1.5 text-sm"
-			type="submit">Afficher</button
-		>
+		<Button size="sm" type="submit" variant="secondary">Afficher</Button>
 	</form>
 
 	<!-- TRESO-F-62 — rapport trimestriel -->
@@ -85,10 +83,10 @@
 					Trimestres — exercice {data.quarters.label}
 				</h2>
 				<!-- eslint-disable svelte/no-navigation-without-resolve -- route d'export, hors table de routage typée -->
-				<a
-					class="border-light-blue/30 text-light-blue hover:bg-blue-gray/15 rounded-xl border px-3 py-1.5 text-xs"
+				<Button
 					href="/admin/treasury/reports/export?kind=quarterly&fy={data.fiscalYearId}"
-					>Exporter en CSV</a
+					size="sm"
+					variant="secondary">Exporter en CSV</Button
 				>
 				<!-- eslint-enable svelte/no-navigation-without-resolve -->
 			</div>
@@ -147,10 +145,10 @@
 		<div class="mb-3 flex flex-wrap items-center justify-between gap-3">
 			<h2 class="text-dark-light-blue text-sm font-semibold tracking-wide uppercase">Projets</h2>
 			<!-- eslint-disable svelte/no-navigation-without-resolve -- route d'export, hors table de routage typée -->
-			<a
-				class="border-light-blue/30 text-light-blue hover:bg-blue-gray/15 rounded-xl border px-3 py-1.5 text-xs"
+			<Button
 				href="/admin/treasury/reports/export?kind=projects&sy={data.schoolYearId}"
-				>Exporter en CSV</a
+				size="sm"
+				variant="secondary">Exporter en CSV</Button
 			>
 			<!-- eslint-enable svelte/no-navigation-without-resolve -->
 		</div>

@@ -1,4 +1,5 @@
 <script lang="ts">
+	import { Button } from '@davincibot/components';
 	import { enhance } from '$app/forms';
 	import { resolve } from '$app/paths';
 	import StateBadge from '$lib/components/cash/StateBadge.svelte';
@@ -55,10 +56,8 @@
 				passage de celle-ci.
 			</p>
 		</div>
-		<button
-			class="bg-light-blue text-dark-blue rounded-xl px-4 py-2.5 text-sm font-semibold hover:bg-white"
-			onclick={() => (editing = editing === 0 ? null : 0)}
-			type="button">{editing === 0 ? 'Annuler' : 'Nouveau mouvement'}</button
+		<Button onclick={() => (editing = editing === 0 ? null : 0)} size="md" variant="primary"
+			>{editing === 0 ? 'Annuler' : 'Nouveau mouvement'}</Button
 		>
 	</header>
 
@@ -197,15 +196,8 @@
 				</p>
 			{/if}
 			<div class="mt-3 flex items-center gap-2">
-				<button
-					class="bg-light-blue text-dark-blue rounded-xl px-3 py-1.5 text-sm font-semibold hover:bg-white"
-					type="submit">Enregistrer</button
-				>
-				<button
-					class="border-light-blue/30 text-dark-light-blue hover:bg-blue-gray/15 rounded-xl border px-3 py-1.5 text-sm"
-					onclick={() => (editing = null)}
-					type="button">Annuler</button
-				>
+				<Button size="sm" type="submit" variant="primary">Enregistrer</Button>
+				<Button onclick={() => (editing = null)} size="sm" variant="secondary">Annuler</Button>
 			</div>
 		</form>
 	{/snippet}
@@ -272,7 +264,7 @@
 									{/if}
 									<form action="?/removeProof" method="POST" use:enhance>
 										<input name="proof" type="hidden" value={proof.id} />
-										<button class="text-red-400 hover:underline" type="submit">retirer</button>
+										<Button size="sm" type="submit" variant="danger-ghost">retirer</Button>
 									</form>
 								</li>
 							{/each}
@@ -299,43 +291,32 @@
 								required
 								type="file"
 							/>
-							<button
-								class="border-light-blue/30 text-light-blue hover:bg-blue-gray/15 rounded-xl border px-3 py-1.5 text-xs"
-								type="submit">Déposer</button
-							>
-							<button
-								class="text-dark-light-blue hover:text-light-blue text-xs"
-								onclick={() => (uploading = null)}
-								type="button">annuler</button
-							>
+							<Button size="sm" type="submit" variant="secondary">Déposer</Button>
+							<Button onclick={() => (uploading = null)} size="sm" variant="ghost">annuler</Button>
 						</form>
 					{/if}
 
 					<div class="mt-3 flex flex-wrap items-center gap-2">
-						<button
-							class="border-light-blue/30 text-light-blue hover:bg-blue-gray/15 rounded-xl border px-3 py-1.5 text-xs"
+						<Button
 							onclick={() => (editing = editing === flow.id ? null : flow.id)}
-							type="button">Modifier</button
+							size="sm"
+							variant="secondary">Modifier</Button
 						>
-						<button
-							class="border-light-blue/30 text-light-blue hover:bg-blue-gray/15 rounded-xl border px-3 py-1.5 text-xs"
+						<Button
 							onclick={() => (uploading = uploading === flow.id ? null : flow.id)}
-							type="button">Justificatif</button
+							size="sm"
+							variant="secondary">Justificatif</Button
 						>
 						<form action="?/toggleReconciled" method="POST" use:enhance>
 							<input name="id" type="hidden" value={flow.id} />
 							<input name="reconciled" type="hidden" value={flow.isReconciled ? '0' : '1'} />
-							<button
-								class="border-light-blue/30 text-light-blue hover:bg-blue-gray/15 rounded-xl border px-3 py-1.5 text-xs"
-								type="submit">{flow.isReconciled ? 'Dépointer' : 'Pointer'}</button
+							<Button size="sm" type="submit" variant="secondary"
+								>{flow.isReconciled ? 'Dépointer' : 'Pointer'}</Button
 							>
 						</form>
 						<form action="?/delete" method="POST" use:enhance>
 							<input name="id" type="hidden" value={flow.id} />
-							<button
-								class="border-light-blue/30 rounded-lg border px-3 py-1 text-xs text-red-400 hover:bg-red-500/10"
-								type="submit">Supprimer</button
-							>
+							<Button size="sm" type="submit" variant="danger">Supprimer</Button>
 						</form>
 					</div>
 

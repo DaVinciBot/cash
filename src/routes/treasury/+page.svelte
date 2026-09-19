@@ -35,18 +35,11 @@
 			</p>
 		</div>
 		<div class="flex flex-wrap gap-2">
-			<a
-				class="border-light-blue/30 text-light-blue hover:bg-blue-gray/15 rounded-xl border px-4 py-2.5 text-sm"
-				href={resolve('/treasury/flows')}>Dépenses et recettes</a
+			<Button href={resolve('/treasury/flows')} size="md" variant="secondary"
+				>Dépenses et recettes</Button
 			>
-			<a
-				class="border-light-blue/30 text-light-blue hover:bg-blue-gray/15 rounded-xl border px-4 py-2.5 text-sm"
-				href={resolve('/treasury/reports')}>Rapports</a
-			>
-			<a
-				class="border-light-blue/30 text-light-blue hover:bg-blue-gray/15 rounded-xl border px-4 py-2.5 text-sm"
-				href={resolve('/treasury/documents')}>Documents</a
-			>
+			<Button href={resolve('/treasury/reports')} size="md" variant="secondary">Rapports</Button>
+			<Button href={resolve('/treasury/documents')} size="md" variant="secondary">Documents</Button>
 		</div>
 	</header>
 
@@ -70,10 +63,7 @@
 			</label>
 			<input name="from" type="hidden" value={data.from} />
 			<input name="to" type="hidden" value={data.to} />
-			<button
-				class="border-light-blue/30 text-light-blue hover:bg-blue-gray/15 rounded-xl border px-3 py-1.5 text-sm"
-				type="submit">Recalculer</button
-			>
+			<Button size="sm" type="submit" variant="secondary">Recalculer</Button>
 			<p class="ml-auto text-right">
 				<span class="text-dark-light-blue block text-xs"
 					>Trésorerie au {day.format(new Date(data.on))}</span
@@ -134,10 +124,7 @@
 					value={data.to}
 				/>
 			</label>
-			<button
-				class="border-light-blue/30 text-light-blue hover:bg-blue-gray/15 rounded-xl border px-3 py-1.5 text-sm"
-				type="submit">Calculer</button
-			>
+			<Button size="sm" type="submit" variant="secondary">Calculer</Button>
 			<div class="ml-auto flex gap-6 text-right">
 				<p>
 					<span class="text-dark-light-blue block text-xs">Recettes</span>
@@ -167,10 +154,8 @@
 	<div class="mb-8">
 		<div class="mb-3 flex items-center justify-between">
 			<h2 class="text-dark-light-blue text-sm font-semibold tracking-wide uppercase">Comptes</h2>
-			<button
-				class="border-light-blue/30 text-light-blue hover:bg-blue-gray/15 rounded-xl border px-3 py-1.5 text-sm"
-				onclick={() => (openAccount = !openAccount)}
-				type="button">{openAccount ? 'Annuler' : 'Ouvrir un compte'}</button
+			<Button onclick={() => (openAccount = !openAccount)} size="sm" variant="secondary"
+				>{openAccount ? 'Annuler' : 'Ouvrir un compte'}</Button
 			>
 		</div>
 
@@ -213,10 +198,7 @@
 						value="0,00"
 					/>
 				</label>
-				<button
-					class="bg-light-blue text-dark-blue rounded-xl px-3 py-1.5 text-sm font-semibold hover:bg-white"
-					type="submit">Créer</button
-				>
+				<Button size="sm" type="submit" variant="primary">Créer</Button>
 			</form>
 		{/if}
 
@@ -237,18 +219,15 @@
 						<form action="?/toggleArchiveAccount" method="POST" use:enhance>
 							<input name="id" type="hidden" value={account.id} />
 							<input name="archive" type="hidden" value="0" />
-							<button
-								class="border-light-blue/30 text-dark-light-blue hover:bg-blue-gray/15 rounded-xl border px-3 py-1.5 text-xs"
-								type="submit">Réactiver</button
-							>
+							<Button size="sm" type="submit" variant="secondary">Réactiver</Button>
 						</form>
 					{:else}
-						<button
-							class="border-light-blue/30 text-dark-light-blue hover:bg-blue-gray/15 rounded-xl border px-3 py-1.5 text-xs"
+						<Button
 							onclick={() => {
 								archiving = archiving === account.id ? null : account.id;
 							}}
-							type="button">Archiver</button
+							size="sm"
+							variant="danger">Archiver</Button
 						>
 					{/if}
 
@@ -285,12 +264,12 @@
 							</p>
 							<div class="mt-3 flex items-center gap-2">
 								<Button size="sm" type="submit" variant="primary">Confirmer l'archivage</Button>
-								<button
-									class="border-light-blue/30 text-dark-light-blue hover:bg-blue-gray/15 rounded-xl border px-3 py-1.5 text-xs"
+								<Button
 									onclick={() => {
 										archiving = null;
 									}}
-									type="button">Annuler</button
+									size="sm"
+									variant="secondary">Annuler</Button
 								>
 							</div>
 						</form>
@@ -304,10 +283,8 @@
 	<div>
 		<div class="mb-3 flex items-center justify-between">
 			<h2 class="text-dark-light-blue text-sm font-semibold tracking-wide uppercase">Périodes</h2>
-			<button
-				class="border-light-blue/30 text-light-blue hover:bg-blue-gray/15 rounded-xl border px-3 py-1.5 text-sm"
-				onclick={() => (openPeriod = !openPeriod)}
-				type="button">{openPeriod ? 'Annuler' : 'Ouvrir une période'}</button
+			<Button onclick={() => (openPeriod = !openPeriod)} size="sm" variant="secondary"
+				>{openPeriod ? 'Annuler' : 'Ouvrir une période'}</Button
 			>
 		</div>
 
@@ -365,10 +342,7 @@
 						type="date"
 					/>
 				</label>
-				<button
-					class="bg-light-blue text-dark-blue rounded-xl px-3 py-1.5 text-sm font-semibold hover:bg-white"
-					type="submit">Ouvrir</button
-				>
+				<Button size="sm" type="submit" variant="primary">Ouvrir</Button>
 			</form>
 		{/if}
 
@@ -395,9 +369,8 @@
 									<input name="kind" type="hidden" value={group.kind} />
 									<input name="id" type="hidden" value={period.id} />
 									<input name="close" type="hidden" value={period.closedAt ? '0' : '1'} />
-									<button
-										class="border-light-blue/30 text-dark-light-blue hover:bg-blue-gray/15 rounded-xl border px-3 py-1.5 text-xs"
-										type="submit">{period.closedAt ? 'Rouvrir' : 'Clore'}</button
+									<Button size="sm" type="submit" variant="secondary"
+										>{period.closedAt ? 'Rouvrir' : 'Clore'}</Button
 									>
 								</form>
 							</li>

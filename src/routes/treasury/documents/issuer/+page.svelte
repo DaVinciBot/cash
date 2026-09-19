@@ -1,5 +1,5 @@
 <script lang="ts">
-	import { Checkbox } from '@davincibot/components';
+	import { Button, Checkbox } from '@davincibot/components';
 	// Identité de l'émetteur — un écran, un seul objet.
 	//
 	// Elle était auparavant un panneau dépliant sur l'écran des documents, à côté
@@ -253,9 +253,6 @@
 			</p>
 		</div>
 
-		<button
-			class="bg-light-blue text-dark-blue mt-4 rounded-xl px-3 py-1.5 text-sm font-semibold hover:bg-white"
-			type="submit">Enregistrer</button
-		>
+		<Button class="mt-4" size="sm" type="submit" variant="primary">Enregistrer</Button>
 	</form>
 </section>

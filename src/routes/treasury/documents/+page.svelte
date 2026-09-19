@@ -1,4 +1,5 @@
 <script lang="ts">
+	import { Button } from '@davincibot/components';
 	import { resolve } from '$app/paths';
 	import { DOCUMENT_KIND_LABELS } from '@davincibot/lib';
 	import type { PageData } from './$types';
@@ -25,13 +26,11 @@
 			</p>
 		</div>
 		<div class="flex gap-2">
-			<a
-				class="border-light-blue/30 text-light-blue hover:bg-blue-gray/15 rounded-xl border px-4 py-2.5 text-sm"
-				href={resolve('/treasury/documents/issuer')}>Identité de l'émetteur</a
+			<Button href={resolve('/treasury/documents/issuer')} size="md" variant="secondary"
+				>Identité de l'émetteur</Button
 			>
-			<a
-				class="bg-light-blue text-dark-blue rounded-xl px-4 py-2.5 text-sm font-semibold hover:bg-white"
-				href={resolve('/treasury/documents/new')}>Nouveau document</a
+			<Button href={resolve('/treasury/documents/new')} size="md" variant="primary"
+				>Nouveau document</Button
 			>
 		</div>
 	</header>
@@ -65,11 +64,12 @@
 						>{/if}
 					<span class="text-light-blue ml-auto font-medium">{euro.format(doc.amountTtc)}</span>
 					<span class="text-dark-light-blue/70 text-xs">{day.format(new Date(doc.issuedOn))}</span>
-					<a
-						class="border-light-blue/30 text-light-blue hover:bg-blue-gray/15 rounded-xl border px-3 py-1.5 text-xs"
+					<Button
 						href={resolve('/treasury/documents/[id]', { id: String(doc.id) })}
+						size="sm"
+						variant="secondary"
 						>Ouvrir
-					</a>
+					</Button>
 				</li>
 			{/each}
 		</ul>

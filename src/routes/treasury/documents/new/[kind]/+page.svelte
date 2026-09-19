@@ -1,4 +1,5 @@
 <script lang="ts">
+	import { Button } from '@davincibot/components';
 	// Formulaire d'émission, pour un type déjà choisi. Plus de menu déroulant qui
 	// fait apparaître et disparaître des champs : la page ne montre que ce que
 	// CETTE pièce demande.
@@ -223,22 +224,18 @@
 								bind:value={expense.ttc}
 							/>
 						</label>
-						<button
-							class="border-light-blue/30 text-dark-light-blue hover:bg-blue-gray/15 rounded-xl border px-3 py-1.5 text-xs"
+						<Button
 							onclick={() => {
 								removeExpense(expense.id);
 							}}
-							type="button">Retirer</button
+							size="sm"
+							variant="secondary">Retirer</Button
 						>
 					</div>
 				{/each}
 
 				<div class="mt-2 flex flex-wrap items-center gap-3">
-					<button
-						class="border-light-blue/30 text-light-blue hover:bg-blue-gray/15 rounded-xl border px-3 py-1.5 text-xs"
-						onclick={addExpense}
-						type="button">Ajouter une dépense</button
-					>
+					<Button onclick={addExpense} size="sm" variant="secondary">Ajouter une dépense</Button>
 					{#if hasLines}
 						<span class="text-dark-light-blue text-xs">Total TTC : {euro.format(total)}</span>
 					{:else}
@@ -281,22 +278,18 @@
 								bind:value={line.price}
 							/>
 						</label>
-						<button
-							class="border-light-blue/30 text-dark-light-blue hover:bg-blue-gray/15 rounded-xl border px-3 py-1.5 text-xs"
+						<Button
 							onclick={() => {
 								removeLine(line.id);
 							}}
-							type="button">Retirer</button
+							size="sm"
+							variant="secondary">Retirer</Button
 						>
 					</div>
 				{/each}
 
 				<div class="mt-2 flex flex-wrap items-center gap-3">
-					<button
-						class="border-light-blue/30 text-light-blue hover:bg-blue-gray/15 rounded-xl border px-3 py-1.5 text-xs"
-						onclick={addLine}
-						type="button">Ajouter une ligne</button
-					>
+					<Button onclick={addLine} size="sm" variant="secondary">Ajouter une ligne</Button>
 					{#if hasLines}
 						<span class="text-dark-light-blue text-xs">Total TTC : {euro.format(total)}</span>
 					{:else}
@@ -384,10 +377,8 @@
 		</fieldset>
 
 		<div class="flex items-center gap-3">
-			<button
-				class="bg-light-blue text-dark-blue rounded-xl px-4 py-2.5 text-sm font-semibold hover:bg-white disabled:opacity-40"
-				disabled={data.missing.length > 0}
-				type="submit">Émettre</button
+			<Button disabled={data.missing.length > 0} size="md" type="submit" variant="primary"
+				>Émettre</Button
 			>
 			<span class="text-dark-light-blue/70 text-xs">
 				L'émission consomme un numéro de série : elle ne s'annule pas, elle se contrepasse.
