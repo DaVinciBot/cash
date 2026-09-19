@@ -30,4 +30,18 @@
 		background-color: var(--color-surface-modal);
 		color: var(--color-light-blue);
 	}
+
+	/* Tailwind v4 a changé sa Preflight : un <button> vaut désormais
+	   `cursor: default`, là où la v3 posait `cursor: pointer`. Le curseur a donc
+	   disparu de presque tout l'intranet d'un seul coup, sans que rien ne le
+	   signale — ce n'est pas un oubli page par page.
+
+	   On rétablit la règle ici plutôt que de compter sur un `cursor-pointer` dans
+	   chaque classe : les primitives le portent déjà, mais les éléments
+	   volontairement laissés hors du système — une ligne de liste cliquable, une
+	   affordance d'en-tête de tableau — ne l'auraient pas. */
+	button:not(:disabled),
+	[role='button']:not(:disabled) {
+		cursor: pointer;
+	}
 }

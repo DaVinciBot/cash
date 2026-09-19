@@ -596,7 +596,7 @@
 						{/each}
 					</div>
 					<button
-						class={`bg-light-blue text-dark-blue focus:ring-light-blue/60 inline-flex items-center rounded-lg px-5 py-2.5 text-center text-sm font-medium text-white focus:ring-4 focus:outline-none ${
+						class={`bg-light-blue text-dark-blue focus:ring-light-blue/60 inline-flex items-center rounded-lg px-5 py-2.5 text-center text-sm font-medium focus:ring-4 focus:outline-none ${
 							submitting ? 'cursor-not-allowed opacity-60' : 'hover:bg-white'
 						}`}
 						disabled={submitting}

@@ -166,9 +166,9 @@
 			<div class="flex flex-row justify-center space-x-2">
 				{#each action as el (el.text)}
 					<button
-						class="rounded-lg px-3 py-2 text-center text-sm font-medium text-white {el.is_main
+						class="rounded-lg px-3 py-2 text-center text-sm font-medium {el.is_main
 							? 'bg-light-blue text-dark-blue hover:bg-white'
-							: 'border border-white'} focus:ring-light-blue/60 focus:ring-4 focus:outline-none"
+							: 'border border-white text-white'} focus:ring-light-blue/60 focus:ring-4 focus:outline-none"
 						onclick={(e: MouseEvent) => {
 							handleActionClick(el, e);
 						}}
