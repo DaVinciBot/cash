@@ -12,7 +12,7 @@
 	import { hasAnyPermission, userdata } from '@davincibot/lib';
 	import { onDestroy, untrack, type Snippet } from 'svelte';
 	import type { PageData } from './$types';
-	import { DevRbacPanel, SideBar } from '@davincibot/components';
+	import { Button, DevRbacPanel, SideBar } from '@davincibot/components';
 	import { Menu, Plus } from '@lucide/svelte';
 	import SettingsModal from '$lib/components/settings/SettingsModal.svelte';
 	import UserBadge from '$lib/components/share/UserBadge.svelte';
@@ -114,28 +114,25 @@
 
 			<div class="flex items-center lg:order-2">
 				{#if canRequestItems}
-					<!-- En étroit le libellé disparaît : l'aria-label garde un nom au bouton.
-						 Classes du bouton primaire écrites à la main : la primitive Button
-						 vit dans @davincibot/components mais n'est pas encore publiée. À la
-						 prochaine release de la lib, ce bloc redevient un <Button>. -->
-					<a
-						class="bg-light-blue text-dark-blue focus-visible:ring-light-blue/60 mr-2 inline-flex cursor-pointer items-center justify-center gap-2 rounded-xl px-4 py-2.5 text-sm font-semibold transition-colors hover:bg-white focus-visible:ring-2 focus-visible:outline-none"
+					<!-- En étroit le libellé disparaît : l'aria-label garde un nom au bouton. -->
+					<Button
+						class="mr-2"
 						aria-label="Faire une commande"
 						href={resolve('/items/new')}
+						size="md"
+						variant="primary"
 					>
 						<Plus class="size-4 shrink-0" />
 						<span class="hidden sm:block">Faire une commande</span>
-					</a>
+					</Button>
 				{/if}
 				<UserBadge />
 			</div>
 		</div>
 	</nav>
 
-	<!-- La SideBar publiée a ses défauts en gris Tailwind. `bgClass` et
-		 `activeClass` existent précisément pour ça : on lui passe les couleurs de
-		 marque au lieu d'attendre la prochaine release de la lib. -->
-	<SideBar activeClass="hover:bg-blue-gray/15" bgClass="bg-surface-modal" menu={__menu} {open} />
+	<!-- Sidebar -->
+	<SideBar menu={__menu} {open} />
 
 	<main class="min-h-screen p-4 pt-20 md:ml-64">
 		{@render children?.()}

@@ -4,39 +4,6 @@
    classes utilisées par les composants packagés sont purgées. */
 @source '../node_modules/@davincibot/components/dist';
 
-/* Surface des coquilles de modale et de la barre de navigation.
-   Ce jeton existe aussi dans le thème partagé, mais dans une version pas encore
-   publiée : sans cette déclaration locale, `bg-surface-modal` n'est pas générée
-   et les surfaces concernées deviennent transparentes — une panne muette, que
-   ni le typecheck ni les tests ne voient. Tailwind v4 fusionne les blocs
-   `@theme` : le jour où la lib est publiée, les deux valeurs coïncident et
-   cette déclaration peut disparaître. */
-@theme {
-	--color-surface-modal: #060a2c;
-}
-
-/* La SideBar publiée code en dur quelques gris que ses props n'atteignent pas :
-   la bordure de l'aside, le survol et l'état actif des entrées, la barre du bas.
-   On les repeint sous son identifiant, en attendant la release de la lib — qui
-   les porte déjà aux couleurs de marque.
-
-   La portée est volontairement étroite. Redéfinir les jetons `gray-*` à l'échelle
-   de l'app aurait été plus court, mais les feuilles de documents utilisent les
-   mêmes nuances et sont en thème clair pour l'impression : elles y auraient
-   laissé leur lisibilité. À supprimer le jour où la lib est publiée. */
-#drawer-navigation {
-	border-color: color-mix(in srgb, var(--color-light-blue) 20%, transparent);
-}
-#drawer-navigation .bg-gray-700 {
-	background-color: color-mix(in srgb, var(--color-blue-gray) 25%, transparent);
-}
-#drawer-navigation .hover\:bg-gray-700:hover {
-	background-color: color-mix(in srgb, var(--color-blue-gray) 15%, transparent);
-}
-#drawer-navigation .bg-gray-800 {
-	background-color: var(--color-surface-modal);
-}
-
 @layer base {
 	/* Un <select> non stylé garde le widget du système : flèche dessinée par
 	   macOS, Windows ou GTK, hauteur imposée par la plateforme, et largeur calée
