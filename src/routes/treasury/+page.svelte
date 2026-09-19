@@ -1,6 +1,7 @@
 <script lang="ts">
 	import { enhance } from '$app/forms';
 	import { resolve } from '$app/paths';
+	import { Button } from '@davincibot/components';
 	import { ACCOUNT_KIND_LABELS, ACCOUNT_KINDS } from '@davincibot/lib';
 	import type { ActionData, PageData } from './$types';
 
@@ -283,10 +284,7 @@
 								Réversible : un compte archivé se réactive d'un clic.
 							</p>
 							<div class="mt-3 flex items-center gap-2">
-								<button
-									class="rounded-lg bg-amber-600 px-3 py-1.5 text-xs font-medium text-white hover:bg-amber-500"
-									type="submit">Confirmer l'archivage</button
-								>
+								<Button size="sm" type="submit" variant="primary">Confirmer l'archivage</Button>
 								<button
 									class="border-light-blue/30 text-dark-light-blue hover:bg-blue-gray/15 rounded-xl border px-3 py-1.5 text-xs"
 									onclick={() => {

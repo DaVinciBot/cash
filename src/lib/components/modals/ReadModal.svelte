@@ -1,5 +1,5 @@
 <script lang="ts">
-	import { OverlayBackdrop } from '@davincibot/components';
+	import { Button, OverlayBackdrop } from '@davincibot/components';
 	import { hideOnClickOutside } from '@davincibot/lib';
 	import { onMount } from 'svelte';
 
@@ -397,16 +397,16 @@
 												<td>{item.price}</td>
 												{#if isPendingCdp()}
 													<td>
-														<button
-															class="inline-flex items-center rounded-lg bg-red-500 px-5 py-2.5 text-center text-sm font-medium text-white hover:bg-red-600 focus:ring-4 focus:ring-red-900 focus:outline-none"
+														<Button
 															aria-label="Supprimer {item.name}"
 															onclick={() => {
 																void removeItem(item);
 															}}
-															type="button"
+															size="icon"
+															variant="danger"
 														>
 															<svg
-																class="-mx-2.5 h-5 w-5"
+																class="h-5 w-5"
 																aria-hidden="true"
 																fill="currentColor"
 																viewBox="0 0 20 20"
@@ -417,7 +417,7 @@
 																	fill-rule="evenodd"
 																></path></svg
 															>
-														</button>
+														</Button>
 													</td>
 												{/if}
 											</tr>
@@ -493,13 +493,9 @@
 						</button>
 					{/if}
 					{#if action.type === 'delete'}
-						<button
-							class="inline-flex items-center rounded-lg bg-red-500 px-5 py-2.5 text-center text-sm font-medium text-white hover:bg-red-600 focus:ring-4 focus:ring-red-900 focus:outline-none"
-							onclick={action.handler}
-							type="button"
-						>
+						<Button onclick={action.handler} size="md" variant="danger">
 							<svg
-								class="mr-1.5 -ml-1 h-5 w-5"
+								class="h-5 w-5"
 								aria-hidden="true"
 								fill="currentColor"
 								viewBox="0 0 20 20"
@@ -511,7 +507,7 @@
 								></path></svg
 							>
 							{action.title}
-						</button>
+						</Button>
 					{/if}
 				{/each}
 			</div>

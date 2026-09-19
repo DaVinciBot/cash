@@ -1,5 +1,5 @@
 <script lang="ts">
-	import { Checkbox } from '@davincibot/components';
+	import { Button, Checkbox } from '@davincibot/components';
 	import { enhance } from '$app/forms';
 	import { resolve } from '$app/paths';
 	import CampusBadge from '$lib/components/cash/CampusBadge.svelte';
@@ -122,11 +122,9 @@
 	<!-- Actions de cycle de vie -->
 	<div class="mb-6 flex flex-wrap items-center gap-2">
 		{#if isOrderPassable(order.state)}
-			<button
-				class="rounded-lg bg-emerald-600 px-4 py-2 text-sm font-medium text-white hover:bg-emerald-500"
-				onclick={() => (passing = !passing)}
-				type="button">Passer la commande</button
-			>
+			<Button onclick={() => (passing = !passing)} size="md" variant="primary">
+				Passer la commande
+			</Button>
 		{/if}
 		{#if isOrderCancelable(order.state)}
 			<button
@@ -177,11 +175,9 @@
 				Réparti : {euro.format(settlement)} sur {euro.format(total)}
 			</p>
 			<div class="mt-3 flex items-center gap-2">
-				<button
-					class="rounded-lg bg-emerald-600 px-4 py-2 text-sm font-medium text-white hover:bg-emerald-500 disabled:opacity-40"
-					disabled={settlementError}
-					type="submit">Confirmer le passage</button
-				>
+				<Button disabled={settlementError} size="md" type="submit" variant="primary">
+					Confirmer le passage
+				</Button>
 				<button
 					class="border-light-blue/30 text-dark-light-blue hover:bg-blue-gray/15 rounded-xl border px-4 py-2.5 text-sm"
 					onclick={() => (passing = false)}
@@ -291,10 +287,7 @@
 							bind:value={raiseAmount}
 						/>
 					</label>
-					<button
-						class="rounded-lg bg-amber-600 px-3 py-2 text-sm font-medium text-white hover:bg-amber-500"
-						type="submit">Enregistrer</button
-					>
+					<Button size="sm" type="submit" variant="primary">Enregistrer</Button>
 					<button
 						class="border-light-blue/30 text-dark-light-blue hover:bg-blue-gray/15 rounded-xl border px-3 py-1.5 text-sm"
 						onclick={() => {
