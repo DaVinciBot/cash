@@ -1,5 +1,5 @@
 <script lang="ts">
-	import { Checkbox } from '@davincibot/components';
+	import { Button, Checkbox } from '@davincibot/components';
 	import { enhance } from '$app/forms';
 	import type { ActionData, PageData } from './$types';
 
@@ -81,10 +81,11 @@
 			<Checkbox className="size-4" bind:checked={showArchived} />
 			Afficher les archivés
 		</label>
-		<button
-			class="border-light-blue/30 text-light-blue hover:bg-blue-gray/15 mt-4 ml-auto rounded-lg border px-3 py-1.5 text-sm"
+		<Button
+			class="mt-4 ml-auto"
 			onclick={() => (creatingUnder = creatingUnder === null ? undefined : null)}
-			type="button">Ajouter une racine</button
+			size="sm"
+			variant="secondary">Ajouter une racine</Button
 		>
 	</div>
 
@@ -142,17 +143,14 @@
 						: node.amountTtc.toFixed(2).replace('.', ',')}
 				/>
 			</label>
-			<button
-				class="bg-light-blue text-dark-blue rounded-xl px-3 py-1.5 text-sm font-semibold hover:bg-white"
-				type="submit">Enregistrer</button
-			>
-			<button
-				class="border-light-blue/30 text-dark-light-blue hover:bg-blue-gray/15 rounded-xl border px-3 py-1.5 text-sm"
+			<Button size="sm" type="submit" variant="primary">Enregistrer</Button>
+			<Button
 				onclick={() => {
 					editing = null;
 					creatingUnder = undefined;
 				}}
-				type="button">Annuler</button
+				size="sm"
+				variant="secondary">Annuler</Button
 			>
 		</form>
 	{/snippet}
@@ -212,25 +210,26 @@
 						style="margin-left: {node.depth * 1.5 + 1}rem"
 						class="mt-1 mb-2 flex flex-wrap items-center gap-2"
 					>
-						<button
-							class="text-dark-light-blue hover:text-light-blue text-xs underline"
+						<Button
 							onclick={() => (editing = editing === node.id ? null : node.id)}
-							type="button">modifier</button
+							size="sm"
+							variant="ghost">modifier</Button
 						>
 						{#if node.amountTtc === null && !node.archivedAt}
-							<button
-								class="text-dark-light-blue hover:text-light-blue text-xs underline"
+							<Button
 								onclick={() => (creatingUnder = creatingUnder === node.id ? undefined : node.id)}
-								type="button">ajouter dessous</button
+								size="sm"
+								variant="ghost">ajouter dessous</Button
 							>
 						{/if}
 						{#if node.isLeaf && !node.archivedAt}
 							<form action="?/split" method="POST" use:enhance>
 								<input name="id" type="hidden" value={node.id} />
-								<button
-									class="text-dark-light-blue hover:text-light-blue text-xs underline"
+								<Button
+									size="sm"
 									title="Crée {node.name}_default sous ce budget, qui reprend son montant et ses dépenses."
-									type="submit">transformer en parent</button
+									type="submit"
+									variant="ghost">transformer en parent</Button
 								>
 							</form>
 						{/if}
@@ -238,34 +237,23 @@
 							<form action="?/setDefault" method="POST" use:enhance>
 								<input name="id" type="hidden" value={node.id} />
 								<input name="parent_id" type="hidden" value={node.parentId ?? ''} />
-								<button
-									class="text-dark-light-blue hover:text-light-blue text-xs underline"
-									type="submit">marquer par défaut</button
-								>
+								<Button size="sm" type="submit" variant="ghost">marquer par défaut</Button>
 							</form>
 						{/if}
 						{#if node.archivedAt}
 							<form action="?/restore" method="POST" use:enhance>
 								<input name="id" type="hidden" value={node.id} />
-								<button
-									class="text-dark-light-blue hover:text-light-blue text-xs underline"
-									type="submit">réactiver</button
-								>
+								<Button size="sm" type="submit" variant="ghost">réactiver</Button>
 							</form>
 						{:else}
 							<form action="?/archive" method="POST" use:enhance>
 								<input name="id" type="hidden" value={node.id} />
-								<button
-									class="text-dark-light-blue hover:text-light-blue text-xs underline"
-									type="submit">archiver</button
-								>
+								<Button size="sm" type="submit" variant="danger-ghost">archiver</Button>
 							</form>
 						{/if}
 						<form action="?/remove" method="POST" use:enhance>
 							<input name="id" type="hidden" value={node.id} />
-							<button class="text-xs text-red-400 underline hover:text-red-300" type="submit"
-								>supprimer</button
-							>
+							<Button size="sm" type="submit" variant="danger-ghost">supprimer</Button>
 						</form>
 					</div>
 

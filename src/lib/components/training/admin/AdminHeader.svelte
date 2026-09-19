@@ -1,4 +1,5 @@
 <script lang="ts">
+	import { Button } from '@davincibot/components';
 	const noop = () => undefined;
 
 	interface Props {
@@ -46,28 +47,14 @@
 		</p>
 	</div>
 	<div class="flex flex-wrap gap-2">
-		<button
-			class="bg-light-blue text-dark-blue rounded-xl px-4 py-2.5 text-sm font-semibold hover:bg-white"
-			onclick={onAddSlot}
-			type="button">Nouvelle session</button
-		>
-		<button
-			class="border-light-blue/30 text-light-blue hover:bg-blue-gray/15 rounded-xl border px-4 py-2.5 text-sm"
-			onclick={onAddTraining}
-			type="button">Nouvelle formation</button
-		>
+		<Button onclick={onAddSlot} size="md" variant="primary">Nouvelle session</Button>
+		<Button onclick={onAddTraining} size="md" variant="secondary">Nouvelle formation</Button>
 		<!-- eslint-disable svelte/no-navigation-without-resolve -- liens résolus par l'appelant -->
 		{#if statsHref}
-			<a
-				class="border-light-blue/30 text-light-blue hover:bg-blue-gray/15 rounded-xl border px-4 py-2.5 text-sm"
-				href={statsHref}>Statistiques</a
-			>
+			<Button href={statsHref} size="md" variant="secondary">Statistiques</Button>
 		{/if}
 		{#if calendarHref}
-			<a
-				class="border-light-blue/30 text-light-blue hover:bg-blue-gray/15 rounded-xl border px-4 py-2.5 text-sm"
-				href={calendarHref}>Calendrier public</a
-			>
+			<Button href={calendarHref} size="md" variant="secondary">Calendrier public</Button>
 		{/if}
 		<!-- eslint-enable svelte/no-navigation-without-resolve -->
 	</div>

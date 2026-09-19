@@ -1,4 +1,5 @@
 <script lang="ts">
+	import { Button } from '@davincibot/components';
 	import StateBadge from '$lib/components/cash/StateBadge.svelte';
 	import { categoryBadge, stateBadgeLabel } from '$lib/helpers/trainingTables';
 	import { TRAINING_CATEGORY_ICONS } from '$lib/helpers/trainingOptions';
@@ -54,11 +55,7 @@
 				Les contenus de référence dont héritent les sessions.
 			</p>
 		</div>
-		<button
-			class="border-light-blue/30 text-light-blue hover:bg-blue-gray/15 rounded-xl border px-3 py-1.5 text-sm"
-			onclick={onAddTraining}
-			type="button">Ajouter</button
-		>
+		<Button onclick={onAddTraining} size="sm" variant="secondary">Ajouter</Button>
 	</div>
 
 	<div class="border-light-blue/20 bg-blue-gray/15 hidden rounded-lg border md:block">
@@ -98,12 +95,12 @@
 									{training.description ?? 'Aucune description'}
 								</p>
 							</div>
-							<button
-								class="border-light-blue/30 text-light-blue hover:bg-blue-gray/15 rounded-xl border px-3 py-1.5 text-sm"
+							<Button
 								onclick={() => {
 									onEditTraining(training);
 								}}
-								type="button">Éditer</button
+								size="sm"
+								variant="secondary">Éditer</Button
 							>
 						</div>
 					</li>

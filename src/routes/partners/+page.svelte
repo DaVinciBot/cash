@@ -1,5 +1,5 @@
 <script lang="ts">
-	import { Checkbox } from '@davincibot/components';
+	import { Button, Checkbox } from '@davincibot/components';
 	import { enhance } from '$app/forms';
 	import type { ActionData, PageData } from './$types';
 
@@ -28,10 +28,8 @@
 				<strong>enveloppe de crédit</strong> se modélise : une remise n'a pas de solde à décompter.
 			</p>
 		</div>
-		<button
-			class="bg-light-blue text-dark-blue rounded-xl px-4 py-2.5 text-sm font-semibold hover:bg-white"
-			onclick={() => (creating = !creating)}
-			type="button">{creating ? 'Annuler' : 'Nouveau partenariat'}</button
+		<Button onclick={() => (creating = !creating)} size="md" variant="primary"
+			>{creating ? 'Annuler' : 'Nouveau partenariat'}</Button
 		>
 	</header>
 
@@ -98,10 +96,7 @@
 					chez un tiers, pas de l'argent en banque.
 				</p>
 			{/if}
-			<button
-				class="bg-light-blue text-dark-blue mt-3 rounded-xl px-3 py-1.5 text-sm font-semibold hover:bg-white"
-				type="submit">Créer</button
-			>
+			<Button class="mt-3" size="sm" type="submit" variant="primary">Créer</Button>
 		</form>
 	{/if}
 
@@ -141,17 +136,14 @@
 						</p>
 					{/if}
 					<div class="mt-3 flex flex-wrap items-center gap-2">
-						<button
-							class="text-dark-light-blue hover:text-light-blue text-xs underline"
+						<Button
 							onclick={() => (editing = editing === partner.id ? null : partner.id)}
-							type="button">modifier</button
+							size="sm"
+							variant="ghost">modifier</Button
 						>
 						<form action="?/archive" method="POST" use:enhance>
 							<input name="id" type="hidden" value={partner.id} />
-							<button
-								class="text-dark-light-blue hover:text-light-blue text-xs underline"
-								type="submit">archiver</button
-							>
+							<Button size="sm" type="submit" variant="danger-ghost">archiver</Button>
 						</form>
 					</div>
 
@@ -194,10 +186,7 @@
 									rows="2">{partner.notes ?? ''}</textarea
 								>
 							</label>
-							<button
-								class="bg-light-blue text-dark-blue mt-3 rounded-xl px-3 py-1.5 text-sm font-semibold hover:bg-white"
-								type="submit">Enregistrer</button
-							>
+							<Button class="mt-3" size="sm" type="submit" variant="primary">Enregistrer</Button>
 						</form>
 					{/if}
 				</li>

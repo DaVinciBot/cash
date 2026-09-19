@@ -1,5 +1,5 @@
 <script lang="ts">
-	import { Stepper } from '@davincibot/components';
+	import { Button, Stepper } from '@davincibot/components';
 	import type { Enums, Json } from '@davincibot/database-types';
 	import { getSupabaseBrowserClient, supabaseKey, supabaseUrl } from '@davincibot/lib/supabase';
 	import { Carta, CartaEditor } from 'carta-md';
@@ -530,10 +530,7 @@
 <div class="mx-auto max-w-6xl">
 	<div class="mb-4 flex items-center justify-between">
 		<h1 class="text-2xl font-bold">Articles</h1>
-		<button
-			class="bg-light-blue text-dark-blue rounded-xl px-3 py-1.5 text-sm font-semibold hover:bg-white"
-			onclick={newArticle}>Nouvel article</button
-		>
+		<Button onclick={newArticle} size="sm" variant="primary">Nouvel article</Button>
 	</div>
 	<div class="grid grid-cols-1 gap-4 md:grid-cols-3">
 		<!-- Editor -->
@@ -573,6 +570,9 @@
 								.toLowerCase()
 								.includes(search.toLowerCase())) as a (a.slug)}
 							<li>
+								<!-- Ligne de résultat : volontairement hors du système de boutons. Ce n'est
+									 pas un bouton mais une ligne de liste rendue cliquable — lui donner une
+									 variante la détacherait de la liste qu'elle compose. -->
 								<button
 									class={`hover:bg-blue-gray/15 w-full cursor-pointer rounded-xl p-2 text-left ${a.slug === selectedSlug ? 'bg-dark-blue/40' : ''}`}
 									onclick={() => {
@@ -707,13 +707,9 @@
 				</div>
 			</div>
 
-			<button
-				class="bg-light-blue text-dark-blue rounded-xl px-4 py-2.5 text-sm font-semibold hover:bg-white disabled:opacity-50"
-				disabled={saving}
-				onclick={handleSave}
-			>
+			<Button disabled={saving} onclick={handleSave} size="md" variant="primary">
 				{saving ? 'Enregistrement…' : 'Enregistrer'}
-			</button>
+			</Button>
 		</div>
 	</div>
 </div>
@@ -734,10 +730,7 @@
 			<div class="text-dark-light-blue mb-4">{message}</div>
 			{#if !saving}
 				<div class="flex justify-end">
-					<button
-						class="bg-light-blue text-dark-blue rounded-xl px-4 py-2.5 text-sm font-semibold hover:bg-white"
-						onclick={() => (message = '')}>Fermer</button
-					>
+					<Button onclick={() => (message = '')} size="md" variant="primary">Fermer</Button>
 				</div>
 			{/if}
 		</div>

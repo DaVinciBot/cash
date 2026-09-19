@@ -1,4 +1,5 @@
 <script lang="ts">
+	import { Button } from '@davincibot/components';
 	import { enhance } from '$app/forms';
 	import { resolve } from '$app/paths';
 	import CampusBadge from '$lib/components/cash/CampusBadge.svelte';
@@ -30,10 +31,8 @@
 				campus du projet sert à résoudre la destination des items qu'on y rattache.
 			</p>
 		</div>
-		<button
-			class="bg-light-blue text-dark-blue rounded-xl px-4 py-2.5 text-sm font-semibold hover:bg-white"
-			onclick={() => (creating = !creating)}
-			type="button">{creating ? 'Annuler' : 'Nouveau projet'}</button
+		<Button onclick={() => (creating = !creating)} size="md" variant="primary"
+			>{creating ? 'Annuler' : 'Nouveau projet'}</Button
 		>
 	</header>
 
@@ -107,10 +106,7 @@
 					{/each}
 				</select>
 			</label>
-			<button
-				class="bg-light-blue text-dark-blue rounded-xl px-3 py-1.5 text-sm font-semibold hover:bg-white"
-				type="submit">Enregistrer</button
-			>
+			<Button size="sm" type="submit" variant="primary">Enregistrer</Button>
 		</form>
 	{/snippet}
 
@@ -138,25 +134,20 @@
 					<span class="text-dark-light-blue/70 ml-auto text-xs">{project.itemCount} item(s)</span>
 				</div>
 				<div class="mt-3 flex flex-wrap items-center gap-2">
-					<button
-						class="text-dark-light-blue hover:text-light-blue text-xs underline"
+					<Button
 						onclick={() => (editing = editing === project.id ? null : project.id)}
-						type="button">modifier</button
+						size="sm"
+						variant="ghost">modifier</Button
 					>
 					<form action="?/toggleArchive" method="POST" use:enhance>
 						<input name="id" type="hidden" value={project.id} />
 						<input name="archive" type="hidden" value="1" />
-						<button
-							class="text-dark-light-blue hover:text-light-blue text-xs underline"
-							type="submit">archiver</button
-						>
+						<Button size="sm" type="submit" variant="danger-ghost">archiver</Button>
 					</form>
 					{#if project.itemCount === 0}
 						<form action="?/remove" method="POST" use:enhance>
 							<input name="id" type="hidden" value={project.id} />
-							<button class="text-xs text-red-400 underline hover:text-red-300" type="submit"
-								>supprimer</button
-							>
+							<Button size="sm" type="submit" variant="danger-ghost">supprimer</Button>
 						</form>
 					{/if}
 				</div>
@@ -179,10 +170,7 @@
 					<form action="?/toggleArchive" method="POST" use:enhance>
 						<input name="id" type="hidden" value={project.id} />
 						<input name="archive" type="hidden" value="0" />
-						<button
-							class="text-dark-light-blue hover:text-light-blue text-xs underline"
-							type="submit">réactiver</button
-						>
+						<Button size="sm" type="submit" variant="ghost">réactiver</Button>
 					</form>
 				</li>
 			{/each}

@@ -1,4 +1,5 @@
 <script lang="ts">
+	import { Button } from '@davincibot/components';
 	import {
 		ACTIVITY_BADGES,
 		actorLabel,
@@ -72,11 +73,11 @@
 							datetime={entry.occurredAt}>{moment.format(new Date(entry.occurredAt))}</time
 						>
 						{#if detailed}
-							<button
-								class="text-dark-light-blue hover:text-light-blue text-xs underline decoration-dotted"
+							<Button
 								aria-expanded={open === entry.id}
 								onclick={() => (open = open === entry.id ? null : entry.id)}
-								type="button">{open === entry.id ? 'masquer' : 'détail'}</button
+								size="sm"
+								variant="ghost">{open === entry.id ? 'masquer' : 'détail'}</Button
 							>
 						{/if}
 					</div>

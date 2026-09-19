@@ -1,4 +1,5 @@
 <script lang="ts">
+	import { Button } from '@davincibot/components';
 	import type { EffectivePermission, GlobalPermission } from '@davincibot/lib';
 	import { GLOBAL_PERMISSIONS } from '@davincibot/lib';
 	import { openSettings } from '$lib/settings';
@@ -100,9 +101,9 @@
 	});
 </script>
 
-<button
+<Button
 	id="user-menu-button"
-	class="bg-blue-gray/15 focus:ring-light-blue/60 mx-3 flex rounded-full text-sm focus:ring-3 md:mr-0"
+	class="mx-3 md:mr-0"
 	aria-expanded="false"
 	onclick={(e: MouseEvent) => {
 		const dropdown = getDropdown();
@@ -113,11 +114,12 @@
 		e.stopPropagation();
 		hideOnClickOutside(dropdown);
 	}}
-	type="button"
+	size="icon"
+	variant="ghost"
 >
 	<span class="sr-only">Open user menu</span>
 	<img class="h-8 w-8 rounded-full" alt="user avatar" src={displayUser.avatar} />
-</button>
+</Button>
 <!-- Dropdown menu -->
 <div
 	id="dropdown"
@@ -131,8 +133,11 @@
 	</div>
 	<ul class="text-dark-light-blue py-1" aria-labelledby="dropdown">
 		<li>
+			<!-- Item de navigation : volontairement hors du système de boutons. Il porte
+				 un état sélectionné et occupe toute la largeur du panneau, deux choses
+				 qu'aucune variante n'exprime. -->
 			<button
-				class="bg-opacity-80 hover:bg-blue-gray/15 block w-full px-4 py-2 text-left text-sm hover:cursor-pointer hover:text-white"
+				class="hover:bg-blue-gray/15 block w-full px-4 py-2 text-left text-sm hover:cursor-pointer hover:text-white"
 				onclick={() => {
 					// fermer le dropdown avant d'ouvrir le modal : il vit en fin de body
 					// et passerait au-dessus à z-index égal

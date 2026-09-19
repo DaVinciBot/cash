@@ -1,4 +1,5 @@
 <script lang="ts">
+	import { Button } from '@davincibot/components';
 	import { resolve } from '$app/paths';
 	import RecordModal from '$lib/components/modals/RecordModal.svelte';
 	import SucessModal from '$lib/components/modals/InfoModal.svelte';
@@ -1130,16 +1131,16 @@
 		<div class="bg-blue-gray/15 rounded-lg p-4">
 			<div class="mb-4 flex items-center justify-between gap-3">
 				<h3 class="text-xl font-semibold text-white">Invitations en attente</h3>
-				<button
-					class="border-light-blue/30 text-light-blue hover:bg-blue-gray/15 rounded-xl border px-3 py-1.5 text-sm font-medium disabled:cursor-not-allowed disabled:opacity-50"
+				<Button
 					disabled={pendingInvitesLoading || reinvitingUserId !== null || cancelingUserId !== null}
 					onclick={() => {
 						void loadPendingInvites();
 					}}
-					type="button"
+					size="sm"
+					variant="secondary"
 				>
 					Rafraîchir
-				</button>
+				</Button>
 			</div>
 
 			{#if pendingInvitesError}
@@ -1175,26 +1176,26 @@
 									<td class="px-3 py-2">{formatDate(authUser.last_sign_in_at)}</td>
 									<td class="px-3 py-2 text-right">
 										<div class="flex flex-wrap justify-end gap-2">
-											<button
-												class="bg-light-blue text-dark-blue rounded-xl px-3 py-1.5 text-sm font-semibold hover:bg-white disabled:cursor-not-allowed disabled:opacity-50"
+											<Button
 												disabled={reinvitingUserId !== null || cancelingUserId !== null}
 												onclick={() => {
 													void reinvitePendingUser(authUser);
 												}}
-												type="button"
+												size="sm"
+												variant="primary"
 											>
 												{reinvitingUserId === authUser.id ? 'Envoi...' : 'Réinviter'}
-											</button>
-											<button
-												class="border-light-blue/30 rounded-xl border px-3 py-1.5 text-sm font-medium text-red-400 hover:bg-red-500/10 disabled:cursor-not-allowed disabled:opacity-50"
+											</Button>
+											<Button
 												disabled={reinvitingUserId !== null || cancelingUserId !== null}
 												onclick={() => {
 													void cancelPendingInvite(authUser);
 												}}
-												type="button"
+												size="sm"
+												variant="danger"
 											>
 												{cancelingUserId === authUser.id ? 'Annulation...' : 'Annuler'}
-											</button>
+											</Button>
 										</div>
 									</td>
 								</tr>

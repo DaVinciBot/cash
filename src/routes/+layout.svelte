@@ -91,17 +91,19 @@
 			<div class="flex items-center justify-start">
 				<!-- La croix qui accompagnait ce burger portait un `hidden` statique :
 						 elle n'a jamais pu s'afficher. Une icône Lucide suffit. -->
-				<button
-					class="text-dark-light-blue hover:bg-blue-gray/15 hover:text-light-blue focus-visible:ring-light-blue/60 mr-2 cursor-pointer rounded-lg p-2 transition-colors focus-visible:ring-2 focus-visible:outline-none md:hidden"
+				<Button
+					class="mr-2 md:hidden"
 					aria-controls="drawer-navigation"
 					aria-expanded={open}
 					onclick={() => {
 						open = !open;
 					}}
+					size="icon"
+					variant="ghost"
 				>
 					<Menu class="size-6" />
 					<span class="sr-only">Toggle sidebar</span>
-				</button>
+				</Button>
 				<!-- eslint-disable-next-line svelte/no-navigation-without-resolve -->
 				<a class="mr-4 flex items-center justify-between" href="/">
 					<img class="mr-3 h-8" alt="Davincibot Logo" src="/admin/white_logo_notext.webp" />

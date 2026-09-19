@@ -1,4 +1,5 @@
 <script lang="ts">
+	import { Button } from '@davincibot/components';
 	// La plage vit dans l'URL, donc le formulaire est un simple GET : le
 	// rechargement refait le calcul côté serveur, et le lien obtenu montre à qui
 	// le reçoit exactement ce que l'expéditeur avait sous les yeux.
@@ -35,8 +36,5 @@
 			value={range.periodDays}
 		/>
 	</label>
-	<button
-		class="border-light-blue/30 text-light-blue hover:bg-blue-gray/15 rounded-xl border px-3 py-1.5 text-sm"
-		type="submit">Afficher</button
-	>
+	<Button size="sm" type="submit" variant="secondary">Afficher</Button>
 </form>

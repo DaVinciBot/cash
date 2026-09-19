@@ -1,4 +1,5 @@
 <script lang="ts">
+	import { Button } from '@davincibot/components';
 	import { hasAnyPermission, type EffectivePermission } from '@davincibot/lib';
 	import { userdata } from '@davincibot/lib';
 	import { hideOnClickOutside, loadUserdata } from '@davincibot/lib';
@@ -141,13 +142,15 @@
 </svelte:head>
 
 <!-- Info Button (top right, outside layout) -->
-<button
-	class="hover:bg-blue-gray/25 fixed top-20 right-4 z-20 rounded-full p-2 focus:outline-none"
+<Button
+	class="fixed top-20 right-4 z-20"
 	aria-label="Afficher les instructions"
 	onclick={(e: MouseEvent) => {
 		e.stopPropagation();
 		showToolbox = !showToolbox;
 	}}
+	size="icon"
+	variant="icon"
 >
 	<svg
 		class="h-6 w-6 text-blue-500"
@@ -160,7 +163,7 @@
 		<path d="M12 16v-4" stroke="currentColor" stroke-linecap="round" stroke-width="2" />
 		<circle cx="12" cy="8" fill="currentColor" r="1" />
 	</svg>
-</button>
+</Button>
 
 <!-- Info Toolbox (top right, outside layout) -->
 <div
@@ -274,10 +277,12 @@
 			</p>
 		</div>
 		<div class="flex">
-			<button
-				class="bg-light-blue text-dark-blue flex-1 rounded-xl px-4 py-2.5 text-sm font-semibold transition hover:bg-white disabled:cursor-not-allowed disabled:opacity-50"
+			<Button
+				class="flex-1"
 				disabled={!canCastSmartShare || is_busy || sharing}
 				onclick={startShare}
+				size="md"
+				variant="primary"
 			>
 				<svg
 					class="-mt-1 mr-2 inline h-5 w-5"
@@ -300,12 +305,9 @@
 					<path d="M12 16v4" stroke="currentColor" stroke-linecap="round" stroke-width="2" />
 				</svg>
 				Caster
-			</button>
+			</Button>
 			{#if canManageTraining}
-				<button
-					class="border-light-blue/30 ml-4 flex-1 rounded-xl border bg-transparent px-4 py-2 font-semibold text-red-400 transition hover:bg-red-500/10"
-					onclick={sendKill}
-				>
+				<Button class="ml-4 flex-1" onclick={sendKill} size="sm" variant="danger">
 					<svg
 						class="-mt-1 mr-2 inline h-5 w-5"
 						fill="none"
@@ -321,7 +323,7 @@
 						/>
 					</svg>
 					Kill switch
-				</button>
+				</Button>
 			{/if}
 		</div>
 	</div>

@@ -1,4 +1,5 @@
 <script lang="ts">
+	import { Button } from '@davincibot/components';
 	import StateBadge from '$lib/components/cash/StateBadge.svelte';
 	import { statusBadge, stateBadgeLabel } from '$lib/helpers/trainingTables';
 	import { SLOT_STATUS_ICONS } from '$lib/helpers/trainingOptions';
@@ -59,11 +60,7 @@
 			</h2>
 			<p class="text-dark-light-blue/70 mt-1 text-xs">Planifiez, suivez et ajustez les sessions.</p>
 		</div>
-		<button
-			class="border-light-blue/30 text-light-blue hover:bg-blue-gray/15 rounded-xl border px-3 py-1.5 text-sm"
-			onclick={onAddSlot}
-			type="button">Ajouter</button
-		>
+		<Button onclick={onAddSlot} size="sm" variant="secondary">Ajouter</Button>
 	</div>
 
 	<!-- La table paginée reste au clavier et à la souris ; sous 768 px elle
@@ -99,12 +96,12 @@
 									{findTrainingName(slot.training_id, trainings)}
 								</p>
 							</div>
-							<button
-								class="border-light-blue/30 text-light-blue hover:bg-blue-gray/15 rounded-xl border px-3 py-1.5 text-sm"
+							<Button
 								onclick={() => {
 									onEditSlot(slot);
 								}}
-								type="button">Éditer</button
+								size="sm"
+								variant="secondary">Éditer</Button
 							>
 						</div>
 						<div class="text-dark-light-blue mt-3 flex flex-wrap items-center gap-3 text-sm">

@@ -1,4 +1,5 @@
 <script lang="ts">
+	import { Button } from '@davincibot/components';
 	import { resolve } from '$app/paths';
 	import StateBadge from '$lib/components/cash/StateBadge.svelte';
 	import CrudForm from '$lib/components/modals/CrudForm.svelte';
@@ -623,11 +624,8 @@ DVBisous ! :robot:`;
 					l'envoi réel.
 				</p>
 			</div>
-			<button
-				class="bg-light-blue text-dark-blue rounded-xl px-4 py-2.5 text-sm font-semibold hover:bg-white disabled:cursor-not-allowed disabled:opacity-50"
-				disabled={summarySending}
-				onclick={openSummaryModal}
-				type="button">{summarySending ? 'Envoi…' : 'Configurer et envoyer'}</button
+			<Button disabled={summarySending} onclick={openSummaryModal} size="md" variant="primary"
+				>{summarySending ? 'Envoi…' : 'Configurer et envoyer'}</Button
 			>
 		</div>
 		{#if summaryError}
@@ -648,11 +646,7 @@ DVBisous ! :robot:`;
 	{:else if error}
 		<div class="rounded-xl bg-red-500/15 px-4 py-3 ring-1 ring-red-500/30">
 			<p class="text-sm text-red-300">{error}</p>
-			<button
-				class="border-light-blue/30 mt-3 rounded-lg border px-3 py-1.5 text-sm text-red-300 hover:bg-red-500/10"
-				onclick={loadData}
-				type="button">Réessayer</button
-			>
+			<Button class="mt-3" onclick={loadData} size="sm" variant="secondary">Réessayer</Button>
 		</div>
 	{:else}
 		<AdminSlotSection
