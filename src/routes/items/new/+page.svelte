@@ -1,4 +1,5 @@
 <script lang="ts">
+	import { FilterChip } from '@davincibot/components';
 	import { enhance } from '$app/forms';
 	import { resolve } from '$app/paths';
 	import CampusBadge from '$lib/components/cash/CampusBadge.svelte';
@@ -277,17 +278,14 @@
 								<span class="text-dark-light-blue mb-1 block text-xs">Tags</span>
 								<div class="flex flex-wrap gap-2">
 									{#each ITEM_TAGS as tag (tag)}
-										<button
-											class="cursor-pointer rounded-full border px-3 py-1 text-xs transition-colors {line.tags.includes(
-												tag
-											)
-												? 'border-light-blue bg-light-blue text-dark-blue'
-												: 'border-light-blue/30 bg-dark-blue/60 text-dark-light-blue hover:border-light-blue/60 hover:text-light-blue'}"
+										<FilterChip
 											onclick={() => {
 												toggleTag(line, tag);
 											}}
-											type="button">{tag}</button
+											pressed={line.tags.includes(tag)}
 										>
+											{tag}
+										</FilterChip>
 									{/each}
 								</div>
 								<input name="tags" type="hidden" value={JSON.stringify(line.tags)} />

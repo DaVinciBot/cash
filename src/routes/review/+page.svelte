@@ -1,5 +1,5 @@
 <script lang="ts">
-	import { Checkbox } from '@davincibot/components';
+	import { Checkbox, FilterChip } from '@davincibot/components';
 	import { enhance } from '$app/forms';
 	import CampusBadge from '$lib/components/cash/CampusBadge.svelte';
 	import { REFUSAL_REASON_MIN_LENGTH, refusalReasonError } from '@davincibot/lib';
@@ -123,24 +123,16 @@
 	{:else}
 		{#if projects.length > 1}
 			<div class="mb-4 flex flex-wrap items-center gap-2">
-				<button
-					class="cursor-pointer rounded-full border px-3 py-1 text-xs font-medium transition-colors {projectFilter ===
-					'all'
-						? 'border-light-blue bg-light-blue text-dark-blue'
-						: 'border-light-blue/30 bg-dark-blue/60 text-dark-light-blue hover:border-light-blue/60 hover:text-light-blue'}"
-					onclick={() => (projectFilter = 'all')}
-					type="button">Tous les projets ({items.length})</button
-				>
+				<FilterChip onclick={() => (projectFilter = 'all')} pressed={projectFilter === 'all'}>
+					Tous les projets ({items.length})
+				</FilterChip>
 				{#each projects as project (project.id)}
-					<button
-						class="cursor-pointer rounded-full border px-3 py-1 text-xs font-medium transition-colors {projectFilter ===
-						project.id
-							? 'border-light-blue bg-light-blue text-dark-blue'
-							: 'border-light-blue/30 bg-dark-blue/60 text-dark-light-blue hover:border-light-blue/60 hover:text-light-blue'}"
+					<FilterChip
 						onclick={() => (projectFilter = project.id)}
-						type="button"
-						>{project.name} ({items.filter((i) => i.projectId === project.id).length})</button
+						pressed={projectFilter === project.id}
 					>
+						{project.name} ({items.filter((i) => i.projectId === project.id).length})
+					</FilterChip>
 				{/each}
 			</div>
 		{/if}

@@ -1,4 +1,5 @@
 <script lang="ts">
+	import { FilterChip } from '@davincibot/components';
 	import { enhance } from '$app/forms';
 	import { resolve } from '$app/paths';
 	import CampusBadge from '$lib/components/cash/CampusBadge.svelte';
@@ -74,23 +75,13 @@
 	{/if}
 
 	<div class="mb-4 flex flex-wrap items-center gap-2">
-		<button
-			class="cursor-pointer rounded-full border px-3 py-1 text-xs font-medium transition-colors {stateFilter ===
-			'all'
-				? 'border-light-blue bg-light-blue text-dark-blue'
-				: 'border-light-blue/30 bg-dark-blue/60 text-dark-light-blue hover:border-light-blue/60 hover:text-light-blue'}"
-			onclick={() => (stateFilter = 'all')}
-			type="button">Tous ({counts.all})</button
-		>
+		<FilterChip onclick={() => (stateFilter = 'all')} pressed={stateFilter === 'all'}>
+			Tous ({counts.all})
+		</FilterChip>
 		{#each ITEM_STATES as state (state)}
-			<button
-				class="cursor-pointer rounded-full border px-3 py-1 text-xs font-medium transition-colors {stateFilter ===
-				state
-					? 'border-light-blue bg-light-blue text-dark-blue'
-					: 'border-light-blue/30 bg-dark-blue/60 text-dark-light-blue hover:border-light-blue/60 hover:text-light-blue'}"
-				onclick={() => (stateFilter = state)}
-				type="button">{ITEM_STATE_BADGES[state].label} ({counts[state]})</button
-			>
+			<FilterChip onclick={() => (stateFilter = state)} pressed={stateFilter === state}>
+				{ITEM_STATE_BADGES[state].label} ({counts[state]})
+			</FilterChip>
 		{/each}
 		<input
 			class="border-light-blue/30 bg-dark-blue/60 placeholder-dark-light-blue/50 ml-auto w-56 rounded-xl border p-2.5 text-sm"

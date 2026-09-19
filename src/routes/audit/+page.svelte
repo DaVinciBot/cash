@@ -1,4 +1,5 @@
 <script lang="ts">
+	import { FilterChip } from '@davincibot/components';
 	import { resolve } from '$app/paths';
 	import HistoryTimeline from '$lib/components/cash/HistoryTimeline.svelte';
 	import { CASH_ENTITY_LABELS, CASH_ERROR_MESSAGES, SOCLE_ENTITY_LABELS } from '@davincibot/lib';
@@ -24,7 +25,8 @@
 
 	// `resolve` est appelé ici, une fois : les liens ci-dessous n'en sont que des
 	// variantes de query string. La règle `no-navigation-without-resolve` ne sait
-	// pas suivre l'appel à travers la fonction, d'où les exemptions ponctuelles.
+	// pas suivre l'appel à travers la fonction ; l'exemption vit désormais dans
+	// FilterChip, qui porte le `href`.
 	function tabHref(tab: string, params: Record<string, string> = {}): string {
 		const query = new URLSearchParams({ tab, ...params });
 		return `${resolve('/audit')}?${query.toString()}`;
@@ -42,17 +44,11 @@
 		</p>
 	</header>
 
-	<!-- eslint-disable svelte/no-navigation-without-resolve -- voir tabHref -->
 	<nav class="mb-6 flex flex-wrap gap-2">
 		{#each TABS as tab (tab.id)}
-			<a
-				class="cursor-pointer rounded-xl border px-3 py-2 text-sm transition-colors {data.tab ===
-				tab.id
-					? 'border-light-blue bg-light-blue text-dark-blue'
-					: 'border-light-blue/30 bg-dark-blue/60 text-dark-light-blue hover:border-light-blue/60 hover:text-light-blue'}"
-				href={tabHref(tab.id)}
-				title={tab.hint}>{tab.label}</a
-			>
+			<FilterChip href={tabHref(tab.id)} pressed={data.tab === tab.id} title={tab.hint}>
+				{tab.label}
+			</FilterChip>
 		{/each}
 	</nav>
 
@@ -61,21 +57,17 @@
 		     close : c'est le refus qu'on subit sans comprendre, et celui qu'on
 		     vient chercher ici. -->
 		<div class="mb-4 flex flex-wrap items-center gap-2">
-			<a
-				class="cursor-pointer rounded-full border px-3 py-1 text-xs font-medium transition-colors {data.sqlstate
-					? 'border-light-blue/30 bg-dark-blue/60 text-dark-light-blue hover:border-light-blue/60 hover:text-light-blue'
-					: 'border-light-blue bg-light-blue text-dark-blue'}"
-				href={tabHref('rejets')}>Tous ({data.rejected.length})</a
-			>
+			<FilterChip href={tabHref('rejets')} pressed={!data.sqlstate}>
+				Tous ({data.rejected.length})
+			</FilterChip>
 			{#each codes as code (code)}
-				<a
-					class="cursor-pointer rounded-full border px-3 py-1 text-xs font-medium transition-colors {data.sqlstate ===
-					code
-						? 'border-light-blue bg-light-blue text-dark-blue'
-						: 'border-light-blue/30 bg-dark-blue/60 text-dark-light-blue hover:border-light-blue/60 hover:text-light-blue'}"
+				<FilterChip
 					href={tabHref('rejets', { code })}
-					title={CASH_ERROR_MESSAGES[code] ?? ''}>{code}</a
+					pressed={data.sqlstate === code}
+					title={CASH_ERROR_MESSAGES[code] ?? ''}
 				>
+					{code}
+				</FilterChip>
 			{/each}
 		</div>
 
@@ -128,20 +120,11 @@
 		{/if}
 	{:else}
 		<div class="mb-4 flex flex-wrap items-center gap-2">
-			<a
-				class="cursor-pointer rounded-full border px-3 py-1 text-xs font-medium transition-colors {data.entityType
-					? 'border-light-blue/30 bg-dark-blue/60 text-dark-light-blue hover:border-light-blue/60 hover:text-light-blue'
-					: 'border-light-blue bg-light-blue text-dark-blue'}"
-				href={tabHref(data.tab)}>Tout</a
-			>
+			<FilterChip href={tabHref(data.tab)} pressed={!data.entityType}>Tout</FilterChip>
 			{#each Object.entries(entities) as [id, label] (id)}
-				<a
-					class="cursor-pointer rounded-full border px-3 py-1 text-xs font-medium transition-colors {data.entityType ===
-					id
-						? 'border-light-blue bg-light-blue text-dark-blue'
-						: 'border-light-blue/30 bg-dark-blue/60 text-dark-light-blue hover:border-light-blue/60 hover:text-light-blue'}"
-					href={tabHref(data.tab, { entity: id })}>{label}</a
-				>
+				<FilterChip href={tabHref(data.tab, { entity: id })} pressed={data.entityType === id}>
+					{label}
+				</FilterChip>
 			{/each}
 		</div>
 
@@ -161,5 +144,4 @@
 			</ul>
 		{/if}
 	{/if}
-	<!-- eslint-enable svelte/no-navigation-without-resolve -->
 </section>
