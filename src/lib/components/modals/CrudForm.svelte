@@ -1,5 +1,5 @@
 <script lang="ts">
-	import { Checkbox, OverlayBackdrop } from '@davincibot/components';
+	import { Button, Checkbox, OverlayBackdrop } from '@davincibot/components';
 	import type {
 		AutocompleteCompletion,
 		CrudField,
@@ -105,10 +105,11 @@
 					<h3 class="text-light-blue m-0 text-lg font-semibold">
 						{title}
 					</h3>
-					<button
-						class="text-dark-light-blue/70 hover:bg-blue-gray/25 ml-auto inline-flex cursor-pointer items-center rounded-lg bg-transparent p-1.5 text-sm hover:text-white"
+					<Button
+						class="ml-auto inline-flex items-center"
 						onclick={(e: MouseEvent) => onClose(e)}
-						type="button"
+						size="icon"
+						variant="ghost"
 					>
 						<svg
 							class="h-5 w-5"
@@ -123,7 +124,7 @@
 							></path></svg
 						>
 						<span class="sr-only">Close modal</span>
-					</button>
+					</Button>
 				</div>
 				<!-- Modal body -->
 				<form action="#">
@@ -265,8 +266,8 @@
 													<p>
 														{doc.name}
 													</p>
-													<button
-														class="hover: text-dark-light-blue hover:bg-blue-gray/25 ml-auto inline-flex items-center rounded-lg bg-transparent p-1.5 text-sm hover:text-white"
+													<Button
+														class="ml-auto inline-flex items-center"
 														aria-label={`Remove ${doc.name}`}
 														onclick={async (e: MouseEvent) => {
 															field.value = documentPreviews(field.value).filter(
@@ -276,7 +277,8 @@
 																await field.onRemove(e, doc.name);
 															}
 														}}
-														type="button"
+														size="icon"
+														variant="icon"
 													>
 														<svg
 															class="octicon octicon-x"
@@ -292,7 +294,7 @@
 																d="M3.72 3.72a.75.75 0 0 1 1.06 0L8 6.94l3.22-3.22a.749.749 0 0 1 1.275.326.749.749 0 0 1-.215.734L9.06 8l3.22 3.22a.749.749 0 0 1-.326 1.275.749.749 0 0 1-.734-.215L8 9.06l-3.22 3.22a.751.751 0 0 1-1.042-.018.751.751 0 0 1-.018-1.042L6.94 8 3.72 4.78a.75.75 0 0 1 0-1.06Z"
 															></path>
 														</svg>
-													</button>
+													</Button>
 												</div>
 											{/each}
 										</div>
@@ -379,8 +381,8 @@
 									</label>
 								{:else if field.type === 'duplicate'}
 									<!--Duplicate is a + btn to replicate the last collumn -->
-									<button
-										class="focus:border-light-blue/70 border-light-blue/30 bg-dark-blue/60 placeholder-dark-light-blue/50 flex h-8 w-full items-center justify-center rounded-lg border p-2.5 text-sm text-white"
+									<Button
+										class="h-8 w-full items-center justify-center"
 										onclick={() => {
 											const clean_filter = fields.filter((el) => el.type !== 'duplicate');
 											let lasts: CrudField[] = []; // get the last full row, 1 if wide, 2 if not
@@ -421,9 +423,10 @@
 												{ name: 'duplicate', type: 'duplicate', wide: true }
 											];
 										}}
-										type="button"
+										size="sm"
+										variant="secondary"
 										>+
-									</button>
+									</Button>
 								{:else if field.type === 'autocomplete'}
 									{@const fieldKey = fieldId(field)}
 									{@const inputValue = autocompleteValues[fieldKey] ?? field.value ?? ''}
@@ -504,6 +507,9 @@
 												class="almarai-regular focus:border-light-blue/70 border-light-blue/30 bg-dark-blue/60 absolute top-full left-0 z-50 mt-2 max-h-56 w-full overflow-y-auto rounded-lg border p-2 pl-4 text-sm text-white"
 											>
 												{#each completion as c (completionKey(c))}
+													<!-- Ligne de résultat : volontairement hors du système de boutons. Ce n'est
+														 pas un bouton mais une ligne de liste rendue cliquable — lui donner une
+														 variante la détacherait de la liste qu'elle compose. -->
 													<button
 														class="almarai-regular border-light-blue/20 flex w-full items-center rounded-lg border-b {c.image
 															? 'p-1'
@@ -594,10 +600,8 @@
 							</div>
 						{/each}
 					</div>
-					<button
-						class={`bg-light-blue text-dark-blue focus:ring-light-blue/60 inline-flex items-center rounded-lg px-5 py-2.5 text-center text-sm font-medium focus:ring-4 focus:outline-none ${
-							submitting ? 'cursor-not-allowed opacity-60' : 'hover:bg-white'
-						}`}
+					<Button
+						class={submitting ? 'cursor-not-allowed opacity-60' : ''}
 						disabled={submitting}
 						onclick={(e: MouseEvent) => {
 							if (submitting) {
@@ -605,7 +609,9 @@
 							}
 							void onSubmit(e);
 						}}
+						size="md"
 						type="submit"
+						variant="primary"
 					>
 						<svg
 							class={`mr-1 -ml-1 h-6 w-6 ${submitting ? 'animate-spin' : ''}`}
@@ -619,7 +625,7 @@
 							></path></svg
 						>
 						{submitting ? submitLoadingLabel : submitLabel}
-					</button>
+					</Button>
 				</form>
 			</div>
 		</div>

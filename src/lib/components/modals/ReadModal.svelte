@@ -260,12 +260,13 @@
 					{/if}
 				</div>
 				<div>
-					<button
-						class="text-dark-light-blue hover:bg-blue-gray/25 inline-flex rounded-lg bg-transparent p-1.5 text-sm hover:text-white"
+					<Button
+						class="inline-flex"
 						data-modal-toggle={id}
 						data-toggle="true"
 						onclick={__onClose}
-						type="button"
+						size="icon"
+						variant="ghost"
 					>
 						<svg
 							class="h-5 w-5"
@@ -281,7 +282,7 @@
 							></path></svg
 						>
 						<span class="sr-only">Close modal</span>
-					</button>
+					</Button>
 				</div>
 			</div>
 			<div class="grid space-x-4 {attachmentPaths().length > 0 ? 'md:grid-cols-2' : 'grid-cols-1'}">
@@ -291,14 +292,14 @@
 						<div class="header">
 							<h3 class="text-light-blue m-0 text-lg font-semibold">Pièces jointes</h3>
 							<div class="mt-2 mb-2 flex w-full justify-between">
-								<button
-									class="
-									text-dark-light-blue hover:bg-blue-gray/25 inline-flex rounded-lg bg-transparent p-1.5 text-sm hover:text-white"
+								<Button
+									class="inline-flex"
 									aria-label="Pièce jointe précédente"
 									onclick={() => {
 										moveFile(-1);
 									}}
-									type="button"
+									size="icon"
+									variant="icon"
 								>
 									<svg
 										class="h-5 w-5"
@@ -312,19 +313,19 @@
 											fill-rule="evenodd"
 										></path></svg
 									>
-								</button>
+								</Button>
 								<p class="text-dark-light-blue items-center self-center text-center text-sm">
 									{current_file || 'Chargement'} - {current_file_index + 1}/{attachmentPaths()
 										.length}
 								</p>
-								<button
-									class="
-								text-dark-light-blue hover:bg-blue-gray/25 inline-flex rounded-lg bg-transparent p-1.5 text-sm hover:text-white"
+								<Button
+									class="inline-flex"
 									aria-label="Pièce jointe suivante"
 									onclick={() => {
 										moveFile(1);
 									}}
-									type="button"
+									size="icon"
+									variant="icon"
 								>
 									<svg
 										class="h-5 w-5 rotate-180"
@@ -338,7 +339,7 @@
 											fill-rule="evenodd"
 										></path></svg
 									>
-								</button>
+								</Button>
 							</div>
 						</div>
 						<div class="flex aspect-[1/1.414] h-auto w-88 gap-2 overflow-x-hidden md:w-96">
@@ -401,7 +402,7 @@
 																void removeItem(item);
 															}}
 															size="icon"
-															variant="danger"
+															variant="danger-ghost"
 														>
 															<svg
 																class="h-5 w-5"
@@ -447,10 +448,11 @@
 						</select>
 					{/if}
 					{#if action.type === 'edit'}
-						<button
-							class="bg-light-blue text-dark-blue focus-visible:ring-light-blue/60 inline-flex items-center rounded-xl px-4 py-2.5 text-sm font-semibold hover:bg-white focus-visible:ring-2 focus-visible:outline-none"
+						<Button
+							class="inline-flex items-center"
 							onclick={action.handler}
-							type="button"
+							size="md"
+							variant="primary"
 						>
 							<svg
 								class="mr-1 -ml-1 h-5 w-5"
@@ -467,13 +469,14 @@
 								></path></svg
 							>
 							{action.title}
-						</button>
+						</Button>
 					{/if}
 					{#if action.type === 'validate'}
-						<button
-							class="bg-light-blue text-dark-blue focus-visible:ring-light-blue/60 inline-flex items-center rounded-xl px-4 py-2.5 text-sm font-semibold hover:bg-white focus-visible:ring-2 focus-visible:outline-none"
+						<Button
+							class="inline-flex items-center"
 							onclick={action.handler}
-							type="button"
+							size="md"
+							variant="primary"
 						>
 							<svg
 								class="mr-1.5 -ml-1 h-5 w-5"
@@ -488,7 +491,7 @@
 								></path></svg
 							>
 							{action.title}
-						</button>
+						</Button>
 					{/if}
 					{#if action.type === 'delete'}
 						<Button onclick={action.handler} size="md" variant="danger">

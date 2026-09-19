@@ -62,22 +62,14 @@
 			{/each}
 		</ul>
 		<div class="flex flex-wrap items-center justify-end gap-2">
-			<button
-				class="text-dark-light-blue flex cursor-pointer items-center gap-1.5 rounded-lg border-0 bg-transparent px-2 py-1 text-sm hover:underline"
-				onclick={() => void handleCopy()}
-				type="button"
-			>
+			<Button class="items-center" onclick={() => void handleCopy()} size="sm" variant="ghost">
 				<Copy class="size-4" />
 				{copied ? 'Copiés !' : 'Copier'}
-			</button>
-			<button
-				class="text-dark-light-blue flex cursor-pointer items-center gap-1.5 rounded-lg border-0 bg-transparent px-2 py-1 text-sm hover:underline"
-				onclick={handleDownload}
-				type="button"
-			>
+			</Button>
+			<Button class="items-center" onclick={handleDownload} size="sm" variant="ghost">
 				<Download class="size-4" />
 				Télécharger (.txt)
-			</button>
+			</Button>
 			<Button onclick={onClose} size="sm" variant="secondary">J'ai enregistré mes codes</Button>
 		</div>
 	</div>

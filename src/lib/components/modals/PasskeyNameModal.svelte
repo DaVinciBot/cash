@@ -63,13 +63,7 @@
 				bind:value={name}
 			/>
 			<div class="flex items-center justify-end gap-2">
-				<button
-					class="text-dark-light-blue cursor-pointer rounded-lg border-0 bg-transparent px-2 py-1 text-sm hover:underline"
-					onclick={onCancel}
-					type="button"
-				>
-					Annuler
-				</button>
+				<Button onclick={onCancel} size="sm" variant="ghost">Annuler</Button>
 				<Button size="sm" type="submit" variant="secondary">
 					{confirmLabel}
 				</Button>

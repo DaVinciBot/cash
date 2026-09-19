@@ -104,18 +104,18 @@
 		<form class="grid gap-4" onsubmit={handleSubmit}>
 			<div class="grid gap-2">
 				<CodeInput id="mfa-enroll-code" disabled={busy} bind:value={code} />
-				<button
-					class="text-dark-light-blue cursor-pointer rounded-lg border-0 bg-transparent p-0 text-left text-xs hover:underline disabled:cursor-not-allowed disabled:no-underline disabled:opacity-50"
+				<Button
 					disabled={busy || resending || resendCooldown > 0}
 					onclick={() => void handleResend()}
-					type="button"
+					size="sm"
+					variant="ghost"
 				>
 					{resending
 						? 'Envoi…'
 						: resendCooldown > 0
 							? `Renvoyer le code (${String(resendCooldown)}s)`
 							: 'Renvoyer le code'}
-				</button>
+				</Button>
 			</div>
 
 			{#if errorMessage}
@@ -123,14 +123,7 @@
 			{/if}
 
 			<div class="flex items-center justify-end gap-2">
-				<button
-					class="text-dark-light-blue cursor-pointer rounded-lg border-0 bg-transparent px-2 py-1 text-sm hover:underline"
-					disabled={busy}
-					onclick={onClose}
-					type="button"
-				>
-					Annuler
-				</button>
+				<Button disabled={busy} onclick={onClose} size="sm" variant="ghost">Annuler</Button>
 				<Button disabled={busy} size="sm" type="submit" variant="secondary">
 					{busy ? 'Vérification…' : 'Valider'}
 				</Button>

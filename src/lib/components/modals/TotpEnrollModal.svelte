@@ -92,14 +92,15 @@
 				class="border-light-blue/10 bg-dark-blue/40 flex w-full items-center justify-between gap-2 rounded-xl border p-2.5"
 			>
 				<code class="text-light-blue min-w-0 truncate font-mono text-xs">{enrollment.secret}</code>
-				<button
-					class="text-dark-light-blue flex shrink-0 cursor-pointer items-center gap-1.5 rounded-lg border-0 bg-transparent px-2 py-1 text-xs hover:underline"
+				<Button
+					class="shrink-0 items-center"
 					onclick={() => void handleCopySecret()}
-					type="button"
+					size="sm"
+					variant="ghost"
 				>
 					<Copy class="size-3.5" />
 					{copied ? 'Copiée !' : 'Copier'}
-				</button>
+				</Button>
 			</div>
 		</div>
 
@@ -111,14 +112,7 @@
 			{/if}
 
 			<div class="flex items-center justify-end gap-2">
-				<button
-					class="text-dark-light-blue cursor-pointer rounded-lg border-0 bg-transparent px-2 py-1 text-sm hover:underline"
-					disabled={busy}
-					onclick={onClose}
-					type="button"
-				>
-					Annuler
-				</button>
+				<Button disabled={busy} onclick={onClose} size="sm" variant="ghost">Annuler</Button>
 				<Button disabled={busy} size="sm" type="submit" variant="secondary">
 					{busy ? 'Vérification…' : 'Valider'}
 				</Button>

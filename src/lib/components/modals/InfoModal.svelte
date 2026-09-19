@@ -1,5 +1,5 @@
 <script lang="ts">
-	import { OverlayBackdrop } from '@davincibot/components';
+	import { Button, OverlayBackdrop } from '@davincibot/components';
 	import { hideOnClickOutside } from '@davincibot/lib';
 	import { onMount } from 'svelte';
 
@@ -68,10 +68,11 @@
 			id="MultiPopup"
 			class="border-light-blue/20 bg-surface-modal relative flex max-h-[min(85dvh,720px)] w-full flex-col overflow-y-auto rounded-2xl border p-4 text-center shadow-[0_26px_70px_rgba(2,6,30,0.6)] sm:p-6"
 		>
-			<button
-				class="text-dark-light-blue hover:bg-blue-gray/25 absolute top-2.5 right-2.5 ml-auto inline-flex items-center rounded-lg bg-transparent p-1.5 text-sm hover:text-white"
+			<Button
+				class="absolute top-2.5 right-2.5 ml-auto inline-flex items-center"
 				onclick={close}
-				type="button"
+				size="icon"
+				variant="ghost"
 			>
 				<svg
 					class="h-5 w-5"
@@ -86,7 +87,7 @@
 					></path></svg
 				>
 				<span class="sr-only">Close modal</span>
-			</button>
+			</Button>
 			<div
 				class="h-12 w-12 rounded-full {type === 'success' ? 'bg-emerald-500/15' : ''} {type ===
 				'error'
@@ -165,17 +166,15 @@
 			<p class="mb-4 text-lg font-semibold text-white">{message}</p>
 			<div class="flex flex-row justify-center space-x-2">
 				{#each action as el (el.text)}
-					<button
-						class="rounded-lg px-3 py-2 text-center text-sm font-medium {el.is_main
-							? 'bg-light-blue text-dark-blue hover:bg-white'
-							: 'border border-white text-white'} focus:ring-light-blue/60 focus:ring-4 focus:outline-none"
+					<Button
 						onclick={(e: MouseEvent) => {
 							handleActionClick(el, e);
 						}}
-						type="button"
+						size="sm"
+						variant={el.is_main ? 'primary' : 'secondary'}
 					>
 						{el.text}
-					</button>
+					</Button>
 				{/each}
 			</div>
 		</div>

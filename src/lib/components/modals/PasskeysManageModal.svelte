@@ -134,30 +134,32 @@
 								{formatParisDateTimeShort(passkey.created_at)}
 							</p>
 						</div>
-						<button
+						<Button
 							id={`passkey-rename-${passkey.id}`}
-							class="text-dark-light-blue hover:bg-light-blue/10 shrink-0 cursor-pointer rounded-lg border-0 bg-transparent p-2 disabled:cursor-not-allowed disabled:opacity-50"
+							class="shrink-0"
 							aria-label="Renommer cette passkey"
 							disabled={busy}
 							onclick={() => {
 								openRename(passkey);
 							}}
+							size="icon"
 							title="Renommer cette passkey"
-							type="button"
+							variant="icon"
 						>
 							<Pencil class="size-4" />
-						</button>
-						<button
+						</Button>
+						<Button
 							id={`passkey-delete-${passkey.id}`}
-							class="shrink-0 cursor-pointer rounded-lg border-0 bg-transparent p-2 text-red-400 hover:bg-red-500/10 disabled:cursor-not-allowed disabled:opacity-50"
+							class="shrink-0"
 							aria-label="Supprimer cette passkey"
 							disabled={busy}
 							onclick={() => void handleDelete(passkey)}
+							size="icon"
 							title="Supprimer cette passkey"
-							type="button"
+							variant="danger-ghost"
 						>
 							<Trash2 class="size-4" />
-						</button>
+						</Button>
 					</li>
 				{/each}
 			</ul>
@@ -183,13 +185,7 @@
 			{:else}
 				<span></span>
 			{/if}
-			<button
-				class="text-dark-light-blue cursor-pointer rounded-lg border-0 bg-transparent px-2 py-1 text-sm hover:underline"
-				onclick={onClose}
-				type="button"
-			>
-				Fermer
-			</button>
+			<Button onclick={onClose} size="sm" variant="ghost">Fermer</Button>
 		</div>
 	</div>
 </div>
