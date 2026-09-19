@@ -1,5 +1,5 @@
 <script lang="ts">
-	import { CtaButton } from '@davincibot/components';
+	import { Button } from '@davincibot/components';
 	import { formatParisDateTimeShort } from '@davincibot/lib';
 	import { isMobileUserAgent, parseDeviceLabel } from '$lib/settings';
 	import { fetchSessions, revokeAllSessions, revokeSession } from '$lib/settings';
@@ -74,9 +74,7 @@
 		<p class="text-dark-light-blue m-0 text-sm">Chargement…</p>
 	{:else if loadError}
 		<p class="m-0 mb-3 text-sm text-red-400">{loadError}</p>
-		<CtaButton fullWidth={false} onclick={() => void load()} size="sm" variant="secondary">
-			Réessayer
-		</CtaButton>
+		<Button onclick={() => void load()} size="sm" variant="secondary">Réessayer</Button>
 	{:else}
 		<ul class="m-0 grid list-none gap-2 p-0">
 			{#each sessions as session (session.id)}

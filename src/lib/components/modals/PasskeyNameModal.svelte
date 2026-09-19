@@ -1,6 +1,5 @@
 <script lang="ts">
-	import { OverlayBackdrop } from '@davincibot/components';
-	import { CtaButton } from '@davincibot/components';
+	import { Button, OverlayBackdrop } from '@davincibot/components';
 
 	interface Props {
 		title: string;
@@ -71,9 +70,9 @@
 				>
 					Annuler
 				</button>
-				<CtaButton fullWidth={false} size="sm" type="submit" variant="secondary">
+				<Button size="sm" type="submit" variant="secondary">
 					{confirmLabel}
-				</CtaButton>
+				</Button>
 			</div>
 		</form>
 	</div>

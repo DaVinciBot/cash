@@ -1,7 +1,5 @@
 <script lang="ts">
-	import { OverlayBackdrop } from '@davincibot/components';
-	import { CodeInput } from '@davincibot/components';
-	import { CtaButton } from '@davincibot/components';
+	import { Button, CodeInput, OverlayBackdrop } from '@davincibot/components';
 	import { stepUpChallenge, stepUpVerify, stepUpVerifyWebauthn } from '$lib/settings';
 	import { stepUpRequest, type StepUpRequest } from '$lib/settings';
 	import { onDestroy } from 'svelte';
@@ -194,9 +192,7 @@
 				</p>
 				<div class="mt-4 flex justify-end gap-2">
 					{#if errorMessage}
-						<CtaButton fullWidth={false} onclick={() => void open()} size="sm" variant="secondary">
-							Réessayer
-						</CtaButton>
+						<Button onclick={() => void open()} size="sm" variant="secondary">Réessayer</Button>
 					{/if}
 					<button
 						class="text-dark-light-blue cursor-pointer rounded-lg border-0 bg-transparent px-2 py-1 text-sm hover:underline"
@@ -322,10 +318,9 @@
 							>
 								Annuler
 							</button>
-							<CtaButton
+							<Button
 								id={mode === 'webauthn' ? 'step-up-passkey' : 'step-up-confirm'}
 								disabled={busy}
-								fullWidth={false}
 								size="sm"
 								type="submit"
 								variant="secondary"
@@ -335,7 +330,7 @@
 									: mode === 'webauthn'
 										? 'Confirmer avec ma passkey'
 										: 'Confirmer'}
-							</CtaButton>
+							</Button>
 						</div>
 					</div>
 				</form>

@@ -1,7 +1,5 @@
 <script lang="ts">
-	import { OverlayBackdrop } from '@davincibot/components';
-	import { CodeInput } from '@davincibot/components';
-	import { CtaButton } from '@davincibot/components';
+	import { Button, CodeInput, OverlayBackdrop } from '@davincibot/components';
 	import { startEmailEnrollment, verifyEmailEnrollment } from '$lib/settings';
 	import { StepUpCancelledError, withStepUp } from '$lib/settings';
 	import { onMount } from 'svelte';
@@ -133,9 +131,9 @@
 				>
 					Annuler
 				</button>
-				<CtaButton disabled={busy} fullWidth={false} size="sm" type="submit" variant="secondary">
+				<Button disabled={busy} size="sm" type="submit" variant="secondary">
 					{busy ? 'Vérification…' : 'Valider'}
-				</CtaButton>
+				</Button>
 			</div>
 		</form>
 	</div>

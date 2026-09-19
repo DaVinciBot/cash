@@ -1,6 +1,5 @@
 <script lang="ts">
-	import { OverlayBackdrop } from '@davincibot/components';
-	import { Checkbox } from '@davincibot/components';
+	import { Checkbox, OverlayBackdrop } from '@davincibot/components';
 	import type {
 		AutocompleteCompletion,
 		CrudField,

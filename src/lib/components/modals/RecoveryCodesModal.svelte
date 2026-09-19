@@ -1,6 +1,5 @@
 <script lang="ts">
-	import { OverlayBackdrop } from '@davincibot/components';
-	import { CtaButton } from '@davincibot/components';
+	import { Button, OverlayBackdrop } from '@davincibot/components';
 	import { Copy, Download, TriangleAlert } from '@lucide/svelte';
 
 	interface Props {
@@ -79,9 +78,7 @@
 				<Download class="size-4" />
 				Télécharger (.txt)
 			</button>
-			<CtaButton fullWidth={false} onclick={onClose} size="sm" variant="secondary">
-				J'ai enregistré mes codes
-			</CtaButton>
+			<Button onclick={onClose} size="sm" variant="secondary">J'ai enregistré mes codes</Button>
 		</div>
 	</div>
 </div>

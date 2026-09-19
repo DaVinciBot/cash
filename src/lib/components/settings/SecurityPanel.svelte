@@ -3,7 +3,7 @@
 	import MfaSection from '$lib/components/settings/MfaSection.svelte';
 	import SessionsSection from '$lib/components/settings/SessionsSection.svelte';
 	import StepUpDialog from '$lib/components/settings/StepUpDialog.svelte';
-	import { CtaButton } from '@davincibot/components';
+	import { Button } from '@davincibot/components';
 	import { changePassword } from '$lib/settings';
 	import { StepUpCancelledError, withStepUp } from '$lib/settings';
 
@@ -72,9 +72,9 @@
 					bind:value={confirmation}
 				/>
 			</div>
-			<CtaButton disabled={saving} fullWidth={false} size="sm" type="submit" variant="secondary">
+			<Button disabled={saving} size="sm" type="submit" variant="secondary">
 				{saving ? 'Chargement…' : 'Changer mon mot de passe'}
-			</CtaButton>
+			</Button>
 		</form>
 	</section>
 	<MfaSection />

@@ -4,7 +4,7 @@
 	import PasskeysManageModal from '$lib/components/modals/PasskeysManageModal.svelte';
 	import RecoveryCodesModal from '$lib/components/modals/RecoveryCodesModal.svelte';
 	import TotpEnrollModal from '$lib/components/modals/TotpEnrollModal.svelte';
-	import { CtaButton } from '@davincibot/components';
+	import { Button } from '@davincibot/components';
 	import {
 		disableMfaMethod,
 		fetchMfaState,
@@ -147,9 +147,7 @@
 		<p class="text-dark-light-blue m-0 text-sm">Chargement…</p>
 	{:else if loadError}
 		<p class="m-0 mb-3 text-sm text-red-400">{loadError}</p>
-		<CtaButton fullWidth={false} onclick={() => void load()} size="sm" variant="secondary">
-			Réessayer
-		</CtaButton>
+		<Button onclick={() => void load()} size="sm" variant="secondary">Réessayer</Button>
 	{:else}
 		<div class="grid gap-3">
 			<div
@@ -174,16 +172,15 @@
 					</button>
 				{:else}
 					<div class="ml-auto shrink-0">
-						<CtaButton
+						<Button
 							id="mfa-enable-email"
 							disabled={busy || enrollingEmail}
-							fullWidth={false}
 							onclick={() => void handleEnableEmail()}
 							size="sm"
 							variant="secondary"
 						>
 							{busyAction === 'enable-email' ? 'Envoi…' : 'Activer'}
-						</CtaButton>
+						</Button>
 					</div>
 				{/if}
 			</div>
@@ -211,16 +208,15 @@
 					</button>
 				{:else}
 					<div class="ml-auto shrink-0">
-						<CtaButton
+						<Button
 							id="mfa-enable-totp"
 							disabled={busy || totpEnrollment !== null}
-							fullWidth={false}
 							onclick={() => void handleEnableTotp()}
 							size="sm"
 							variant="secondary"
 						>
 							{busyAction === 'enable-totp' ? 'Chargement…' : 'Activer'}
-						</CtaButton>
+						</Button>
 					</div>
 				{/if}
 			</div>
@@ -237,21 +233,19 @@
 				</div>
 				<div class="ml-auto shrink-0">
 					{#if webauthnMethod}
-						<CtaButton
+						<Button
 							id="mfa-manage-passkeys"
 							disabled={busy}
-							fullWidth={false}
 							onclick={() => (managingPasskeys = true)}
 							size="sm"
 							variant="secondary"
 						>
 							Gérer
-						</CtaButton>
+						</Button>
 					{:else}
-						<CtaButton
+						<Button
 							id="mfa-enable-passkey"
 							disabled={busy || enrollingPasskey || !passkeySupported}
-							fullWidth={false}
 							onclick={() => (enrollingPasskey = true)}
 							size="sm"
 							title={passkeySupported
@@ -260,7 +254,7 @@
 							variant="secondary"
 						>
 							{busyAction === 'enable-passkey' ? 'Chargement…' : 'Activer'}
-						</CtaButton>
+						</Button>
 					{/if}
 				</div>
 			</div>
@@ -272,15 +266,14 @@
 					<KeyRound class="size-4 shrink-0" />
 					{mfaState.recovery_codes_remaining} codes de récupération restants
 				</p>
-				<CtaButton
+				<Button
 					disabled={busy}
-					fullWidth={false}
 					onclick={() => void handleRegenerate()}
 					size="sm"
 					variant="secondary"
 				>
 					{busyAction === 'regenerate' ? 'Génération…' : 'Régénérer les codes'}
-				</CtaButton>
+				</Button>
 			</div>
 		{/if}
 	{/if}

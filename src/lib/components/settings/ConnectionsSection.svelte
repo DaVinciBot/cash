@@ -1,5 +1,5 @@
 <script lang="ts">
-	import { CtaButton } from '@davincibot/components';
+	import { Button } from '@davincibot/components';
 	import { formatParisDateTimeShort } from '@davincibot/lib';
 	import { fetchConnections, revokeConnection } from '$lib/settings';
 	import type { ConnectionInfo } from '$lib/settings';
@@ -56,9 +56,7 @@
 		<p class="text-dark-light-blue m-0 text-sm">Chargement…</p>
 	{:else if loadError}
 		<p class="m-0 mb-3 text-sm text-red-400">{loadError}</p>
-		<CtaButton fullWidth={false} onclick={() => void load()} size="sm" variant="secondary">
-			Réessayer
-		</CtaButton>
+		<Button onclick={() => void load()} size="sm" variant="secondary">Réessayer</Button>
 	{:else if connections.length === 0}
 		<p class="text-dark-light-blue/70 m-0 text-sm">
 			Aucune application connectée à votre compte DaVinciBot.

@@ -1,5 +1,5 @@
 <script lang="ts">
-	import { CtaButton } from '@davincibot/components';
+	import { Button } from '@davincibot/components';
 	import { updateUsername, uploadAvatar } from '$lib/settings';
 	import { userdata, type UserData } from '@davincibot/lib';
 	import { onDestroy } from 'svelte';
@@ -112,16 +112,15 @@
 				type="text"
 				bind:value={username}
 			/>
-			<CtaButton
+			<Button
 				class="shrink-0"
 				disabled={savingUsername}
-				fullWidth={false}
 				size="sm"
 				type="submit"
 				variant="secondary"
 			>
 				{savingUsername ? 'Chargement…' : 'Enregistrer'}
-			</CtaButton>
+			</Button>
 		</form>
 	</section>
 </div>

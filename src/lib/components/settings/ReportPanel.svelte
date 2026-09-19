@@ -1,6 +1,5 @@
 <script lang="ts">
-	import { Checkbox } from '@davincibot/components';
-	import { CtaButton } from '@davincibot/components';
+	import { Button, Checkbox } from '@davincibot/components';
 	import {
 		MAX_REPORT_IMAGES,
 		MAX_REPORT_TOTAL_BYTES,
@@ -226,15 +225,8 @@
 			<p class="m-0 text-sm text-emerald-400">{successMessage}</p>
 		{/if}
 
-		<CtaButton
-			class="self-end"
-			disabled={submitting}
-			fullWidth={false}
-			size="sm"
-			type="submit"
-			variant="secondary"
-		>
+		<Button class="self-end" disabled={submitting} size="sm" type="submit" variant="secondary">
 			{submitting ? 'Envoi…' : 'Envoyer'}
-		</CtaButton>
+		</Button>
 	</form>
 </section>

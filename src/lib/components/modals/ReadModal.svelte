@@ -1,11 +1,9 @@
 <script lang="ts">
-	import { Button, OverlayBackdrop } from '@davincibot/components';
+	import { Button, OverlayBackdrop, Stepper } from '@davincibot/components';
 	import { hideOnClickOutside } from '@davincibot/lib';
 	import { onMount } from 'svelte';
 
 	import { getSupabaseBrowserClient } from '@davincibot/lib/supabase';
-
-	import { Stepper } from '@davincibot/components';
 
 	interface ReadHeader {
 		title: string;

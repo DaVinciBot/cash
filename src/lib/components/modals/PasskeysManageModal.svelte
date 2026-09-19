@@ -1,8 +1,7 @@
 <script lang="ts">
-	import { OverlayBackdrop } from '@davincibot/components';
+	import { Button, OverlayBackdrop } from '@davincibot/components';
 	import PasskeyNameModal from '$lib/components/modals/PasskeyNameModal.svelte';
 	import RecoveryCodesModal from '$lib/components/modals/RecoveryCodesModal.svelte';
-	import { CtaButton } from '@davincibot/components';
 	import { formatParisDateTimeShort } from '@davincibot/lib';
 	import {
 		deletePasskey,
@@ -116,9 +115,7 @@
 			<p class="text-dark-light-blue m-0 text-sm">Chargement…</p>
 		{:else if loadError}
 			<p class="m-0 mb-3 text-sm text-red-400">{loadError}</p>
-			<CtaButton fullWidth={false} onclick={() => void load()} size="sm" variant="secondary">
-				Réessayer
-			</CtaButton>
+			<Button onclick={() => void load()} size="sm" variant="secondary">Réessayer</Button>
 		{:else if passkeys.length === 0}
 			<p class="text-dark-light-blue m-0 mb-3 text-sm">Aucune passkey enregistrée.</p>
 		{:else}
@@ -174,16 +171,15 @@
 
 		<div class="mt-2 flex items-center justify-between gap-2">
 			{#if supported}
-				<CtaButton
+				<Button
 					id="passkey-add"
 					disabled={busy || loading}
-					fullWidth={false}
 					onclick={openAdd}
 					size="sm"
 					variant="secondary"
 				>
 					Ajouter une passkey
-				</CtaButton>
+				</Button>
 			{:else}
 				<span></span>
 			{/if}
