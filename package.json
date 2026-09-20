@@ -46,7 +46,7 @@
 		"vitest": "^4.1.10"
 	},
 	"dependencies": {
-		"@davincibot/components": "^6.1.0",
+		"@davincibot/components": "^6.2.0",
 		"@davincibot/database-types": "^4.4.0",
 		"@davincibot/lib": "^5.3.0",
 		"@lucide/svelte": "^1.31.0",
