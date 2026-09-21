@@ -17,13 +17,16 @@
 
 	let name = $state(initial.name);
 	let link = $state(initial.link);
-	let unitPrice = $state(String(initial.unitPriceTtc));
-	let quantity = $state(String(initial.quantity));
+	// `bind:value` sur un `<input type="number">` coerce en nombre (et en `null`
+	// quand le champ est vidé) : amorcer en chaîne mentait sur le type et faisait
+	// planter le calcul du total à la première saisie.
+	let unitPrice = $state<number | null>(initial.unitPriceTtc);
+	let quantity = $state<number | null>(initial.quantity);
 	let tags = $state<ItemTag[]>([...initial.tags]);
 	let note = $state(initial.note);
 	let submitting = $state(false);
 
-	const total = $derived((Number(unitPrice.replace(',', '.')) || 0) * (Number(quantity) || 0));
+	const total = $derived((unitPrice ?? 0) * (quantity ?? 0));
 
 	function toggleTag(tag: ItemTag) {
 		tags = tags.includes(tag) ? tags.filter((t) => t !== tag) : [...tags, tag];

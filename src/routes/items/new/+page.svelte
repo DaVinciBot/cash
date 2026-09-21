@@ -19,8 +19,15 @@
 		id: number;
 		name: string;
 		link: string;
-		unitPrice: string;
-		quantity: string;
+		/**
+		 * `bind:value` sur un `<input type="number">` COERCE : Svelte écrit un
+		 * nombre, et `null` quand le champ est vidé — jamais une chaîne. Typer ces
+		 * deux champs en `string` était un mensonge qui faisait planter le
+		 * `.replace()` du calcul de total dès la première saisie, gelant la
+		 * réactivité de tout le formulaire (« Ajouter » et « Retirer » compris).
+		 */
+		unitPrice: number | null;
+		quantity: number | null;
 		tags: ItemTag[];
 		note: string;
 	}
@@ -31,8 +38,8 @@
 		id: nextLineId++,
 		name: '',
 		link: '',
-		unitPrice: '',
-		quantity: '1',
+		unitPrice: null,
+		quantity: 1,
 		tags: [],
 		note: ''
 	});
@@ -54,11 +61,16 @@
 		needsCampusChoice ? chosenCampus || null : (project?.campus ?? null)
 	);
 
+	/**
+	 * Un champ numérique vidé vaut `null` : on le lit comme zéro plutôt que de
+	 * laisser `NaN` contaminer la somme et afficher un total illisible.
+	 */
+	const lineTotal = (line: Line) => (line.unitPrice ?? 0) * (line.quantity ?? 0);
+
 	const total = $derived(
 		lines.reduce((sum, line) => {
-			const price = Number(line.unitPrice.replace(',', '.'));
-			const qty = Number(line.quantity);
-			return sum + (Number.isFinite(price) && Number.isFinite(qty) ? price * qty : 0);
+			const amount = lineTotal(line);
+			return sum + (Number.isFinite(amount) ? amount : 0);
 		}, 0)
 	);
 
@@ -310,9 +322,7 @@
 
 						<div class="mt-3 flex items-center justify-between">
 							<span class="text-dark-light-blue text-sm">
-								Total ligne : {euro.format(
-									(Number(line.unitPrice.replace(',', '.')) || 0) * (Number(line.quantity) || 0)
-								)}
+								Total ligne : {euro.format(lineTotal(line))}
 							</span>
 							<Button
 								onclick={() => {
