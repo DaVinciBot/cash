@@ -4,6 +4,11 @@
 	import CampusBadge from '$lib/components/cash/CampusBadge.svelte';
 	import RecordModal from '$lib/components/modals/RecordModal.svelte';
 	import SucessModal from '$lib/components/modals/InfoModal.svelte';
+	import {
+		buildProfileFields,
+		PROFILE_FIELD_KEYS,
+		readProfileEdits
+	} from '$lib/helpers/profileForm';
 	import { GLOBAL_ROLE_CATEGORIES, OVERRIDE_PERMISSION_CATEGORIES } from '$lib/rbacCatalog';
 	import {
 		Table,
@@ -921,8 +926,13 @@
 				sub: `${String(activeGlobalRoles.length)} rôle(s) · ${String(overridePermissions.length)} override(s)`
 			},
 			body: [
-				{ label: 'Nom', value: data.username, avatar: data.avatar_url },
-				{ label: 'Campus', value: data.campus ?? 'NULL' },
+				{
+					label: 'Nom',
+					id: PROFILE_FIELD_KEYS.username,
+					value: data.username,
+					avatar: data.avatar_url
+				},
+				{ label: 'Campus', id: PROFILE_FIELD_KEYS.campus, value: data.campus ?? 'NULL' },
 				{
 					label: 'Rôles globaux',
 					value: { type: 'badges', list: roleBadges },
@@ -949,25 +959,7 @@
 		// un champ absent ne doit jamais être lu comme « sélection vide », faute
 		// de quoi ouvrir la fiche révoquerait rôles et rattachements.
 		const fields = [
-			...(canEditProfile
-				? [
-						{
-							name: 'Nom',
-							type: 'text',
-							placeholder: 'Rob, aka Robert',
-							required: true,
-							wide: true
-						},
-						{
-							name: 'Campus',
-							type: 'select',
-							options: (Object.keys(CAMPUS_BADGES) as Campus[]).map((value) => ({
-								value,
-								text: CAMPUS_BADGES[value].label
-							}))
-						}
-					]
-				: []),
+			...(canEditProfile ? buildProfileFields() : []),
 			...(canManageRoles
 				? [
 						{
@@ -1018,34 +1010,14 @@
 				) => {
 					const formData = new FormData(forms);
 
-					const nomField = newFields.find((f) => f.name === 'Nom');
-					const campusField = newFields.find((f) => f.name === 'Campus');
 					const rolesField = newFields.find((f) => f.id === 'roles');
 					const permsField = newFields.find((f) => f.id === 'permissions');
 					const projectsField = newFields.find((f) => f.id === 'projects');
 
-					let nom: string | undefined;
-					if (nomField) {
-						const nomVal = formData.get('Nom');
-						nom =
-							typeof nomVal === 'string'
-								? nomVal
-								: typeof nomField.value === 'string'
-									? nomField.value
-									: '';
-					}
-
-					// Le sélecteur renvoie 'NULL' quand rien n'est choisi ; la RPC traite
-					// NULL comme « ne pas toucher », ce qui évite d'effacer un campus déjà
-					// posé en rouvrant simplement la fiche.
-					let campus: Campus | undefined;
-					if (campusField) {
-						const campusVal = formData.get('Campus');
-						campus =
-							typeof campusVal === 'string' && campusVal !== 'NULL'
-								? (campusVal as Campus)
-								: undefined;
-					}
+					const { username: nom, campus } = readProfileEdits(formData, {
+						username: newFields.some((f) => f.id === PROFILE_FIELD_KEYS.username),
+						campus: newFields.some((f) => f.id === PROFILE_FIELD_KEYS.campus)
+					});
 
 					const extractedPermissions =
 						permsField && Array.isArray(permsField.value)
