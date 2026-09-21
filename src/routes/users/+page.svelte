@@ -1,6 +1,7 @@
 <script lang="ts">
 	import { Button } from '@davincibot/components';
 	import { resolve } from '$app/paths';
+	import CampusBadge from '$lib/components/cash/CampusBadge.svelte';
 	import RecordModal from '$lib/components/modals/RecordModal.svelte';
 	import SucessModal from '$lib/components/modals/InfoModal.svelte';
 	import { GLOBAL_ROLE_CATEGORIES, OVERRIDE_PERMISSION_CATEGORIES } from '$lib/rbacCatalog';
@@ -8,11 +9,13 @@
 		Table,
 		UserImportModal,
 		type Filter,
+		type TableCell,
 		type TableColumn,
 		type TableRow
 	} from '@davincibot/components';
 	import {
 		CAMPUS_BADGES,
+		GLOBAL_ROLES,
 		GLOBAL_ROLE_LABELS,
 		hasAnyPermission,
 		mountClosable,
@@ -51,14 +54,21 @@
 		id: string;
 		username: string;
 		avatar_url: string | null;
+		campus: Campus | null;
 		status: string;
 		member_of: MemberOfRow[];
+		profile_global_roles: GlobalRoleRow[];
 	}
 
 	interface MemberOfRow {
 		role: string;
 		revoked_at: string | null;
 		project: { id: number; name: string } | null;
+	}
+
+	interface GlobalRoleRow {
+		role: string;
+		revoked_at: string | null;
 	}
 
 	interface ProjectRoleEntry {
@@ -77,9 +87,35 @@
 		message: string;
 	}
 
+	/** Le campus et les rôles s'affichent en badges : le CSV, lui, reprend les libellés. */
+	function campusOf(value: unknown): Campus | null {
+		return typeof value === 'string' && value in CAMPUS_BADGES ? (value as Campus) : null;
+	}
+
+	function globalRolesOf(value: unknown): GlobalRole[] {
+		return Array.isArray(value) ? (value as GlobalRole[]) : [];
+	}
+
 	const columns: TableColumn[] = [
 		{ key: 'username', label: 'Nom', sortable: true },
+		{
+			key: 'campus',
+			label: 'Campus',
+			sortable: true,
+			csv: (row) => {
+				const campus = campusOf(row[1]?.value);
+				return campus ? CAMPUS_BADGES[campus].label : '';
+			}
+		},
 		{ key: 'projects', label: 'Projets' },
+		{
+			key: 'roles',
+			label: 'Rôles globaux',
+			csv: (row) =>
+				globalRolesOf(row[3]?.value)
+					.map((role) => GLOBAL_ROLE_LABELS[role])
+					.join(', ')
+		},
 		{ key: 'status', label: 'Statut', sortable: true }
 	];
 
@@ -102,11 +138,11 @@
 		triggerTableRefresh(usersTableTopic);
 	}
 
-	// `project_filter` ne sert qu'au filtre Projets : filtrer l'embed affiché masquerait les
-	// autres projets des membres retenus.
+	// `project_filter` et `role_filter` ne servent qu'aux filtres Projets et Rôles globaux :
+	// filtrer l'embed affiché masquerait les autres projets et rôles des membres retenus.
 	const dbInfo = {
 		table: 'profiles',
-		key: 'id, username, avatar_url, status, member_of!membre_projet_profile_fkey(project!inner(id, name), revoked_at), project_filter:member_of!membre_projet_profile_fkey(project, revoked_at)'
+		key: 'id, username, avatar_url, campus, status, member_of!membre_projet_profile_fkey(project!inner(id, name), revoked_at), project_filter:member_of!membre_projet_profile_fkey(project, revoked_at), profile_global_roles!profile_global_roles_profile_fkey(role, revoked_at), role_filter:profile_global_roles!profile_global_roles_profile_fkey(role, revoked_at)'
 	};
 
 	let canEditProfile = $state<boolean>(false);
@@ -234,6 +270,26 @@
 		return dt.toLocaleString('fr-FR');
 	}
 
+	// La liste des invitations vient de l'API admin, pas de PostgREST : `devData` court-circuite la
+	// requête Supabase et `dbInfo` ne sert plus qu'à identifier la table côté composant.
+	const pendingInvitesDbInfo = { table: 'pending_invites', key: 'id' };
+	// Aligné sur le `perPage` de l'API : `devData` rend toutes les lignes d'un coup, la pagination
+	// du composant n'aurait aucune page suivante à servir.
+	const PENDING_INVITES_PAGE_SIZE = 25;
+	const pendingInvitesColumns: TableColumn[] = [
+		{ key: 'email', label: 'Email' },
+		{ key: 'invited_at', label: 'Invité·e le' },
+		{ key: 'actions', label: 'Actions', csv: () => '' }
+	];
+
+	function parsePendingInvites(data: unknown[]): TableRow[] {
+		return (data as AuthUser[]).map((authUser) => [
+			{ value: authUser.email ?? '', data: authUser.id },
+			{ value: formatDate(authUser.invited_at) },
+			{ value: authUser, cell: inviteActionsCell }
+		]);
+	}
+
 	async function loadPendingInvites() {
 		if (!canReinvite) {
 			pendingInvites = [];
@@ -352,11 +408,30 @@
 
 	const filters = $derived<Filter[]>([
 		{
+			category: 'Campus',
+			value: 'campus',
+			options: (Object.keys(CAMPUS_BADGES) as Campus[]).map((value) => ({
+				name: CAMPUS_BADGES[value].label,
+				value
+			}))
+		},
+		{
 			category: 'Projets',
 			value: 'project',
 			relation: 'project_filter',
 			where: [{ column: 'revoked_at', operator: 'is', value: 'null' }],
 			options: allProjects
+		},
+		{
+			category: 'Rôles globaux',
+			value: 'role',
+			relation: 'role_filter',
+			where: [{ column: 'revoked_at', operator: 'is', value: 'null' }],
+			wide: true,
+			// L'ordre du catalogue (Direction, responsables, membres) plutôt que celui de l'enum.
+			options: Object.values(GLOBAL_ROLE_CATEGORIES)
+				.flat()
+				.map((role) => ({ name: role.label, value: role.value }))
 		},
 		{
 			category: 'Statut',
@@ -413,10 +488,18 @@
 				.filter((m) => !m.revoked_at)
 				.map((m) => m.project?.name ?? '')
 				.join(', ');
+			// PostgREST ne garantit pas l'ordre de l'embed : on le fige sur le rang de l'enum,
+			// sans quoi les badges dansent d'un chargement à l'autre.
+			const roles = el.profile_global_roles
+				.filter((r) => !r.revoked_at)
+				.map((r) => r.role as GlobalRole)
+				.sort((a, b) => GLOBAL_ROLES.indexOf(a) - GLOBAL_ROLES.indexOf(b));
 			const status = el.status === 'disabled' ? 'Désactivé' : 'Activé';
 			items.push([
 				{ value: el.username, data: el.id, avatar: el.avatar_url },
+				{ value: el.campus, cell: campusCell },
 				{ value: project },
+				{ value: roles, cell: rolesCell },
 				{ value: status }
 			]);
 		}
@@ -784,14 +867,7 @@
 			)
 			.eq('id', id)
 			.single()) as {
-			data:
-				| (ProfileRow & {
-						campus: Campus | null;
-						permissions: string[] | null;
-						status: string;
-						profile_global_roles: { role: string; revoked_at: string | null }[];
-				  })
-				| null;
+			data: (ProfileRow & { permissions: string[] | null }) | null;
 			error: unknown;
 		};
 		if (error || !data) {
@@ -1094,6 +1170,58 @@
 	}
 </script>
 
+{#snippet campusCell(cell: TableCell)}
+	{@const campus = campusOf(cell.value)}
+	{#if campus}
+		<CampusBadge {campus} compact />
+	{:else}
+		<span class="text-gray-500">—</span>
+	{/if}
+{/snippet}
+
+{#snippet rolesCell(cell: TableCell)}
+	{@const roles = globalRolesOf(cell.value)}
+	{#if roles.length > 0}
+		<div class="flex min-w-0 flex-wrap gap-1">
+			{#each roles as role (role)}
+				<span
+					class="bg-dark-blue border-light-blue/70 text-light-blue inline-flex items-center rounded-full border px-2 py-0.5 text-xs whitespace-nowrap"
+				>
+					{GLOBAL_ROLE_LABELS[role]}
+				</span>
+			{/each}
+		</div>
+	{:else}
+		<span class="text-gray-500">—</span>
+	{/if}
+{/snippet}
+
+{#snippet inviteActionsCell(cell: TableCell)}
+	{@const authUser = cell.value as AuthUser}
+	<div class="flex w-full flex-wrap justify-end gap-2">
+		<Button
+			disabled={reinvitingUserId !== null || cancelingUserId !== null}
+			onclick={() => {
+				void reinvitePendingUser(authUser);
+			}}
+			size="sm"
+			variant="primary"
+		>
+			{reinvitingUserId === authUser.id ? 'Envoi...' : 'Réinviter'}
+		</Button>
+		<Button
+			disabled={reinvitingUserId !== null || cancelingUserId !== null}
+			onclick={() => {
+				void cancelPendingInvite(authUser);
+			}}
+			size="sm"
+			variant="danger"
+		>
+			{cancelingUserId === authUser.id ? 'Annulation...' : 'Annuler'}
+		</Button>
+	</div>
+{/snippet}
+
 <svelte:head><title>Membres — DaVinciBot</title></svelte:head>
 
 <div class="w-full py-2 sm:px-8 lg:px-16">
@@ -1156,53 +1284,14 @@
 			{:else if pendingInvites.length === 0}
 				<p class="text-dark-light-blue text-sm">Aucune invitation expirée/en attente détectée.</p>
 			{:else}
-				<div class="overflow-x-auto">
-					<table class="text-dark-light-blue w-full text-left text-sm">
-						<thead
-							class="border-light-blue/20 text-dark-light-blue border-b text-xs tracking-wide uppercase"
-						>
-							<tr>
-								<th class="px-3 py-2">Email</th>
-								<th class="px-3 py-2">Invité le</th>
-								<th class="px-3 py-2">Dernière connexion</th>
-								<th class="px-3 py-2 text-right">Actions</th>
-							</tr>
-						</thead>
-						<tbody>
-							{#each pendingInvites as authUser (authUser.id)}
-								<tr class="border-light-blue/20 border-b">
-									<td class="px-3 py-2 text-white">{authUser.email}</td>
-									<td class="px-3 py-2">{formatDate(authUser.invited_at)}</td>
-									<td class="px-3 py-2">{formatDate(authUser.last_sign_in_at)}</td>
-									<td class="px-3 py-2 text-right">
-										<div class="flex flex-wrap justify-end gap-2">
-											<Button
-												disabled={reinvitingUserId !== null || cancelingUserId !== null}
-												onclick={() => {
-													void reinvitePendingUser(authUser);
-												}}
-												size="sm"
-												variant="primary"
-											>
-												{reinvitingUserId === authUser.id ? 'Envoi...' : 'Réinviter'}
-											</Button>
-											<Button
-												disabled={reinvitingUserId !== null || cancelingUserId !== null}
-												onclick={() => {
-													void cancelPendingInvite(authUser);
-												}}
-												size="sm"
-												variant="danger"
-											>
-												{cancelingUserId === authUser.id ? 'Annulation...' : 'Annuler'}
-											</Button>
-										</div>
-									</td>
-								</tr>
-							{/each}
-						</tbody>
-					</table>
-				</div>
+				<Table
+					columns={pendingInvitesColumns}
+					dbInfo={pendingInvitesDbInfo}
+					devData={pendingInvites}
+					pageSize={PENDING_INVITES_PAGE_SIZE}
+					parseItems={parsePendingInvites}
+					searchable="email"
+				/>
 			{/if}
 		</div>
 	</div>
