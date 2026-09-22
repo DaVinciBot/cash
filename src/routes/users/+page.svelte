@@ -85,6 +85,7 @@
 		email: string;
 		name: string;
 		project?: string;
+		campus?: string;
 	}
 
 	interface FailureEntry {
@@ -99,6 +100,12 @@
 
 	function globalRolesOf(value: unknown): GlobalRole[] {
 		return Array.isArray(value) ? (value as GlobalRole[]) : [];
+	}
+
+	function globalRoleOf(value: unknown): GlobalRole | null {
+		return typeof value === 'string' && GLOBAL_ROLES.includes(value as GlobalRole)
+			? (value as GlobalRole)
+			: null;
 	}
 
 	const columns: TableColumn[] = [
@@ -156,7 +163,12 @@
 	let canInviteMembers = $state<boolean>(false);
 	let canUpdateStatus = $state<boolean>(false);
 	const canReinvite = $derived(canEditProfile || canUpdateStatus);
-	const canImportMembers = $derived(canInviteMembers && canManageRoles && canManageProjects);
+	// Le trigger `create_user_profile` pose le profil et son rôle de base dans la
+	// transaction d'invitation : l'import n'a plus besoin d'`iam.roles.manage`,
+	// qui réservait l'écran au seul super_admin alors que c'est le secrétariat qui
+	// saisit les arrivées. Attribuer un rôle en plus reste possible, et c'est ce
+	// surplus — pas l'import — qui demande `iam.roles.manage` (`canManageRoles`).
+	const canImportMembers = $derived(canInviteMembers && canManageProjects && canEditProfile);
 	let pendingInvites = $state<AuthUser[]>([]);
 	let pendingInvitesLoading = $state<boolean>(false);
 	let pendingInvitesError = $state('');
@@ -511,16 +523,123 @@
 		return items;
 	}
 
+	/**
+	 * Nom et campus issus du CSV, posés sur le profil que le trigger
+	 * `create_user_profile` vient de créer à l'invitation. La RPC lit `undefined`
+	 * comme « ne touche pas » : un CSV sans campus laisse la colonne vide.
+	 */
+	async function applyImportedProfile(
+		supabase: ReturnType<typeof getSupabaseBrowserClient>,
+		profileId: string,
+		username: string,
+		campus: Campus | null
+	): Promise<void> {
+		// Le profil naît dans la transaction d'invitation, jamais ici. S'il manque,
+		// la RPC mettrait zéro ligne à jour sans rien signaler : on préfère l'échec
+		// visible, qui déclenche le rollback de l'invitation.
+		const { count, error: lookupError } = await supabase
+			.from('profiles')
+			.select('id', { count: 'exact', head: true })
+			.eq('id', profileId);
+		if (lookupError) {
+			throw new Error((lookupError as { message: string }).message);
+		}
+		if ((count ?? 0) === 0) {
+			throw new Error('Profil introuvable après invitation.');
+		}
+
+		if (!username && !campus) {
+			return;
+		}
+		const { error } = await supabase.rpc('admin_update_profile', {
+			p_profile: profileId,
+			p_username: username || undefined,
+			p_campus: campus ?? undefined
+		});
+		if (error) {
+			throw new Error(error.message);
+		}
+	}
+
+	/**
+	 * Rôle global choisi pour l'import, posé sur chaque membre traité. La base
+	 * attribue déjà son rôle de base à la création : celui-ci s'y ajoute.
+	 */
+	async function assignImportedRole(
+		supabase: ReturnType<typeof getSupabaseBrowserClient>,
+		profileId: string,
+		role: GlobalRole | null
+	): Promise<void> {
+		if (!role) {
+			return;
+		}
+		const { error } = await supabase.rpc('assign_global_role', {
+			p_profile: profileId,
+			p_role: role
+		});
+		if (error) {
+			throw new Error(
+				`Attribution du rôle ${GLOBAL_ROLE_LABELS[role]} impossible : ${error.message}`
+			);
+		}
+	}
+
+	/** Rattache au projet si aucune ligne active ne le fait déjà. */
+	async function attachToProject(
+		supabase: ReturnType<typeof getSupabaseBrowserClient>,
+		profileId: string,
+		projectId: number
+	): Promise<boolean> {
+		const { count, error: checkError } = await supabase
+			.from('member_of')
+			.select('project', { count: 'exact', head: true })
+			.eq('profile', profileId)
+			.eq('project', projectId)
+			.is('revoked_at', null);
+		if (checkError) {
+			throw new Error((checkError as { message: string }).message);
+		}
+		if ((count ?? 0) > 0) {
+			return false;
+		}
+		const { error: attachError } = await supabase.from('member_of').insert({
+			profile: profileId,
+			project: projectId,
+			role: 'project_member' satisfies ProjectRole
+		});
+		if (attachError) {
+			throw new Error((attachError as { message: string }).message);
+		}
+		return true;
+	}
+
 	function addNew() {
 		mountClosable(UserImportModal, {
 			target: document.body,
 			props: {
 				projectOptions: allProjects,
+				// Attribuer un rôle relève d'`iam.roles.manage` : sans elle, le
+				// sélecteur ne s'affiche pas et la base pose son rôle de base.
+				roleOptions: canManageRoles
+					? Object.values(GLOBAL_ROLE_CATEGORIES)
+							.flat()
+							.map((role) => ({ name: role.label, value: role.value }))
+					: [],
 				title: 'Importer des utilisateurs',
-				onSubmit: async ({ project, users }: { project: string; users: ImportUser[] }) => {
+				onSubmit: async ({
+					campus,
+					project,
+					role,
+					users
+				}: {
+					campus: string;
+					project: string;
+					role: string;
+					users: ImportUser[];
+				}) => {
 					if (!canImportMembers) {
 						throw new Error(
-							"Vous n'avez pas les permissions requises pour cette action (members.invite.send, iam.roles.manage et members.projects.update.all nécessaires)."
+							"Vous n'avez pas les permissions requises pour cette action (members.invite.send, members.projects.update.all et members.profile.update.all nécessaires)."
 						);
 					}
 
@@ -530,6 +649,28 @@
 					const alreadyLinked: string[] = [];
 					const failures: FailureEntry[] = [];
 					const defaultProject = project !== '' && project !== 'NULL' ? project : '';
+					const defaultCampus = campusOf(campus);
+					const importedRole = globalRoleOf(role);
+
+					// Le rang décide : `can_manage_role` refuse un rôle au moins aussi haut
+					// que le sien. On le demande une fois, avant d'inviter qui que ce soit —
+					// sinon chaque membre serait créé puis supprimé par le rollback.
+					if (importedRole) {
+						const { data: allowed, error: roleCheckError } = await supabase.rpc('can_manage_role', {
+							p_target_role: importedRole
+						});
+						if (roleCheckError) {
+							throw new Error(
+								'Vérification du rôle impossible : ' +
+									(roleCheckError as { message: string }).message
+							);
+						}
+						if (!allowed) {
+							throw new Error(
+								`Vous ne pouvez pas attribuer le rôle ${GLOBAL_ROLE_LABELS[importedRole]} : il faut un rôle strictement supérieur au sien.`
+							);
+						}
+					}
 
 					const existingAuthUsers = new SvelteMap<string, AuthUser>();
 					try {
@@ -573,6 +714,7 @@
 							});
 							continue;
 						}
+						const userCampus = campusOf(user.campus) ?? defaultCampus;
 						const existingAuth = existingAuthUsers.get(email);
 						let createdUserId: string | null = existingAuth?.id ?? null;
 						let isNewlyCreated = false;
@@ -585,28 +727,12 @@
 									throw new Error('Invitation échouée : ID utilisateur manquant.');
 								}
 								isNewlyCreated = true;
-								const { error: profileError } = await supabase.from('profiles').insert({
-									id: createdUserId,
-									username
-								});
-								if (profileError) {
-									throw new Error((profileError as { message: string }).message);
-								}
-								const { error: roleError } = await supabase.rpc('assign_global_role', {
-									p_profile: createdUserId,
-									p_role: DEFAULT_IMPORT_ROLE
-								});
-								if (roleError) {
-									throw new Error(roleError.message);
-								}
-								const { error: memberError } = await supabase.from('member_of').insert({
-									profile: createdUserId,
-									project: projectId,
-									role: 'project_member' satisfies ProjectRole
-								});
-								if (memberError) {
-									throw new Error((memberError as { message: string }).message);
-								}
+								// Le profil et le rôle de base existent déjà (trigger
+								// `create_user_profile`) : l'import ne fait que remplacer le nom
+								// déduit de l'email par celui du CSV, et poser le campus.
+								await applyImportedProfile(supabase, createdUserId, username, userCampus);
+								await assignImportedRole(supabase, createdUserId, importedRole);
+								await attachToProject(supabase, createdUserId, projectId);
 								createdUsers.push(email);
 								existingAuthUsers.set(email, {
 									id: createdUserId,
@@ -616,56 +742,12 @@
 									last_sign_in_at: null
 								});
 							} else {
-								// existingAuth est défini dans cette branche : son id aussi.
-								const profileId = existingAuth.id;
-								const { data: existingProfileRows, error: existingProfileError } = (await supabase
-									.from('profiles')
-									.select('id, username')
-									.eq('id', profileId)
-									.limit(1)) as {
-									data: { id: string; username: string }[] | null;
-									error: unknown;
-								};
-								if (existingProfileError) {
-									throw new Error((existingProfileError as { message: string }).message);
-								}
-								const existingProfile = existingProfileRows?.[0];
-								if (!existingProfile) {
-									const fallbackUsername = username || email.split('@')[0];
-									const { error: profileInsertError } = await supabase.from('profiles').insert({
-										id: profileId,
-										username: fallbackUsername
-									});
-									if (profileInsertError) {
-										throw new Error((profileInsertError as { message: string }).message);
-									}
-									// Profil créé à la volée : lui garantir le rôle par défaut.
-									const { error: roleError } = await supabase.rpc('assign_global_role', {
-										p_profile: profileId,
-										p_role: DEFAULT_IMPORT_ROLE
-									});
-									if (roleError) {
-										throw new Error(roleError.message);
-									}
-								}
-								const { count: memberCount, error: memberCheckError } = await supabase
-									.from('member_of')
-									.select('project', { count: 'exact', head: true })
-									.eq('profile', profileId)
-									.eq('project', projectId)
-									.is('revoked_at', null);
-								if (memberCheckError) {
-									throw new Error((memberCheckError as { message: string }).message);
-								}
-								if ((memberCount ?? 0) === 0) {
-									const { error: attachError } = await supabase.from('member_of').insert({
-										profile: profileId,
-										project: projectId,
-										role: 'project_member' satisfies ProjectRole
-									});
-									if (attachError) {
-										throw new Error((attachError as { message: string }).message);
-									}
+								// Membre déjà connu : on ne réécrit ni son nom ni son campus, qu'il
+								// a pu corriger lui-même. Le rôle demandé vaut pour tout l'import,
+								// lui compris ; `assign_global_role` est idempotent.
+								await assignImportedRole(supabase, existingAuth.id, importedRole);
+								const attached = await attachToProject(supabase, existingAuth.id, projectId);
+								if (attached) {
 									updatedUsers.push(email);
 								} else {
 									alreadyLinked.push(email);
@@ -676,12 +758,9 @@
 								email,
 								message: (error as Error | null)?.message ?? 'Erreur inconnue'
 							});
+							// La suppression du compte auth emporte profil, rôles et
+							// rattachements (ON DELETE CASCADE) : rien à nettoyer en amont.
 							if (isNewlyCreated && createdUserId) {
-								await supabase.rpc('set_profile_status', {
-									p_profile: createdUserId,
-									p_status: 'disabled',
-									p_reason: 'rollback_import_failed'
-								});
 								try {
 									await deleteAuthUser(createdUserId);
 								} catch {
@@ -722,6 +801,12 @@
 					if (alreadyLinked.length > 0) {
 						messageParts.push(`Déjà associés à ce projet : ${alreadyLinked.join(', ')}`);
 					}
+					if (
+						importedRole &&
+						createdUsers.length + updatedUsers.length + alreadyLinked.length > 0
+					) {
+						messageParts.push(`Rôle ${GLOBAL_ROLE_LABELS[importedRole]} attribué à tout l'import.`);
+					}
 					if (failures.length > 0) {
 						const failureEmails = failures.map((f) => f.email).join(', ');
 						messageParts.push(
@@ -745,8 +830,6 @@
 			}
 		});
 	}
-
-	const DEFAULT_IMPORT_ROLE: GlobalRole = 'guest';
 
 	/**
 	 * Applique un diff de rôles globaux via les RPC assign/revoke (immuabilité de
