@@ -52,11 +52,6 @@ describe('permissions helpers', () => {
 		expect(canAccessAdminPath('/admin/items/123/edit', ['training.slot.read'])).toBe(false);
 	});
 
-	it('canAccessAdminPath requires smartshare cast permission for SmartShare', () => {
-		expect(canAccessAdminPath('/admin/screen-share', ['training.slot.manage'])).toBe(false);
-		expect(canAccessAdminPath('/admin/screen-share', ['integration.smartshare.cast'])).toBe(true);
-	});
-
 	it('filterMenuByPermissions keeps only authorized entries', () => {
 		const menu = filterMenuByPermissions(ADMIN_MENU, [
 			'orders.items.manage.self',

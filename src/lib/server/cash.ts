@@ -231,6 +231,8 @@ export interface ScopedProject {
 	id: number;
 	name: string;
 	campus: Campus | null;
+	/** Nœud de l'arbre visé par le projet, `null` tant qu'aucun n'est désigné. */
+	budgetId: number | null;
 }
 
 /**
@@ -253,7 +255,7 @@ export async function projectsWithPermission(
 	const [{ data: memberships, error }, { data: catalogue }] = await Promise.all([
 		supabase
 			.from('member_of')
-			.select('role, permissions, project(id, name, campus, archived_at)')
+			.select('role, permissions, project(id, name, campus, budget_id, archived_at)')
 			.eq('profile', profileId)
 			.is('revoked_at', null),
 		supabase.from('project_role_permissions').select('role, permissions')
@@ -271,7 +273,12 @@ export async function projectsWithPermission(
 				!m.project.archived_at &&
 				((byRole.get(m.role) ?? []).includes(permission) || m.permissions.includes(permission))
 		)
-		.map((m) => ({ id: m.project.id, name: m.project.name ?? '', campus: m.project.campus }))
+		.map((m) => ({
+			id: m.project.id,
+			name: m.project.name ?? '',
+			campus: m.project.campus,
+			budgetId: m.project.budget_id
+		}))
 		.sort((a, b) => a.name.localeCompare(b.name, 'fr'));
 }
 

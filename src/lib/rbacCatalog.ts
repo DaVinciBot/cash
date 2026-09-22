@@ -64,10 +64,9 @@ export const GLOBAL_PERMISSION_LABELS: Record<GlobalPermission, string> = {
 	'finance.periods.close': 'Clore une période comptable',
 	'finance.documents.generate': 'Générer des documents',
 	'stats.read.all': 'Voir les statistiques globales',
-	// blog.* / integration.*
+	// blog.*
 	'blog.draft.write': 'Éditer les brouillons du blog',
 	'blog.publish': 'Publier sur le blog',
-	'integration.smartshare.cast': 'Diffuser sur SmartShare',
 	// audit.* / infra.*
 	'audit.logs.read': 'Consulter les journaux',
 	'audit.events.export': 'Exporter les journaux',
@@ -141,7 +140,7 @@ const PERMISSION_GROUPS: { title: string; permissions: GlobalPermission[] }[] = 
 	},
 	{
 		title: 'Communication',
-		permissions: ['blog.draft.write', 'blog.publish', 'integration.smartshare.cast']
+		permissions: ['blog.draft.write', 'blog.publish']
 	},
 	{
 		title: 'Audit et infrastructure',

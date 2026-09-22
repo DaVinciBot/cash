@@ -1,18 +1,26 @@
 <script lang="ts">
 	import { Button } from '@davincibot/components';
 	import { resolve } from '$app/paths';
+	import CampusBadge from '$lib/components/cash/CampusBadge.svelte';
 	import RecordModal from '$lib/components/modals/RecordModal.svelte';
 	import SucessModal from '$lib/components/modals/InfoModal.svelte';
+	import {
+		buildProfileFields,
+		PROFILE_FIELD_KEYS,
+		readProfileEdits
+	} from '$lib/helpers/profileForm';
 	import { GLOBAL_ROLE_CATEGORIES, OVERRIDE_PERMISSION_CATEGORIES } from '$lib/rbacCatalog';
 	import {
 		Table,
 		UserImportModal,
 		type Filter,
+		type TableCell,
 		type TableColumn,
 		type TableRow
 	} from '@davincibot/components';
 	import {
 		CAMPUS_BADGES,
+		GLOBAL_ROLES,
 		GLOBAL_ROLE_LABELS,
 		hasAnyPermission,
 		mountClosable,
@@ -51,14 +59,21 @@
 		id: string;
 		username: string;
 		avatar_url: string | null;
+		campus: Campus | null;
 		status: string;
 		member_of: MemberOfRow[];
+		profile_global_roles: GlobalRoleRow[];
 	}
 
 	interface MemberOfRow {
 		role: string;
 		revoked_at: string | null;
 		project: { id: number; name: string } | null;
+	}
+
+	interface GlobalRoleRow {
+		role: string;
+		revoked_at: string | null;
 	}
 
 	interface ProjectRoleEntry {
@@ -70,6 +85,7 @@
 		email: string;
 		name: string;
 		project?: string;
+		campus?: string;
 	}
 
 	interface FailureEntry {
@@ -77,9 +93,41 @@
 		message: string;
 	}
 
+	/** Le campus et les rôles s'affichent en badges : le CSV, lui, reprend les libellés. */
+	function campusOf(value: unknown): Campus | null {
+		return typeof value === 'string' && value in CAMPUS_BADGES ? (value as Campus) : null;
+	}
+
+	function globalRolesOf(value: unknown): GlobalRole[] {
+		return Array.isArray(value) ? (value as GlobalRole[]) : [];
+	}
+
+	function globalRoleOf(value: unknown): GlobalRole | null {
+		return typeof value === 'string' && GLOBAL_ROLES.includes(value as GlobalRole)
+			? (value as GlobalRole)
+			: null;
+	}
+
 	const columns: TableColumn[] = [
 		{ key: 'username', label: 'Nom', sortable: true },
+		{
+			key: 'campus',
+			label: 'Campus',
+			sortable: true,
+			csv: (row) => {
+				const campus = campusOf(row[1]?.value);
+				return campus ? CAMPUS_BADGES[campus].label : '';
+			}
+		},
 		{ key: 'projects', label: 'Projets' },
+		{
+			key: 'roles',
+			label: 'Rôles globaux',
+			csv: (row) =>
+				globalRolesOf(row[3]?.value)
+					.map((role) => GLOBAL_ROLE_LABELS[role])
+					.join(', ')
+		},
 		{ key: 'status', label: 'Statut', sortable: true }
 	];
 
@@ -102,11 +150,11 @@
 		triggerTableRefresh(usersTableTopic);
 	}
 
-	// `project_filter` ne sert qu'au filtre Projets : filtrer l'embed affiché masquerait les
-	// autres projets des membres retenus.
+	// `project_filter` et `role_filter` ne servent qu'aux filtres Projets et Rôles globaux :
+	// filtrer l'embed affiché masquerait les autres projets et rôles des membres retenus.
 	const dbInfo = {
 		table: 'profiles',
-		key: 'id, username, avatar_url, status, member_of!membre_projet_profile_fkey(project!inner(id, name), revoked_at), project_filter:member_of!membre_projet_profile_fkey(project, revoked_at)'
+		key: 'id, username, avatar_url, campus, status, member_of!membre_projet_profile_fkey(project!inner(id, name), revoked_at), project_filter:member_of!membre_projet_profile_fkey(project, revoked_at), profile_global_roles!profile_global_roles_profile_fkey(role, revoked_at), role_filter:profile_global_roles!profile_global_roles_profile_fkey(role, revoked_at)'
 	};
 
 	let canEditProfile = $state<boolean>(false);
@@ -115,7 +163,12 @@
 	let canInviteMembers = $state<boolean>(false);
 	let canUpdateStatus = $state<boolean>(false);
 	const canReinvite = $derived(canEditProfile || canUpdateStatus);
-	const canImportMembers = $derived(canInviteMembers && canManageRoles && canManageProjects);
+	// Le trigger `create_user_profile` pose le profil et son rôle de base dans la
+	// transaction d'invitation : l'import n'a plus besoin d'`iam.roles.manage`,
+	// qui réservait l'écran au seul super_admin alors que c'est le secrétariat qui
+	// saisit les arrivées. Attribuer un rôle en plus reste possible, et c'est ce
+	// surplus — pas l'import — qui demande `iam.roles.manage` (`canManageRoles`).
+	const canImportMembers = $derived(canInviteMembers && canManageProjects && canEditProfile);
 	let pendingInvites = $state<AuthUser[]>([]);
 	let pendingInvitesLoading = $state<boolean>(false);
 	let pendingInvitesError = $state('');
@@ -232,6 +285,26 @@
 			return value;
 		}
 		return dt.toLocaleString('fr-FR');
+	}
+
+	// La liste des invitations vient de l'API admin, pas de PostgREST : `devData` court-circuite la
+	// requête Supabase et `dbInfo` ne sert plus qu'à identifier la table côté composant.
+	const pendingInvitesDbInfo = { table: 'pending_invites', key: 'id' };
+	// Aligné sur le `perPage` de l'API : `devData` rend toutes les lignes d'un coup, la pagination
+	// du composant n'aurait aucune page suivante à servir.
+	const PENDING_INVITES_PAGE_SIZE = 25;
+	const pendingInvitesColumns: TableColumn[] = [
+		{ key: 'email', label: 'Email' },
+		{ key: 'invited_at', label: 'Invité·e le' },
+		{ key: 'actions', label: 'Actions', csv: () => '' }
+	];
+
+	function parsePendingInvites(data: unknown[]): TableRow[] {
+		return (data as AuthUser[]).map((authUser) => [
+			{ value: authUser.email ?? '', data: authUser.id },
+			{ value: formatDate(authUser.invited_at) },
+			{ value: authUser, cell: inviteActionsCell }
+		]);
 	}
 
 	async function loadPendingInvites() {
@@ -352,11 +425,30 @@
 
 	const filters = $derived<Filter[]>([
 		{
+			category: 'Campus',
+			value: 'campus',
+			options: (Object.keys(CAMPUS_BADGES) as Campus[]).map((value) => ({
+				name: CAMPUS_BADGES[value].label,
+				value
+			}))
+		},
+		{
 			category: 'Projets',
 			value: 'project',
 			relation: 'project_filter',
 			where: [{ column: 'revoked_at', operator: 'is', value: 'null' }],
 			options: allProjects
+		},
+		{
+			category: 'Rôles globaux',
+			value: 'role',
+			relation: 'role_filter',
+			where: [{ column: 'revoked_at', operator: 'is', value: 'null' }],
+			wide: true,
+			// L'ordre du catalogue (Direction, responsables, membres) plutôt que celui de l'enum.
+			options: Object.values(GLOBAL_ROLE_CATEGORIES)
+				.flat()
+				.map((role) => ({ name: role.label, value: role.value }))
 		},
 		{
 			category: 'Statut',
@@ -413,14 +505,112 @@
 				.filter((m) => !m.revoked_at)
 				.map((m) => m.project?.name ?? '')
 				.join(', ');
+			// PostgREST ne garantit pas l'ordre de l'embed : on le fige sur le rang de l'enum,
+			// sans quoi les badges dansent d'un chargement à l'autre.
+			const roles = el.profile_global_roles
+				.filter((r) => !r.revoked_at)
+				.map((r) => r.role as GlobalRole)
+				.sort((a, b) => GLOBAL_ROLES.indexOf(a) - GLOBAL_ROLES.indexOf(b));
 			const status = el.status === 'disabled' ? 'Désactivé' : 'Activé';
 			items.push([
 				{ value: el.username, data: el.id, avatar: el.avatar_url },
+				{ value: el.campus, cell: campusCell },
 				{ value: project },
+				{ value: roles, cell: rolesCell },
 				{ value: status }
 			]);
 		}
 		return items;
+	}
+
+	/**
+	 * Nom et campus issus du CSV, posés sur le profil que le trigger
+	 * `create_user_profile` vient de créer à l'invitation. La RPC lit `undefined`
+	 * comme « ne touche pas » : un CSV sans campus laisse la colonne vide.
+	 */
+	async function applyImportedProfile(
+		supabase: ReturnType<typeof getSupabaseBrowserClient>,
+		profileId: string,
+		username: string,
+		campus: Campus | null
+	): Promise<void> {
+		// Le profil naît dans la transaction d'invitation, jamais ici. S'il manque,
+		// la RPC mettrait zéro ligne à jour sans rien signaler : on préfère l'échec
+		// visible, qui déclenche le rollback de l'invitation.
+		const { count, error: lookupError } = await supabase
+			.from('profiles')
+			.select('id', { count: 'exact', head: true })
+			.eq('id', profileId);
+		if (lookupError) {
+			throw new Error((lookupError as { message: string }).message);
+		}
+		if ((count ?? 0) === 0) {
+			throw new Error('Profil introuvable après invitation.');
+		}
+
+		if (!username && !campus) {
+			return;
+		}
+		const { error } = await supabase.rpc('admin_update_profile', {
+			p_profile: profileId,
+			p_username: username || undefined,
+			p_campus: campus ?? undefined
+		});
+		if (error) {
+			throw new Error(error.message);
+		}
+	}
+
+	/**
+	 * Rôle global choisi pour l'import, posé sur chaque membre traité. La base
+	 * attribue déjà son rôle de base à la création : celui-ci s'y ajoute.
+	 */
+	async function assignImportedRole(
+		supabase: ReturnType<typeof getSupabaseBrowserClient>,
+		profileId: string,
+		role: GlobalRole | null
+	): Promise<void> {
+		if (!role) {
+			return;
+		}
+		const { error } = await supabase.rpc('assign_global_role', {
+			p_profile: profileId,
+			p_role: role
+		});
+		if (error) {
+			throw new Error(
+				`Attribution du rôle ${GLOBAL_ROLE_LABELS[role]} impossible : ${error.message}`
+			);
+		}
+	}
+
+	/** Rattache au projet si aucune ligne active ne le fait déjà. */
+	async function attachToProject(
+		supabase: ReturnType<typeof getSupabaseBrowserClient>,
+		profileId: string,
+		projectId: number
+	): Promise<boolean> {
+		const { count, error: checkError } = await supabase
+			.from('member_of')
+			.select('project', { count: 'exact', head: true })
+			.eq('profile', profileId)
+			.eq('project', projectId)
+			.is('revoked_at', null);
+		if (checkError) {
+			throw new Error((checkError as { message: string }).message);
+		}
+		if ((count ?? 0) > 0) {
+			return false;
+		}
+		const { error: attachError } = await supabase.from('member_of').insert({
+			profile: profileId,
+			project: projectId,
+			role: 'project_member' satisfies ProjectRole
+		});
+		if (attachError) {
+			throw new Error((attachError as { message: string }).message);
+		}
+		return true;
 	}
 
 	function addNew() {
@@ -428,11 +618,28 @@
 			target: document.body,
 			props: {
 				projectOptions: allProjects,
+				// Attribuer un rôle relève d'`iam.roles.manage` : sans elle, le
+				// sélecteur ne s'affiche pas et la base pose son rôle de base.
+				roleOptions: canManageRoles
+					? Object.values(GLOBAL_ROLE_CATEGORIES)
+							.flat()
+							.map((role) => ({ name: role.label, value: role.value }))
+					: [],
 				title: 'Importer des utilisateurs',
-				onSubmit: async ({ project, users }: { project: string; users: ImportUser[] }) => {
+				onSubmit: async ({
+					campus,
+					project,
+					role,
+					users
+				}: {
+					campus: string;
+					project: string;
+					role: string;
+					users: ImportUser[];
+				}) => {
 					if (!canImportMembers) {
 						throw new Error(
-							"Vous n'avez pas les permissions requises pour cette action (members.invite.send, iam.roles.manage et members.projects.update.all nécessaires)."
+							"Vous n'avez pas les permissions requises pour cette action (members.invite.send, members.projects.update.all et members.profile.update.all nécessaires)."
 						);
 					}
 
@@ -442,6 +649,28 @@
 					const alreadyLinked: string[] = [];
 					const failures: FailureEntry[] = [];
 					const defaultProject = project !== '' && project !== 'NULL' ? project : '';
+					const defaultCampus = campusOf(campus);
+					const importedRole = globalRoleOf(role);
+
+					// Le rang décide : `can_manage_role` refuse un rôle au moins aussi haut
+					// que le sien. On le demande une fois, avant d'inviter qui que ce soit —
+					// sinon chaque membre serait créé puis supprimé par le rollback.
+					if (importedRole) {
+						const { data: allowed, error: roleCheckError } = await supabase.rpc('can_manage_role', {
+							p_target_role: importedRole
+						});
+						if (roleCheckError) {
+							throw new Error(
+								'Vérification du rôle impossible : ' +
+									(roleCheckError as { message: string }).message
+							);
+						}
+						if (!allowed) {
+							throw new Error(
+								`Vous ne pouvez pas attribuer le rôle ${GLOBAL_ROLE_LABELS[importedRole]} : il faut un rôle strictement supérieur au sien.`
+							);
+						}
+					}
 
 					const existingAuthUsers = new SvelteMap<string, AuthUser>();
 					try {
@@ -485,6 +714,7 @@
 							});
 							continue;
 						}
+						const userCampus = campusOf(user.campus) ?? defaultCampus;
 						const existingAuth = existingAuthUsers.get(email);
 						let createdUserId: string | null = existingAuth?.id ?? null;
 						let isNewlyCreated = false;
@@ -497,28 +727,12 @@
 									throw new Error('Invitation échouée : ID utilisateur manquant.');
 								}
 								isNewlyCreated = true;
-								const { error: profileError } = await supabase.from('profiles').insert({
-									id: createdUserId,
-									username
-								});
-								if (profileError) {
-									throw new Error((profileError as { message: string }).message);
-								}
-								const { error: roleError } = await supabase.rpc('assign_global_role', {
-									p_profile: createdUserId,
-									p_role: DEFAULT_IMPORT_ROLE
-								});
-								if (roleError) {
-									throw new Error(roleError.message);
-								}
-								const { error: memberError } = await supabase.from('member_of').insert({
-									profile: createdUserId,
-									project: projectId,
-									role: 'project_member' satisfies ProjectRole
-								});
-								if (memberError) {
-									throw new Error((memberError as { message: string }).message);
-								}
+								// Le profil et le rôle de base existent déjà (trigger
+								// `create_user_profile`) : l'import ne fait que remplacer le nom
+								// déduit de l'email par celui du CSV, et poser le campus.
+								await applyImportedProfile(supabase, createdUserId, username, userCampus);
+								await assignImportedRole(supabase, createdUserId, importedRole);
+								await attachToProject(supabase, createdUserId, projectId);
 								createdUsers.push(email);
 								existingAuthUsers.set(email, {
 									id: createdUserId,
@@ -528,56 +742,12 @@
 									last_sign_in_at: null
 								});
 							} else {
-								// existingAuth est défini dans cette branche : son id aussi.
-								const profileId = existingAuth.id;
-								const { data: existingProfileRows, error: existingProfileError } = (await supabase
-									.from('profiles')
-									.select('id, username')
-									.eq('id', profileId)
-									.limit(1)) as {
-									data: { id: string; username: string }[] | null;
-									error: unknown;
-								};
-								if (existingProfileError) {
-									throw new Error((existingProfileError as { message: string }).message);
-								}
-								const existingProfile = existingProfileRows?.[0];
-								if (!existingProfile) {
-									const fallbackUsername = username || email.split('@')[0];
-									const { error: profileInsertError } = await supabase.from('profiles').insert({
-										id: profileId,
-										username: fallbackUsername
-									});
-									if (profileInsertError) {
-										throw new Error((profileInsertError as { message: string }).message);
-									}
-									// Profil créé à la volée : lui garantir le rôle par défaut.
-									const { error: roleError } = await supabase.rpc('assign_global_role', {
-										p_profile: profileId,
-										p_role: DEFAULT_IMPORT_ROLE
-									});
-									if (roleError) {
-										throw new Error(roleError.message);
-									}
-								}
-								const { count: memberCount, error: memberCheckError } = await supabase
-									.from('member_of')
-									.select('project', { count: 'exact', head: true })
-									.eq('profile', profileId)
-									.eq('project', projectId)
-									.is('revoked_at', null);
-								if (memberCheckError) {
-									throw new Error((memberCheckError as { message: string }).message);
-								}
-								if ((memberCount ?? 0) === 0) {
-									const { error: attachError } = await supabase.from('member_of').insert({
-										profile: profileId,
-										project: projectId,
-										role: 'project_member' satisfies ProjectRole
-									});
-									if (attachError) {
-										throw new Error((attachError as { message: string }).message);
-									}
+								// Membre déjà connu : on ne réécrit ni son nom ni son campus, qu'il
+								// a pu corriger lui-même. Le rôle demandé vaut pour tout l'import,
+								// lui compris ; `assign_global_role` est idempotent.
+								await assignImportedRole(supabase, existingAuth.id, importedRole);
+								const attached = await attachToProject(supabase, existingAuth.id, projectId);
+								if (attached) {
 									updatedUsers.push(email);
 								} else {
 									alreadyLinked.push(email);
@@ -588,12 +758,9 @@
 								email,
 								message: (error as Error | null)?.message ?? 'Erreur inconnue'
 							});
+							// La suppression du compte auth emporte profil, rôles et
+							// rattachements (ON DELETE CASCADE) : rien à nettoyer en amont.
 							if (isNewlyCreated && createdUserId) {
-								await supabase.rpc('set_profile_status', {
-									p_profile: createdUserId,
-									p_status: 'disabled',
-									p_reason: 'rollback_import_failed'
-								});
 								try {
 									await deleteAuthUser(createdUserId);
 								} catch {
@@ -634,6 +801,12 @@
 					if (alreadyLinked.length > 0) {
 						messageParts.push(`Déjà associés à ce projet : ${alreadyLinked.join(', ')}`);
 					}
+					if (
+						importedRole &&
+						createdUsers.length + updatedUsers.length + alreadyLinked.length > 0
+					) {
+						messageParts.push(`Rôle ${GLOBAL_ROLE_LABELS[importedRole]} attribué à tout l'import.`);
+					}
 					if (failures.length > 0) {
 						const failureEmails = failures.map((f) => f.email).join(', ');
 						messageParts.push(
@@ -657,8 +830,6 @@
 			}
 		});
 	}
-
-	const DEFAULT_IMPORT_ROLE: GlobalRole = 'guest';
 
 	/**
 	 * Applique un diff de rôles globaux via les RPC assign/revoke (immuabilité de
@@ -784,14 +955,7 @@
 			)
 			.eq('id', id)
 			.single()) as {
-			data:
-				| (ProfileRow & {
-						campus: Campus | null;
-						permissions: string[] | null;
-						status: string;
-						profile_global_roles: { role: string; revoked_at: string | null }[];
-				  })
-				| null;
+			data: (ProfileRow & { permissions: string[] | null }) | null;
 			error: unknown;
 		};
 		if (error || !data) {
@@ -845,8 +1009,13 @@
 				sub: `${String(activeGlobalRoles.length)} rôle(s) · ${String(overridePermissions.length)} override(s)`
 			},
 			body: [
-				{ label: 'Nom', value: data.username, avatar: data.avatar_url },
-				{ label: 'Campus', value: data.campus ?? 'NULL' },
+				{
+					label: 'Nom',
+					id: PROFILE_FIELD_KEYS.username,
+					value: data.username,
+					avatar: data.avatar_url
+				},
+				{ label: 'Campus', id: PROFILE_FIELD_KEYS.campus, value: data.campus ?? 'NULL' },
 				{
 					label: 'Rôles globaux',
 					value: { type: 'badges', list: roleBadges },
@@ -873,25 +1042,7 @@
 		// un champ absent ne doit jamais être lu comme « sélection vide », faute
 		// de quoi ouvrir la fiche révoquerait rôles et rattachements.
 		const fields = [
-			...(canEditProfile
-				? [
-						{
-							name: 'Nom',
-							type: 'text',
-							placeholder: 'Rob, aka Robert',
-							required: true,
-							wide: true
-						},
-						{
-							name: 'Campus',
-							type: 'select',
-							options: (Object.keys(CAMPUS_BADGES) as Campus[]).map((value) => ({
-								value,
-								text: CAMPUS_BADGES[value].label
-							}))
-						}
-					]
-				: []),
+			...(canEditProfile ? buildProfileFields() : []),
 			...(canManageRoles
 				? [
 						{
@@ -942,34 +1093,14 @@
 				) => {
 					const formData = new FormData(forms);
 
-					const nomField = newFields.find((f) => f.name === 'Nom');
-					const campusField = newFields.find((f) => f.name === 'Campus');
 					const rolesField = newFields.find((f) => f.id === 'roles');
 					const permsField = newFields.find((f) => f.id === 'permissions');
 					const projectsField = newFields.find((f) => f.id === 'projects');
 
-					let nom: string | undefined;
-					if (nomField) {
-						const nomVal = formData.get('Nom');
-						nom =
-							typeof nomVal === 'string'
-								? nomVal
-								: typeof nomField.value === 'string'
-									? nomField.value
-									: '';
-					}
-
-					// Le sélecteur renvoie 'NULL' quand rien n'est choisi ; la RPC traite
-					// NULL comme « ne pas toucher », ce qui évite d'effacer un campus déjà
-					// posé en rouvrant simplement la fiche.
-					let campus: Campus | undefined;
-					if (campusField) {
-						const campusVal = formData.get('Campus');
-						campus =
-							typeof campusVal === 'string' && campusVal !== 'NULL'
-								? (campusVal as Campus)
-								: undefined;
-					}
+					const { username: nom, campus } = readProfileEdits(formData, {
+						username: newFields.some((f) => f.id === PROFILE_FIELD_KEYS.username),
+						campus: newFields.some((f) => f.id === PROFILE_FIELD_KEYS.campus)
+					});
 
 					const extractedPermissions =
 						permsField && Array.isArray(permsField.value)
@@ -1094,6 +1225,58 @@
 	}
 </script>
 
+{#snippet campusCell(cell: TableCell)}
+	{@const campus = campusOf(cell.value)}
+	{#if campus}
+		<CampusBadge {campus} compact />
+	{:else}
+		<span class="text-gray-500">—</span>
+	{/if}
+{/snippet}
+
+{#snippet rolesCell(cell: TableCell)}
+	{@const roles = globalRolesOf(cell.value)}
+	{#if roles.length > 0}
+		<div class="flex min-w-0 flex-wrap gap-1">
+			{#each roles as role (role)}
+				<span
+					class="bg-dark-blue border-light-blue/70 text-light-blue inline-flex items-center rounded-full border px-2 py-0.5 text-xs whitespace-nowrap"
+				>
+					{GLOBAL_ROLE_LABELS[role]}
+				</span>
+			{/each}
+		</div>
+	{:else}
+		<span class="text-gray-500">—</span>
+	{/if}
+{/snippet}
+
+{#snippet inviteActionsCell(cell: TableCell)}
+	{@const authUser = cell.value as AuthUser}
+	<div class="flex w-full flex-wrap justify-end gap-2">
+		<Button
+			disabled={reinvitingUserId !== null || cancelingUserId !== null}
+			onclick={() => {
+				void reinvitePendingUser(authUser);
+			}}
+			size="sm"
+			variant="primary"
+		>
+			{reinvitingUserId === authUser.id ? 'Envoi...' : 'Réinviter'}
+		</Button>
+		<Button
+			disabled={reinvitingUserId !== null || cancelingUserId !== null}
+			onclick={() => {
+				void cancelPendingInvite(authUser);
+			}}
+			size="sm"
+			variant="danger"
+		>
+			{cancelingUserId === authUser.id ? 'Annulation...' : 'Annuler'}
+		</Button>
+	</div>
+{/snippet}
+
 <svelte:head><title>Membres — DaVinciBot</title></svelte:head>
 
 <div class="w-full py-2 sm:px-8 lg:px-16">
@@ -1156,53 +1339,14 @@
 			{:else if pendingInvites.length === 0}
 				<p class="text-dark-light-blue text-sm">Aucune invitation expirée/en attente détectée.</p>
 			{:else}
-				<div class="overflow-x-auto">
-					<table class="text-dark-light-blue w-full text-left text-sm">
-						<thead
-							class="border-light-blue/20 text-dark-light-blue border-b text-xs tracking-wide uppercase"
-						>
-							<tr>
-								<th class="px-3 py-2">Email</th>
-								<th class="px-3 py-2">Invité le</th>
-								<th class="px-3 py-2">Dernière connexion</th>
-								<th class="px-3 py-2 text-right">Actions</th>
-							</tr>
-						</thead>
-						<tbody>
-							{#each pendingInvites as authUser (authUser.id)}
-								<tr class="border-light-blue/20 border-b">
-									<td class="px-3 py-2 text-white">{authUser.email}</td>
-									<td class="px-3 py-2">{formatDate(authUser.invited_at)}</td>
-									<td class="px-3 py-2">{formatDate(authUser.last_sign_in_at)}</td>
-									<td class="px-3 py-2 text-right">
-										<div class="flex flex-wrap justify-end gap-2">
-											<Button
-												disabled={reinvitingUserId !== null || cancelingUserId !== null}
-												onclick={() => {
-													void reinvitePendingUser(authUser);
-												}}
-												size="sm"
-												variant="primary"
-											>
-												{reinvitingUserId === authUser.id ? 'Envoi...' : 'Réinviter'}
-											</Button>
-											<Button
-												disabled={reinvitingUserId !== null || cancelingUserId !== null}
-												onclick={() => {
-													void cancelPendingInvite(authUser);
-												}}
-												size="sm"
-												variant="danger"
-											>
-												{cancelingUserId === authUser.id ? 'Annulation...' : 'Annuler'}
-											</Button>
-										</div>
-									</td>
-								</tr>
-							{/each}
-						</tbody>
-					</table>
-				</div>
+				<Table
+					columns={pendingInvitesColumns}
+					dbInfo={pendingInvitesDbInfo}
+					devData={pendingInvites}
+					pageSize={PENDING_INVITES_PAGE_SIZE}
+					parseItems={parsePendingInvites}
+					searchable="email"
+				/>
 			{/if}
 		</div>
 	</div>
