@@ -52,8 +52,7 @@ const lines = (target: HTMLElement) => target.querySelectorAll('fieldset');
 
 const fill = (target: HTMLElement, name: string, typed: string, index = 0) => {
 	const input = target.querySelectorAll<HTMLInputElement>(`input[name="${name}"]`)[index] as
-		| HTMLInputElement
-		| undefined;
+		HTMLInputElement | undefined;
 	if (!input) {
 		throw new Error(`Champ « ${name} » n° ${String(index)} introuvable.`);
 	}
@@ -74,7 +73,7 @@ afterEach(() => {
 });
 
 describe('panier de création de commande', () => {
-	it('ajoute une ligne alors même qu\'un prix unitaire a été saisi', () => {
+	it("ajoute une ligne alors même qu'un prix unitaire a été saisi", () => {
 		const target = mountPage();
 		fill(target, 'unit_price_ttc', '12.5');
 
@@ -84,7 +83,7 @@ describe('panier de création de commande', () => {
 		expect(lines(target)).toHaveLength(2);
 	});
 
-	it('retire une ligne alors même qu\'un prix unitaire a été saisi', () => {
+	it("retire une ligne alors même qu'un prix unitaire a été saisi", () => {
 		const target = mountPage();
 		buttonByText(target, 'Ajouter un composant')?.click();
 		flushSync();
