@@ -91,14 +91,14 @@
 			<div
 				class="h-12 w-12 rounded-full {type === 'success' ? 'bg-emerald-500/15' : ''} {type ===
 				'error'
-					? 'bg-red-900'
+					? 'bg-red-500/15'
 					: ''} {type === 'warning'
-					? 'bg-yellow-900'
+					? 'bg-amber-500/15'
 					: ''} mx-auto mb-3.5 flex items-center justify-center p-2"
 			>
 				{#if type === 'success'}
 					<svg
-						class="size-8 text-emerald-400"
+						class="size-8 text-emerald-300"
 						aria-hidden="true"
 						fill="currentColor"
 						viewBox="0 0 20 20"
@@ -111,7 +111,7 @@
 					>
 				{:else if type === 'error'}
 					<svg
-						class="h-8 w-8 text-red-400"
+						class="h-8 w-8 text-red-300"
 						fill="none"
 						height="24"
 						viewBox="0 0 24 24"
@@ -128,7 +128,7 @@
 					</svg>
 				{:else if type === 'warning'}
 					<svg
-						class="h-8 w-8 text-yellow-400"
+						class="h-8 w-8 text-amber-300"
 						fill="none"
 						height="24"
 						viewBox="0 0 24 24"
