@@ -37,7 +37,7 @@
 </script>
 
 <div class="grid gap-4">
-	<section class="border-light-blue/20 bg-blue-gray/15 rounded-2xl border p-4 sm:p-5">
+	<section class="border-rule bg-blue-gray/15 rounded-2xl border p-4 sm:p-5">
 		<p class="text-dark-light-blue m-0 mb-3 text-[0.65rem] tracking-[0.32em] uppercase">
 			Changer le mot de passe
 		</p>
@@ -49,7 +49,7 @@
 				<input
 					id="password"
 					name="new-password"
-					class="border-light-blue/30 bg-dark-blue/60 text-light-blue placeholder:text-dark-light-blue/50 focus:border-light-blue/70 block w-full rounded-xl border p-2.5 text-sm focus:outline-none disabled:opacity-50"
+					class="border-rule-strong bg-dark-blue/60 text-light-blue placeholder:text-muted focus:border-light-blue/70 focus-visible:ring-light-blue/60 block w-full rounded-xl border p-2.5 text-sm focus:outline-none focus-visible:ring-2 disabled:opacity-50"
 					autocomplete="new-password"
 					disabled={saving}
 					placeholder="********"
@@ -64,7 +64,7 @@
 				<input
 					id="password-confirm"
 					name="confirm-password"
-					class="border-light-blue/30 bg-dark-blue/60 text-light-blue placeholder:text-dark-light-blue/50 focus:border-light-blue/70 block w-full rounded-xl border p-2.5 text-sm focus:outline-none disabled:opacity-50"
+					class="border-rule-strong bg-dark-blue/60 text-light-blue placeholder:text-muted focus:border-light-blue/70 focus-visible:ring-light-blue/60 block w-full rounded-xl border p-2.5 text-sm focus:outline-none focus-visible:ring-2 disabled:opacity-50"
 					autocomplete="new-password"
 					disabled={saving}
 					placeholder="********"

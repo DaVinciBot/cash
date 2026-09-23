@@ -116,7 +116,7 @@
 
 	{#if data.address}
 		<pre
-			class="border-light-blue/20 bg-blue-gray/15 text-dark-light-blue mb-6 rounded-lg border px-4 py-3 text-sm whitespace-pre-wrap">{data.address}</pre>
+			class="border-rule bg-blue-gray/15 text-dark-light-blue mb-6 rounded-lg border px-4 py-3 text-sm whitespace-pre-wrap">{data.address}</pre>
 	{/if}
 
 	<!-- Actions de cycle de vie -->
@@ -161,7 +161,7 @@
 						>
 						<input
 							name="account_amount"
-							class="border-light-blue/30 bg-dark-blue/60 w-32 rounded-xl border p-2.5 text-sm"
+							class="border-rule-strong bg-dark-blue/60 w-32 rounded-xl border p-2.5 text-sm"
 							inputmode="decimal"
 							placeholder="0,00"
 							bind:value={settlementRaw[index]}
@@ -268,7 +268,7 @@
 						Nouveau montant de l'enveloppe
 						<input
 							name="amount_ttc"
-							class="border-light-blue/30 bg-dark-blue/60 mt-1 block w-40 rounded-xl border p-2.5 text-sm"
+							class="border-rule-strong bg-dark-blue/60 mt-1 block w-40 rounded-xl border p-2.5 text-sm"
 							inputmode="decimal"
 							placeholder="0,00"
 							bind:value={raiseAmount}
@@ -290,7 +290,7 @@
 	<!-- Frais de port (CMD-F-12, §7.2) -->
 	{#if editable}
 		<form
-			class="border-light-blue/20 bg-blue-gray/15 mb-6 rounded-2xl border p-4 sm:p-5"
+			class="border-rule bg-blue-gray/15 mb-6 rounded-2xl border p-4 sm:p-5"
 			action="?/shipping"
 			method="POST"
 			use:enhance
@@ -301,7 +301,7 @@
 					Montant TTC
 					<input
 						name="shipping_cost_ttc"
-						class="border-light-blue/30 bg-dark-blue/60 mt-1 block w-32 rounded-xl border p-2.5 text-sm"
+						class="border-rule-strong bg-dark-blue/60 mt-1 block w-32 rounded-xl border p-2.5 text-sm"
 						inputmode="decimal"
 						bind:value={shippingCost}
 					/>
@@ -310,7 +310,7 @@
 					Répartition entre les budgets
 					<select
 						name="shipping_allocation"
-						class="border-light-blue/30 bg-dark-blue/60 text-light-blue placeholder:text-dark-light-blue/50 focus:border-light-blue/70 mt-1 block rounded-xl border p-2.5 text-sm focus:outline-none disabled:opacity-50"
+						class="border-rule-strong bg-dark-blue/60 text-light-blue placeholder:text-muted focus:border-light-blue/70 focus-visible:ring-light-blue/60 mt-1 block rounded-xl border p-2.5 text-sm focus:outline-none focus-visible:ring-2 disabled:opacity-50"
 						bind:value={shippingMode}
 					>
 						{#each SHIPPING_ALLOCATIONS as mode (mode)}
@@ -329,7 +329,7 @@
 	</h2>
 	<ul class="mb-8 space-y-2">
 		{#each order.items as item (item.id)}
-			<li class="border-light-blue/20 bg-blue-gray/15 rounded-2xl border p-4 sm:p-5">
+			<li class="border-rule bg-blue-gray/15 rounded-2xl border p-4 sm:p-5">
 				<div class="flex flex-wrap items-start justify-between gap-3">
 					<div class="min-w-0 flex-1">
 						<div class="flex flex-wrap items-center gap-2">
@@ -410,7 +410,7 @@
 		<h2 class="text-dark-light-blue mb-3 text-sm font-semibold tracking-wide uppercase">
 			Répartition budgétaire
 		</h2>
-		<div class="border-light-blue/20 overflow-x-auto rounded-lg border">
+		<div class="border-rule overflow-x-auto rounded-lg border">
 			<table class="w-full text-sm">
 				<thead class="bg-blue-gray/15 text-dark-light-blue text-left text-xs uppercase">
 					<tr>
@@ -421,7 +421,7 @@
 						<th class="px-4 py-2 text-right">Reste</th>
 					</tr>
 				</thead>
-				<tbody class="divide-light-blue/10 divide-y">
+				<tbody class="divide-rule divide-y">
 					{#each order.shares as share (share.budgetId)}
 						<tr>
 							<td class="text-light-blue px-4 py-2">{share.budgetPath}</td>

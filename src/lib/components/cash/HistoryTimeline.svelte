@@ -40,7 +40,7 @@
 	{#if entries.length === 0}
 		<p class="text-dark-light-blue/70 text-sm">{empty}</p>
 	{:else}
-		<ol class="border-light-blue/20 relative space-y-1 border-l pl-4">
+		<ol class="border-rule relative space-y-1 border-l pl-4">
 			{#each entries as entry (entry.id)}
 				{@const badge = ACTIVITY_BADGES[entry.kind]}
 				{@const detailed = entry.changes.length > 0}
@@ -83,7 +83,7 @@
 					</div>
 
 					{#if detailed && open === entry.id}
-						<dl class="bg-blue-gray/15 ring-light-blue/20 mb-2 rounded-lg p-3 text-xs ring-1">
+						<dl class="bg-blue-gray/15 ring-rule mb-2 rounded-lg p-3 text-xs ring-1">
 							{#each entry.changes as change (change.field)}
 								<div class="flex flex-wrap items-baseline gap-2 py-0.5">
 									<dt class="text-dark-light-blue w-44 shrink-0">{fieldLabel(change.field)}</dt>

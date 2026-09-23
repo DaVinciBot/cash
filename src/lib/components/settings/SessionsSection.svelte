@@ -63,10 +63,7 @@
 	}
 </script>
 
-<section
-	id="sessions-section"
-	class="border-light-blue/20 bg-blue-gray/15 rounded-2xl border p-4 sm:p-5"
->
+<section id="sessions-section" class="border-rule bg-blue-gray/15 rounded-2xl border p-4 sm:p-5">
 	<p class="text-dark-light-blue m-0 mb-3 text-[0.65rem] tracking-[0.32em] uppercase">
 		Appareils connectés
 	</p>
@@ -81,7 +78,7 @@
 				{@const DeviceIcon = isMobileUserAgent(session.device_label) ? Smartphone : Monitor}
 				<li
 					id={`session-${session.id}`}
-					class="border-light-blue/10 bg-dark-blue/40 flex items-center gap-3 rounded-xl border p-3"
+					class="border-rule bg-dark-blue/40 flex items-center gap-3 rounded-xl border p-3"
 				>
 					<DeviceIcon class="text-dark-light-blue size-5 shrink-0" />
 					<div class="min-w-0 flex-1">
@@ -91,7 +88,7 @@
 							</span>
 							{#if session.trusted_device}
 								<span
-									class="border-light-blue/30 text-dark-light-blue inline-flex size-5 shrink-0 items-center justify-center rounded-full border"
+									class="border-rule-strong text-dark-light-blue inline-flex size-5 shrink-0 items-center justify-center rounded-full border"
 									aria-label="Appareil de confiance"
 									role="img"
 									title="Appareil de confiance"

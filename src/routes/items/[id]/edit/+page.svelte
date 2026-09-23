@@ -57,7 +57,7 @@
 	{/if}
 
 	<form
-		class="border-light-blue/20 bg-blue-gray/15 rounded-lg border p-6"
+		class="border-rule bg-blue-gray/15 rounded-lg border p-6"
 		method="POST"
 		use:enhance={() => {
 			submitting = true;
@@ -72,7 +72,7 @@
 				<span class="text-dark-light-blue mb-1 block text-sm">Nom</span>
 				<input
 					name="name"
-					class="border-light-blue/30 bg-dark-blue/60 text-light-blue placeholder:text-dark-light-blue/50 focus:border-light-blue/70 w-full rounded-xl border p-2.5 focus:outline-none disabled:opacity-50"
+					class="border-rule-strong bg-dark-blue/60 text-light-blue placeholder:text-muted focus:border-light-blue/70 focus-visible:ring-light-blue/60 w-full rounded-xl border p-2.5 focus:outline-none focus-visible:ring-2 disabled:opacity-50"
 					required
 					bind:value={name}
 				/>
@@ -81,7 +81,7 @@
 				<span class="text-dark-light-blue mb-1 block text-sm">Lien</span>
 				<input
 					name="link"
-					class="border-light-blue/30 bg-dark-blue/60 text-light-blue placeholder:text-dark-light-blue/50 focus:border-light-blue/70 w-full rounded-xl border p-2.5 focus:outline-none disabled:opacity-50"
+					class="border-rule-strong bg-dark-blue/60 text-light-blue placeholder:text-muted focus:border-light-blue/70 focus-visible:ring-light-blue/60 w-full rounded-xl border p-2.5 focus:outline-none focus-visible:ring-2 disabled:opacity-50"
 					type="url"
 					bind:value={link}
 				/>
@@ -90,7 +90,7 @@
 				<span class="text-dark-light-blue mb-1 block text-sm">Prix unitaire TTC</span>
 				<input
 					name="unit_price_ttc"
-					class="border-light-blue/30 bg-dark-blue/60 text-light-blue placeholder:text-dark-light-blue/50 focus:border-light-blue/70 w-full rounded-xl border p-2.5 focus:outline-none disabled:opacity-50"
+					class="border-rule-strong bg-dark-blue/60 text-light-blue placeholder:text-muted focus:border-light-blue/70 focus-visible:ring-light-blue/60 w-full rounded-xl border p-2.5 focus:outline-none focus-visible:ring-2 disabled:opacity-50"
 					min="0"
 					required
 					step="0.01"
@@ -102,7 +102,7 @@
 				<span class="text-dark-light-blue mb-1 block text-sm">Quantité</span>
 				<input
 					name="quantity"
-					class="border-light-blue/30 bg-dark-blue/60 text-light-blue placeholder:text-dark-light-blue/50 focus:border-light-blue/70 w-full rounded-xl border p-2.5 focus:outline-none disabled:opacity-50"
+					class="border-rule-strong bg-dark-blue/60 text-light-blue placeholder:text-muted focus:border-light-blue/70 focus-visible:ring-light-blue/60 w-full rounded-xl border p-2.5 focus:outline-none focus-visible:ring-2 disabled:opacity-50"
 					min="1"
 					required
 					step="1"
@@ -130,7 +130,7 @@
 				<span class="text-dark-light-blue mb-1 block text-sm">Note</span>
 				<textarea
 					name="note"
-					class="border-light-blue/30 bg-dark-blue/60 text-light-blue placeholder:text-dark-light-blue/50 focus:border-light-blue/70 w-full rounded-xl border p-2.5 focus:outline-none disabled:opacity-50"
+					class="border-rule-strong bg-dark-blue/60 text-light-blue placeholder:text-muted focus:border-light-blue/70 focus-visible:ring-light-blue/60 w-full rounded-xl border p-2.5 focus:outline-none focus-visible:ring-2 disabled:opacity-50"
 					rows="2"
 					bind:value={note}></textarea>
 			</label>

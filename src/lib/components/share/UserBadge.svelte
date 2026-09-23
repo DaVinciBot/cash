@@ -125,7 +125,7 @@
 	id="dropdown"
 	class="{fixed
 		? 'fixed'
-		: 'absolute'} bg-opacity-20 divide-light-blue/10 border-light-blue/20 bg-dark-blue/60 z-50 my-4 hidden w-56 list-none divide-y overflow-hidden rounded-xl border text-base shadow backdrop-blur-lg"
+		: 'absolute'} divide-rule border-rule bg-dark-blue/60 z-50 my-4 hidden w-56 list-none divide-y overflow-hidden rounded-xl border text-base shadow backdrop-blur-lg"
 >
 	<div class="px-4 py-3">
 		<span class="block text-sm font-semibold text-white">{displayUser.name}</span>

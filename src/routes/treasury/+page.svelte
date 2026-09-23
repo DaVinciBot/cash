@@ -50,13 +50,13 @@
 	{/if}
 
 	<!-- TRESO-F-51 — solde à un instant donné -->
-	<div class="border-light-blue/20 bg-blue-gray/15 mb-6 rounded-2xl border p-4 sm:p-5">
+	<div class="border-rule bg-blue-gray/15 mb-6 rounded-2xl border p-4 sm:p-5">
 		<form class="mb-4 flex flex-wrap items-end gap-3" method="GET">
 			<label class="text-dark-light-blue text-xs">
 				Solde au
 				<input
 					name="on"
-					class="border-light-blue/30 bg-dark-blue/60 text-light-blue placeholder:text-dark-light-blue/50 focus:border-light-blue/70 mt-1 block rounded-xl border p-2.5 text-sm focus:outline-none disabled:opacity-50"
+					class="border-rule-strong bg-dark-blue/60 text-light-blue placeholder:text-muted focus:border-light-blue/70 focus-visible:ring-light-blue/60 mt-1 block rounded-xl border p-2.5 text-sm focus:outline-none focus-visible:ring-2 disabled:opacity-50"
 					type="date"
 					value={data.on}
 				/>
@@ -72,7 +72,7 @@
 			</p>
 		</form>
 
-		<ul class="divide-light-blue/10 divide-y">
+		<ul class="divide-rule divide-y">
 			{#each treasury as snapshot (snapshot.accountId)}
 				<li class="flex items-center justify-between py-2 text-sm">
 					<span class="text-light-blue">{snapshot.name}</span>
@@ -85,11 +85,11 @@
 		</ul>
 
 		{#if envelopes.length > 0}
-			<div class="border-light-blue/20 mt-4 border-t pt-3">
+			<div class="border-rule mt-4 border-t pt-3">
 				<p class="text-dark-light-blue mb-2 text-xs">
 					Enveloppes partenaires — avoirs chez un tiers, hors trésorerie de l'association.
 				</p>
-				<ul class="divide-light-blue/10 divide-y">
+				<ul class="divide-rule divide-y">
 					{#each envelopes as snapshot (snapshot.accountId)}
 						<li class="flex items-center justify-between py-2 text-sm">
 							<span class="text-light-blue">{snapshot.name}</span>
@@ -102,7 +102,7 @@
 	</div>
 
 	<!-- TRESO-F-52 — crédits et débits entre deux dates -->
-	<div class="border-light-blue/20 bg-blue-gray/15 mb-8 rounded-2xl border p-4 sm:p-5">
+	<div class="border-rule bg-blue-gray/15 mb-8 rounded-2xl border p-4 sm:p-5">
 		<h2 class="text-light-blue mb-3 text-sm font-semibold">Mouvements sur une période</h2>
 		<form class="flex flex-wrap items-end gap-3" method="GET">
 			<input name="on" type="hidden" value={data.on} />
@@ -110,7 +110,7 @@
 				Du
 				<input
 					name="from"
-					class="border-light-blue/30 bg-dark-blue/60 text-light-blue placeholder:text-dark-light-blue/50 focus:border-light-blue/70 mt-1 block rounded-xl border p-2.5 text-sm focus:outline-none disabled:opacity-50"
+					class="border-rule-strong bg-dark-blue/60 text-light-blue placeholder:text-muted focus:border-light-blue/70 focus-visible:ring-light-blue/60 mt-1 block rounded-xl border p-2.5 text-sm focus:outline-none focus-visible:ring-2 disabled:opacity-50"
 					type="date"
 					value={data.from}
 				/>
@@ -119,7 +119,7 @@
 				Au
 				<input
 					name="to"
-					class="border-light-blue/30 bg-dark-blue/60 text-light-blue placeholder:text-dark-light-blue/50 focus:border-light-blue/70 mt-1 block rounded-xl border p-2.5 text-sm focus:outline-none disabled:opacity-50"
+					class="border-rule-strong bg-dark-blue/60 text-light-blue placeholder:text-muted focus:border-light-blue/70 focus-visible:ring-light-blue/60 mt-1 block rounded-xl border p-2.5 text-sm focus:outline-none focus-visible:ring-2 disabled:opacity-50"
 					type="date"
 					value={data.to}
 				/>
@@ -161,7 +161,7 @@
 
 		{#if openAccount}
 			<form
-				class="border-light-blue/20 bg-blue-gray/15 mb-3 flex flex-wrap items-end gap-3 rounded-lg border p-4"
+				class="border-rule bg-blue-gray/15 mb-3 flex flex-wrap items-end gap-3 rounded-lg border p-4"
 				action="?/createAccount"
 				method="POST"
 				use:enhance={() =>
@@ -174,7 +174,7 @@
 					Nom
 					<input
 						name="name"
-						class="border-light-blue/30 bg-dark-blue/60 text-light-blue placeholder:text-dark-light-blue/50 focus:border-light-blue/70 mt-1 block rounded-xl border p-2.5 text-sm focus:outline-none disabled:opacity-50"
+						class="border-rule-strong bg-dark-blue/60 text-light-blue placeholder:text-muted focus:border-light-blue/70 focus-visible:ring-light-blue/60 mt-1 block rounded-xl border p-2.5 text-sm focus:outline-none focus-visible:ring-2 disabled:opacity-50"
 						required
 					/>
 				</label>
@@ -182,7 +182,7 @@
 					Type
 					<select
 						name="kind"
-						class="border-light-blue/30 bg-dark-blue/60 text-light-blue placeholder:text-dark-light-blue/50 focus:border-light-blue/70 mt-1 block rounded-xl border p-2.5 text-sm focus:outline-none disabled:opacity-50"
+						class="border-rule-strong bg-dark-blue/60 text-light-blue placeholder:text-muted focus:border-light-blue/70 focus-visible:ring-light-blue/60 mt-1 block rounded-xl border p-2.5 text-sm focus:outline-none focus-visible:ring-2 disabled:opacity-50"
 					>
 						{#each ACCOUNT_KINDS as kind (kind)}
 							<option value={kind}>{ACCOUNT_KIND_LABELS[kind]}</option>
@@ -193,7 +193,7 @@
 					Solde d'ouverture
 					<input
 						name="opening_balance"
-						class="border-light-blue/30 bg-dark-blue/60 mt-1 block w-32 rounded-xl border p-2.5 text-sm"
+						class="border-rule-strong bg-dark-blue/60 mt-1 block w-32 rounded-xl border p-2.5 text-sm"
 						inputmode="decimal"
 						value="0,00"
 					/>
@@ -205,7 +205,7 @@
 		<ul class="space-y-2">
 			{#each data.accounts as account (account.id)}
 				<li
-					class="border-light-blue/20 bg-blue-gray/15 flex flex-wrap items-center gap-3 rounded-lg border px-4 py-3 text-sm"
+					class="border-rule bg-blue-gray/15 flex flex-wrap items-center gap-3 rounded-lg border px-4 py-3 text-sm"
 				>
 					<span class="font-medium text-white">{account.name}</span>
 					<span class="text-dark-light-blue">{ACCOUNT_KIND_LABELS[account.kind]}</span>
@@ -296,7 +296,7 @@
 
 		{#if openPeriod}
 			<form
-				class="border-light-blue/20 bg-blue-gray/15 mb-3 flex flex-wrap items-end gap-3 rounded-lg border p-4"
+				class="border-rule bg-blue-gray/15 mb-3 flex flex-wrap items-end gap-3 rounded-lg border p-4"
 				action="?/createPeriod"
 				method="POST"
 				use:enhance={() =>
@@ -309,7 +309,7 @@
 					Découpage
 					<select
 						name="kind"
-						class="border-light-blue/30 bg-dark-blue/60 text-light-blue placeholder:text-dark-light-blue/50 focus:border-light-blue/70 mt-1 block rounded-xl border p-2.5 text-sm focus:outline-none disabled:opacity-50"
+						class="border-rule-strong bg-dark-blue/60 text-light-blue placeholder:text-muted focus:border-light-blue/70 focus-visible:ring-light-blue/60 mt-1 block rounded-xl border p-2.5 text-sm focus:outline-none focus-visible:ring-2 disabled:opacity-50"
 					>
 						<option value="school">Année scolaire</option>
 						<option value="fiscal">Exercice fiscal</option>
@@ -319,7 +319,7 @@
 					Libellé
 					<input
 						name="label"
-						class="border-light-blue/30 bg-dark-blue/60 text-light-blue placeholder:text-dark-light-blue/50 focus:border-light-blue/70 mt-1 block rounded-xl border p-2.5 text-sm focus:outline-none disabled:opacity-50"
+						class="border-rule-strong bg-dark-blue/60 text-light-blue placeholder:text-muted focus:border-light-blue/70 focus-visible:ring-light-blue/60 mt-1 block rounded-xl border p-2.5 text-sm focus:outline-none focus-visible:ring-2 disabled:opacity-50"
 						placeholder="2026/2027"
 						required
 					/>
@@ -328,7 +328,7 @@
 					Début
 					<input
 						name="starts_on"
-						class="border-light-blue/30 bg-dark-blue/60 text-light-blue placeholder:text-dark-light-blue/50 focus:border-light-blue/70 mt-1 block rounded-xl border p-2.5 text-sm focus:outline-none disabled:opacity-50"
+						class="border-rule-strong bg-dark-blue/60 text-light-blue placeholder:text-muted focus:border-light-blue/70 focus-visible:ring-light-blue/60 mt-1 block rounded-xl border p-2.5 text-sm focus:outline-none focus-visible:ring-2 disabled:opacity-50"
 						required
 						type="date"
 					/>
@@ -337,7 +337,7 @@
 					Fin
 					<input
 						name="ends_on"
-						class="border-light-blue/30 bg-dark-blue/60 text-light-blue placeholder:text-dark-light-blue/50 focus:border-light-blue/70 mt-1 block rounded-xl border p-2.5 text-sm focus:outline-none disabled:opacity-50"
+						class="border-rule-strong bg-dark-blue/60 text-light-blue placeholder:text-muted focus:border-light-blue/70 focus-visible:ring-light-blue/60 mt-1 block rounded-xl border p-2.5 text-sm focus:outline-none focus-visible:ring-2 disabled:opacity-50"
 						required
 						type="date"
 					/>
@@ -348,7 +348,7 @@
 
 		<div class="grid gap-4 md:grid-cols-2">
 			{#each [{ kind: 'school', title: 'Années scolaires', rows: data.periods.schoolYears }, { kind: 'fiscal', title: 'Exercices fiscaux', rows: data.periods.fiscalYears }] as group (group.kind)}
-				<div class="border-light-blue/20 bg-blue-gray/15 rounded-2xl border p-4 sm:p-5">
+				<div class="border-rule bg-blue-gray/15 rounded-2xl border p-4 sm:p-5">
 					<h3 class="text-dark-light-blue mb-2 text-xs font-semibold tracking-wide uppercase">
 						{group.title}
 					</h3>

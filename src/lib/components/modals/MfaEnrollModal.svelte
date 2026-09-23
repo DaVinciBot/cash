@@ -90,9 +90,7 @@
 	role="dialog"
 >
 	<OverlayBackdrop />
-	<div
-		class="border-light-blue/20 relative w-full max-w-md rounded-2xl border bg-[#060a2c] p-5 sm:p-6"
-	>
+	<div class="border-rule bg-surface-modal relative w-full max-w-md rounded-2xl border p-5 sm:p-6">
 		<p class="text-dark-light-blue m-0 mb-3 text-[0.65rem] tracking-[0.32em] uppercase">
 			Vérification en deux étapes
 		</p>

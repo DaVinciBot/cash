@@ -73,7 +73,7 @@
 			Exercice
 			<select
 				name="year"
-				class="border-light-blue/30 bg-dark-blue/60 text-light-blue placeholder:text-dark-light-blue/50 focus:border-light-blue/70 mt-1 block rounded-xl border p-2.5 text-sm focus:outline-none disabled:opacity-50"
+				class="border-rule-strong bg-dark-blue/60 text-light-blue placeholder:text-muted focus:border-light-blue/70 focus-visible:ring-light-blue/60 mt-1 block rounded-xl border p-2.5 text-sm focus:outline-none focus-visible:ring-2 disabled:opacity-50"
 				onchange={(event) => event.currentTarget.form?.requestSubmit()}
 				value={data.fiscalYearId ?? ''}
 			>
@@ -95,7 +95,7 @@
 
 	{#snippet flowForm(flow: (typeof data.flows)[number] | null)}
 		<form
-			class="border-light-blue/20 bg-blue-gray/15 mb-3 rounded-lg border p-4"
+			class="border-rule bg-blue-gray/15 mb-3 rounded-lg border p-4"
 			action={flow ? '?/update' : '?/create'}
 			method="POST"
 			use:enhance={() =>
@@ -112,7 +112,7 @@
 					Sens
 					<select
 						name="direction"
-						class="border-light-blue/30 bg-dark-blue/60 text-light-blue placeholder:text-dark-light-blue/50 focus:border-light-blue/70 mt-1 block rounded-xl border p-2.5 text-sm focus:outline-none disabled:opacity-50"
+						class="border-rule-strong bg-dark-blue/60 text-light-blue placeholder:text-muted focus:border-light-blue/70 focus-visible:ring-light-blue/60 mt-1 block rounded-xl border p-2.5 text-sm focus:outline-none focus-visible:ring-2 disabled:opacity-50"
 						value={flow?.direction ?? 'debit'}
 					>
 						<option value="debit">Dépense (débit)</option>
@@ -123,7 +123,7 @@
 					Montant TTC
 					<input
 						name="amount_ttc"
-						class="border-light-blue/30 bg-dark-blue/60 mt-1 block w-32 rounded-xl border p-2.5 text-sm"
+						class="border-rule-strong bg-dark-blue/60 mt-1 block w-32 rounded-xl border p-2.5 text-sm"
 						inputmode="decimal"
 						required
 						value={flow ? flow.amountTtc.toFixed(2).replace('.', ',') : ''}
@@ -133,7 +133,7 @@
 					Date
 					<input
 						name="occurred_on"
-						class="border-light-blue/30 bg-dark-blue/60 text-light-blue placeholder:text-dark-light-blue/50 focus:border-light-blue/70 mt-1 block rounded-xl border p-2.5 text-sm focus:outline-none disabled:opacity-50"
+						class="border-rule-strong bg-dark-blue/60 text-light-blue placeholder:text-muted focus:border-light-blue/70 focus-visible:ring-light-blue/60 mt-1 block rounded-xl border p-2.5 text-sm focus:outline-none focus-visible:ring-2 disabled:opacity-50"
 						required
 						type="date"
 						value={flow?.occurredOn ?? today}
@@ -143,7 +143,7 @@
 					Libellé
 					<input
 						name="label"
-						class="border-light-blue/30 bg-dark-blue/60 text-light-blue placeholder:text-dark-light-blue/50 focus:border-light-blue/70 mt-1 block w-full rounded-xl border p-2.5 text-sm focus:outline-none disabled:opacity-50"
+						class="border-rule-strong bg-dark-blue/60 text-light-blue placeholder:text-muted focus:border-light-blue/70 focus-visible:ring-light-blue/60 mt-1 block w-full rounded-xl border p-2.5 text-sm focus:outline-none focus-visible:ring-2 disabled:opacity-50"
 						required
 						value={flow?.label ?? ''}
 					/>
@@ -154,7 +154,7 @@
 					Compte
 					<select
 						name="account_id"
-						class="border-light-blue/30 bg-dark-blue/60 text-light-blue placeholder:text-dark-light-blue/50 focus:border-light-blue/70 mt-1 block rounded-xl border p-2.5 text-sm focus:outline-none disabled:opacity-50"
+						class="border-rule-strong bg-dark-blue/60 text-light-blue placeholder:text-muted focus:border-light-blue/70 focus-visible:ring-light-blue/60 mt-1 block rounded-xl border p-2.5 text-sm focus:outline-none focus-visible:ring-2 disabled:opacity-50"
 						value={flow?.accountId ?? data.accounts.at(0)?.id}
 					>
 						{#each data.accounts as account (account.id)}
@@ -166,7 +166,7 @@
 					Exercice
 					<select
 						name="fiscal_year_id"
-						class="border-light-blue/30 bg-dark-blue/60 text-light-blue placeholder:text-dark-light-blue/50 focus:border-light-blue/70 mt-1 block rounded-xl border p-2.5 text-sm focus:outline-none disabled:opacity-50"
+						class="border-rule-strong bg-dark-blue/60 text-light-blue placeholder:text-muted focus:border-light-blue/70 focus-visible:ring-light-blue/60 mt-1 block rounded-xl border p-2.5 text-sm focus:outline-none focus-visible:ring-2 disabled:opacity-50"
 						value={flow?.fiscalYearId ?? openYear?.id}
 					>
 						{#each data.periods.fiscalYears as year (year.id)}
@@ -178,7 +178,7 @@
 					Budget imputé
 					<select
 						name="budget_id"
-						class="border-light-blue/30 bg-dark-blue/60 text-light-blue placeholder:text-dark-light-blue/50 focus:border-light-blue/70 mt-1 block w-full rounded-xl border p-2.5 text-sm focus:outline-none disabled:opacity-50"
+						class="border-rule-strong bg-dark-blue/60 text-light-blue placeholder:text-muted focus:border-light-blue/70 focus-visible:ring-light-blue/60 mt-1 block w-full rounded-xl border p-2.5 text-sm focus:outline-none focus-visible:ring-2 disabled:opacity-50"
 						disabled={flow !== null && isFlowGenerated(flow.origin)}
 						value={flow?.budgetId ?? ''}
 					>
@@ -208,14 +208,14 @@
 
 	{#if data.flows.length === 0}
 		<p
-			class="border-light-blue/20 text-dark-light-blue/70 rounded-xl border border-dashed px-4 py-12 text-center"
+			class="border-rule text-dark-light-blue/70 rounded-xl border border-dashed px-4 py-12 text-center"
 		>
 			Aucun mouvement sur cet exercice.
 		</p>
 	{:else}
 		<ul class="space-y-2">
 			{#each data.flows as flow (flow.id)}
-				<li class="border-light-blue/20 bg-blue-gray/15 rounded-2xl border p-4 sm:p-5">
+				<li class="border-rule bg-blue-gray/15 rounded-2xl border p-4 sm:p-5">
 					<div class="flex flex-wrap items-center gap-3">
 						<StateBadge
 							badge={FLOW_DIRECTION_BADGES[flow.direction]}
@@ -251,7 +251,7 @@
 						<ul class="mt-2 flex flex-wrap gap-2">
 							{#each flow.proofs as proof (proof.id)}
 								<li
-									class="border-light-blue/30 text-dark-light-blue flex items-center gap-2 rounded border px-2 py-1 text-xs"
+									class="border-rule-strong text-dark-light-blue flex items-center gap-2 rounded border px-2 py-1 text-xs"
 								>
 									{#if proof.url}
 										<!-- eslint-disable svelte/no-navigation-without-resolve -- URL signée du bucket de stockage -->

@@ -66,7 +66,7 @@
 		<!-- Modal content -->
 		<div
 			id="MultiPopup"
-			class="border-light-blue/20 bg-surface-modal relative flex max-h-[min(85dvh,720px)] w-full flex-col overflow-y-auto rounded-2xl border p-4 text-center shadow-[0_26px_70px_rgba(2,6,30,0.6)] sm:p-6"
+			class="border-rule bg-surface-modal relative flex max-h-[min(85dvh,720px)] w-full flex-col overflow-y-auto rounded-2xl border p-4 text-center shadow-[0_26px_70px_rgba(2,6,30,0.6)] sm:p-6"
 		>
 			<Button
 				class="absolute top-2.5 right-2.5 ml-auto inline-flex items-center"
@@ -92,8 +92,8 @@
 				class="h-12 w-12 rounded-full {type === 'success' ? 'bg-emerald-500/15' : ''} {type ===
 				'error'
 					? 'bg-red-900'
-					: ''} {type === 'warning' ? 'bg-yellow-900' : ''} {type === 'info'
-					? 'bg-opacity-0'
+					: ''} {type === 'warning'
+					? 'bg-yellow-900'
 					: ''} mx-auto mb-3.5 flex items-center justify-center p-2"
 			>
 				{#if type === 'success'}

@@ -116,7 +116,7 @@
 
 	{#if projects.length === 0}
 		<p
-			class="border-light-blue/20 text-dark-light-blue/70 rounded-xl border border-dashed px-4 py-12 text-center"
+			class="border-rule text-dark-light-blue/70 rounded-xl border border-dashed px-4 py-12 text-center"
 		>
 			Vous n'êtes chef de projet d'aucun projet actif : il n'y a rien à revoir ici.
 		</p>
@@ -139,13 +139,13 @@
 
 		{#if visible.length === 0}
 			<p
-				class="border-light-blue/20 text-dark-light-blue/70 rounded-xl border border-dashed px-4 py-12 text-center"
+				class="border-rule text-dark-light-blue/70 rounded-xl border border-dashed px-4 py-12 text-center"
 			>
 				Aucune demande en attente. Tout est à jour.
 			</p>
 		{:else}
 			<div
-				class="border-light-blue/20 bg-blue-gray/15 mb-3 flex flex-wrap items-center gap-3 rounded-lg border px-4 py-3"
+				class="border-rule bg-blue-gray/15 mb-3 flex flex-wrap items-center gap-3 rounded-lg border px-4 py-3"
 			>
 				<label class="text-dark-light-blue flex items-center gap-2 text-sm">
 					<Checkbox checked={allVisibleSelected} className="size-4" onchange={toggleAll} />
@@ -203,7 +203,7 @@
 					<textarea
 						id="refusal-reason"
 						name="reason"
-						class="border-light-blue/30 bg-dark-blue/60 placeholder-dark-light-blue/50 mt-1 w-full rounded-lg border p-2 text-sm text-white"
+						class="border-rule-strong bg-dark-blue/60 placeholder:text-muted mt-1 w-full rounded-lg border p-2 text-sm text-white"
 						placeholder="Ex. : hors budget ce trimestre, à représenter en septembre."
 						rows="3"
 						bind:value={reason}></textarea>
@@ -228,7 +228,7 @@
 
 			<ul class="space-y-3">
 				{#each visible as item (item.id)}
-					<li class="border-light-blue/20 bg-blue-gray/15 rounded-2xl border p-4 sm:p-5">
+					<li class="border-rule bg-blue-gray/15 rounded-2xl border p-4 sm:p-5">
 						<div class="flex flex-wrap items-start gap-3">
 							<Checkbox
 								checked={selected.has(item.id)}

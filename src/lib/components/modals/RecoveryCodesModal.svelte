@@ -41,9 +41,7 @@
 	role="dialog"
 >
 	<OverlayBackdrop />
-	<div
-		class="border-light-blue/20 relative w-full max-w-md rounded-2xl border bg-[#060a2c] p-5 sm:p-6"
-	>
+	<div class="border-rule bg-surface-modal relative w-full max-w-md rounded-2xl border p-5 sm:p-6">
 		<p class="text-dark-light-blue m-0 mb-3 text-[0.65rem] tracking-[0.32em] uppercase">
 			Codes de récupération
 		</p>
@@ -55,7 +53,7 @@
 			</span>
 		</p>
 		<ul
-			class="border-light-blue/10 bg-dark-blue/40 m-0 mb-4 grid list-none grid-cols-2 gap-x-4 gap-y-1 rounded-xl border p-3 font-mono text-sm"
+			class="border-rule bg-dark-blue/40 m-0 mb-4 grid list-none grid-cols-2 gap-x-4 gap-y-1 rounded-xl border p-3 font-mono text-sm"
 		>
 			{#each codes as recoveryCode (recoveryCode)}
 				<li class="text-light-blue">{recoveryCode}</li>

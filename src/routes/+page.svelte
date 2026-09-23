@@ -81,7 +81,7 @@
 			</FilterChip>
 		{/each}
 		<input
-			class="border-light-blue/30 bg-dark-blue/60 placeholder-dark-light-blue/50 ml-auto w-56 rounded-xl border p-2.5 text-sm"
+			class="border-rule-strong bg-dark-blue/60 placeholder:text-muted ml-auto w-56 rounded-xl border p-2.5 text-sm"
 			placeholder="Rechercher…"
 			type="search"
 			bind:value={search}
@@ -90,7 +90,7 @@
 
 	{#if visible.length === 0}
 		<p
-			class="border-light-blue/20 text-dark-light-blue/70 rounded-xl border border-dashed px-4 py-12 text-center"
+			class="border-rule text-dark-light-blue/70 rounded-xl border border-dashed px-4 py-12 text-center"
 		>
 			{items.length === 0
 				? "Vous n'avez encore demandé aucun composant."
@@ -99,7 +99,7 @@
 	{:else}
 		<ul class="space-y-3">
 			{#each visible as item (item.id)}
-				<li class="border-light-blue/20 bg-blue-gray/15 rounded-2xl border p-4 sm:p-5">
+				<li class="border-rule bg-blue-gray/15 rounded-2xl border p-4 sm:p-5">
 					<div class="flex flex-wrap items-start justify-between gap-3">
 						<div class="min-w-0 flex-1">
 							<div class="flex flex-wrap items-center gap-2">

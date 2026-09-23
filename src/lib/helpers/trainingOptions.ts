@@ -45,7 +45,7 @@ export const TRAINING_CATEGORY_BADGES: Record<TrainingCategory, StateBadge> = {
 	other: {
 		label: 'Autre',
 		emoji: '',
-		className: 'bg-blue-gray/15 text-dark-light-blue ring-1 ring-light-blue/20'
+		className: 'bg-blue-gray/15 text-dark-light-blue ring-1 ring-rule'
 	}
 };
 
@@ -57,7 +57,7 @@ export const SLOT_STATUS_BADGES: Record<SlotStatus, StateBadge> = {
 	draft: {
 		label: 'Brouillon',
 		emoji: '',
-		className: 'bg-blue-gray/15 text-dark-light-blue ring-1 ring-light-blue/20'
+		className: 'bg-blue-gray/15 text-dark-light-blue ring-1 ring-rule'
 	},
 	pending: {
 		label: 'Planifiée',

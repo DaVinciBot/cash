@@ -70,11 +70,11 @@
 	<OverlayBackdrop {onClose} />
 	<section
 		bind:this={card}
-		class="border-light-blue/30 text-light-blue relative flex h-[min(85dvh,720px)] w-[min(920px,100%)] flex-col overflow-hidden rounded-[22px] border bg-[#060a2c] shadow-[0_26px_70px_rgba(2,6,30,0.6)] focus:outline-none"
+		class="border-rule-strong text-light-blue bg-surface-modal focus-visible:ring-light-blue/60 relative flex h-[min(85dvh,720px)] w-[min(920px,100%)] flex-col overflow-hidden rounded-[22px] border shadow-[0_26px_70px_rgba(2,6,30,0.6)] focus:outline-none focus-visible:ring-2"
 		tabindex="-1"
 	>
 		<header
-			class="border-light-blue/20 flex shrink-0 items-center justify-between gap-4 border-b p-4 sm:px-6"
+			class="border-rule flex shrink-0 items-center justify-between gap-4 border-b p-4 sm:px-6"
 		>
 			<h2 id="settings-modal-title" class="text-light-blue m-0 text-xl font-semibold">
 				Paramètres
@@ -95,7 +95,7 @@
 				id="settings-categories"
 				class="{mobilePanelOpen
 					? 'hidden'
-					: 'flex'} md:border-light-blue/20 w-full flex-col gap-1 overflow-y-auto p-3 md:flex md:w-56 md:shrink-0 md:border-r"
+					: 'flex'} md:border-rule w-full flex-col gap-1 overflow-y-auto p-3 md:flex md:w-56 md:shrink-0 md:border-r"
 				aria-label="Catégories des paramètres"
 			>
 				{#each SETTINGS_CATEGORIES as category (category.id)}
@@ -106,7 +106,7 @@
 					<button
 						class="flex w-full cursor-pointer items-center justify-between gap-3 rounded-xl border px-3 py-2.5 text-left transition {activeCategory ===
 						category.id
-							? 'border-light-blue/30 bg-blue-gray/25 text-light-blue'
+							? 'border-rule-strong bg-blue-gray/25 text-light-blue'
 							: 'text-dark-light-blue hover:bg-blue-gray/15 hover:text-light-blue border-transparent'}"
 						aria-current={activeCategory === category.id ? 'true' : undefined}
 						onclick={() => {
@@ -122,7 +122,7 @@
 					</button>
 				{/each}
 
-				<div class="border-light-blue/20 my-1 border-t" role="separator"></div>
+				<div class="border-rule my-1 border-t" role="separator"></div>
 
 				<!-- Item de navigation : volontairement hors du système de boutons. Il porte
 					 un état sélectionné et occupe toute la largeur du panneau, deux choses
@@ -130,7 +130,7 @@
 				<button
 					class="flex w-full cursor-pointer items-center justify-between gap-3 rounded-xl border px-3 py-2.5 text-left transition {activeCategory ===
 					REPORT_CATEGORY.id
-						? 'border-light-blue/30 bg-blue-gray/25 text-light-blue'
+						? 'border-rule-strong bg-blue-gray/25 text-light-blue'
 						: 'text-dark-light-blue hover:bg-blue-gray/15 hover:text-light-blue border-transparent'}"
 					aria-current={activeCategory === REPORT_CATEGORY.id ? 'true' : undefined}
 					onclick={() => {
@@ -167,7 +167,7 @@
 					 du panneau mobile, une bande pleine largeur soulignée d'un filet, pas
 					 un bouton posé dans une mise en page. -->
 				<button
-					class="border-light-blue/20 text-dark-light-blue hover:text-light-blue flex shrink-0 cursor-pointer items-center gap-2 border-b px-4 py-3 text-sm font-semibold md:hidden"
+					class="border-rule text-dark-light-blue hover:text-light-blue flex shrink-0 cursor-pointer items-center gap-2 border-b px-4 py-3 text-sm font-semibold md:hidden"
 					onclick={() => {
 						mobilePanelOpen = false;
 					}}

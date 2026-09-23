@@ -12,7 +12,7 @@
 	let { range }: Props = $props();
 
 	const field =
-		'mt-1 block rounded-lg border border-light-blue/30 bg-dark-blue/60 p-2 text-sm text-white';
+		'mt-1 block rounded-lg border border-rule-strong bg-dark-blue/60 p-2 text-sm text-white';
 </script>
 
 <form class="flex flex-wrap items-end gap-3" method="GET">

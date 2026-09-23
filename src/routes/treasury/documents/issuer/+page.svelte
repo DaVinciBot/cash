@@ -46,7 +46,7 @@
 	{/if}
 
 	<form
-		class="border-light-blue/20 bg-blue-gray/15 rounded-2xl border p-4 sm:p-5"
+		class="border-rule bg-blue-gray/15 rounded-2xl border p-4 sm:p-5"
 		action="?/save"
 		method="POST"
 		use:enhance
@@ -61,7 +61,7 @@
 				Genre de la présidence
 				<select
 					name="president_gender"
-					class="border-light-blue/30 bg-dark-blue/60 text-light-blue placeholder:text-dark-light-blue/50 focus:border-light-blue/70 mt-1 block w-full rounded-xl border p-2.5 text-sm focus:outline-none disabled:opacity-50"
+					class="border-rule-strong bg-dark-blue/60 text-light-blue placeholder:text-muted focus:border-light-blue/70 focus-visible:ring-light-blue/60 mt-1 block w-full rounded-xl border p-2.5 text-sm focus:outline-none focus-visible:ring-2 disabled:opacity-50"
 					value={data.organization.presidentGender}
 				>
 					{#each OFFICER_GENDERS as g (g)}
@@ -73,7 +73,7 @@
 				Présidence
 				<input
 					name="president_name"
-					class="border-light-blue/30 bg-dark-blue/60 text-light-blue placeholder:text-dark-light-blue/50 focus:border-light-blue/70 mt-1 block w-full rounded-xl border p-2.5 text-sm focus:outline-none disabled:opacity-50"
+					class="border-rule-strong bg-dark-blue/60 text-light-blue placeholder:text-muted focus:border-light-blue/70 focus-visible:ring-light-blue/60 mt-1 block w-full rounded-xl border p-2.5 text-sm focus:outline-none focus-visible:ring-2 disabled:opacity-50"
 					value={data.organization.presidentName ?? ''}
 				/>
 			</label>
@@ -81,7 +81,7 @@
 				Genre de la trésorerie
 				<select
 					name="treasurer_gender"
-					class="border-light-blue/30 bg-dark-blue/60 text-light-blue placeholder:text-dark-light-blue/50 focus:border-light-blue/70 mt-1 block w-full rounded-xl border p-2.5 text-sm focus:outline-none disabled:opacity-50"
+					class="border-rule-strong bg-dark-blue/60 text-light-blue placeholder:text-muted focus:border-light-blue/70 focus-visible:ring-light-blue/60 mt-1 block w-full rounded-xl border p-2.5 text-sm focus:outline-none focus-visible:ring-2 disabled:opacity-50"
 					value={data.organization.treasurerGender}
 				>
 					{#each OFFICER_GENDERS as g (g)}
@@ -93,7 +93,7 @@
 				Trésorerie
 				<input
 					name="treasurer_name"
-					class="border-light-blue/30 bg-dark-blue/60 text-light-blue placeholder:text-dark-light-blue/50 focus:border-light-blue/70 mt-1 block w-full rounded-xl border p-2.5 text-sm focus:outline-none disabled:opacity-50"
+					class="border-rule-strong bg-dark-blue/60 text-light-blue placeholder:text-muted focus:border-light-blue/70 focus-visible:ring-light-blue/60 mt-1 block w-full rounded-xl border p-2.5 text-sm focus:outline-none focus-visible:ring-2 disabled:opacity-50"
 					value={data.organization.treasurerName ?? ''}
 				/>
 			</label>
@@ -101,7 +101,7 @@
 				Nom légal
 				<input
 					name="legal_name"
-					class="border-light-blue/30 bg-dark-blue/60 text-light-blue placeholder:text-dark-light-blue/50 focus:border-light-blue/70 mt-1 block w-full rounded-xl border p-2.5 text-sm focus:outline-none disabled:opacity-50"
+					class="border-rule-strong bg-dark-blue/60 text-light-blue placeholder:text-muted focus:border-light-blue/70 focus-visible:ring-light-blue/60 mt-1 block w-full rounded-xl border p-2.5 text-sm focus:outline-none focus-visible:ring-2 disabled:opacity-50"
 					value={data.organization.legalName ?? ''}
 				/>
 			</label>
@@ -109,7 +109,7 @@
 				Adresse du siège
 				<input
 					name="address_line"
-					class="border-light-blue/30 bg-dark-blue/60 text-light-blue placeholder:text-dark-light-blue/50 focus:border-light-blue/70 mt-1 block w-full rounded-xl border p-2.5 text-sm focus:outline-none disabled:opacity-50"
+					class="border-rule-strong bg-dark-blue/60 text-light-blue placeholder:text-muted focus:border-light-blue/70 focus-visible:ring-light-blue/60 mt-1 block w-full rounded-xl border p-2.5 text-sm focus:outline-none focus-visible:ring-2 disabled:opacity-50"
 					value={data.organization.addressLine ?? ''}
 				/>
 			</label>
@@ -117,7 +117,7 @@
 				Code postal
 				<input
 					name="postal_code"
-					class="border-light-blue/30 bg-dark-blue/60 text-light-blue placeholder:text-dark-light-blue/50 focus:border-light-blue/70 mt-1 block w-full rounded-xl border p-2.5 text-sm focus:outline-none disabled:opacity-50"
+					class="border-rule-strong bg-dark-blue/60 text-light-blue placeholder:text-muted focus:border-light-blue/70 focus-visible:ring-light-blue/60 mt-1 block w-full rounded-xl border p-2.5 text-sm focus:outline-none focus-visible:ring-2 disabled:opacity-50"
 					value={data.organization.postalCode ?? ''}
 				/>
 			</label>
@@ -125,7 +125,7 @@
 				Ville
 				<input
 					name="city"
-					class="border-light-blue/30 bg-dark-blue/60 text-light-blue placeholder:text-dark-light-blue/50 focus:border-light-blue/70 mt-1 block w-full rounded-xl border p-2.5 text-sm focus:outline-none disabled:opacity-50"
+					class="border-rule-strong bg-dark-blue/60 text-light-blue placeholder:text-muted focus:border-light-blue/70 focus-visible:ring-light-blue/60 mt-1 block w-full rounded-xl border p-2.5 text-sm focus:outline-none focus-visible:ring-2 disabled:opacity-50"
 					value={data.organization.city ?? ''}
 				/>
 			</label>
@@ -133,7 +133,7 @@
 				Pays
 				<input
 					name="country"
-					class="border-light-blue/30 bg-dark-blue/60 text-light-blue placeholder:text-dark-light-blue/50 focus:border-light-blue/70 mt-1 block w-full rounded-xl border p-2.5 text-sm focus:outline-none disabled:opacity-50"
+					class="border-rule-strong bg-dark-blue/60 text-light-blue placeholder:text-muted focus:border-light-blue/70 focus-visible:ring-light-blue/60 mt-1 block w-full rounded-xl border p-2.5 text-sm focus:outline-none focus-visible:ring-2 disabled:opacity-50"
 					value={data.organization.country}
 				/>
 			</label>
@@ -141,7 +141,7 @@
 				RNA <span class="text-dark-light-blue/70">(W + 9 chiffres)</span>
 				<input
 					name="rna"
-					class="border-light-blue/30 bg-dark-blue/60 text-light-blue placeholder:text-dark-light-blue/50 focus:border-light-blue/70 mt-1 block w-full rounded-xl border p-2.5 text-sm focus:outline-none disabled:opacity-50"
+					class="border-rule-strong bg-dark-blue/60 text-light-blue placeholder:text-muted focus:border-light-blue/70 focus-visible:ring-light-blue/60 mt-1 block w-full rounded-xl border p-2.5 text-sm focus:outline-none focus-visible:ring-2 disabled:opacity-50"
 					value={data.organization.rna ?? ''}
 				/>
 			</label>
@@ -149,7 +149,7 @@
 				SIRET
 				<input
 					name="siret"
-					class="border-light-blue/30 bg-dark-blue/60 text-light-blue placeholder:text-dark-light-blue/50 focus:border-light-blue/70 mt-1 block w-full rounded-xl border p-2.5 text-sm focus:outline-none disabled:opacity-50"
+					class="border-rule-strong bg-dark-blue/60 text-light-blue placeholder:text-muted focus:border-light-blue/70 focus-visible:ring-light-blue/60 mt-1 block w-full rounded-xl border p-2.5 text-sm focus:outline-none focus-visible:ring-2 disabled:opacity-50"
 					value={data.organization.siret ?? ''}
 				/>
 			</label>
@@ -157,7 +157,7 @@
 				Banque
 				<input
 					name="bank_name"
-					class="border-light-blue/30 bg-dark-blue/60 text-light-blue placeholder:text-dark-light-blue/50 focus:border-light-blue/70 mt-1 block w-full rounded-xl border p-2.5 text-sm focus:outline-none disabled:opacity-50"
+					class="border-rule-strong bg-dark-blue/60 text-light-blue placeholder:text-muted focus:border-light-blue/70 focus-visible:ring-light-blue/60 mt-1 block w-full rounded-xl border p-2.5 text-sm focus:outline-none focus-visible:ring-2 disabled:opacity-50"
 					value={data.organization.bankName ?? ''}
 				/>
 			</label>
@@ -165,7 +165,7 @@
 				IBAN
 				<input
 					name="iban"
-					class="border-light-blue/30 bg-dark-blue/60 mt-1 block w-full rounded-lg border p-2 font-mono text-sm text-white"
+					class="border-rule-strong bg-dark-blue/60 mt-1 block w-full rounded-lg border p-2 font-mono text-sm text-white"
 					value={data.organization.iban ?? ''}
 				/>
 			</label>
@@ -173,7 +173,7 @@
 				BIC
 				<input
 					name="bic"
-					class="border-light-blue/30 bg-dark-blue/60 mt-1 block w-full rounded-lg border p-2 font-mono text-sm text-white"
+					class="border-rule-strong bg-dark-blue/60 mt-1 block w-full rounded-lg border p-2 font-mono text-sm text-white"
 					value={data.organization.bic ?? ''}
 				/>
 			</label>
@@ -181,7 +181,7 @@
 				N° TVA <span class="text-dark-light-blue/70">(vide si non assujettie)</span>
 				<input
 					name="vat_number"
-					class="border-light-blue/30 bg-dark-blue/60 text-light-blue placeholder:text-dark-light-blue/50 focus:border-light-blue/70 mt-1 block w-full rounded-xl border p-2.5 text-sm focus:outline-none disabled:opacity-50"
+					class="border-rule-strong bg-dark-blue/60 text-light-blue placeholder:text-muted focus:border-light-blue/70 focus-visible:ring-light-blue/60 mt-1 block w-full rounded-xl border p-2.5 text-sm focus:outline-none focus-visible:ring-2 disabled:opacity-50"
 					value={data.organization.vatNumber ?? ''}
 				/>
 			</label>
@@ -189,7 +189,7 @@
 				Courriel
 				<input
 					name="email"
-					class="border-light-blue/30 bg-dark-blue/60 text-light-blue placeholder:text-dark-light-blue/50 focus:border-light-blue/70 mt-1 block w-full rounded-xl border p-2.5 text-sm focus:outline-none disabled:opacity-50"
+					class="border-rule-strong bg-dark-blue/60 text-light-blue placeholder:text-muted focus:border-light-blue/70 focus-visible:ring-light-blue/60 mt-1 block w-full rounded-xl border p-2.5 text-sm focus:outline-none focus-visible:ring-2 disabled:opacity-50"
 					value={data.organization.email ?? ''}
 				/>
 			</label>
@@ -197,7 +197,7 @@
 				Site
 				<input
 					name="website"
-					class="border-light-blue/30 bg-dark-blue/60 text-light-blue placeholder:text-dark-light-blue/50 focus:border-light-blue/70 mt-1 block w-full rounded-xl border p-2.5 text-sm focus:outline-none disabled:opacity-50"
+					class="border-rule-strong bg-dark-blue/60 text-light-blue placeholder:text-muted focus:border-light-blue/70 focus-visible:ring-light-blue/60 mt-1 block w-full rounded-xl border p-2.5 text-sm focus:outline-none focus-visible:ring-2 disabled:opacity-50"
 					value={data.organization.website ?? ''}
 				/>
 			</label>
@@ -223,7 +223,7 @@
 					Catégorie d'organisme <span class="text-dark-light-blue/70">(Cerfa 11580)</span>
 					<input
 						name="tax_category"
-						class="border-light-blue/30 bg-dark-blue/60 text-light-blue placeholder:text-dark-light-blue/50 focus:border-light-blue/70 mt-1 block w-full rounded-xl border p-2.5 text-sm focus:outline-none disabled:opacity-50"
+						class="border-rule-strong bg-dark-blue/60 text-light-blue placeholder:text-muted focus:border-light-blue/70 focus-visible:ring-light-blue/60 mt-1 block w-full rounded-xl border p-2.5 text-sm focus:outline-none focus-visible:ring-2 disabled:opacity-50"
 						placeholder="Œuvre ou organisme d'intérêt général"
 						value={data.organization.taxCategory ?? ''}
 					/>
@@ -232,7 +232,7 @@
 					Articles du CGI applicables
 					<input
 						name="tax_articles"
-						class="border-light-blue/30 bg-dark-blue/60 text-light-blue placeholder:text-dark-light-blue/50 focus:border-light-blue/70 mt-1 block w-full rounded-xl border p-2.5 text-sm focus:outline-none disabled:opacity-50"
+						class="border-rule-strong bg-dark-blue/60 text-light-blue placeholder:text-muted focus:border-light-blue/70 focus-visible:ring-light-blue/60 mt-1 block w-full rounded-xl border p-2.5 text-sm focus:outline-none focus-visible:ring-2 disabled:opacity-50"
 						placeholder="Articles 200 et 238 bis du CGI"
 						value={data.organization.taxArticles ?? ''}
 					/>
@@ -242,7 +242,7 @@
 				Objet de l'association <span class="text-dark-light-blue/70">(statuts)</span>
 				<textarea
 					name="purpose"
-					class="border-light-blue/30 bg-dark-blue/60 text-light-blue placeholder:text-dark-light-blue/50 focus:border-light-blue/70 mt-1 block w-full rounded-xl border p-2.5 text-sm focus:outline-none disabled:opacity-50"
+					class="border-rule-strong bg-dark-blue/60 text-light-blue placeholder:text-muted focus:border-light-blue/70 focus-visible:ring-light-blue/60 mt-1 block w-full rounded-xl border p-2.5 text-sm focus:outline-none focus-visible:ring-2 disabled:opacity-50"
 					rows="5">{data.organization.purpose ?? ''}</textarea
 				>
 			</label>

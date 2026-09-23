@@ -106,9 +106,7 @@
 	role="dialog"
 >
 	<OverlayBackdrop />
-	<div
-		class="border-light-blue/20 relative w-full max-w-md rounded-2xl border bg-[#060a2c] p-5 sm:p-6"
-	>
+	<div class="border-rule bg-surface-modal relative w-full max-w-md rounded-2xl border p-5 sm:p-6">
 		<p class="text-dark-light-blue m-0 mb-3 text-[0.65rem] tracking-[0.32em] uppercase">Passkeys</p>
 
 		{#if loading}
@@ -123,7 +121,7 @@
 				{#each passkeys as passkey (passkey.id)}
 					<li
 						id={`passkey-row-${passkey.id}`}
-						class="border-light-blue/10 bg-dark-blue/40 flex items-center gap-3 rounded-xl border p-3"
+						class="border-rule bg-dark-blue/40 flex items-center gap-3 rounded-xl border p-3"
 					>
 						<FingerprintPattern class="text-dark-light-blue size-5 shrink-0" />
 						<div class="min-w-0 flex-1">

@@ -45,7 +45,7 @@
 			{@const KindIcon = ICON[kind]}
 			<li>
 				<a
-					class="hover:bg-blue-gray/15 border-light-blue/20 bg-blue-gray/15 hover:border-light-blue/60 flex h-full flex-col rounded-lg border p-4 transition aria-disabled:pointer-events-none aria-disabled:opacity-50"
+					class="hover:bg-blue-gray/15 border-rule bg-blue-gray/15 hover:border-light-blue/60 flex h-full flex-col rounded-lg border p-4 transition aria-disabled:pointer-events-none aria-disabled:opacity-50"
 					aria-disabled={missing.length > 0}
 					href={resolve('/treasury/documents/new/[kind]', { kind })}
 				>

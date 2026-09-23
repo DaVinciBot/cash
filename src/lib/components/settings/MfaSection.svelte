@@ -136,10 +136,7 @@
 	}
 </script>
 
-<section
-	id="mfa-section"
-	class="border-light-blue/20 bg-blue-gray/15 rounded-2xl border p-4 sm:p-5"
->
+<section id="mfa-section" class="border-rule bg-blue-gray/15 rounded-2xl border p-4 sm:p-5">
 	<p class="text-dark-light-blue m-0 mb-3 text-[0.65rem] tracking-[0.32em] uppercase">
 		Vérification en deux étapes
 	</p>
@@ -151,7 +148,7 @@
 	{:else}
 		<div class="grid gap-3">
 			<div
-				class="border-light-blue/10 bg-dark-blue/40 flex flex-wrap items-center gap-3 rounded-xl border p-3"
+				class="border-rule bg-dark-blue/40 flex flex-wrap items-center gap-3 rounded-xl border p-3"
 			>
 				<Mail class="text-dark-light-blue size-5 shrink-0" />
 				<div class="min-w-0 flex-1 basis-48">
@@ -187,7 +184,7 @@
 			</div>
 
 			<div
-				class="border-light-blue/10 bg-dark-blue/40 flex flex-wrap items-center gap-3 rounded-xl border p-3"
+				class="border-rule bg-dark-blue/40 flex flex-wrap items-center gap-3 rounded-xl border p-3"
 			>
 				<Smartphone class="text-dark-light-blue size-5 shrink-0" />
 				<div class="min-w-0 flex-1 basis-48">
@@ -224,7 +221,7 @@
 			</div>
 
 			<div
-				class="border-light-blue/10 bg-dark-blue/40 flex flex-wrap items-center gap-3 rounded-xl border p-3"
+				class="border-rule bg-dark-blue/40 flex flex-wrap items-center gap-3 rounded-xl border p-3"
 			>
 				<FingerprintPattern class="text-dark-light-blue size-5 shrink-0" />
 				<div class="min-w-0 flex-1 basis-48">

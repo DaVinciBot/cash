@@ -85,7 +85,7 @@
 	class="bg-dark-blue text-light-blue min-h-screen min-w-screen overflow-hidden font-['Almarai'] antialiased"
 >
 	<nav
-		class="border-light-blue/20 bg-surface-modal fixed top-0 right-0 left-0 z-50 w-screen border-b px-4 py-2.5"
+		class="border-rule bg-surface-modal fixed top-0 right-0 left-0 z-50 w-screen border-b px-4 py-2.5"
 	>
 		<div class="flex flex-wrap items-center justify-between">
 			<div class="flex items-center justify-start">

@@ -46,7 +46,7 @@
 
 	{#if data.documents.length === 0}
 		<p
-			class="border-light-blue/20 text-dark-light-blue/70 rounded-xl border border-dashed px-4 py-12 text-center"
+			class="border-rule text-dark-light-blue/70 rounded-xl border border-dashed px-4 py-12 text-center"
 		>
 			Aucun document émis.
 		</p>
@@ -54,7 +54,7 @@
 		<ul class="space-y-2">
 			{#each data.documents as doc (doc.id)}
 				<li
-					class="border-light-blue/20 bg-blue-gray/15 flex flex-wrap items-center gap-3 rounded-lg border px-4 py-3 text-sm"
+					class="border-rule bg-blue-gray/15 flex flex-wrap items-center gap-3 rounded-lg border px-4 py-3 text-sm"
 				>
 					<span class="text-dark-light-blue font-mono text-xs">{doc.number}</span>
 					<span class="font-medium text-white">{DOCUMENT_KIND_LABELS[doc.kind]}</span>

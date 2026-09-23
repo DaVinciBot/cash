@@ -108,7 +108,7 @@
 			<input
 				id="name"
 				name="name"
-				class="border-light-blue/30 bg-dark-blue/60 mt-1 w-full rounded-lg border p-2 text-sm text-white"
+				class="border-rule-strong bg-dark-blue/60 mt-1 w-full rounded-lg border p-2 text-sm text-white"
 				required
 				bind:value={name}
 			/>
@@ -119,7 +119,7 @@
 			<input
 				id="link"
 				name="link"
-				class="border-light-blue/30 bg-dark-blue/60 mt-1 w-full rounded-lg border p-2 text-sm text-white"
+				class="border-rule-strong bg-dark-blue/60 mt-1 w-full rounded-lg border p-2 text-sm text-white"
 				placeholder="https://…"
 				type="url"
 				bind:value={link}
@@ -134,7 +134,7 @@
 				<input
 					id="unit_price_ttc"
 					name="unit_price_ttc"
-					class="border-light-blue/30 bg-dark-blue/60 mt-1 w-32 rounded-xl border p-2.5 text-sm"
+					class="border-rule-strong bg-dark-blue/60 mt-1 w-32 rounded-xl border p-2.5 text-sm"
 					inputmode="decimal"
 					required
 					bind:value={unitPrice}
@@ -145,7 +145,7 @@
 				<input
 					id="quantity"
 					name="quantity"
-					class="border-light-blue/30 bg-dark-blue/60 mt-1 w-24 rounded-lg border p-2 text-sm text-white"
+					class="border-rule-strong bg-dark-blue/60 mt-1 w-24 rounded-lg border p-2 text-sm text-white"
 					min="1"
 					required
 					step="1"
@@ -159,7 +159,7 @@
 		</div>
 
 		<!-- CMD-F-18 / CMD-F-19 — imputation, éventuellement répartie. -->
-		<fieldset class="border-light-blue/20 bg-blue-gray/15 rounded-2xl border p-4 sm:p-5">
+		<fieldset class="border-rule bg-blue-gray/15 rounded-2xl border p-4 sm:p-5">
 			<legend class="text-light-blue px-1 text-sm font-semibold">Imputation budgétaire</legend>
 			<p class="text-dark-light-blue mb-3 text-xs">
 				Seules les feuilles actives de l'année scolaire sont proposées. La somme des parts doit
@@ -172,7 +172,7 @@
 						Budget
 						<select
 							name="budget"
-							class="border-light-blue/30 bg-dark-blue/60 text-light-blue placeholder:text-dark-light-blue/50 focus:border-light-blue/70 mt-1 block w-full rounded-xl border p-2.5 text-sm focus:outline-none disabled:opacity-50"
+							class="border-rule-strong bg-dark-blue/60 text-light-blue placeholder:text-muted focus:border-light-blue/70 focus-visible:ring-light-blue/60 mt-1 block w-full rounded-xl border p-2.5 text-sm focus:outline-none focus-visible:ring-2 disabled:opacity-50"
 							bind:value={line.budgetId}
 						>
 							<option value={null}>— aucun —</option>
@@ -186,7 +186,7 @@
 						Part TTC
 						<input
 							name="amount"
-							class="border-light-blue/30 bg-dark-blue/60 mt-1 block w-28 rounded-xl border p-2.5 text-sm"
+							class="border-rule-strong bg-dark-blue/60 mt-1 block w-28 rounded-xl border p-2.5 text-sm"
 							inputmode="decimal"
 							placeholder="0,00"
 							bind:value={line.amount}

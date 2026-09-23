@@ -95,7 +95,7 @@
 	}
 
 	const CHAMP =
-		'mt-1 block w-full rounded-lg border border-light-blue/30 bg-dark-blue/60 p-2 text-sm text-white';
+		'mt-1 block w-full rounded-lg border border-rule-strong bg-dark-blue/60 p-2 text-sm text-white';
 </script>
 
 <svelte:head><title>{DOCUMENT_KIND_LABELS[kind]} — nouveau document</title></svelte:head>
@@ -131,7 +131,7 @@
 	{/if}
 
 	<form class="space-y-5" method="POST" use:enhance>
-		<fieldset class="border-light-blue/20 bg-blue-gray/15 rounded-2xl border p-4 sm:p-5">
+		<fieldset class="border-rule bg-blue-gray/15 rounded-2xl border p-4 sm:p-5">
 			<legend class="text-dark-light-blue px-1 text-xs font-semibold">Qui et quand</legend>
 
 			<div class="grid gap-3 md:grid-cols-2">
@@ -182,7 +182,7 @@
 			{/if}
 		</fieldset>
 
-		<fieldset class="border-light-blue/20 bg-blue-gray/15 rounded-2xl border p-4 sm:p-5">
+		<fieldset class="border-rule bg-blue-gray/15 rounded-2xl border p-4 sm:p-5">
 			<legend class="text-dark-light-blue px-1 text-xs font-semibold">
 				{detailed ? 'Détail' : 'Montant'}
 			</legend>
@@ -318,7 +318,7 @@
 			{/if}
 		</fieldset>
 
-		<fieldset class="border-light-blue/20 bg-blue-gray/15 rounded-2xl border p-4 sm:p-5">
+		<fieldset class="border-rule bg-blue-gray/15 rounded-2xl border p-4 sm:p-5">
 			<legend class="text-dark-light-blue px-1 text-xs font-semibold">
 				{kind === 'tax_receipt' ? 'Le don' : 'Précisions'}
 			</legend>

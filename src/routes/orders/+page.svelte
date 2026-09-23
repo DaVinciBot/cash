@@ -73,7 +73,7 @@
 
 	{#if visible.length === 0}
 		<p
-			class="border-light-blue/20 text-dark-light-blue/70 rounded-xl border border-dashed px-4 py-12 text-center"
+			class="border-rule text-dark-light-blue/70 rounded-xl border border-dashed px-4 py-12 text-center"
 		>
 			{orders.length === 0
 				? 'Aucune commande. Constituez-en une depuis la file des items à regrouper.'
@@ -83,7 +83,7 @@
 		{#each years as year (year.id)}
 			<div class="mb-8">
 				<h2
-					class="border-light-blue/20 text-dark-light-blue mb-3 border-b pb-1 text-sm font-semibold tracking-wide uppercase"
+					class="border-rule text-dark-light-blue mb-3 border-b pb-1 text-sm font-semibold tracking-wide uppercase"
 				>
 					Année scolaire {year.label}
 				</h2>
@@ -91,7 +91,7 @@
 					{#each year.orders as order (order.id)}
 						<li>
 							<a
-								class="border-light-blue/20 bg-blue-gray/15 hover:border-light-blue/60 block rounded-lg border p-4"
+								class="border-rule bg-blue-gray/15 hover:border-light-blue/60 block rounded-lg border p-4"
 								href={resolve('/orders/[id]', { id: String(order.id) })}
 							>
 								<div class="flex flex-wrap items-center gap-3">

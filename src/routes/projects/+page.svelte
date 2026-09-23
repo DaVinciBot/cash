@@ -58,7 +58,7 @@
 
 	{#snippet projectForm(project: (typeof data.projects)[number] | null)}
 		<form
-			class="border-light-blue/30 bg-dark-blue/60 mb-3 flex flex-wrap items-end gap-3 rounded-lg border p-3"
+			class="border-rule-strong bg-dark-blue/60 mb-3 flex flex-wrap items-end gap-3 rounded-lg border p-3"
 			action={project ? '?/update' : '?/create'}
 			method="POST"
 			use:enhance={() =>
@@ -75,7 +75,7 @@
 				Nom
 				<input
 					name="name"
-					class="border-light-blue/30 bg-dark-blue/60 text-light-blue placeholder:text-dark-light-blue/50 focus:border-light-blue/70 mt-1 block rounded-xl border p-2.5 text-sm focus:outline-none disabled:opacity-50"
+					class="border-rule-strong bg-dark-blue/60 text-light-blue placeholder:text-muted focus:border-light-blue/70 focus-visible:ring-light-blue/60 mt-1 block rounded-xl border p-2.5 text-sm focus:outline-none focus-visible:ring-2 disabled:opacity-50"
 					required
 					value={project?.name ?? ''}
 				/>
@@ -84,7 +84,7 @@
 				Campus
 				<select
 					name="campus"
-					class="border-light-blue/30 bg-dark-blue/60 text-light-blue placeholder:text-dark-light-blue/50 focus:border-light-blue/70 mt-1 block rounded-xl border p-2.5 text-sm focus:outline-none disabled:opacity-50"
+					class="border-rule-strong bg-dark-blue/60 text-light-blue placeholder:text-muted focus:border-light-blue/70 focus-visible:ring-light-blue/60 mt-1 block rounded-xl border p-2.5 text-sm focus:outline-none focus-visible:ring-2 disabled:opacity-50"
 					value={project?.campus ?? ''}
 				>
 					<option value="">— aucun —</option>
@@ -97,7 +97,7 @@
 				Budget désigné
 				<select
 					name="budget_id"
-					class="border-light-blue/30 bg-dark-blue/60 text-light-blue placeholder:text-dark-light-blue/50 focus:border-light-blue/70 mt-1 block w-full rounded-xl border p-2.5 text-sm focus:outline-none disabled:opacity-50"
+					class="border-rule-strong bg-dark-blue/60 text-light-blue placeholder:text-muted focus:border-light-blue/70 focus-visible:ring-light-blue/60 mt-1 block w-full rounded-xl border p-2.5 text-sm focus:outline-none focus-visible:ring-2 disabled:opacity-50"
 					value={project?.budgetId ?? ''}
 				>
 					<option value="">— aucun —</option>
@@ -116,7 +116,7 @@
 
 	<ul class="space-y-2">
 		{#each active as project (project.id)}
-			<li class="border-light-blue/20 bg-blue-gray/15 rounded-2xl border p-4 sm:p-5">
+			<li class="border-rule bg-blue-gray/15 rounded-2xl border p-4 sm:p-5">
 				<div class="flex flex-wrap items-center gap-3">
 					<span class="font-medium text-white">{project.name}</span>
 					{#if project.campus}

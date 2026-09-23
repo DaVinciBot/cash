@@ -103,7 +103,7 @@
 	}
 </script>
 
-<section class="border-light-blue/20 bg-blue-gray/15 rounded-2xl border p-4 sm:p-5">
+<section class="border-rule bg-blue-gray/15 rounded-2xl border p-4 sm:p-5">
 	<form class="flex flex-col gap-4" onsubmit={handleSubmit}>
 		<div>
 			<label
@@ -115,7 +115,7 @@
 			<div class="relative">
 				<select
 					id="report-type"
-					class="border-light-blue/30 bg-dark-blue/60 text-light-blue focus:border-light-blue/70 block w-full cursor-pointer appearance-none rounded-xl border p-2.5 pr-9 text-sm focus:outline-none disabled:opacity-50"
+					class="border-rule-strong bg-dark-blue/60 text-light-blue focus:border-light-blue/70 focus-visible:ring-light-blue/60 block w-full cursor-pointer appearance-none rounded-xl border p-2.5 pr-9 text-sm focus:outline-none focus-visible:ring-2 disabled:opacity-50"
 					disabled={submitting}
 					bind:value={type}
 				>
@@ -138,7 +138,7 @@
 			</label>
 			<input
 				id="report-title"
-				class="border-light-blue/30 bg-dark-blue/60 text-light-blue placeholder:text-dark-light-blue/50 focus:border-light-blue/70 block w-full rounded-xl border p-2.5 text-sm focus:outline-none disabled:opacity-50"
+				class="border-rule-strong bg-dark-blue/60 text-light-blue placeholder:text-muted focus:border-light-blue/70 focus-visible:ring-light-blue/60 block w-full rounded-xl border p-2.5 text-sm focus:outline-none focus-visible:ring-2 disabled:opacity-50"
 				disabled={submitting}
 				maxlength="200"
 				placeholder="Résumé du problème"
@@ -156,7 +156,7 @@
 			</label>
 			<textarea
 				id="report-description"
-				class="border-light-blue/30 bg-dark-blue/60 text-light-blue placeholder:text-dark-light-blue/50 focus:border-light-blue/70 block w-full resize-y rounded-xl border p-2.5 text-sm focus:outline-none disabled:opacity-50"
+				class="border-rule-strong bg-dark-blue/60 text-light-blue placeholder:text-muted focus:border-light-blue/70 focus-visible:ring-light-blue/60 block w-full resize-y rounded-xl border p-2.5 text-sm focus:outline-none focus-visible:ring-2 disabled:opacity-50"
 				disabled={submitting}
 				maxlength="2000"
 				placeholder="Ce qui s'est passé, ce qui était attendu…"
@@ -172,7 +172,7 @@
 				{#each images as image, index (image.preview)}
 					<div class="relative">
 						<img
-							class="border-light-blue/20 size-20 rounded-xl border object-cover"
+							class="border-rule size-20 rounded-xl border object-cover"
 							alt="Aperçu {index + 1}"
 							src={image.preview}
 						/>
@@ -192,7 +192,7 @@
 				{/each}
 				{#if images.length < MAX_REPORT_IMAGES}
 					<label
-						class="border-light-blue/30 text-dark-light-blue hover:border-light-blue/60 hover:text-light-blue flex size-20 cursor-pointer flex-col items-center justify-center gap-1 rounded-xl border border-dashed text-xs font-semibold transition"
+						class="border-rule-strong text-dark-light-blue hover:border-light-blue/60 hover:text-light-blue flex size-20 cursor-pointer flex-col items-center justify-center gap-1 rounded-xl border border-dashed text-xs font-semibold transition"
 					>
 						<ImagePlus class="size-5" />
 						Ajouter

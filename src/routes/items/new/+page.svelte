@@ -118,7 +118,7 @@
 
 	{#if data.projects.length === 0}
 		<p
-			class="border-light-blue/20 text-dark-light-blue/70 rounded-xl border border-dashed px-4 py-12 text-center"
+			class="border-rule text-dark-light-blue/70 rounded-xl border border-dashed px-4 py-12 text-center"
 		>
 			Vous n'êtes rattaché à aucun projet. Demandez à votre chef de projet de vous ajouter.
 		</p>
@@ -157,7 +157,7 @@
 					<span class="text-dark-light-blue mb-1 block text-sm font-medium">Projet</span>
 					<select
 						name="project_id"
-						class="border-light-blue/30 bg-dark-blue/60 text-light-blue placeholder:text-dark-light-blue/50 focus:border-light-blue/70 w-full rounded-xl border p-2.5 focus:outline-none disabled:opacity-50"
+						class="border-rule-strong bg-dark-blue/60 text-light-blue placeholder:text-muted focus:border-light-blue/70 focus-visible:ring-light-blue/60 w-full rounded-xl border p-2.5 focus:outline-none focus-visible:ring-2 disabled:opacity-50"
 						required
 						bind:value={projectId}
 					>
@@ -210,7 +210,7 @@
 				<div
 					class="mb-4 rounded-lg px-4 py-3 text-sm {overBudget
 						? 'bg-amber-500/15 text-amber-200 ring-1 ring-amber-500/30'
-						: 'bg-blue-gray/15 text-dark-light-blue ring-light-blue/20 ring-1'}"
+						: 'bg-blue-gray/15 text-dark-light-blue ring-rule ring-1'}"
 				>
 					<div class="flex flex-wrap items-center justify-between gap-2">
 						<span>
@@ -233,7 +233,7 @@
 
 			<div class="space-y-3">
 				{#each lines as line, index (line.id)}
-					<fieldset class="border-light-blue/20 bg-blue-gray/15 rounded-2xl border p-4 sm:p-5">
+					<fieldset class="border-rule bg-blue-gray/15 rounded-2xl border p-4 sm:p-5">
 						<legend class="text-dark-light-blue/70 px-2 text-xs">Composant {index + 1}</legend>
 
 						<div class="grid gap-3 sm:grid-cols-12">
@@ -241,7 +241,7 @@
 								<span class="text-dark-light-blue mb-1 block text-xs">Nom</span>
 								<input
 									name="name"
-									class="border-light-blue/30 bg-dark-blue/60 w-full rounded-lg border p-2 text-white"
+									class="border-rule-strong bg-dark-blue/60 w-full rounded-lg border p-2 text-white"
 									placeholder="Résistance 10 kΩ 1 %"
 									required
 									bind:value={line.name}
@@ -251,7 +251,7 @@
 								<span class="text-dark-light-blue mb-1 block text-xs">Lien</span>
 								<input
 									name="link"
-									class="border-light-blue/30 bg-dark-blue/60 w-full rounded-lg border p-2 text-white"
+									class="border-rule-strong bg-dark-blue/60 w-full rounded-lg border p-2 text-white"
 									placeholder="https://eu.mouser.com/…"
 									type="url"
 									bind:value={line.link}
@@ -262,7 +262,7 @@
 								<span class="text-dark-light-blue mb-1 block text-xs">Prix unitaire TTC</span>
 								<input
 									name="unit_price_ttc"
-									class="border-light-blue/30 bg-dark-blue/60 w-full rounded-lg border p-2 text-white"
+									class="border-rule-strong bg-dark-blue/60 w-full rounded-lg border p-2 text-white"
 									min="0"
 									placeholder="0,00"
 									required
@@ -275,7 +275,7 @@
 								<span class="text-dark-light-blue mb-1 block text-xs">Qté</span>
 								<input
 									name="quantity"
-									class="border-light-blue/30 bg-dark-blue/60 w-full rounded-lg border p-2 text-white"
+									class="border-rule-strong bg-dark-blue/60 w-full rounded-lg border p-2 text-white"
 									min="1"
 									required
 									step="1"
@@ -314,7 +314,7 @@
 								</span>
 								<input
 									name="note"
-									class="border-light-blue/30 bg-dark-blue/60 w-full rounded-lg border p-2 text-white"
+									class="border-rule-strong bg-dark-blue/60 w-full rounded-lg border p-2 text-white"
 									bind:value={line.note}
 								/>
 							</label>

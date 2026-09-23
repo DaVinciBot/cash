@@ -41,7 +41,7 @@
 	});
 </script>
 
-<div class="border-light-blue/20 max-h-[28rem] overflow-auto rounded-lg border">
+<div class="border-rule max-h-[28rem] overflow-auto rounded-lg border">
 	<table class={TABLE}>
 		<thead class="bg-blue-gray/15 sticky top-0">
 			<tr>

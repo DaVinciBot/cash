@@ -41,9 +41,7 @@
 	role="dialog"
 >
 	<OverlayBackdrop />
-	<div
-		class="border-light-blue/20 relative w-full max-w-md rounded-2xl border bg-[#060a2c] p-5 sm:p-6"
-	>
+	<div class="border-rule bg-surface-modal relative w-full max-w-md rounded-2xl border p-5 sm:p-6">
 		<p class="text-dark-light-blue m-0 mb-3 text-[0.65rem] tracking-[0.32em] uppercase">
 			{title}
 		</p>
@@ -53,7 +51,7 @@
 		<form class="grid gap-4" onsubmit={handleSubmit}>
 			<input
 				id="passkey-name"
-				class="border-light-blue/30 bg-dark-blue/60 text-light-blue placeholder:text-dark-light-blue/50 focus:border-light-blue/70 block w-full rounded-xl border p-2.5 text-sm focus:outline-none"
+				class="border-rule-strong bg-dark-blue/60 text-light-blue placeholder:text-muted focus:border-light-blue/70 focus-visible:ring-light-blue/60 block w-full rounded-xl border p-2.5 text-sm focus:outline-none focus-visible:ring-2"
 				aria-label="Nom de la passkey"
 				autocomplete="off"
 				maxlength="64"
