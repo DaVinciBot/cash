@@ -179,7 +179,7 @@
 						-->
 						<select
 							name="campus"
-							class="bg-dark-blue/60 w-full rounded-lg border border-amber-500/50 p-2.5 text-white"
+							class="bg-dark-blue/60 w-full rounded-lg border border-amber-500/60 p-2.5 text-white"
 							required
 							bind:value={chosenCampus}
 						>
