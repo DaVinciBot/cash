@@ -83,7 +83,9 @@ describe('contraste des classes écrites à la main', () => {
 			readFileSync(f, 'utf8')
 				.split('\n')
 				.forEach((ligne, i) => {
-					if (motif.test(ligne)) fautifs.push(`${relative(SRC, f)}:${i + 1}`);
+					if (motif.test(ligne)) {
+						fautifs.push(`${relative(SRC, f)}:${String(i + 1)}`);
+					}
 				});
 		}
 		expect(fautifs).toEqual([]);
@@ -99,7 +101,7 @@ describe('contraste des classes écrites à la main', () => {
 				.split('\n')
 				.forEach((ligne, i) => {
 					if (ligne.includes('focus:outline-none') && !ligne.includes('focus-visible:ring')) {
-						fautifs.push(`${relative(SRC, f)}:${i + 1}`);
+						fautifs.push(`${relative(SRC, f)}:${String(i + 1)}`);
 					}
 				});
 		}
