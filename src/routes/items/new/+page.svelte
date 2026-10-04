@@ -200,7 +200,6 @@
 							<CampusBadge campus={effectiveCampus} />
 						</div>
 						<input name="campus" type="hidden" value={effectiveCampus} />
-						<p class="text-dark-light-blue/70 mt-1 text-xs">Déduit du projet et de votre profil.</p>
 					{/if}
 				</div>
 			</div>
