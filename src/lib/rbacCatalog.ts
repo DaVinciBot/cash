@@ -47,8 +47,9 @@ export const GLOBAL_PERMISSION_LABELS: Record<GlobalPermission, string> = {
 	'training.registration.manage.all': 'Gérer les inscriptions',
 	'training.request.manage.self': 'Demander des formations',
 	'training.request.manage.all': 'Gérer les demandes de formation',
+	'training.request.email.receive': 'Recevoir les nouvelles demandes de formation par email',
 	'training.presence.update': 'Éditer les présences',
-	'training.summary_email.receive': 'Recevoir le récapitulatif par email',
+	'training.summary.email.receive': 'Recevoir le récapitulatif par email',
 	'training.summary.discord.send': "Envoyer l'annonce sur Discord",
 	'training.story.discord.send': 'Envoyer la story sur Discord',
 	// orders.*
@@ -112,7 +113,8 @@ const PERMISSION_GROUPS: { title: string; permissions: GlobalPermission[] }[] = 
 	{
 		title: 'Formation — diffusion',
 		permissions: [
-			'training.summary_email.receive',
+			'training.summary.email.receive',
+			'training.request.email.receive',
 			'training.summary.discord.send',
 			'training.story.discord.send'
 		]
