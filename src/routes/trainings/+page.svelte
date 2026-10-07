@@ -520,9 +520,13 @@ DVBisous ! :robot:`;
 		if (!testSent) {
 			return;
 		}
+		const storiesTestSent = await sendDiscordStories(from, to, 'test');
+		if (!storiesTestSent) {
+			return;
+		}
 
 		const shouldSendLive = window.confirm(
-			'Test envoyé sans ping sur le webhook de test. Envoyer maintenant la synthèse sur le webhook réel ?'
+			'Synthèse et stories envoyées sans ping sur le webhook de test. Les envoyer maintenant sur les webhooks réels ?'
 		);
 		if (!shouldSendLive) {
 			closeSummaryModal();
@@ -537,22 +541,30 @@ DVBisous ! :robot:`;
 		// échec de ces dernières ne pousse pas à renvoyer la synthèse. L'erreur
 		// éventuelle s'affiche dans la section.
 		closeSummaryModal();
-		await sendDiscordStories(from, to);
+		await sendDiscordStories(from, to, 'live');
 	}
 
-	// Les stories n'ont pas de mode test : elles ne partent qu'avec l'envoi réel.
-	async function sendDiscordStories(from: string, to: string) {
+	// Même logique que la synthèse : le test part sur le webhook de test sans ping,
+	// l'envoi réel sur le salon des stories avec la mention du rôle.
+	async function sendDiscordStories(from: string, to: string, mode: 'test' | 'live') {
+		const failure =
+			mode === 'test'
+				? "Le test des stories a échoué : rien n'a été envoyé sur les webhooks réels."
+				: "La synthèse a été envoyée, mais l'envoi des stories a échoué.";
 		summarySending = true;
 		try {
 			const supabaseClient = getSupabaseBrowserClient();
 			const { error: invokeError } = await supabaseClient.functions.invoke('training-story', {
-				body: { from, to }
+				body: { from, to, mode }
 			});
 			if (invokeError) {
-				summaryError = "La synthèse a été envoyée, mais l'envoi des stories a échoué.";
+				summaryError = failure;
+				return false;
 			}
+			return true;
 		} catch {
-			summaryError = "La synthèse a été envoyée, mais l'envoi des stories a échoué.";
+			summaryError = failure;
+			return false;
 		} finally {
 			summarySending = false;
 		}
@@ -644,7 +656,7 @@ DVBisous ! :robot:`;
 				<h2 class="text-light-blue text-sm font-semibold">Synthèse Discord</h2>
 				<p class="text-dark-light-blue/70 mt-1 text-xs">
 					Les formations d'une période, annoncées sur le serveur. Un envoi de test précède toujours
-					l'envoi réel, qui envoie aussi les stories Instagram.
+					l'envoi réel, pour la synthèse comme pour les stories Instagram.
 				</p>
 			</div>
 			<Button disabled={summarySending} onclick={openSummaryModal} size="md" variant="primary"
