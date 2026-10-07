@@ -81,12 +81,8 @@
 
 <!-- Une seule coquille : le fond de marque était jusqu'ici intégralement masqué
 	 par un gris Tailwind posé sur le div enfant. -->
-<div
-	class="bg-dark-blue text-light-blue min-h-screen min-w-screen overflow-hidden font-['Almarai'] antialiased"
->
-	<nav
-		class="border-rule bg-surface-modal fixed top-0 right-0 left-0 z-50 w-screen border-b px-4 py-2.5"
-	>
+<div class="bg-dark-blue text-light-blue min-h-screen overflow-hidden font-['Almarai'] antialiased">
+	<nav class="border-rule bg-surface-modal fixed top-0 right-0 left-0 z-50 border-b px-4 py-2.5">
 		<div class="flex flex-wrap items-center justify-between">
 			<div class="flex items-center justify-start">
 				<!-- La croix qui accompagnait ce burger portait un `hidden` statique :
