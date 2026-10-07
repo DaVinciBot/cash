@@ -504,16 +504,14 @@
 										</div>
 										{#if completion.length > 0}
 											<div
-												class="almarai-regular focus:border-light-blue/70 border-rule-strong bg-dark-blue/60 absolute top-full left-0 z-50 mt-2 max-h-56 w-full overflow-y-auto rounded-lg border p-2 pl-4 text-sm text-white"
+												class="almarai-regular border-rule-strong bg-surface-modal text-light-blue absolute top-full left-0 z-50 mt-2 flex max-h-56 w-full flex-col gap-0.5 overflow-y-auto rounded-xl border p-1 text-sm shadow-[0_16px_40px_rgba(2,6,30,0.7)]"
 											>
 												{#each completion as c (completionKey(c))}
 													<!-- Ligne de résultat : volontairement hors du système de boutons. Ce n'est
 														 pas un bouton mais une ligne de liste rendue cliquable — lui donner une
 														 variante la détacherait de la liste qu'elle compose. -->
 													<button
-														class="almarai-regular border-rule flex w-full items-center rounded-lg border-b {c.image
-															? 'p-1'
-															: ''} cursor-pointer"
+														class="almarai-regular hover:bg-blue-gray/25 focus-visible:bg-blue-gray/25 flex w-full cursor-pointer items-center gap-2 rounded-lg px-2 py-1.5 text-left hover:text-white focus-visible:text-white focus-visible:outline-none"
 														onclick={async () => {
 															field.value = c.text;
 															field.data = c.value;
@@ -541,7 +539,7 @@
 													>
 														{#if c.image}
 															<img
-																class="mr-2 -ml-3 h-6 w-6 rounded-full"
+																class="h-6 w-6 shrink-0 rounded-full"
 																alt={c.text}
 																src={c.image}
 															/>
@@ -551,7 +549,7 @@
 																{c.text}
 															</p>
 															{#if c.subtext}
-																<p class="text-dark-light-blue text-xs">{c.subtext}</p>
+																<p class="text-muted text-xs">{c.subtext}</p>
 															{/if}
 														</div>
 													</button>
