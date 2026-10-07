@@ -530,8 +530,31 @@ DVBisous ! :robot:`;
 		}
 
 		const liveSent = await sendDiscordSummary({ from, to, text, mode: 'live' });
-		if (liveSent) {
-			closeSummaryModal();
+		if (!liveSent) {
+			return;
+		}
+		// La synthèse est partie : on ferme la modale avant les stories, pour qu'un
+		// échec de ces dernières ne pousse pas à renvoyer la synthèse. L'erreur
+		// éventuelle s'affiche dans la section.
+		closeSummaryModal();
+		await sendDiscordStories(from, to);
+	}
+
+	// Les stories n'ont pas de mode test : elles ne partent qu'avec l'envoi réel.
+	async function sendDiscordStories(from: string, to: string) {
+		summarySending = true;
+		try {
+			const supabaseClient = getSupabaseBrowserClient();
+			const { error: invokeError } = await supabaseClient.functions.invoke('training-story', {
+				body: { from, to }
+			});
+			if (invokeError) {
+				summaryError = "La synthèse a été envoyée, mais l'envoi des stories a échoué.";
+			}
+		} catch {
+			summaryError = "La synthèse a été envoyée, mais l'envoi des stories a échoué.";
+		} finally {
+			summarySending = false;
 		}
 	}
 
@@ -621,7 +644,7 @@ DVBisous ! :robot:`;
 				<h2 class="text-light-blue text-sm font-semibold">Synthèse Discord</h2>
 				<p class="text-dark-light-blue/70 mt-1 text-xs">
 					Les formations d'une période, annoncées sur le serveur. Un envoi de test précède toujours
-					l'envoi réel.
+					l'envoi réel, qui envoie aussi les stories Instagram.
 				</p>
 			</div>
 			<Button disabled={summarySending} onclick={openSummaryModal} size="md" variant="primary"
