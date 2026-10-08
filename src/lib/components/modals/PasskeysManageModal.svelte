@@ -11,7 +11,7 @@
 		type PasskeyInfo
 	} from '$lib/settings';
 	import { alertUnlessCancelled, withStepUp } from '$lib/settings';
-	import { FingerprintPattern, Pencil, Trash2 } from '@lucide/svelte';
+	import { FingerprintPattern, Pencil, Trash } from '@lucide/svelte';
 	import { onMount } from 'svelte';
 
 	interface Props {
@@ -156,7 +156,7 @@
 							title="Supprimer cette passkey"
 							variant="danger-ghost"
 						>
-							<Trash2 class="size-4" />
+							<Trash class="size-4" />
 						</Button>
 					</li>
 				{/each}

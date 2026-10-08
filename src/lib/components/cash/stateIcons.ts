@@ -23,7 +23,7 @@ import {
 	PackageCheck,
 	Pencil,
 	RefreshCw,
-	Trash2,
+	Trash,
 	TrendingDown,
 	TrendingUp,
 	Truck
@@ -66,5 +66,5 @@ export const ACTIVITY_ICONS: Record<ActivityKind, BadgeIcon> = {
 	created: CirclePlus,
 	updated: Pencil,
 	state_changed: RefreshCw,
-	deleted: Trash2
+	deleted: Trash
 };
