@@ -1,5 +1,5 @@
 <script lang="ts">
-	import { afterNavigate, replaceState } from '$app/navigation';
+	import { afterNavigate, goto } from '$app/navigation';
 	import { resolve } from '$app/paths';
 	import { page } from '$app/state';
 	import {
@@ -45,8 +45,8 @@
 	});
 
 	// Deep-link ?settings=<cat> : ouvre le modal Paramètres puis nettoie l'URL.
-	// afterNavigate (et pas un $effect) : replaceState exige un router initialisé,
-	// et un effet sur page.url se redéclencherait après le replaceState.
+	// afterNavigate (et pas un $effect) : goto exige un router initialisé,
+	// et un effet sur page.url se redéclencherait après la navigation.
 	afterNavigate(() => {
 		const raw = page.url.searchParams.get('settings');
 		if (raw === null) {
@@ -55,8 +55,7 @@
 		openSettings(parseSettingsCategory(raw));
 		const url = new URL(window.location.href);
 		url.searchParams.delete('settings');
-		// eslint-disable-next-line svelte/no-navigation-without-resolve -- URL courante, déjà résolue
-		replaceState(url, {});
+		void goto(url, { state: {}, shallow: true, replace: true });
 	});
 </script>
 
