@@ -5,7 +5,7 @@
 	// marchand ou de formateur·rice, longs et de longueurs inégales. À la
 	// verticale, ils se chevauchent ou basculent en biais, et le graphique devient
 	// un exercice de lecture.
-	import { browser } from '$app/environment';
+	import { browser } from '$app/env';
 	import { Bar } from 'svelte-chartjs';
 	import { chartOptions, chartPalette, registerChartJs, type ValueFormat } from './chartjs';
 

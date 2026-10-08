@@ -1,6 +1,6 @@
 <script lang="ts">
 	// Deux séries comparées catégorie par catégorie — barres groupées.
-	import { browser } from '$app/environment';
+	import { browser } from '$app/env';
 	import { Bar } from 'svelte-chartjs';
 	import { chartOptions, chartPalette, registerChartJs, type ValueFormat } from './chartjs';
 

@@ -5,7 +5,7 @@
 	// Chart.js n'a pas de contrôleur « aire » : une aire, c'est une courbe
 	// remplie sur un axe empilé. La variante à cent pour cent, elle, arrive déjà
 	// normalisée du serveur — la bibliothèque ne sait pas empiler en pourcentage.
-	import { browser } from '$app/environment';
+	import { browser } from '$app/env';
 	import {
 		chartOptions,
 		chartPalette,

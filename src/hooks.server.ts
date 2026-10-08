@@ -1,4 +1,4 @@
-import { building } from '$app/environment';
+import { building } from '$app/env';
 import { resolve as resolveRoute } from '$app/paths';
 import { appServerEnvCheck } from '$lib/server/env';
 import { sessionCache } from '$lib/server/sessionCacheInstance';
@@ -12,7 +12,8 @@ import {
 	sidCookieName
 } from '@davincibot/lib/server';
 import type { User } from '@supabase/supabase-js';
-import { error, redirect, type Handle, type RequestEvent, type ServerInit } from '@sveltejs/kit';
+import { error, redirect, type RequestEvent } from '@sveltejs/kit';
+import type { Handle, ServerInit } from '@sveltejs/kit/hooks';
 
 export const init: ServerInit = () => {
 	if (building) {
