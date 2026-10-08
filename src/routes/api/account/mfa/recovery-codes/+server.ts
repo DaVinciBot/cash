@@ -1,5 +1,4 @@
 import { forwardToAuth } from '$lib/server/authProxy';
-import { json } from '@sveltejs/kit';
 import type { RequestHandler } from './$types';
 
 // Régénère les codes de récupération (retournés en clair une seule fois).
@@ -8,5 +7,5 @@ export const POST: RequestHandler = async ({ fetch, cookies }) => {
 		method: 'POST',
 		body: '{}'
 	});
-	return json(result, { status });
+	return Response.json(result, { status });
 };

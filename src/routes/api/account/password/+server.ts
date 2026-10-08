@@ -1,6 +1,5 @@
 import { publicEnv } from '@davincibot/lib';
 import { sidCookieName } from '@davincibot/lib/server';
-import { json } from '@sveltejs/kit';
 import type { RequestHandler } from './$types';
 
 // Relais serveur→serveur vers le service auth (forward du cookie sid) : le
@@ -17,5 +16,5 @@ export const POST: RequestHandler = async ({ request, cookies }) => {
 		body
 	});
 	const result = (await response.json().catch(() => ({}))) as Record<string, unknown>;
-	return json(result, { status: response.status });
+	return Response.json(result, { status: response.status });
 };

@@ -1,18 +1,17 @@
 import { requireEditMembers } from '$lib/server/adminUsers';
 import { publicEnv } from '@davincibot/lib';
 import { sidCookieName } from '@davincibot/lib/server';
-import { json } from '@sveltejs/kit';
 import type { RequestEvent } from './$types';
 
 export const POST = async (event: RequestEvent) => {
 	const { locals, params, cookies } = event;
 	if (!(await requireEditMembers(locals))) {
-		return json({ error: 'Not authorized' }, { status: 403 });
+		return Response.json({ error: 'Not authorized' }, { status: 403 });
 	}
 
 	const userId = params.id;
 	if (!userId) {
-		return json({ error: 'Missing user id' }, { status: 400 });
+		return Response.json({ error: 'Missing user id' }, { status: 400 });
 	}
 
 	// Délégué au service auth, comme l'invitation initiale : c'est lui qui pose le
@@ -29,9 +28,9 @@ export const POST = async (event: RequestEvent) => {
 			body: JSON.stringify({ user_id: userId })
 		});
 		const result = (await response.json().catch(() => ({}))) as Record<string, unknown>;
-		return json(result, { status: response.status });
+		return Response.json(result, { status: response.status });
 	} catch (error) {
 		const message = error instanceof Error ? error.message : 'Failed to reinvite user';
-		return json({ error: message }, { status: 500 });
+		return Response.json({ error: message }, { status: 500 });
 	}
 };

@@ -1,6 +1,5 @@
 import { forwardToAuth } from '$lib/server/authProxy';
 import { sessionCache } from '$lib/server/sessionCacheInstance';
-import { json } from '@sveltejs/kit';
 import type { RequestHandler } from './$types';
 
 // Révocation de toutes les autres sessions du compte. Purge complète du cache
@@ -12,5 +11,5 @@ export const POST: RequestHandler = async ({ fetch, cookies }) => {
 	if (status === 200) {
 		sessionCache.clear();
 	}
-	return json(result, { status });
+	return Response.json(result, { status });
 };
