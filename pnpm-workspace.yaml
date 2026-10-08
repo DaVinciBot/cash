@@ -14,7 +14,6 @@ minimumReleaseAgeExclude:
   - playwright-core@1.64.0
   - playwright@1.64.0
 overrides:
-  '@sveltejs/kit>cookie': ^0.7.2
   source-map-js: '>=1.2.2'
   devalue: '>=5.9.3'
   undici: '>=8.10.2'
