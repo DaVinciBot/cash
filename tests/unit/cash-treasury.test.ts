@@ -1,15 +1,7 @@
 import { describe, expect, it } from 'vitest';
 
 import { parseDomains } from '$lib/server/treasury';
-import {
-	ACCOUNT_KIND_LABELS,
-	ACCOUNT_KINDS,
-	countsTowardTreasury,
-	FLOW_DIRECTION_BADGES,
-	FLOW_DIRECTIONS,
-	FLOW_ORIGINS,
-	isFlowGenerated
-} from '@davincibot/lib';
+import { ACCOUNT_KIND_LABELS, ACCOUNT_KINDS, countsTowardTreasury, FLOW_DIRECTION_BADGES, FLOW_DIRECTIONS, FLOW_ORIGINS, isFlowGenerated } from '$lib/types/cash';
 
 describe('référentiel de trésorerie (§6.2, §6.3)', () => {
 	it('couvre exactement les enums de la base', () => {

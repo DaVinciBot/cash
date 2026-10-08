@@ -2,7 +2,7 @@
 	import { Button, Checkbox, FilterChip } from '@davincibot/components';
 	import { enhance } from '$app/forms';
 	import CampusBadge from '$lib/components/cash/CampusBadge.svelte';
-	import { REFUSAL_REASON_MIN_LENGTH, refusalReasonError } from '@davincibot/lib';
+	import { REFUSAL_REASON_MIN_LENGTH, refusalReasonError } from '$lib/types/cash';
 	import { SvelteSet } from 'svelte/reactivity';
 	import type { ActionData, PageData } from './$types';
 

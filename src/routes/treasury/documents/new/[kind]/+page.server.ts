@@ -5,7 +5,7 @@ import { rejection } from '$lib/server/audit';
 import { decimal, text, textAll } from '$lib/server/form';
 import { missingIssuerFields, organization, type ExpenseLine } from '$lib/server/reports';
 import { flowList, periods } from '$lib/server/treasury';
-import { DOCUMENT_KINDS, documentFollowsFlow, type DocumentKind } from '@davincibot/lib';
+import { DOCUMENT_KINDS, documentFollowsFlow, type DocumentKind } from '$lib/types/cash';
 import { error, fail, redirect } from '@sveltejs/kit';
 import type { Actions, PageServerLoad } from './$types';
 

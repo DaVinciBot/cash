@@ -21,7 +21,8 @@
 		formatSlotDate
 	} from '$lib/helpers/trainingTables';
 	import type { TableCell, TableRow } from '@davincibot/components';
-	import type { CrudField, StateBadge as StateBadgeData } from '@davincibot/lib';
+	import type { StateBadge as StateBadgeData } from '@davincibot/lib';
+import type { CrudField } from '$lib/types/crud';
 	import {
 		createTraining,
 		createTrainingSlot,

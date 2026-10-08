@@ -14,7 +14,8 @@
 
 import { num, str } from '$lib/server/coerce';
 import type { Database } from '@davincibot/database-types';
-import type { Campus, ItemTag, OrderState, ShippingAllocation } from '@davincibot/lib';
+import type { Campus } from '@davincibot/lib';
+import type { ItemTag, OrderState, ShippingAllocation } from '$lib/types/cash';
 import type { SupabaseClient } from '@supabase/supabase-js';
 
 type Client = SupabaseClient<Database>;

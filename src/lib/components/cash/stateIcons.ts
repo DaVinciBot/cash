@@ -11,7 +11,9 @@
 // tables se lisent côte à côte et ne peuvent pas diverger sans que TypeScript
 // le signale.
 
-import type { ActivityKind, Campus, FlowDirection, ItemState, OrderState } from '@davincibot/lib';
+import type { Campus } from '@davincibot/lib';
+import type { ActivityKind } from '$lib/types/audit';
+import type { FlowDirection, ItemState, OrderState } from '$lib/types/cash';
 import {
 	Ban,
 	Banknote,

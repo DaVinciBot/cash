@@ -8,7 +8,8 @@
 
 import { num, str } from '$lib/server/coerce';
 import type { Database } from '@davincibot/database-types';
-import type { Campus, ItemState, ItemTag, ProjectPermission } from '@davincibot/lib';
+import type { Campus, ProjectPermission } from '@davincibot/lib';
+import type { ItemState, ItemTag } from '$lib/types/cash';
 import type { SupabaseClient } from '@supabase/supabase-js';
 
 type Client = SupabaseClient<Database>;

@@ -10,8 +10,9 @@
 
 import { num, str } from '$lib/server/coerce';
 import type { Database } from '@davincibot/database-types';
-import type { AccountKind, Campus, FlowDirection, FlowOrigin } from '@davincibot/lib';
-import { countsTowardTreasury } from '@davincibot/lib';
+import type { Campus } from '@davincibot/lib';
+import type { AccountKind, FlowDirection, FlowOrigin } from '$lib/types/cash';
+import { countsTowardTreasury } from '$lib/types/cash';
 import type { SupabaseClient } from '@supabase/supabase-js';
 
 type Client = SupabaseClient<Database>;

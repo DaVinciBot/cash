@@ -2,7 +2,7 @@ import { entityHistory, rejection } from '$lib/server/audit';
 import { decimal, text, textAll } from '$lib/server/form';
 import { budgetLeaves, campusAddress, orderDetail } from '$lib/server/orders';
 import { accounts } from '$lib/server/treasury';
-import { SHIPPING_ALLOCATIONS, type ShippingAllocation } from '@davincibot/lib';
+import { SHIPPING_ALLOCATIONS, type ShippingAllocation } from '$lib/types/cash';
 import { error, fail } from '@sveltejs/kit';
 import type { Actions, PageServerLoad } from './$types';
 

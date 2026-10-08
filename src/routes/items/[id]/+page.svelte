@@ -4,7 +4,7 @@
 	import CampusBadge from '$lib/components/cash/CampusBadge.svelte';
 	import HistoryTimeline from '$lib/components/cash/HistoryTimeline.svelte';
 	import ItemStateBadge from '$lib/components/cash/ItemStateBadge.svelte';
-	import { isItemEditableByMember, isItemRefused } from '@davincibot/lib';
+	import { isItemEditableByMember, isItemRefused } from '$lib/types/cash';
 	import type { PageData } from './$types';
 
 	let { data }: { data: PageData } = $props();

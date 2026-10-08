@@ -1,5 +1,5 @@
 <script lang="ts">
-	import { ITEM_STATE_BADGES, type ItemState } from '@davincibot/lib';
+	import { ITEM_STATE_BADGES, type ItemState } from '$lib/types/cash';
 	import { ITEM_STATE_ICONS } from './stateIcons';
 	import StateBadge from './StateBadge.svelte';
 

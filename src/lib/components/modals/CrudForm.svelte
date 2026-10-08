@@ -1,11 +1,6 @@
 <script lang="ts">
 	import { Button, Checkbox, OverlayBackdrop } from '@davincibot/components';
-	import type {
-		AutocompleteCompletion,
-		CrudField,
-		DocumentPreview,
-		FieldValue
-	} from '@davincibot/lib';
+	import type { AutocompleteCompletion, CrudField, DocumentPreview, FieldValue } from '$lib/types/crud';
 
 	type SubmitEventHandler = (event: MouseEvent) => void | Promise<void>;
 	type CloseEventHandler = (event: MouseEvent) => void | Promise<void>;

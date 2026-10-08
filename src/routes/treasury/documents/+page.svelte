@@ -1,7 +1,7 @@
 <script lang="ts">
 	import { Button } from '@davincibot/components';
 	import { resolve } from '$app/paths';
-	import { DOCUMENT_KIND_LABELS } from '@davincibot/lib';
+	import { DOCUMENT_KIND_LABELS } from '$lib/types/cash';
 	import type { PageData } from './$types';
 
 	let { data }: { data: PageData } = $props();

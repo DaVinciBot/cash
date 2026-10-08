@@ -1,5 +1,5 @@
 import { missingIssuerFields, organization } from '$lib/server/reports';
-import { DOCUMENT_KINDS } from '@davincibot/lib';
+import { DOCUMENT_KINDS } from '$lib/types/cash';
 import type { PageServerLoad } from './$types';
 
 // Étape 1 — quel document veut-on faire.

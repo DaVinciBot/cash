@@ -7,15 +7,8 @@
 	import ItemStateBadge from '$lib/components/cash/ItemStateBadge.svelte';
 	import StateBadge from '$lib/components/cash/StateBadge.svelte';
 	import { CAMPUS_ICONS, ORDER_STATE_ICONS } from '$lib/components/cash/stateIcons';
-	import {
-		CAMPUS_BADGES,
-		isOrderCancelable,
-		isOrderEditable,
-		isOrderPassable,
-		ORDER_STATE_BADGES,
-		SHIPPING_ALLOCATION_LABELS,
-		SHIPPING_ALLOCATIONS
-	} from '@davincibot/lib';
+	import { CAMPUS_BADGES } from '@davincibot/lib';
+import { isOrderCancelable, isOrderEditable, isOrderPassable, ORDER_STATE_BADGES, SHIPPING_ALLOCATION_LABELS, SHIPPING_ALLOCATIONS } from '$lib/types/cash';
 	import { untrack } from 'svelte';
 	import type { ActionData, PageData } from './$types';
 

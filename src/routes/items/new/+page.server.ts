@@ -2,7 +2,8 @@ import { resolve } from '$app/paths';
 import { rejection } from '$lib/server/audit';
 import { budgetPressure, currentSchoolYear, memberProjects, resolveCampus } from '$lib/server/cash';
 import { jsonArray, text, textAll } from '$lib/server/form';
-import { cashErrorMessage, type Campus, type ItemTag } from '@davincibot/lib';
+import { type Campus } from '@davincibot/lib';
+import { cashErrorMessage, type ItemTag } from '$lib/types/cash';
 import { error, fail, redirect } from '@sveltejs/kit';
 import type { Actions, PageServerLoad } from './$types';
 

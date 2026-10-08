@@ -6,7 +6,7 @@
 	// Les styles d'impression vivent ICI et non dans la page : ils s'appliquent à
 	// du balisage produit par les composants enfants, que la portée d'une feuille
 	// de style de page n'atteindrait pas.
-	import { DOCUMENT_KIND_LABELS } from '@davincibot/lib';
+	import { DOCUMENT_KIND_LABELS } from '$lib/types/cash';
 	import type { Snippet } from 'svelte';
 	import type { GeneratedDocument } from '$lib/server/reports';
 

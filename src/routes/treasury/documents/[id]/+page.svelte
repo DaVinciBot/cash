@@ -6,7 +6,7 @@
 	import InvoiceSheet from '$lib/components/cash/documents/InvoiceSheet.svelte';
 	import QuoteSheet from '$lib/components/cash/documents/QuoteSheet.svelte';
 	import TaxReceiptSheet from '$lib/components/cash/documents/TaxReceiptSheet.svelte';
-	import { DOCUMENT_KIND_LABELS } from '@davincibot/lib';
+	import { DOCUMENT_KIND_LABELS } from '$lib/types/cash';
 	import type { PageData } from './$types';
 
 	let { data }: { data: PageData } = $props();

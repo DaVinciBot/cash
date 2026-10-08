@@ -1,19 +1,7 @@
 import { describe, expect, it } from 'vitest';
 
 import { orderIdsFrom, type SearchHit } from '$lib/server/audit';
-import {
-	ACTIVITY_BADGES,
-	ACTIVITY_KINDS,
-	CASH_ENTITY_LABELS,
-	SOCLE_ACTIVITY_KINDS,
-	SOCLE_ENTITY_LABELS,
-	actorLabel,
-	fieldLabel,
-	formatJournalValue,
-	isOpaqueField,
-	summarizeActivity,
-	type ActivityEntry
-} from '@davincibot/lib';
+import { ACTIVITY_BADGES, ACTIVITY_KINDS, CASH_ENTITY_LABELS, SOCLE_ACTIVITY_KINDS, SOCLE_ENTITY_LABELS, actorLabel, fieldLabel, formatJournalValue, isOpaqueField, summarizeActivity, type ActivityEntry } from '$lib/types/audit';
 
 function entry(over: Partial<ActivityEntry> = {}): ActivityEntry {
 	return {
