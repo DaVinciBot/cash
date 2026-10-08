@@ -4,7 +4,7 @@
 	import CampusBadge from '$lib/components/cash/CampusBadge.svelte';
 	import StateBadge from '$lib/components/cash/StateBadge.svelte';
 	import { ORDER_STATE_ICONS } from '$lib/components/cash/stateIcons';
-	import { ORDER_STATE_BADGES, ORDER_STATES, type OrderState } from '$lib/types/cash';
+	import { ORDER_STATE_BADGES, ORDER_STATES, type OrderState } from '$lib/types/domain';
 	import type { PageData } from './$types';
 
 	let { data }: { data: PageData } = $props();

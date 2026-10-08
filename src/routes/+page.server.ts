@@ -23,7 +23,7 @@ export const actions: Actions = {
 	 * Suppression d'un item par son auteur.
 	 *
 	 * On ne vérifie pas l'état ici : la policy `items_delete` n'autorise déjà que
-	 * `pending_cdp`, `refused_cdp` et `refused_treso`. Redoubler la règle côté
+	 * `pending_cdp` : un refus reste dans l'historique. Redoubler la règle côté
 	 * application la ferait diverger le jour où elle change en base.
 	 */
 	delete: async ({ locals, request }) => {

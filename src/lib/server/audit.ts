@@ -13,7 +13,7 @@
 //     porte le code annule la transaction, donc l'enregistrement vient d'après.
 
 import type { Database, Json } from '@davincibot/database-types';
-import { cashErrorMessage } from '$lib/types/cash';
+import { cashErrorMessage } from '$lib/types/domain';
 import { type ActivityEntry, type JournalChange } from '$lib/types/audit';
 import type { PostgrestError, SupabaseClient } from '@supabase/supabase-js';
 

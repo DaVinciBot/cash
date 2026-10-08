@@ -7,7 +7,7 @@
 	import { resolve } from '$app/paths';
 	import { INVOICE_OPERATION_KINDS, INVOICE_OPERATION_LABELS } from '$lib/documents';
 	import { round } from '$lib/numbers';
-	import { DOCUMENT_KIND_LABELS } from '$lib/types/cash';
+	import { DOCUMENT_KIND_LABELS } from '$lib/types/domain';
 	import type { ActionData, PageData } from './$types';
 
 	let { data, form }: { data: PageData; form: ActionData } = $props();

@@ -3,7 +3,7 @@
 	import { resolve } from '$app/paths';
 	import HistoryTimeline from '$lib/components/cash/HistoryTimeline.svelte';
 	import { CASH_ENTITY_LABELS, SOCLE_ENTITY_LABELS } from '$lib/types/audit';
-import { CASH_ERROR_MESSAGES } from '$lib/types/cash';
+import { CASH_ERROR_MESSAGES } from '$lib/types/domain';
 	import type { PageData } from './$types';
 
 	let { data }: { data: PageData } = $props();

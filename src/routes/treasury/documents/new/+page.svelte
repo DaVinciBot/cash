@@ -1,7 +1,7 @@
 <script lang="ts">
 	import { resolve } from '$app/paths';
 	import type { BadgeIcon } from '$lib/components/cash/stateIcons';
-	import { DOCUMENT_KIND_LABELS, DOCUMENT_KINDS } from '$lib/types/cash';
+	import { DOCUMENT_KIND_LABELS, DOCUMENT_KINDS } from '$lib/types/domain';
 	import { Euro, FileText, Gift, Receipt } from '@lucide/svelte';
 	import type { PageData } from './$types';
 

@@ -3,7 +3,7 @@ import { rejection } from '$lib/server/audit';
 import { currentSchoolYear } from '$lib/server/cash';
 import { text, textAll } from '$lib/server/form';
 import { budgetLeaves, bundlingQueue, defaultLeafFor } from '$lib/server/orders';
-import { refusalReasonError } from '$lib/types/cash';
+import { refusalReasonError } from '$lib/types/domain';
 import { error, fail, redirect } from '@sveltejs/kit';
 import type { Actions, PageServerLoad } from './$types';
 

@@ -3,7 +3,7 @@
 	import { enhance } from '$app/forms';
 	import { resolve } from '$app/paths';
 	import CampusBadge from '$lib/components/cash/CampusBadge.svelte';
-	import { ITEM_TAGS, type ItemTag } from '$lib/types/cash';
+	import { ITEM_TAGS, type ItemTag } from '$lib/types/domain';
 	import { untrack } from 'svelte';
 	import type { ActionData, PageData } from './$types';
 

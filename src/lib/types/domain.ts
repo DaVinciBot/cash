@@ -115,20 +115,6 @@ export const DOCUMENT_KIND_LABELS: Record<DocumentKind, string> = {
 };
 
 /**
- * Préfixe de la série de numérotation, identique à celui que produit
- * `cash.next_document_number`.
- *
- * Dupliqué côté client pour l'affichage seulement : le numéro est TOUJOURS
- * attribué par la base, sous verrou. Le calculer ici en ferait deux sources.
- */
-export const DOCUMENT_KIND_PREFIXES: Record<DocumentKind, string> = {
-	expense_report: 'NDF',
-	quote: 'DEV',
-	invoice: 'FAC',
-	tax_receipt: 'REC'
-};
-
-/**
  * Un document dont le montant se lit sur un flux existant, plutôt que saisi.
  *
  * Une facture et un reçu matérialisent un mouvement déjà enregistré ; un devis
@@ -245,9 +231,12 @@ export function isItemEditableByMember(state: ItemState): boolean {
 	return state === 'pending_cdp';
 }
 
-/** États depuis lesquels un membre peut supprimer son item — miroir de la policy items_delete. */
+/**
+ * États depuis lesquels un membre peut supprimer son item — miroir de la policy items_delete.
+ * Un refus reste dans l'historique : seul un item encore en revue se retire.
+ */
 export function isItemDeletableByMember(state: ItemState): boolean {
-	return state === 'pending_cdp' || state === 'refused_cdp' || state === 'refused_treso';
+	return state === 'pending_cdp';
 }
 
 /** Un item refusé est terminal, quel que soit l'auteur du refus. */

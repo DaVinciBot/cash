@@ -1,7 +1,7 @@
 import { rejection } from '$lib/server/audit';
 import { decimal, text } from '$lib/server/form';
 import { accounts, balancesOn, movementsBetween, periods } from '$lib/server/treasury';
-import { ACCOUNT_KINDS, type AccountKind } from '$lib/types/cash';
+import { ACCOUNT_KINDS, type AccountKind } from '$lib/types/domain';
 import { fail } from '@sveltejs/kit';
 import type { Actions, PageServerLoad } from './$types';
 

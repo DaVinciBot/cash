@@ -13,7 +13,7 @@
 
 import type { Campus } from '@davincibot/lib';
 import type { ActivityKind } from '$lib/types/audit';
-import type { FlowDirection, ItemState, OrderState } from '$lib/types/cash';
+import type { FlowDirection, ItemState, OrderState } from '$lib/types/domain';
 import {
 	Ban,
 	Banknote,

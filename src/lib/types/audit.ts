@@ -17,11 +17,6 @@ export const ACTIVITY_KINDS = ['created', 'updated', 'state_changed', 'deleted']
 
 export type ActivityKind = (typeof ACTIVITY_KINDS)[number];
 
-/** Enum public.socle_activity_kind — le socle n'a pas d'état à changer. */
-export const SOCLE_ACTIVITY_KINDS = ['created', 'updated', 'deleted'] as const;
-
-export type SocleActivityKind = (typeof SOCLE_ACTIVITY_KINDS)[number];
-
 interface ActivityBadge {
 	label: string;
 	emoji: string;

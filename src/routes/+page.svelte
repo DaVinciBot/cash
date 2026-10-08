@@ -4,7 +4,7 @@
 	import { resolve } from '$app/paths';
 	import CampusBadge from '$lib/components/cash/CampusBadge.svelte';
 	import ItemStateBadge from '$lib/components/cash/ItemStateBadge.svelte';
-	import { ITEM_STATE_BADGES, ITEM_STATES, isItemDeletableByMember, isItemEditableByMember, type ItemState } from '$lib/types/cash';
+	import { ITEM_STATE_BADGES, ITEM_STATES, isItemDeletableByMember, isItemEditableByMember, type ItemState } from '$lib/types/domain';
 	import type { ActionData, PageData } from './$types';
 
 	let { data, form }: { data: PageData; form: ActionData } = $props();

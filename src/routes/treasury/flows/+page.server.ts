@@ -3,7 +3,7 @@ import { currentSchoolYear } from '$lib/server/cash';
 import { decimal, text } from '$lib/server/form';
 import { budgetLeaves } from '$lib/server/orders';
 import { accounts, flowList, periods } from '$lib/server/treasury';
-import { FLOW_DIRECTIONS, type FlowDirection } from '$lib/types/cash';
+import { FLOW_DIRECTIONS, type FlowDirection } from '$lib/types/domain';
 import { fail } from '@sveltejs/kit';
 import type { Actions, PageServerLoad } from './$types';
 

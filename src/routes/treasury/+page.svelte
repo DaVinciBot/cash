@@ -2,7 +2,7 @@
 	import { enhance } from '$app/forms';
 	import { resolve } from '$app/paths';
 	import { Button } from '@davincibot/components';
-	import { ACCOUNT_KIND_LABELS, ACCOUNT_KINDS } from '$lib/types/cash';
+	import { ACCOUNT_KIND_LABELS, ACCOUNT_KINDS } from '$lib/types/domain';
 	import type { ActionData, PageData } from './$types';
 
 	let { data, form }: { data: PageData; form: ActionData } = $props();

@@ -2,7 +2,7 @@ import { describe, expect, it } from 'vitest';
 
 import { resolveCampus } from '$lib/server/cash';
 import { CAMPUS_BADGES } from '@davincibot/lib';
-import { cashErrorMessage, isItemDeletableByMember, isItemEditableByMember, isItemRefused, ITEM_STATE_BADGES, ITEM_STATES } from '$lib/types/cash';
+import { cashErrorMessage, isItemDeletableByMember, isItemEditableByMember, isItemRefused, ITEM_STATE_BADGES, ITEM_STATES } from '$lib/types/domain';
 
 describe('résolution du campus de destination (CMD-F-43 / CMD-F-46)', () => {
 	it('déduit le campus quand projet et membre concordent, sans rien demander', () => {
@@ -93,10 +93,10 @@ describe('droits du membre sur ses items (CMD-F-02)', () => {
 
 	// Miroir de la policy items_delete : un item validé ou regroupé engage déjà le
 	// trésorier, un item reçu est arrivé.
-	it('laisse supprimer un item en revue ou refusé, jamais un item engagé', () => {
+	it('laisse supprimer un item en revue, jamais un item refusé ou engagé', () => {
 		expect(isItemDeletableByMember('pending_cdp')).toBe(true);
-		expect(isItemDeletableByMember('refused_cdp')).toBe(true);
-		expect(isItemDeletableByMember('refused_treso')).toBe(true);
+		expect(isItemDeletableByMember('refused_cdp')).toBe(false);
+		expect(isItemDeletableByMember('refused_treso')).toBe(false);
 		expect(isItemDeletableByMember('pending_bundled')).toBe(false);
 		expect(isItemDeletableByMember('bundled')).toBe(false);
 		expect(isItemDeletableByMember('received')).toBe(false);

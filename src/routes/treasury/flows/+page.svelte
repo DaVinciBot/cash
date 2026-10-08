@@ -4,7 +4,7 @@
 	import { resolve } from '$app/paths';
 	import StateBadge from '$lib/components/cash/StateBadge.svelte';
 	import { FLOW_DIRECTION_ICONS } from '$lib/components/cash/stateIcons';
-	import { FLOW_DIRECTION_BADGES, isFlowGenerated } from '$lib/types/cash';
+	import { FLOW_DIRECTION_BADGES, isFlowGenerated } from '$lib/types/domain';
 	import type { ActionData, PageData } from './$types';
 
 	let { data, form }: { data: PageData; form: ActionData } = $props();

@@ -4,7 +4,7 @@
 	import { resolve } from '$app/paths';
 	import CampusBadge from '$lib/components/cash/CampusBadge.svelte';
 	import { CAMPUS_BADGES, type Campus } from '@davincibot/lib';
-import { ITEM_TAGS, type ItemTag } from '$lib/types/cash';
+import { ITEM_TAGS, type ItemTag } from '$lib/types/domain';
 	import { untrack } from 'svelte';
 	import type { ActionData, PageData } from './$types';
 

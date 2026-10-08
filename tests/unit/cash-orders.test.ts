@@ -1,7 +1,7 @@
 import { describe, expect, it } from 'vitest';
 
 import { defaultLeafFor } from '$lib/server/orders';
-import { isItemBundlable, isItemRefusableByTreasurer, isOrderCancelable, isOrderEditable, isOrderPassable, ITEM_STATES, ORDER_STATES, SHIPPING_ALLOCATION_LABELS, SHIPPING_ALLOCATIONS } from '$lib/types/cash';
+import { isItemBundlable, isItemRefusableByTreasurer, isOrderCancelable, isOrderEditable, isOrderPassable, ITEM_STATES, ORDER_STATES, SHIPPING_ALLOCATION_LABELS, SHIPPING_ALLOCATIONS } from '$lib/types/domain';
 
 // Arbre de démonstration, calqué sur celui de la base de développement :
 // deux racines, des nœuds intermédiaires, et une feuille par défaut par branche.
