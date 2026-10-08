@@ -80,7 +80,7 @@ async function guardDevEnvironment(
 		if (event.url.pathname.startsWith('/api')) {
 			error(401, 'Non authentifié');
 		}
-		redirect(302, buildLoginUrl(event.url.href));
+		redirect(302, buildLoginUrl(event.url.href), { external: true });
 	}
 
 	const result = (await event.locals.supabase.rpc('has_permission', {
