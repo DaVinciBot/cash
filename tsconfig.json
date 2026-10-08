@@ -7,7 +7,6 @@
 		".svelte-kit/types/**/$types.d.ts",
 		"eslint.config.js",
 		"playwright.config.ts",
-		"svelte.config.js",
 		"vite.config.js",
 		"vite.config.ts",
 		"vitest.config.ts",
