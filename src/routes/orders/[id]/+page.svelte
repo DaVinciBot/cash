@@ -115,7 +115,12 @@ import { isOrderCancelable, isOrderEditable, isOrderPassable, ORDER_STATE_BADGES
 	<!-- Actions de cycle de vie -->
 	<div class="mb-6 flex flex-wrap items-center gap-2">
 		{#if isOrderPassable(order.state)}
-			<Button onclick={() => (passing = !passing)} size="md" variant="primary">
+			<Button
+				disabled={order.items.length === 0}
+				onclick={() => (passing = !passing)}
+				size="md"
+				variant="primary"
+			>
 				Passer la commande
 			</Button>
 		{/if}
@@ -209,6 +214,14 @@ import { isOrderCancelable, isOrderEditable, isOrderPassable, ORDER_STATE_BADGES
 				<Button onclick={() => (canceling = false)} size="md" variant="secondary">Revenir</Button>
 			</div>
 		</form>
+	{/if}
+
+	{#if order.items.length === 0 && isOrderPassable(order.state)}
+		<p
+			class="mb-4 rounded-xl bg-amber-500/15 px-4 py-3 text-sm text-amber-300 ring-1 ring-amber-500/30"
+		>
+			Impossible de valider : la commande doit contenir au moins un item.
+		</p>
 	{/if}
 
 	{#if unallocated.length > 0 && isOrderPassable(order.state)}
