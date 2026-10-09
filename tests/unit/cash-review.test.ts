@@ -1,7 +1,17 @@
 import { describe, expect, it } from 'vitest';
 
-import { ADMIN_MENU, canAccessAdminPath, filterMenuByPermissions, type EffectivePermission } from '@davincibot/lib';
-import { isItemReviewableByCdp, ITEM_STATES, REFUSAL_REASON_MIN_LENGTH, refusalReasonError } from '$lib/types/domain';
+import {
+	isItemReviewableByCdp,
+	ITEM_STATES,
+	REFUSAL_REASON_MIN_LENGTH,
+	refusalReasonError
+} from '$lib/types/domain';
+import {
+	ADMIN_MENU,
+	canAccessAdminPath,
+	filterMenuByPermissions,
+	type EffectivePermission
+} from '@davincibot/lib';
 
 describe('périmètre de la revue CDP (§8)', () => {
 	// Une fois validé, l'item appartient au trésorier : check_item_transition

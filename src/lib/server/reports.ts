@@ -7,8 +7,8 @@
 import type { InvoiceOperationKind, OfficerGender } from '$lib/documents';
 import { round } from '$lib/numbers';
 import { num } from '$lib/server/coerce';
-import type { Database } from '@davincibot/database-types';
 import type { DocumentKind } from '$lib/types/domain';
+import type { Database } from '@davincibot/database-types';
 import type { SupabaseClient } from '@supabase/supabase-js';
 
 type Client = SupabaseClient<Database>;

@@ -1,8 +1,15 @@
 import { describe, expect, it } from 'vitest';
 
 import { resolveCampus } from '$lib/server/cash';
+import {
+	cashErrorMessage,
+	isItemDeletableByMember,
+	isItemEditableByMember,
+	isItemRefused,
+	ITEM_STATE_BADGES,
+	ITEM_STATES
+} from '$lib/types/domain';
 import { CAMPUS_BADGES } from '@davincibot/lib';
-import { cashErrorMessage, isItemDeletableByMember, isItemEditableByMember, isItemRefused, ITEM_STATE_BADGES, ITEM_STATES } from '$lib/types/domain';
 
 describe('résolution du campus de destination (CMD-F-43 / CMD-F-46)', () => {
 	it('déduit le campus quand projet et membre concordent, sans rien demander', () => {

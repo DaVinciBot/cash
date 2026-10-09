@@ -1,6 +1,14 @@
 <script lang="ts">
 	import { Button } from '@davincibot/components';
-	import { ACTIVITY_BADGES, actorLabel, fieldLabel, formatJournalValue, isOpaqueField, summarizeActivity, type ActivityEntry } from '$lib/types/audit';
+	import {
+		ACTIVITY_BADGES,
+		actorLabel,
+		fieldLabel,
+		formatJournalValue,
+		isOpaqueField,
+		summarizeActivity,
+		type ActivityEntry
+	} from '$lib/types/audit';
 
 	interface Props {
 		entries: ActivityEntry[];
