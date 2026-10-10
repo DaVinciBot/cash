@@ -77,7 +77,7 @@ Voici une synthèse des formations prévues du {from} au {to} : {nb} formation{s
 
 :warning: Si tu ne peux plus venir, n'oublie pas de te désinscrire pour libérer la place.
 
-:arrow_right: Si tu souhaites une formation en particulier tu peux faire une demande [**ici**](https://forms.office.com/e/KKeQs53RAu?origin=lprLink)
+:arrow_right: Si tu souhaites une formation en particulier tu peux faire une demande [**ici**](https://davincibot.fr/formation/requests)
 
 DVBisous ! :robot:`;
 
