@@ -246,7 +246,7 @@
 		<!-- Modal content -->
 		<div
 			id="popup-{id}"
-			class="modal border-light-blue/20 bg-surface-modal relative flex max-h-[min(85dvh,720px)] w-full max-w-[min(64rem,100%)] flex-col overflow-y-auto rounded-2xl border p-4 shadow-[0_26px_70px_rgba(2,6,30,0.6)] sm:p-6 md:w-[75%] lg:w-[70%] xl:w-[65%] 2xl:w-[55%]"
+			class="modal border-rule bg-surface-modal relative flex max-h-[min(85dvh,720px)] w-full max-w-[min(64rem,100%)] flex-col overflow-y-auto rounded-2xl border p-4 shadow-[0_26px_70px_rgba(2,6,30,0.6)] sm:p-6 md:w-[75%] lg:w-[70%] xl:w-[65%] 2xl:w-[55%]"
 		>
 			<!-- Modal header -->
 			<div class="mb-4 flex justify-between rounded-t sm:mb-5">
@@ -438,7 +438,7 @@
 				{#each actions as action, index (actionKey(action, index))}
 					{#if action.type === 'selector'}
 						<select
-							class="focus:border-light-blue/70 border-light-blue/30 bg-dark-blue/60 placeholder-dark-light-blue/50 block w-full rounded-lg border p-2.5 text-sm text-white"
+							class="focus:border-light-blue/70 border-rule-strong bg-dark-blue/60 placeholder:text-muted block w-full rounded-lg border p-2.5 text-sm text-white"
 							onchange={action.handler}
 						>
 							<option disabled selected value="">Choisir une option</option>

@@ -1,13 +1,15 @@
 import { describe, expect, it } from 'vitest';
 
 import {
-	ADMIN_MENU,
-	canAccessAdminPath,
-	filterMenuByPermissions,
 	isItemReviewableByCdp,
 	ITEM_STATES,
 	REFUSAL_REASON_MIN_LENGTH,
-	refusalReasonError,
+	refusalReasonError
+} from '$lib/types/domain';
+import {
+	ADMIN_MENU,
+	canAccessAdminPath,
+	filterMenuByPermissions,
 	type EffectivePermission
 } from '@davincibot/lib';
 

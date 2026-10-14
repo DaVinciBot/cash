@@ -11,7 +11,7 @@ import {
 	ORDER_STATES,
 	SHIPPING_ALLOCATION_LABELS,
 	SHIPPING_ALLOCATIONS
-} from '@davincibot/lib';
+} from '$lib/types/domain';
 
 // Arbre de démonstration, calqué sur celui de la base de développement :
 // deux racines, des nœuds intermédiaires, et une feuille par défaut par branche.

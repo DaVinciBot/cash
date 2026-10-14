@@ -1,7 +1,7 @@
 <script lang="ts">
 	import { resolve } from '$app/paths';
 	import type { BadgeIcon } from '$lib/components/cash/stateIcons';
-	import { DOCUMENT_KIND_LABELS, DOCUMENT_KINDS } from '@davincibot/lib';
+	import { DOCUMENT_KIND_LABELS, DOCUMENT_KINDS } from '$lib/types/domain';
 	import { Euro, FileText, Gift, Receipt } from '@lucide/svelte';
 	import type { PageData } from './$types';
 
@@ -45,7 +45,7 @@
 			{@const KindIcon = ICON[kind]}
 			<li>
 				<a
-					class="hover:bg-blue-gray/15 border-light-blue/20 bg-blue-gray/15 hover:border-light-blue/60 flex h-full flex-col rounded-lg border p-4 transition aria-disabled:pointer-events-none aria-disabled:opacity-50"
+					class="hover:bg-blue-gray/15 border-rule bg-blue-gray/15 hover:border-light-blue/60 flex h-full flex-col rounded-lg border p-4 transition aria-disabled:pointer-events-none aria-disabled:opacity-50"
 					aria-disabled={missing.length > 0}
 					href={resolve('/treasury/documents/new/[kind]', { kind })}
 				>

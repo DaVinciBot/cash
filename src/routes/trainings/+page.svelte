@@ -21,7 +21,8 @@
 		formatSlotDate
 	} from '$lib/helpers/trainingTables';
 	import type { TableCell, TableRow } from '@davincibot/components';
-	import type { CrudField, StateBadge as StateBadgeData } from '@davincibot/lib';
+	import type { StateBadge as StateBadgeData } from '@davincibot/lib';
+	import type { CrudField } from '$lib/types/crud';
 	import {
 		createTraining,
 		createTrainingSlot,
@@ -76,7 +77,7 @@ Voici une synthèse des formations prévues du {from} au {to} : {nb} formation{s
 
 :warning: Si tu ne peux plus venir, n'oublie pas de te désinscrire pour libérer la place.
 
-:arrow_right: Si tu souhaites une formation en particulier tu peux faire une demande [**ici**](https://forms.office.com/e/KKeQs53RAu?origin=lprLink)
+:arrow_right: Si tu souhaites une formation en particulier tu peux faire une demande [**ici**](https://davincibot.fr/formation/requests)
 
 DVBisous ! :robot:`;
 
@@ -520,9 +521,13 @@ DVBisous ! :robot:`;
 		if (!testSent) {
 			return;
 		}
+		const storiesTestSent = await sendDiscordStories(from, to, 'test');
+		if (!storiesTestSent) {
+			return;
+		}
 
 		const shouldSendLive = window.confirm(
-			'Test envoyé sans ping sur le webhook de test. Envoyer maintenant la synthèse sur le webhook réel ?'
+			'Synthèse et stories envoyées sans ping sur le webhook de test. Les envoyer maintenant sur les webhooks réels ?'
 		);
 		if (!shouldSendLive) {
 			closeSummaryModal();
@@ -530,8 +535,39 @@ DVBisous ! :robot:`;
 		}
 
 		const liveSent = await sendDiscordSummary({ from, to, text, mode: 'live' });
-		if (liveSent) {
-			closeSummaryModal();
+		if (!liveSent) {
+			return;
+		}
+		// La synthèse est partie : on ferme la modale avant les stories, pour qu'un
+		// échec de ces dernières ne pousse pas à renvoyer la synthèse. L'erreur
+		// éventuelle s'affiche dans la section.
+		closeSummaryModal();
+		await sendDiscordStories(from, to, 'live');
+	}
+
+	// Même logique que la synthèse : le test part sur le webhook de test sans ping,
+	// l'envoi réel sur le salon des stories avec la mention du rôle.
+	async function sendDiscordStories(from: string, to: string, mode: 'test' | 'live') {
+		const failure =
+			mode === 'test'
+				? "Le test des stories a échoué : rien n'a été envoyé sur les webhooks réels."
+				: "La synthèse a été envoyée, mais l'envoi des stories a échoué.";
+		summarySending = true;
+		try {
+			const supabaseClient = getSupabaseBrowserClient();
+			const { error: invokeError } = await supabaseClient.functions.invoke('training-story', {
+				body: { from, to, mode }
+			});
+			if (invokeError) {
+				summaryError = failure;
+				return false;
+			}
+			return true;
+		} catch {
+			summaryError = failure;
+			return false;
+		} finally {
+			summarySending = false;
 		}
 	}
 
@@ -615,13 +651,13 @@ DVBisous ! :robot:`;
 
 	<!-- La synthèse part d'abord sur le webhook de test, et n'atteint le salon
 	     réel qu'après confirmation : un ping de masse ne se rattrape pas. -->
-	<div class="border-light-blue/20 bg-blue-gray/15 mb-8 rounded-2xl border p-4 sm:p-5">
+	<div class="border-rule bg-blue-gray/15 mb-8 rounded-2xl border p-4 sm:p-5">
 		<div class="flex flex-wrap items-center justify-between gap-3">
 			<div>
 				<h2 class="text-light-blue text-sm font-semibold">Synthèse Discord</h2>
 				<p class="text-dark-light-blue/70 mt-1 text-xs">
 					Les formations d'une période, annoncées sur le serveur. Un envoi de test précède toujours
-					l'envoi réel.
+					l'envoi réel, pour la synthèse comme pour les stories Instagram.
 				</p>
 			</div>
 			<Button disabled={summarySending} onclick={openSummaryModal} size="md" variant="primary"
@@ -639,7 +675,7 @@ DVBisous ! :robot:`;
 
 	{#if loading}
 		<p
-			class="border-light-blue/20 text-dark-light-blue/70 rounded-xl border border-dashed px-4 py-12 text-center"
+			class="border-rule text-dark-light-blue/70 rounded-xl border border-dashed px-4 py-12 text-center"
 		>
 			Chargement des formations…
 		</p>

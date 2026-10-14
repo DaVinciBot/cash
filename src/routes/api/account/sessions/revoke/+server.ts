@@ -1,6 +1,5 @@
 import { forwardToAuth } from '$lib/server/authProxy';
 import { sessionCache } from '$lib/server/sessionCacheInstance';
-import { json } from '@sveltejs/kit';
 import type { RequestHandler } from './$types';
 
 const readSessionId = (body: string): string | null => {
@@ -30,5 +29,5 @@ export const POST: RequestHandler = async ({ request, fetch, cookies }) => {
 			sessionCache.delete(sessionId);
 		}
 	}
-	return json(result, { status });
+	return Response.json(result, { status });
 };

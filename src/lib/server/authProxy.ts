@@ -19,7 +19,11 @@ export const forwardToAuth = async (
 	const response = await fetchFn(`${publicEnv.PUBLIC_AUTH_BASE_URL}${path}`, {
 		method: init.method ?? 'GET',
 		headers: {
-			...(init.body === undefined ? {} : { 'Content-Type': 'application/json' }),
+			// Toujours présent sur un POST, même sans corps : SvelteKit 3 refuse en 403
+			// un POST sans type de contenu dont l'Origin (absente ici) ne correspond pas.
+			...(init.method === 'POST' || init.body !== undefined
+				? { 'Content-Type': 'application/json' }
+				: {}),
 			...(sid ? { cookie: `${sidCookieName()}=${sid}` } : {})
 		},
 		...(init.body === undefined ? {} : { body: init.body })

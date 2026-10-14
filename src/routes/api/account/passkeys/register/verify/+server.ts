@@ -1,5 +1,4 @@
 import { forwardToAuth } from '$lib/server/authProxy';
-import { json } from '@sveltejs/kit';
 import type { RequestHandler } from './$types';
 
 // Vérifie l'attestation WebAuthn et enregistre la passkey.
@@ -11,5 +10,5 @@ export const POST: RequestHandler = async ({ fetch, cookies, request }) => {
 		'/account/passkeys/register/verify',
 		{ method: 'POST', body }
 	);
-	return json(result, { status });
+	return Response.json(result, { status });
 };

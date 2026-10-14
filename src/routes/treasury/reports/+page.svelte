@@ -52,7 +52,7 @@
 			Exercice fiscal
 			<select
 				name="fy"
-				class="border-light-blue/30 bg-dark-blue/60 text-light-blue placeholder:text-dark-light-blue/50 focus:border-light-blue/70 mt-1 block rounded-xl border p-2.5 text-sm focus:outline-none disabled:opacity-50"
+				class="border-rule-strong bg-dark-blue/60 text-light-blue placeholder:text-muted focus:border-light-blue/70 focus-visible:ring-light-blue/60 mt-1 block rounded-xl border p-2.5 text-sm focus:outline-none focus-visible:ring-2 disabled:opacity-50"
 				value={data.fiscalYearId ?? ''}
 			>
 				{#each data.periods.fiscalYears as year (year.id)}
@@ -64,7 +64,7 @@
 			Année scolaire
 			<select
 				name="sy"
-				class="border-light-blue/30 bg-dark-blue/60 text-light-blue placeholder:text-dark-light-blue/50 focus:border-light-blue/70 mt-1 block rounded-xl border p-2.5 text-sm focus:outline-none disabled:opacity-50"
+				class="border-rule-strong bg-dark-blue/60 text-light-blue placeholder:text-muted focus:border-light-blue/70 focus-visible:ring-light-blue/60 mt-1 block rounded-xl border p-2.5 text-sm focus:outline-none focus-visible:ring-2 disabled:opacity-50"
 				value={data.schoolYearId ?? ''}
 			>
 				{#each data.periods.schoolYears as year (year.id)}
@@ -91,7 +91,7 @@
 				<!-- eslint-enable svelte/no-navigation-without-resolve -->
 			</div>
 
-			<div class="border-light-blue/20 overflow-x-auto rounded-lg border">
+			<div class="border-rule overflow-x-auto rounded-lg border">
 				<table class="w-full text-sm">
 					<thead class="bg-blue-gray/15 text-dark-light-blue text-left text-xs uppercase">
 						<tr>
@@ -103,7 +103,7 @@
 							<th class="px-4 py-2 text-right">Cumulé</th>
 						</tr>
 					</thead>
-					<tbody class="divide-light-blue/10 divide-y">
+					<tbody class="divide-rule divide-y">
 						{#each data.quarters.quarters as q (q.label)}
 							<tr>
 								<td class="text-light-blue px-4 py-2 font-medium">{q.label}</td>
@@ -125,7 +125,7 @@
 							</tr>
 						{/each}
 					</tbody>
-					<tfoot class="border-light-blue/30 bg-blue-gray/15 border-t text-sm">
+					<tfoot class="border-rule-strong bg-blue-gray/15 border-t text-sm">
 						<tr>
 							<td class="text-light-blue px-4 py-2 font-semibold" colspan="2">Exercice</td>
 							<td class="px-4 py-2 text-right text-emerald-300">{euro.format(yearTotal.credit)}</td>
@@ -161,12 +161,12 @@
 
 		{#if data.projects.length === 0}
 			<p
-				class="border-light-blue/20 text-dark-light-blue/70 rounded-xl border border-dashed px-4 py-8 text-center"
+				class="border-rule text-dark-light-blue/70 rounded-xl border border-dashed px-4 py-8 text-center"
 			>
 				Aucun item sur cette année scolaire.
 			</p>
 		{:else}
-			<div class="border-light-blue/20 overflow-x-auto rounded-lg border">
+			<div class="border-rule overflow-x-auto rounded-lg border">
 				<table class="w-full text-sm">
 					<thead class="bg-blue-gray/15 text-dark-light-blue text-left text-xs uppercase">
 						<tr>
@@ -178,7 +178,7 @@
 							<th class="px-4 py-2 text-right">Refusé</th>
 						</tr>
 					</thead>
-					<tbody class="divide-light-blue/10 divide-y">
+					<tbody class="divide-rule divide-y">
 						{#each data.projects as p (p.projectId)}
 							<tr>
 								<td class="text-light-blue px-4 py-2">{p.projectName}</td>
@@ -192,7 +192,7 @@
 							</tr>
 						{/each}
 					</tbody>
-					<tfoot class="border-light-blue/30 bg-blue-gray/15 border-t">
+					<tfoot class="border-rule-strong bg-blue-gray/15 border-t">
 						<tr>
 							<td class="text-light-blue px-4 py-2 font-semibold" colspan="2">Total</td>
 							<td class="text-light-blue px-4 py-2 text-right font-semibold"
@@ -220,7 +220,7 @@
 			Statistiques
 		</h2>
 		<div class="grid gap-4 md:grid-cols-2">
-			<div class="border-light-blue/20 bg-blue-gray/15 rounded-2xl border p-4 sm:p-5">
+			<div class="border-rule bg-blue-gray/15 rounded-2xl border p-4 sm:p-5">
 				<h3 class="text-light-blue mb-3 text-sm font-medium">Solde cumulé, mois par mois</h3>
 				<TrendChart
 					format={euroFormat}
@@ -229,7 +229,7 @@
 				/>
 			</div>
 
-			<div class="border-light-blue/20 bg-blue-gray/15 rounded-2xl border p-4 sm:p-5">
+			<div class="border-rule bg-blue-gray/15 rounded-2xl border p-4 sm:p-5">
 				<h3 class="text-light-blue mb-3 text-sm font-medium">Recettes et dépenses par mois</h3>
 				<GroupedBarsChart
 					format={euroFormat}
@@ -242,7 +242,7 @@
 				/>
 			</div>
 
-			<div class="border-light-blue/20 bg-blue-gray/15 rounded-2xl border p-4 sm:p-5">
+			<div class="border-rule bg-blue-gray/15 rounded-2xl border p-4 sm:p-5">
 				<h3 class="text-light-blue mb-3 text-sm font-medium">Budget par branche</h3>
 				<GroupedBarsChart
 					format={euroFormat}
@@ -256,12 +256,12 @@
 				/>
 			</div>
 
-			<div class="border-light-blue/20 bg-blue-gray/15 rounded-2xl border p-4 sm:p-5">
+			<div class="border-rule bg-blue-gray/15 rounded-2xl border p-4 sm:p-5">
 				<h3 class="text-light-blue mb-3 text-sm font-medium">Dépenses par projet</h3>
 				<RankingChart format={euroFormat} rows={data.charts.byProject} seriesLabel="Engagé" />
 			</div>
 
-			<div class="border-light-blue/20 bg-blue-gray/15 rounded-2xl border p-4 sm:p-5 md:col-span-2">
+			<div class="border-rule bg-blue-gray/15 rounded-2xl border p-4 sm:p-5 md:col-span-2">
 				<h3 class="text-light-blue mb-3 text-sm font-medium">Dépenses par marchand</h3>
 				<p class="text-dark-light-blue/70 mb-3 text-xs">
 					Le marchand est déduit du lien de chaque item, sans référentiel de fournisseurs.

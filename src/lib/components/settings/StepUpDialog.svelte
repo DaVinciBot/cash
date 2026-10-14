@@ -180,7 +180,7 @@
 	>
 		<OverlayBackdrop />
 		<div
-			class="border-light-blue/20 relative w-full max-w-md rounded-2xl border bg-[#060a2c] p-5 sm:p-6"
+			class="border-rule bg-surface-modal relative w-full max-w-md rounded-2xl border p-5 sm:p-6"
 		>
 			<p class="text-dark-light-blue m-0 mb-3 text-[0.65rem] tracking-[0.32em] uppercase">
 				Confirmation de sécurité
@@ -236,7 +236,7 @@
 					{#if mode === 'password'}
 						<input
 							id="step-up-password"
-							class="border-light-blue/30 bg-dark-blue/60 text-light-blue placeholder:text-dark-light-blue/50 focus:border-light-blue/70 block w-full rounded-xl border p-2.5 text-sm focus:outline-none disabled:opacity-50"
+							class="border-rule-strong bg-dark-blue/60 text-light-blue placeholder:text-muted focus:border-light-blue/70 focus-visible:ring-light-blue/60 block w-full rounded-xl border p-2.5 text-sm focus:outline-none focus-visible:ring-2 disabled:opacity-50"
 							aria-label="Mot de passe actuel"
 							autocomplete="current-password"
 							disabled={busy}
@@ -249,7 +249,7 @@
 					{:else if mode === 'recovery'}
 						<input
 							id="step-up-recovery"
-							class="border-light-blue/30 bg-dark-blue/60 text-light-blue placeholder:text-dark-light-blue/50 focus:border-light-blue/70 block w-full rounded-xl border p-2.5 font-mono text-sm tracking-widest focus:outline-none disabled:opacity-50"
+							class="border-rule-strong bg-dark-blue/60 text-light-blue placeholder:text-muted focus:border-light-blue/70 focus-visible:ring-light-blue/60 block w-full rounded-xl border p-2.5 font-mono text-sm tracking-widest focus:outline-none focus-visible:ring-2 disabled:opacity-50"
 							aria-label="Code de récupération"
 							autocomplete="off"
 							disabled={busy}

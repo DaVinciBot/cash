@@ -16,7 +16,7 @@ const publicEnv = {
 vi.mock('$env/dynamic/public', () => ({ env: publicEnv }));
 vi.mock('$env/static/public', () => publicEnv);
 
-vi.mock('$app/environment', () => ({
+vi.mock('$app/env', () => ({
 	browser: true,
 	dev: false,
 	building: false,

@@ -4,7 +4,7 @@
 	// Quatre courbes sur un seul axe : effectifs, places et heures restent du
 	// même ordre de grandeur d'une semaine à l'autre, et un second axe ferait
 	// croire à des croisements qui n'existent pas.
-	import { browser } from '$app/environment';
+	import { browser } from '$app/env';
 	import {
 		chartOptions,
 		chartPalette,

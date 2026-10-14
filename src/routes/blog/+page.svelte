@@ -534,7 +534,7 @@
 	</div>
 	<div class="grid grid-cols-1 gap-4 md:grid-cols-3">
 		<!-- Editor -->
-		<div class="border-light-blue/20 bg-blue-gray/15 rounded-lg border p-3 md:col-span-2">
+		<div class="border-rule bg-blue-gray/15 rounded-lg border p-3 md:col-span-2">
 			<div class="mb-2 flex items-center justify-between">
 				<div class="text-sm">Contenu</div>
 				<label class="flex items-center gap-2 text-xs">
@@ -549,23 +549,23 @@
 			<CartaEditor {carta} bind:value={body} />
 		</div>
 		<!-- Sidebar -->
-		<div class="border-light-blue/20 bg-blue-gray/15 flex flex-col gap-4 rounded-lg border p-3">
+		<div class="border-rule bg-blue-gray/15 flex flex-col gap-4 rounded-lg border p-3">
 			<div>
 				<label class="mb-1 block text-sm" for="search">Rechercher par titre</label>
 				<input
 					id="search"
-					class="border-light-blue/30 bg-dark-blue/60 text-light-blue placeholder:text-dark-light-blue/50 focus:border-light-blue/70 w-full rounded-xl border p-2.5 text-sm focus:outline-none disabled:opacity-50"
+					class="border-rule-strong bg-dark-blue/60 text-light-blue placeholder:text-muted focus:border-light-blue/70 focus-visible:ring-light-blue/60 w-full rounded-xl border p-2.5 text-sm focus:outline-none focus-visible:ring-2 disabled:opacity-50"
 					placeholder="Rechercher..."
 					bind:value={search}
 				/>
 			</div>
-			<div class="border-light-blue/20 max-h-64 overflow-auto rounded-xl border">
+			<div class="border-rule max-h-64 overflow-auto rounded-xl border">
 				{#if loadingList}
 					<div class="text-dark-light-blue p-3 text-sm">Chargement…</div>
 				{:else if !articles.length}
 					<div class="text-dark-light-blue p-3 text-sm">Aucun article</div>
 				{:else}
-					<ul class="divide-light-blue/10 divide-y">
+					<ul class="divide-rule divide-y">
 						{#each articles.filter((a) => (a.title ?? '')
 								.toLowerCase()
 								.includes(search.toLowerCase())) as a (a.slug)}
@@ -590,7 +590,7 @@
 												? 'bg-emerald-500/15 text-emerald-300 ring-1 ring-emerald-500/30'
 												: a.state === 'deleted'
 													? 'bg-red-500/15 text-red-300 ring-1 ring-red-500/30'
-													: 'border-light-blue/30 bg-dark-blue/60 text-dark-light-blue border'}"
+													: 'border-rule-strong bg-dark-blue/60 text-dark-light-blue border'}"
 										>
 											{a.state === 'published'
 												? 'Publié'
@@ -614,7 +614,7 @@
 				<label class="mb-1 block text-sm" for="title">Titre</label>
 				<input
 					id="title"
-					class="border-light-blue/30 bg-dark-blue/60 text-light-blue placeholder:text-dark-light-blue/50 focus:border-light-blue/70 w-full rounded-xl border p-2.5 text-sm focus:outline-none disabled:opacity-50"
+					class="border-rule-strong bg-dark-blue/60 text-light-blue placeholder:text-muted focus:border-light-blue/70 focus-visible:ring-light-blue/60 w-full rounded-xl border p-2.5 text-sm focus:outline-none focus-visible:ring-2 disabled:opacity-50"
 					oninput={() => (slug = toSlug(title))}
 					bind:value={title}
 				/>
@@ -623,7 +623,7 @@
 				<label class="mb-1 block text-sm" for="slug">Slug</label>
 				<input
 					id="slug"
-					class="border-light-blue/30 bg-dark-blue/60 text-light-blue placeholder:text-dark-light-blue/50 focus:border-light-blue/70 w-full rounded-xl border p-2.5 text-sm focus:outline-none disabled:opacity-50"
+					class="border-rule-strong bg-dark-blue/60 text-light-blue placeholder:text-muted focus:border-light-blue/70 focus-visible:ring-light-blue/60 w-full rounded-xl border p-2.5 text-sm focus:outline-none focus-visible:ring-2 disabled:opacity-50"
 					bind:value={slug}
 				/>
 			</div>
@@ -631,7 +631,7 @@
 				<label class="mb-1 block text-sm" for="state">État</label>
 				<select
 					id="state"
-					class="border-light-blue/30 bg-dark-blue/60 text-light-blue placeholder:text-dark-light-blue/50 focus:border-light-blue/70 w-full rounded-xl border p-2.5 text-sm focus:outline-none disabled:opacity-50"
+					class="border-rule-strong bg-dark-blue/60 text-light-blue placeholder:text-muted focus:border-light-blue/70 focus-visible:ring-light-blue/60 w-full rounded-xl border p-2.5 text-sm focus:outline-none focus-visible:ring-2 disabled:opacity-50"
 					bind:value={articleState}
 				>
 					<option value="draft">Brouillon</option>
@@ -643,7 +643,7 @@
 				<label class="mb-1 block text-sm" for="excerpt">Extrait</label>
 				<textarea
 					id="excerpt"
-					class="border-light-blue/30 bg-dark-blue/60 text-light-blue placeholder:text-dark-light-blue/50 focus:border-light-blue/70 w-full rounded-xl border p-2.5 text-sm focus:outline-none disabled:opacity-50"
+					class="border-rule-strong bg-dark-blue/60 text-light-blue placeholder:text-muted focus:border-light-blue/70 focus-visible:ring-light-blue/60 w-full rounded-xl border p-2.5 text-sm focus:outline-none focus-visible:ring-2 disabled:opacity-50"
 					rows="3"
 					bind:value={meta.excerpt}></textarea>
 			</div>
@@ -653,7 +653,7 @@
 				>
 				<input
 					id="tags"
-					class="border-light-blue/30 bg-dark-blue/60 text-light-blue placeholder:text-dark-light-blue/50 focus:border-light-blue/70 w-full rounded-xl border p-2.5 text-sm focus:outline-none disabled:opacity-50"
+					class="border-rule-strong bg-dark-blue/60 text-light-blue placeholder:text-muted focus:border-light-blue/70 focus-visible:ring-light-blue/60 w-full rounded-xl border p-2.5 text-sm focus:outline-none focus-visible:ring-2 disabled:opacity-50"
 					bind:value={meta.tag}
 				/>
 			</div>
@@ -661,7 +661,7 @@
 				<label class="mb-1 block text-sm" for="heroImage">Image de couverture (URL)</label>
 				<input
 					id="heroImage"
-					class="border-light-blue/30 bg-dark-blue/60 text-light-blue placeholder:text-dark-light-blue/50 focus:border-light-blue/70 w-full rounded-xl border p-2.5 text-sm focus:outline-none disabled:opacity-50"
+					class="border-rule-strong bg-dark-blue/60 text-light-blue placeholder:text-muted focus:border-light-blue/70 focus-visible:ring-light-blue/60 w-full rounded-xl border p-2.5 text-sm focus:outline-none focus-visible:ring-2 disabled:opacity-50"
 					bind:value={meta.heroImage}
 				/>
 				<div class="mt-2 flex items-center gap-2">
@@ -673,7 +673,7 @@
 					/>
 					{#if meta.heroImage}
 						<img
-							class="border-light-blue/20 h-10 w-10 rounded-lg border object-cover"
+							class="border-rule h-10 w-10 rounded-lg border object-cover"
 							alt="couverture"
 							src={meta.heroImage}
 						/>
@@ -684,7 +684,7 @@
 				<label class="mb-1 block text-sm" for="heroAlt">Texte alternatif</label>
 				<input
 					id="heroAlt"
-					class="border-light-blue/30 bg-dark-blue/60 text-light-blue placeholder:text-dark-light-blue/50 focus:border-light-blue/70 w-full rounded-xl border p-2.5 text-sm focus:outline-none disabled:opacity-50"
+					class="border-rule-strong bg-dark-blue/60 text-light-blue placeholder:text-muted focus:border-light-blue/70 focus-visible:ring-light-blue/60 w-full rounded-xl border p-2.5 text-sm focus:outline-none focus-visible:ring-2 disabled:opacity-50"
 					bind:value={meta.heroAlt}
 				/>
 			</div>
@@ -693,7 +693,7 @@
 					<label class="mb-1 block text-sm" for="authorName">Auteur</label>
 					<input
 						id="authorName"
-						class="border-light-blue/30 bg-dark-blue/60 text-light-blue placeholder:text-dark-light-blue/50 focus:border-light-blue/70 w-full rounded-xl border p-2.5 text-sm focus:outline-none disabled:opacity-50"
+						class="border-rule-strong bg-dark-blue/60 text-light-blue placeholder:text-muted focus:border-light-blue/70 focus-visible:ring-light-blue/60 w-full rounded-xl border p-2.5 text-sm focus:outline-none focus-visible:ring-2 disabled:opacity-50"
 						bind:value={meta.author.name}
 					/>
 				</div>
@@ -701,7 +701,7 @@
 					<label class="mb-1 block text-sm" for="authorRole">Rôle</label>
 					<input
 						id="authorRole"
-						class="border-light-blue/30 bg-dark-blue/60 text-light-blue placeholder:text-dark-light-blue/50 focus:border-light-blue/70 w-full rounded-xl border p-2.5 text-sm focus:outline-none disabled:opacity-50"
+						class="border-rule-strong bg-dark-blue/60 text-light-blue placeholder:text-muted focus:border-light-blue/70 focus-visible:ring-light-blue/60 w-full rounded-xl border p-2.5 text-sm focus:outline-none focus-visible:ring-2 disabled:opacity-50"
 						bind:value={meta.author.role}
 					/>
 				</div>
@@ -716,9 +716,7 @@
 
 {#if saving || message}
 	<div class="fixed inset-0 z-50 flex items-center justify-center bg-black/50">
-		<div
-			class="border-light-blue/20 bg-blue-gray/15 w-full max-w-sm rounded-lg border p-6 shadow-xl"
-		>
+		<div class="border-rule bg-blue-gray/15 w-full max-w-sm rounded-lg border p-6 shadow-xl">
 			{#if saveSteps.length > 0}
 				<div class="mb-4">
 					<Stepper steps={saveSteps} />

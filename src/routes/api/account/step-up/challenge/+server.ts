@@ -1,5 +1,4 @@
 import { forwardToAuth } from '$lib/server/authProxy';
-import { json } from '@sveltejs/kit';
 import type { RequestHandler } from './$types';
 
 // Prépare un step-up : TOTP ou code envoyé par email selon la méthode demandée,
@@ -10,5 +9,5 @@ export const POST: RequestHandler = async ({ request, fetch, cookies }) => {
 		method: 'POST',
 		body: body || '{}'
 	});
-	return json(result, { status });
+	return Response.json(result, { status });
 };

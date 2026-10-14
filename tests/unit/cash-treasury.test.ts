@@ -9,7 +9,7 @@ import {
 	FLOW_DIRECTIONS,
 	FLOW_ORIGINS,
 	isFlowGenerated
-} from '@davincibot/lib';
+} from '$lib/types/domain';
 
 describe('référentiel de trésorerie (§6.2, §6.3)', () => {
 	it('couvre exactement les enums de la base', () => {

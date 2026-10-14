@@ -47,7 +47,7 @@
 					Année scolaire
 					<select
 						name="year"
-						class="border-light-blue/30 bg-dark-blue/60 text-light-blue focus:border-light-blue/70 mt-1 block rounded-xl border p-2.5 text-sm focus:outline-none"
+						class="border-rule-strong bg-dark-blue/60 text-light-blue focus:border-light-blue/70 focus-visible:ring-light-blue/60 mt-1 block rounded-xl border p-2.5 text-sm focus:outline-none focus-visible:ring-2"
 						onchange={(event) => event.currentTarget.form?.requestSubmit()}
 						value={data.schoolYearId ?? ''}
 					>
@@ -68,7 +68,7 @@
 
 	{#if data.projects.length === 0}
 		<p
-			class="border-light-blue/20 text-dark-light-blue/70 rounded-xl border border-dashed px-4 py-12 text-center"
+			class="border-rule text-dark-light-blue/70 rounded-xl border border-dashed px-4 py-12 text-center"
 		>
 			Aucun projet ne vous est rattaché. Le rattachement est posé par le responsable projets.
 		</p>
@@ -78,7 +78,7 @@
 		{#each data.projects as project (project.projectId)}
 			{@const budget = project.budget}
 			{@const nodes = project.tree.filter((node) => showArchived || !node.archivedAt)}
-			<article class="border-light-blue/20 bg-dark-blue/40 rounded-xl border p-5">
+			<article class="border-rule bg-dark-blue/40 rounded-xl border p-5">
 				<header class="mb-4 flex flex-wrap items-baseline gap-3">
 					<h2 class="text-lg font-semibold text-white">{project.projectName}</h2>
 					{#if project.campus}
@@ -148,8 +148,8 @@
 										style="margin-left: {node.depth * 1.5}rem"
 										class="flex flex-wrap items-center gap-3 rounded-lg border px-4 py-2.5 text-sm {node.depth ===
 										0
-											? 'border-light-blue/40 bg-blue-gray/25'
-											: 'border-light-blue/20 bg-blue-gray/15'}"
+											? 'border-rule-strong bg-blue-gray/25'
+											: 'border-rule bg-blue-gray/15'}"
 									>
 										<span
 											class="font-medium {node.archivedAt
@@ -158,7 +158,7 @@
 										>
 										{#if node.depth === 0}
 											<span
-												class="text-light-blue ring-light-blue/30 rounded-full bg-sky-500/10 px-2 py-0.5 text-xs ring-1"
+												class="text-light-blue ring-rule-strong rounded-full bg-sky-500/10 px-2 py-0.5 text-xs ring-1"
 												>budget du projet</span
 											>
 										{/if}

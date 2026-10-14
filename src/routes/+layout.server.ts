@@ -86,7 +86,7 @@ export const load: LayoutServerLoad = async ({ locals, cookies, depends, url }) 
 	const { session, user } = await safeGetSession();
 
 	if (!session) {
-		redirect(303, buildLoginUrl(url.href));
+		redirect(303, buildLoginUrl(url.href), { external: true });
 	}
 
 	let userProfile: UserProfile | null = null;

@@ -40,10 +40,13 @@ describe('UserImportModal (components submodule)', () => {
 		form.dispatchEvent(new Event('submit', { bubbles: true, cancelable: true }));
 		await new Promise<void>((resolve) => setTimeout(resolve, 0));
 
+		// @davincibot/components 7.0.0 a remplacé `permissions` par `campus` et
+		// `role` dans le payload d'import, et ajouté un campus par utilisateur.
 		expect(onSubmit).toHaveBeenCalledWith({
-			permissions: [],
+			campus: '',
 			project: '',
-			users: [{ name: 'Alice', email: 'alice@example.com', project: 'project-1' }]
+			role: '',
+			users: [{ name: 'Alice', email: 'alice@example.com', project: 'project-1', campus: '' }]
 		});
 		expect(onClose).toHaveBeenCalledTimes(1);
 

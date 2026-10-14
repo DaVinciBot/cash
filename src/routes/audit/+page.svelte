@@ -2,7 +2,8 @@
 	import { FilterChip } from '@davincibot/components';
 	import { resolve } from '$app/paths';
 	import HistoryTimeline from '$lib/components/cash/HistoryTimeline.svelte';
-	import { CASH_ENTITY_LABELS, CASH_ERROR_MESSAGES, SOCLE_ENTITY_LABELS } from '@davincibot/lib';
+	import { CASH_ENTITY_LABELS, SOCLE_ENTITY_LABELS } from '$lib/types/audit';
+	import { CASH_ERROR_MESSAGES } from '$lib/types/domain';
 	import type { PageData } from './$types';
 
 	let { data }: { data: PageData } = $props();
@@ -74,7 +75,7 @@
 		{#if data.rejected.length === 0}
 			<p class="text-dark-light-blue/70 text-sm">Aucune écriture rejetée enregistrée.</p>
 		{:else}
-			<div class="ring-light-blue/20 overflow-x-auto rounded-lg ring-1">
+			<div class="ring-rule overflow-x-auto rounded-lg ring-1">
 				<table class="w-full min-w-3xl text-left text-sm">
 					<thead class="bg-blue-gray/15 text-dark-light-blue text-xs uppercase">
 						<tr>
@@ -85,7 +86,7 @@
 							<th class="px-4 py-2">Auteur</th>
 						</tr>
 					</thead>
-					<tbody class="divide-light-blue/10 divide-y">
+					<tbody class="divide-rule divide-y">
 						{#each data.rejected as row (row.id)}
 							<tr class="hover:bg-blue-gray/15">
 								<td class="text-dark-light-blue px-4 py-2 text-xs whitespace-nowrap"
@@ -133,7 +134,7 @@
 		{:else}
 			<ul class="space-y-3">
 				{#each entries as entry (entry.id)}
-					<li class="bg-blue-gray/15 ring-light-blue/20 rounded-lg p-3 ring-1">
+					<li class="bg-blue-gray/15 ring-rule rounded-lg p-3 ring-1">
 						<p class="text-dark-light-blue/70 mb-1 text-xs">
 							{entities[entry.entityType] ?? entry.entityType}
 							<span class="text-dark-light-blue/70">n° {entry.entityId}</span>

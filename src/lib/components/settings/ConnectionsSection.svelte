@@ -45,10 +45,7 @@
 	}
 </script>
 
-<section
-	id="connections-section"
-	class="border-light-blue/20 bg-blue-gray/15 rounded-2xl border p-4 sm:p-5"
->
+<section id="connections-section" class="border-rule bg-blue-gray/15 rounded-2xl border p-4 sm:p-5">
 	<p class="text-dark-light-blue m-0 mb-3 text-[0.65rem] tracking-[0.32em] uppercase">
 		Applications connectées
 	</p>
@@ -66,7 +63,7 @@
 			{#each connections as connection (connection.client_id)}
 				<li
 					id={`connection-${connection.client_id}`}
-					class="border-light-blue/10 bg-dark-blue/40 flex items-center gap-3 rounded-xl border p-3"
+					class="border-rule bg-dark-blue/40 flex items-center gap-3 rounded-xl border p-3"
 				>
 					<AppWindow class="text-dark-light-blue size-5 shrink-0" />
 					<div class="min-w-0 flex-1">

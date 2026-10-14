@@ -5,7 +5,7 @@
 		CrudField,
 		DocumentPreview,
 		FieldValue
-	} from '@davincibot/lib';
+	} from '$lib/types/crud';
 
 	type SubmitEventHandler = (event: MouseEvent) => void | Promise<void>;
 	type CloseEventHandler = (event: MouseEvent) => void | Promise<void>;
@@ -97,7 +97,7 @@
 		<!-- Modal content -->
 		<div
 			id="CrudPopup"
-			class="border-light-blue/20 bg-surface-modal relative flex max-h-[min(85dvh,720px)] w-full max-w-[min(48rem,100%)] flex-col overflow-hidden rounded-2xl border shadow-[0_26px_70px_rgba(2,6,30,0.6)] sm:min-w-96"
+			class="border-rule bg-surface-modal relative flex max-h-[min(85dvh,720px)] w-full max-w-[min(48rem,100%)] flex-col overflow-hidden rounded-2xl border shadow-[0_26px_70px_rgba(2,6,30,0.6)] sm:min-w-96"
 		>
 			<div class="min-h-0 flex-1 overflow-y-auto p-4 sm:p-6">
 				<!-- Modal header -->
@@ -150,7 +150,7 @@
 									<select
 										id={fieldId(field)}
 										name={fieldId(field)}
-										class="almarai-regular focus:border-light-blue/70 border-light-blue/30 bg-dark-blue/60 placeholder-dark-light-blue/50 block w-full cursor-pointer rounded-lg border p-2.5 text-sm text-white"
+										class="almarai-regular focus:border-light-blue/70 border-rule-strong bg-dark-blue/60 placeholder:text-muted block w-full cursor-pointer rounded-lg border p-2.5 text-sm text-white"
 										disabled={field.readonly ?? false}
 										onchange={field.onChange ?? null}
 									>
@@ -177,7 +177,7 @@
 									<input
 										id={fieldId(field)}
 										name={fieldId(field)}
-										class=" focus:border-light-blue/70 border-light-blue/30 bg-dark-blue/60 placeholder-dark-light-blue/50 block w-full rounded-lg border p-2.5 text-sm text-white"
+										class=" focus:border-light-blue/70 border-rule-strong bg-dark-blue/60 placeholder:text-muted block w-full rounded-lg border p-2.5 text-sm text-white"
 										max={field.max ?? 2000}
 										min={field.min ?? 0}
 										placeholder={field.placeholder ?? field.name.toLowerCase()}
@@ -191,7 +191,7 @@
 									<textarea
 										id={fieldId(field)}
 										name={fieldId(field)}
-										class=" focus:border-light-blue/70 border-light-blue/30 bg-dark-blue/60 placeholder-dark-light-blue/50 block w-full rounded-lg border p-2.5 text-sm text-white"
+										class=" focus:border-light-blue/70 border-rule-strong bg-dark-blue/60 placeholder:text-muted block w-full rounded-lg border p-2.5 text-sm text-white"
 										placeholder={field.placeholder ?? field.name.toLowerCase()}
 										readonly={field.readonly ?? false}
 										required={field.required}
@@ -219,7 +219,7 @@
 										type="file"
 									/>
 									<label
-										class="focus:border-light-blue/70 border-light-blue/30 bg-dark-blue/60 placeholder-dark-light-blue/50 flex h-12 w-full items-center justify-center rounded-lg border p-2.5 text-sm text-white"
+										class="focus:border-light-blue/70 border-rule-strong bg-dark-blue/60 placeholder:text-muted flex h-12 w-full items-center justify-center rounded-lg border p-2.5 text-sm text-white"
 										for={fieldId(field)}
 									>
 										{#if field.value}
@@ -245,10 +245,10 @@
 								{:else if field.type === 'document'}
 									{#if field.multiple}
 										<div
-											class="border-light-blue/30 bg-dark-blue/60 mb-2 flex w-full flex-col items-center justify-center rounded-lg border p-2.5 text-sm text-white"
+											class="border-rule-strong bg-dark-blue/60 mb-2 flex w-full flex-col items-center justify-center rounded-lg border p-2.5 text-sm text-white"
 										>
 											{#each documentPreviews(field.value) as doc (doc.id ?? doc.name)}
-												<div class="border-light-blue/30 flex w-full items-center gap-2 py-1">
+												<div class="border-rule-strong flex w-full items-center gap-2 py-1">
 													<svg
 														class="octicon octicon-file"
 														aria-hidden="true"
@@ -352,7 +352,7 @@
 										type="file"
 									/>
 									<label
-										class="focus:border-light-blue/70 border-light-blue/30 bg-dark-blue/60 placeholder-dark-light-blue/50 flex h-12 w-full items-center justify-center rounded-lg border p-2.5 text-sm text-white"
+										class="focus:border-light-blue/70 border-rule-strong bg-dark-blue/60 placeholder:text-muted flex h-12 w-full items-center justify-center rounded-lg border p-2.5 text-sm text-white"
 										for={fieldId(field)}
 									>
 										{#if field.value && field.data === 'image' && !field.multiple}
@@ -434,7 +434,7 @@
 									{@const displayImage = autocompleteImages[fieldKey] ?? field.image}
 									<div class="relative w-full">
 										<div
-											class="focus:border-light-blue/70 border-light-blue/30 bg-dark-blue/60 placeholder-dark-light-blue/50 flex w-full items-center justify-center rounded-lg border text-sm text-white"
+											class="focus:border-light-blue/70 border-rule-strong bg-dark-blue/60 placeholder:text-muted flex w-full items-center justify-center rounded-lg border text-sm text-white"
 										>
 											{#if displayImage}
 												<img
@@ -446,7 +446,7 @@
 											<input
 												id={fieldId(field)}
 												name={fieldId(field)}
-												class=" bordertext-sm focus:border-light-blue/70 border-light-blue/30 bg-dark-blue/60 placeholder-dark-light-blue/50 block w-full rounded-lg p-2.5 text-white"
+												class=" bordertext-sm focus:border-light-blue/70 border-rule-strong bg-dark-blue/60 placeholder:text-muted block w-full rounded-lg p-2.5 text-white"
 												oninput={(
 													e: Event & {
 														currentTarget: EventTarget & HTMLInputElement;
@@ -504,16 +504,14 @@
 										</div>
 										{#if completion.length > 0}
 											<div
-												class="almarai-regular focus:border-light-blue/70 border-light-blue/30 bg-dark-blue/60 absolute top-full left-0 z-50 mt-2 max-h-56 w-full overflow-y-auto rounded-lg border p-2 pl-4 text-sm text-white"
+												class="almarai-regular border-rule-strong bg-surface-modal text-light-blue absolute top-full left-0 z-50 mt-2 flex max-h-56 w-full flex-col gap-0.5 overflow-y-auto rounded-xl border p-1 text-sm shadow-[0_16px_40px_rgba(2,6,30,0.7)]"
 											>
 												{#each completion as c (completionKey(c))}
 													<!-- Ligne de résultat : volontairement hors du système de boutons. Ce n'est
 														 pas un bouton mais une ligne de liste rendue cliquable — lui donner une
 														 variante la détacherait de la liste qu'elle compose. -->
 													<button
-														class="almarai-regular border-light-blue/20 flex w-full items-center rounded-lg border-b {c.image
-															? 'p-1'
-															: ''} cursor-pointer"
+														class="almarai-regular hover:bg-blue-gray/25 focus-visible:bg-blue-gray/25 flex w-full cursor-pointer items-center gap-2 rounded-lg px-2 py-1.5 text-left hover:text-white focus-visible:text-white focus-visible:outline-none"
 														onclick={async () => {
 															field.value = c.text;
 															field.data = c.value;
@@ -541,7 +539,7 @@
 													>
 														{#if c.image}
 															<img
-																class="mr-2 -ml-3 h-6 w-6 rounded-full"
+																class="h-6 w-6 shrink-0 rounded-full"
 																alt={c.text}
 																src={c.image}
 															/>
@@ -551,7 +549,7 @@
 																{c.text}
 															</p>
 															{#if c.subtext}
-																<p class="text-dark-light-blue text-xs">{c.subtext}</p>
+																<p class="text-muted text-xs">{c.subtext}</p>
 															{/if}
 														</div>
 													</button>
@@ -561,7 +559,7 @@
 									</div>
 								{:else if field.type === 'checkbox'}
 									<label
-										class="border-light-blue/30 bg-dark-blue/60 text-light-blue flex cursor-pointer items-center gap-2.5 rounded-xl border p-2.5 text-sm"
+										class="border-rule-strong bg-dark-blue/60 text-light-blue flex cursor-pointer items-center gap-2.5 rounded-xl border p-2.5 text-sm"
 										for={fieldId(field)}
 									>
 										<Checkbox
@@ -589,7 +587,7 @@
 									<input
 										id={fieldId(field)}
 										name={fieldId(field)}
-										class="focus:border-light-blue/70 border-light-blue/30 bg-dark-blue/60 placeholder-dark-light-blue/50 block w-full cursor-text rounded-lg border p-2.5 text-sm text-white"
+										class="focus:border-light-blue/70 border-rule-strong bg-dark-blue/60 placeholder:text-muted block w-full cursor-text rounded-lg border p-2.5 text-sm text-white"
 										placeholder={field.placeholder ?? field.name.toLowerCase()}
 										readonly={field.readonly ?? false}
 										required={field.required}

@@ -12,8 +12,9 @@
 //   - les écritures rejetées s'ÉCRIVENT par RPC (TRANS-NF-52) : l'exception qui
 //     porte le code annule la transaction, donc l'enregistrement vient d'après.
 
+import { type ActivityEntry, type JournalChange } from '$lib/types/audit';
+import { cashErrorMessage } from '$lib/types/domain';
 import type { Database, Json } from '@davincibot/database-types';
-import { cashErrorMessage, type ActivityEntry, type JournalChange } from '@davincibot/lib';
 import type { PostgrestError, SupabaseClient } from '@supabase/supabase-js';
 
 type Client = SupabaseClient<Database>;

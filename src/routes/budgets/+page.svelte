@@ -67,7 +67,7 @@
 				Année scolaire
 				<select
 					name="year"
-					class="border-light-blue/30 bg-dark-blue/60 text-light-blue placeholder:text-dark-light-blue/50 focus:border-light-blue/70 mt-1 block rounded-xl border p-2.5 text-sm focus:outline-none disabled:opacity-50"
+					class="border-rule-strong bg-dark-blue/60 text-light-blue placeholder:text-muted focus:border-light-blue/70 focus-visible:ring-light-blue/60 mt-1 block rounded-xl border p-2.5 text-sm focus:outline-none focus-visible:ring-2 disabled:opacity-50"
 					onchange={(event) => event.currentTarget.form?.requestSubmit()}
 					value={data.schoolYearId ?? ''}
 				>
@@ -91,7 +91,7 @@
 
 	{#snippet budgetForm(parentId: number | null, node: (typeof data.tree)[number] | null)}
 		<form
-			class="border-light-blue/30 bg-dark-blue/60 mb-2 flex flex-wrap items-end gap-3 rounded-lg border p-3"
+			class="border-rule-strong bg-dark-blue/60 mb-2 flex flex-wrap items-end gap-3 rounded-lg border p-3"
 			action={node ? '?/update' : '?/create'}
 			method="POST"
 			use:enhance={() =>
@@ -111,7 +111,7 @@
 				Nom
 				<input
 					name="name"
-					class="border-light-blue/30 bg-dark-blue/60 text-light-blue placeholder:text-dark-light-blue/50 focus:border-light-blue/70 mt-1 block rounded-xl border p-2.5 text-sm focus:outline-none disabled:opacity-50"
+					class="border-rule-strong bg-dark-blue/60 text-light-blue placeholder:text-muted focus:border-light-blue/70 focus-visible:ring-light-blue/60 mt-1 block rounded-xl border p-2.5 text-sm focus:outline-none focus-visible:ring-2 disabled:opacity-50"
 					required
 					value={node?.name ?? ''}
 				/>
@@ -121,7 +121,7 @@
 					Parent
 					<select
 						name="parent_id"
-						class="border-light-blue/30 bg-dark-blue/60 text-light-blue placeholder:text-dark-light-blue/50 focus:border-light-blue/70 mt-1 block rounded-xl border p-2.5 text-sm focus:outline-none disabled:opacity-50"
+						class="border-rule-strong bg-dark-blue/60 text-light-blue placeholder:text-muted focus:border-light-blue/70 focus-visible:ring-light-blue/60 mt-1 block rounded-xl border p-2.5 text-sm focus:outline-none focus-visible:ring-2 disabled:opacity-50"
 						value={node.parentId ?? ''}
 					>
 						<option value="">— racine —</option>
@@ -135,7 +135,7 @@
 				Montant TTC <span class="text-dark-light-blue/70">(feuille uniquement)</span>
 				<input
 					name="amount_ttc"
-					class="border-light-blue/30 bg-dark-blue/60 mt-1 block w-32 rounded-xl border p-2.5 text-sm"
+					class="border-rule-strong bg-dark-blue/60 mt-1 block w-32 rounded-xl border p-2.5 text-sm"
 					inputmode="decimal"
 					placeholder="—"
 					value={node?.amountTtc === null || node === null
@@ -161,7 +161,7 @@
 
 	{#if visible.length === 0}
 		<p
-			class="border-light-blue/20 text-dark-light-blue/70 rounded-xl border border-dashed px-4 py-12 text-center"
+			class="border-rule text-dark-light-blue/70 rounded-xl border border-dashed px-4 py-12 text-center"
 		>
 			Aucun budget sur cette année. Créez une racine, puis ses feuilles.
 		</p>
@@ -171,7 +171,7 @@
 				<li>
 					<div
 						style="margin-left: {node.depth * 1.5}rem"
-						class="border-light-blue/20 bg-blue-gray/15 flex flex-wrap items-center gap-3 rounded-lg border px-4 py-2.5 text-sm"
+						class="border-rule bg-blue-gray/15 flex flex-wrap items-center gap-3 rounded-lg border px-4 py-2.5 text-sm"
 					>
 						<span class="font-medium {node.archivedAt ? 'text-dark-light-blue/70' : 'text-white'}"
 							>{node.name}</span

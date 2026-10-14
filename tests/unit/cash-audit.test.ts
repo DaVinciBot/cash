@@ -5,7 +5,6 @@ import {
 	ACTIVITY_BADGES,
 	ACTIVITY_KINDS,
 	CASH_ENTITY_LABELS,
-	SOCLE_ACTIVITY_KINDS,
 	SOCLE_ENTITY_LABELS,
 	actorLabel,
 	fieldLabel,
@@ -13,7 +12,7 @@ import {
 	isOpaqueField,
 	summarizeActivity,
 	type ActivityEntry
-} from '@davincibot/lib';
+} from '$lib/types/audit';
 
 function entry(over: Partial<ActivityEntry> = {}): ActivityEntry {
 	return {
@@ -30,8 +29,6 @@ function entry(over: Partial<ActivityEntry> = {}): ActivityEntry {
 describe('référentiel des journaux (jalon 8)', () => {
 	it('couvre exactement les enums de la base', () => {
 		expect(ACTIVITY_KINDS).toEqual(['created', 'updated', 'state_changed', 'deleted']);
-		// Le socle n'a pas d'état à changer : un rôle se pose ou se révoque.
-		expect(SOCLE_ACTIVITY_KINDS).toEqual(['created', 'updated', 'deleted']);
 	});
 
 	it("donne un repère visuel distinct à chaque nature d'événement", () => {

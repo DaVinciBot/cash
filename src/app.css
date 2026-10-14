@@ -3,6 +3,13 @@
 /* Obligatoire : Tailwind v4 ne scanne pas node_modules — sans cette ligne les
    classes utilisées par les composants packagés sont purgées. */
 @source '../node_modules/@davincibot/components/dist';
+/* Même raison pour la lib : les registres de badges (ITEM_STATE_BADGES,
+   ORDER_STATE_BADGES, CAMPUS_BADGES, ACTIVITY_BADGES…) portent leurs classes
+   Tailwind en chaînes de caractères. Sans cette ligne, seules celles qui
+   existent par ailleurs dans src/ sont générées — les autres sortent sans
+   couleur, en silence : « Annulé », « Refusé trésorerie », les badges de
+   campus et « créé » étaient dans ce cas. */
+@source '../node_modules/@davincibot/lib/dist';
 
 @layer base {
 	/* Un <select> non stylé garde le widget du système : flèche dessinée par

@@ -51,9 +51,7 @@ function mountPage() {
 const lines = (target: HTMLElement) => target.querySelectorAll('fieldset');
 
 const fill = (target: HTMLElement, name: string, typed: string, index = 0) => {
-	const input = target.querySelectorAll<HTMLInputElement>(`input[name="${name}"]`)[index] as
-		| HTMLInputElement
-		| undefined;
+	const input = [...target.querySelectorAll<HTMLInputElement>(`input[name="${name}"]`)].at(index);
 	if (!input) {
 		throw new Error(`Champ « ${name} » n° ${String(index)} introuvable.`);
 	}
@@ -63,10 +61,10 @@ const fill = (target: HTMLElement, name: string, typed: string, index = 0) => {
 };
 
 const buttonByText = (target: HTMLElement, label: string) =>
-	[...target.querySelectorAll('button')].find((b) => b.textContent?.includes(label));
+	[...target.querySelectorAll('button')].find((b) => b.textContent.includes(label));
 
 /** Les montants sont formatés en euros français : espaces insécables compris. */
-const normalise = (text: string) => text.replace(/ | /g, ' ');
+const normalise = (text: string) => text.replace(/\u202f|\u00a0/g, ' ');
 
 afterEach(() => {
 	cleanup?.();
@@ -74,7 +72,7 @@ afterEach(() => {
 });
 
 describe('panier de création de commande', () => {
-	it('ajoute une ligne alors même qu\'un prix unitaire a été saisi', () => {
+	it("ajoute une ligne alors même qu'un prix unitaire a été saisi", () => {
 		const target = mountPage();
 		fill(target, 'unit_price_ttc', '12.5');
 
@@ -84,15 +82,13 @@ describe('panier de création de commande', () => {
 		expect(lines(target)).toHaveLength(2);
 	});
 
-	it('retire une ligne alors même qu\'un prix unitaire a été saisi', () => {
+	it("retire une ligne alors même qu'un prix unitaire a été saisi", () => {
 		const target = mountPage();
 		buttonByText(target, 'Ajouter un composant')?.click();
 		flushSync();
 		fill(target, 'unit_price_ttc', '12.5');
 
-		[...target.querySelectorAll('button')]
-			.filter((b) => b.textContent?.includes('Retirer'))[0]
-			?.click();
+		[...target.querySelectorAll('button')].find((b) => b.textContent.includes('Retirer'))?.click();
 		flushSync();
 
 		expect(lines(target)).toHaveLength(1);
@@ -103,8 +99,8 @@ describe('panier de création de commande', () => {
 		fill(target, 'unit_price_ttc', '12.5');
 		fill(target, 'quantity', '3');
 
-		expect(normalise(target.textContent ?? '')).toContain('Total ligne : 37,50 €');
-		expect(normalise(target.textContent ?? '')).toContain('Total : 37,50 €');
+		expect(normalise(target.textContent)).toContain('Total ligne : 37,50 €');
+		expect(normalise(target.textContent)).toContain('Total : 37,50 €');
 	});
 
 	it('recalcule le total sur plusieurs lignes', () => {
@@ -117,7 +113,7 @@ describe('panier de création de commande', () => {
 		fill(target, 'unit_price_ttc', '5.5', 1);
 		fill(target, 'quantity', '4', 1);
 
-		expect(normalise(target.textContent ?? '')).toContain('Total : 42,00 €');
+		expect(normalise(target.textContent)).toContain('Total : 42,00 €');
 	});
 
 	// Vider un champ numérique écrit `null`, pas `''` : le total doit le traiter
@@ -127,6 +123,6 @@ describe('panier de création de commande', () => {
 		fill(target, 'unit_price_ttc', '12.5');
 		fill(target, 'unit_price_ttc', '');
 
-		expect(normalise(target.textContent ?? '')).toContain('Total : 0,00 €');
+		expect(normalise(target.textContent)).toContain('Total : 0,00 €');
 	});
 });

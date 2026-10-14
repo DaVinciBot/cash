@@ -1,5 +1,4 @@
 import { forwardToAuth } from '$lib/server/authProxy';
-import { json } from '@sveltejs/kit';
 import type { RequestHandler } from './$types';
 
 export const POST: RequestHandler = async ({ fetch, cookies, request }) => {
@@ -8,5 +7,5 @@ export const POST: RequestHandler = async ({ fetch, cookies, request }) => {
 		method: 'POST',
 		body
 	});
-	return json(result, { status });
+	return Response.json(result, { status });
 };

@@ -4,7 +4,7 @@
 	// Une courbe et non des barres : la valeur suivie PASSE PAR ZÉRO et peut être
 	// négative. Une barre proportionnelle au maximum ne sait pas représenter ça,
 	// elle ne connaît que des longueurs positives.
-	import { browser } from '$app/environment';
+	import { browser } from '$app/env';
 	import { Line } from 'svelte-chartjs';
 	import { chartOptions, chartPalette, registerChartJs, type ValueFormat } from './chartjs';
 

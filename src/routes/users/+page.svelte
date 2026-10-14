@@ -1230,7 +1230,7 @@
 	{#if campus}
 		<CampusBadge {campus} compact />
 	{:else}
-		<span class="text-gray-500">—</span>
+		<span class="text-muted">—</span>
 	{/if}
 {/snippet}
 
@@ -1247,7 +1247,7 @@
 			{/each}
 		</div>
 	{:else}
-		<span class="text-gray-500">—</span>
+		<span class="text-muted">—</span>
 	{/if}
 {/snippet}
 

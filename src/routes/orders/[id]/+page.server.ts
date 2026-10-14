@@ -2,7 +2,7 @@ import { entityHistory, rejection } from '$lib/server/audit';
 import { decimal, text, textAll } from '$lib/server/form';
 import { budgetLeaves, campusAddress, orderDetail } from '$lib/server/orders';
 import { accounts } from '$lib/server/treasury';
-import { SHIPPING_ALLOCATIONS, type ShippingAllocation } from '@davincibot/lib';
+import { SHIPPING_ALLOCATIONS, type ShippingAllocation } from '$lib/types/domain';
 import { error, fail } from '@sveltejs/kit';
 import type { Actions, PageServerLoad } from './$types';
 
@@ -99,6 +99,11 @@ export const actions: Actions = {
 		// nomme donc les items fautifs avant de tenter l'écriture ; la base reste
 		// la garde, ceci n'est que la formulation.
 		const detail = await orderDetail(locals.supabase, id);
+		if (!detail || detail.items.length === 0) {
+			return fail(400, {
+				message: 'Impossible de valider : la commande doit contenir au moins un item.'
+			});
+		}
 		const orphans = detail?.items.filter((i) => i.allocations.length === 0) ?? [];
 		if (orphans.length > 0) {
 			return fail(400, {

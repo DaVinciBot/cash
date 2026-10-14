@@ -10,16 +10,16 @@ import type { Trend } from '$lib/helpers/trainingStatsHighlight';
 
 export const TABLE = 'w-full min-w-[36rem] border-collapse text-sm';
 
-export const SCROLLER = 'overflow-x-auto rounded-lg border border-light-blue/20';
+export const SCROLLER = 'overflow-x-auto rounded-lg border border-rule';
 
 export const HEAD_CELL =
-	'border-b border-light-blue/20 bg-blue-gray/15 px-4 py-2 text-left text-xs font-normal tracking-wide text-dark-light-blue uppercase';
+	'border-b border-rule bg-blue-gray/15 px-4 py-2 text-left text-xs font-normal tracking-wide text-dark-light-blue uppercase';
 
 /** Les nombres se lisent alignés à droite, les libellés à gauche. */
 export const HEAD_CELL_NUMBER = `${HEAD_CELL} text-right`;
 
 /** Le gabarit d'une cellule, sans sa couleur de texte : voir `TREND_TONE`. */
-const CELL_BASE = 'border-b border-light-blue/20 px-4 py-2';
+const CELL_BASE = 'border-b border-rule px-4 py-2';
 
 export const CELL = `${CELL_BASE} text-dark-light-blue`;
 
@@ -39,7 +39,7 @@ export function cellNumber(trend: Trend = 'neutral'): string {
 }
 
 export const TOTAL_CELL =
-	'border-t border-light-blue/30 bg-blue-gray/15 px-4 py-2 font-semibold text-light-blue';
+	'border-t border-rule-strong bg-blue-gray/15 px-4 py-2 font-semibold text-light-blue';
 
 export const TOTAL_CELL_NUMBER = `${TOTAL_CELL} text-right tabular-nums text-white`;
 
