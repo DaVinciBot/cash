@@ -11,7 +11,10 @@
 	const items = $derived(data.items);
 
 	const selected = new SvelteSet<number>();
-	let refusing = $state<number[]>([]);
+	// Panneau de motif ouvert ou non. Il vise la sélection courante, pas un
+	// instantané pris à l'ouverture : cocher ou décocher pendant la saisie du
+	// motif change bien ce qui sera refusé, comme pour « Créer une commande ».
+	let refusing = $state(false);
 	let reason = $state('');
 	// Pré-regroupement par marchand : le domaine est déjà déduit du lien à la
 	// saisie (CMD-F-16). Regrouper la file par domaine est le confort minimal qui
@@ -140,7 +143,7 @@
 				<Button
 					disabled={selected.size === 0}
 					onclick={() => {
-						refusing = chosen.map((i) => i.id);
+						refusing = true;
 						reason = '';
 					}}
 					size="sm"
@@ -158,24 +161,28 @@
 			</p>
 		{/if}
 
-		{#if refusing.length > 0}
+		{#if refusing}
 			<form
 				class="mb-4 rounded-xl border border-red-500/30 bg-red-500/10 p-4"
 				action="?/refuse"
 				method="POST"
 				use:enhance={() =>
 					({ update }) => {
-						refusing = [];
+						refusing = false;
 						reason = '';
 						selected.clear();
 						return update();
 					}}
 			>
-				{#each refusing as id (id)}
-					<input name="id" type="hidden" value={id} />
+				{#each chosen as item (item.id)}
+					<input name="id" type="hidden" value={item.id} />
 				{/each}
 				<h2 class="text-sm font-semibold text-red-300">
-					Refuser {refusing.length === 1 ? 'cet item' : `ces ${String(refusing.length)} items`}
+					{#if chosen.length === 0}
+						Aucun item sélectionné
+					{:else}
+						Refuser {chosen.length === 1 ? 'cet item' : `ces ${String(chosen.length)} items`}
+					{/if}
 				</h2>
 				<p class="text-dark-light-blue mt-1 text-xs">
 					Le refus est terminal et se distingue de celui du chef de projet : le membre saura que la
@@ -196,14 +203,14 @@
 				{/if}
 				<div class="mt-3 flex items-center gap-2">
 					<Button
-						disabled={reason.trim().length < REFUSAL_REASON_MIN_LENGTH}
+						disabled={chosen.length === 0 || reason.trim().length < REFUSAL_REASON_MIN_LENGTH}
 						size="sm"
 						type="submit"
 						variant="danger">Confirmer le refus</Button
 					>
 					<Button
 						onclick={() => {
-							refusing = [];
+							refusing = false;
 						}}
 						size="sm"
 						variant="secondary">Annuler</Button
