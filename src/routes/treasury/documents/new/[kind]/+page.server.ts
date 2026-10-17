@@ -1,5 +1,10 @@
 import { resolve } from '$app/paths';
-import { isInvoiceOperationKind, isValidSiren } from '$lib/documents';
+import {
+	INCOMPLETE_DOCUMENT_MESSAGE,
+	isInvoiceOperationKind,
+	isValidSiren,
+	missingDocumentFields
+} from '$lib/documents';
 import { round } from '$lib/numbers';
 import { rejection } from '$lib/server/audit';
 import { decimal, text, textAll } from '$lib/server/form';
@@ -68,20 +73,57 @@ export const actions: Actions = {
 		const subject = text(form, 'subject');
 		const rawFlow = text(form, 'flow_id');
 
+		const labels = textAll(form, 'line_label');
+		const quantityRaw = textAll(form, 'line_quantity');
+		const priceRaw = textAll(form, 'line_price');
+		const expenseDates = textAll(form, 'expense_date');
+		const expenseLabels = textAll(form, 'expense_label');
+		const expenseHtRaw = textAll(form, 'expense_ht');
+		const expenseTtcRaw = textAll(form, 'expense_ttc');
+
+		// Tout est obligatoire, le mouvement rattaché excepté. C'est vérifié avant
+		// toute autre règle, et surtout avant que le numéro de série ne soit
+		// consommé : une pièce incomplète ne se réécrit pas.
+		const incomplete = missingDocumentFields(kind, {
+			recipientName,
+			issuedOn,
+			recipientAddress,
+			subject,
+			serviceOn: text(form, 'service_on'),
+			recipientSiren: text(form, 'recipient_siren'),
+			purchaseOrder: text(form, 'purchase_order'),
+			operationKind: text(form, 'operation_kind'),
+			amountTtc: text(form, 'amount_ttc'),
+			beneficiaryIban: text(form, 'beneficiary_iban'),
+			donationNature: text(form, 'donation_nature'),
+			donationMethod: text(form, 'donation_method'),
+			lines: labels.map((label, i) => ({
+				label,
+				quantity: quantityRaw[i] ?? '',
+				price: priceRaw[i] ?? ''
+			})),
+			expenses: expenseLabels.map((label, i) => ({
+				label,
+				date: expenseDates[i] ?? '',
+				ht: expenseHtRaw[i] ?? '',
+				ttc: expenseTtcRaw[i] ?? ''
+			}))
+		});
+		if (incomplete.length > 0) {
+			return fail(400, { message: INCOMPLETE_DOCUMENT_MESSAGE, missing: incomplete });
+		}
+
 		if (!ISO_DAY.test(issuedOn)) {
 			return fail(400, { message: "La date d'émission est obligatoire." });
-		}
-		if (recipientName.length === 0) {
-			return fail(400, { message: 'Le destinataire est obligatoire.' });
 		}
 
 		// L'émetteur est vérifié ICI et pas seulement à l'affichage : un document
 		// incomplet consomme un numéro de série, et une série ne se réécrit pas.
 		const org = await organization(locals.supabase);
-		const missing = missingIssuerFields(org, kind);
-		if (missing.length > 0) {
+		const missingIssuer = missingIssuerFields(org, kind);
+		if (missingIssuer.length > 0) {
 			return fail(400, {
-				message: `Complétez l'identité de l'émetteur avant d'émettre : ${missing.join(', ')}.`
+				message: `Complétez l'identité de l'émetteur avant d'émettre : ${missingIssuer.join(', ')}.`
 			});
 		}
 
@@ -99,9 +141,6 @@ export const actions: Actions = {
 					message: 'La date de la prestation ou de la livraison est obligatoire.'
 				});
 			}
-			if (purchaseOrder.length === 0) {
-				return fail(400, { message: 'Le numéro de bon de commande est obligatoire.' });
-			}
 			if (!isValidSiren(recipientSiren)) {
 				return fail(400, { message: 'Le SIREN du client doit comporter neuf chiffres valides.' });
 			}
@@ -110,53 +149,62 @@ export const actions: Actions = {
 			}
 		}
 
-		const labels = textAll(form, 'line_label');
-		const quantities = textAll(form, 'line_quantity').map((v) => Number(v.replace(',', '.')));
-		const prices = textAll(form, 'line_price').map((v) => Number(v.replace(',', '.')));
+		const quantities = quantityRaw.map((v) => Number(v.replace(',', '.')));
+		const prices = priceRaw.map((v) => Number(v.replace(',', '.')));
 
-		const lines = labels
-			.map((label, i) => ({
-				label: label.trim(),
-				quantity: quantities[i] ?? 0,
-				unitPriceTtc: prices[i] ?? 0
-			}))
-			.filter(
+		const lines = labels.map((label, i) => ({
+			label: label.trim(),
+			quantity: quantities[i] ?? Number.NaN,
+			unitPriceTtc: prices[i] ?? Number.NaN
+		}));
+
+		if (
+			lines.some(
 				(l) =>
-					l.label.length > 0 &&
-					Number.isFinite(l.quantity) &&
-					l.quantity > 0 &&
-					Number.isFinite(l.unitPriceTtc) &&
-					l.unitPriceTtc >= 0
-			);
+					!Number.isFinite(l.quantity) ||
+					l.quantity <= 0 ||
+					!Number.isFinite(l.unitPriceTtc) ||
+					l.unitPriceTtc < 0
+			)
+		) {
+			return fail(400, {
+				message: 'Chaque ligne doit porter une quantité positive et un prix valide.'
+			});
+		}
 
 		// Une dépense remboursée se décrit autrement qu'un article vendu : une
 		// date, une nature, et deux montants dont l'écart est la TVA avancée.
-		const expenseDates = textAll(form, 'expense_date');
-		const expenseLabels = textAll(form, 'expense_label');
-		const expenseHt = textAll(form, 'expense_ht').map((v) => Number(v.replace(',', '.')));
-		const expenseTtc = textAll(form, 'expense_ttc').map((v) => Number(v.replace(',', '.')));
+		const expenseHt = expenseHtRaw.map((v) => Number(v.replace(',', '.')));
+		const expenseTtc = expenseTtcRaw.map((v) => Number(v.replace(',', '.')));
 
 		const expenseLines: ExpenseLine[] =
 			kind === 'expense_report'
-				? expenseLabels
-						.map((label, i) => {
-							const ttc = expenseTtc[i] ?? Number.NaN;
-							return {
-								occurredOn: (expenseDates[i] ?? '').trim(),
-								label: label.trim(),
-								// Sans TVA saisie, le HT vaut le TTC : la dépense n'en portait
-								// pas, ou le justificatif ne la détaille pas.
-								amountHt: Number.isFinite(expenseHt[i]) ? (expenseHt[i] ?? 0) : ttc,
-								amountTtc: ttc
-							};
-						})
-						.filter((l) => l.label.length > 0 && Number.isFinite(l.amountTtc) && l.amountTtc >= 0)
+				? expenseLabels.map((label, i) => ({
+						occurredOn: (expenseDates[i] ?? '').trim(),
+						label: label.trim(),
+						amountHt: expenseHt[i] ?? Number.NaN,
+						amountTtc: expenseTtc[i] ?? Number.NaN
+					}))
 				: [];
 
 		// La date de la dépense est ce qui rattache un justificatif à la note :
 		// sans elle, le trésorier ne peut plus rapprocher la ligne du ticket.
 		if (expenseLines.some((l) => !ISO_DAY.test(l.occurredOn))) {
 			return fail(400, { message: 'Chaque dépense doit porter sa date.' });
+		}
+
+		if (
+			expenseLines.some(
+				(l) =>
+					!Number.isFinite(l.amountHt) ||
+					!Number.isFinite(l.amountTtc) ||
+					l.amountHt < 0 ||
+					l.amountTtc < 0
+			)
+		) {
+			return fail(400, {
+				message: 'Les montants des dépenses doivent être des nombres positifs.'
+			});
 		}
 
 		const flowId = rawFlow === '' ? null : Number(rawFlow);
@@ -169,12 +217,10 @@ export const actions: Actions = {
 		// dépenses. C'est le TTC qui fait foi — c'est ce qui est dû.
 		const detailTotal =
 			kind === 'expense_report'
-				? expenseLines.length > 0
-					? round(expenseLines.reduce((s, l) => s + l.amountTtc, 0))
-					: null
-				: lines.length > 0
-					? round(lines.reduce((s, l) => s + l.quantity * l.unitPriceTtc, 0))
-					: null;
+				? round(expenseLines.reduce((s, l) => s + l.amountTtc, 0))
+				: kind === 'tax_receipt'
+					? null
+					: round(lines.reduce((s, l) => s + l.quantity * l.unitPriceTtc, 0));
 
 		const amount = detailTotal ?? round(decimal(form, 'amount_ttc'));
 
@@ -215,11 +261,11 @@ export const actions: Actions = {
 				issued_on: issuedOn,
 				flow_id: flowId,
 				recipient_name: recipientName,
-				recipient_address: recipientAddress || null,
+				recipient_address: recipientAddress,
 				amount_ttc: amount,
-				subject: subject || null,
+				subject,
 				payload: {
-					lines,
+					lines: kind === 'tax_receipt' || kind === 'expense_report' ? [] : lines,
 					expenseLines,
 					issuer: org,
 					donation:
@@ -228,8 +274,7 @@ export const actions: Actions = {
 							: null,
 					// L'IBAN du bénéficiaire d'une note de frais change à chaque
 					// document : il appartient à la pièce, pas à l'association.
-					beneficiaryIban:
-						kind === 'expense_report' ? text(form, 'beneficiary_iban') || null : null,
+					beneficiaryIban: kind === 'expense_report' ? text(form, 'beneficiary_iban') : null,
 					serviceOn: kind === 'invoice' ? serviceOn : null,
 					purchaseOrder: kind === 'invoice' ? purchaseOrder : null,
 					recipientSiren: kind === 'invoice' ? recipientSiren : null,

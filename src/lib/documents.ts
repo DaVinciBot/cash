@@ -98,3 +98,87 @@ export function formatSiren(raw: string): string {
 		? `${digits.slice(0, 3)} ${digits.slice(3, 6)} ${digits.slice(6)}`
 		: raw;
 }
+
+export const INCOMPLETE_DOCUMENT_MESSAGE =
+	"Veuillez remplir l'intégralité des champs pour générer ce document.";
+
+/** Saisie brute d'une pièce, telle qu'elle sort du formulaire. */
+export interface DocumentFormInput {
+	recipientName: string;
+	issuedOn: string;
+	recipientAddress: string;
+	subject: string;
+	serviceOn: string;
+	recipientSiren: string;
+	purchaseOrder: string;
+	operationKind: string;
+	amountTtc: string;
+	beneficiaryIban: string;
+	donationNature: string;
+	donationMethod: string;
+	lines: { label: string; quantity: string; price: string }[];
+	expenses: { date: string; label: string; ht: string; ttc: string }[];
+}
+
+const filled = (value: string) => value.trim().length > 0;
+
+/**
+ * Noms des champs laissés vides, dans l'ordre du formulaire.
+ *
+ * Tous les champs sont obligatoires, sauf le mouvement rattaché : il désigne une
+ * donnée qui existe déjà, il ne se saisit pas. Les lignes vides ne sont plus
+ * écartées en silence — une ligne à moitié remplie est un champ manquant, pas
+ * une ligne en moins.
+ */
+export function missingDocumentFields(
+	kind: 'invoice' | 'quote' | 'expense_report' | 'tax_receipt',
+	input: DocumentFormInput
+): string[] {
+	const missing: string[] = [];
+	const need = (name: string, value: string) => {
+		if (!filled(value)) {
+			missing.push(name);
+		}
+	};
+
+	need('recipient_name', input.recipientName);
+	need('issued_on', input.issuedOn);
+	need('recipient_address', input.recipientAddress);
+
+	if (kind === 'invoice') {
+		need('service_on', input.serviceOn);
+		need('recipient_siren', input.recipientSiren);
+		need('purchase_order', input.purchaseOrder);
+		need('operation_kind', input.operationKind);
+	}
+
+	if (kind === 'tax_receipt') {
+		need('amount_ttc', input.amountTtc);
+		need('donation_nature', input.donationNature);
+		need('donation_method', input.donationMethod);
+	} else if (kind === 'expense_report') {
+		if (input.expenses.length === 0) {
+			missing.push('expense_label');
+		}
+		for (const e of input.expenses) {
+			need('expense_date', e.date);
+			need('expense_label', e.label);
+			need('expense_ht', e.ht);
+			need('expense_ttc', e.ttc);
+		}
+		need('beneficiary_iban', input.beneficiaryIban);
+	} else {
+		if (input.lines.length === 0) {
+			missing.push('line_label');
+		}
+		for (const l of input.lines) {
+			need('line_label', l.label);
+			need('line_quantity', l.quantity);
+			need('line_price', l.price);
+		}
+	}
+
+	need('subject', input.subject);
+
+	return [...new Set(missing)];
+}

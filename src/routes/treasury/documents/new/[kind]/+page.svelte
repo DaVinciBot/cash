@@ -17,6 +17,7 @@
 	const today = new Date().toISOString().slice(0, 10);
 
 	const failure = $derived(form && 'message' in form ? form.message : null);
+	const missing = $derived(form && 'missing' in form ? (form.missing as string[]) : []);
 	const kind = $derived(data.kind);
 
 	// Le vocabulaire suit la pièce : un destinataire de note de frais est un
@@ -68,11 +69,6 @@
 					}, 0)
 				)
 	);
-	const hasLines = $derived(
-		isExpense
-			? expenses.some((e) => e.label.trim().length > 0)
-			: lines.some((l) => l.label.trim().length > 0)
-	);
 
 	function addLine() {
 		lines = [...lines, { id: nextLine++, label: '', quantity: '1', price: '' }];
@@ -95,7 +91,7 @@
 	}
 
 	const CHAMP =
-		'mt-1 block w-full rounded-lg border border-rule-strong bg-dark-blue/60 p-2 text-sm text-white';
+		'mt-1 block w-full rounded-lg border border-rule-strong bg-dark-blue/60 p-2 text-sm text-white aria-invalid:border-red-500 user-invalid:border-red-500';
 </script>
 
 <svelte:head><title>{DOCUMENT_KIND_LABELS[kind]} — nouveau document</title></svelte:head>
@@ -137,24 +133,60 @@
 			<div class="grid gap-3 md:grid-cols-2">
 				<label class="text-dark-light-blue text-xs">
 					{RECIPIENT_LABEL[kind]}
-					<input name="recipient_name" class={CHAMP} required />
+					<input
+						name="recipient_name"
+						class={CHAMP}
+						aria-invalid={missing.includes('recipient_name')}
+						required
+					/>
+					{#if missing.includes('recipient_name')}
+						<span class="mt-1 block text-xs text-red-300">Ce champ est obligatoire.</span>
+					{/if}
 				</label>
 				<label class="text-dark-light-blue text-xs">
 					Date d'émission
-					<input name="issued_on" class={CHAMP} required type="date" value={today} />
+					<input
+						name="issued_on"
+						class={CHAMP}
+						aria-invalid={missing.includes('issued_on')}
+						required
+						type="date"
+						value={today}
+					/>
+					{#if missing.includes('issued_on')}
+						<span class="mt-1 block text-xs text-red-300"> Ce champ est obligatoire.</span>
+					{/if}
 				</label>
 			</div>
 
 			<label class="text-dark-light-blue mt-3 block text-xs">
 				Adresse
-				<textarea name="recipient_address" class={CHAMP} rows="2"></textarea>
+				<textarea
+					name="recipient_address"
+					class={CHAMP}
+					aria-invalid={missing.includes('recipient_address')}
+					required
+					rows="2"></textarea>
+				{#if missing.includes('recipient_address')}
+					<span class="mt-1 block text-xs text-red-300">Ce champ est obligatoire.</span>
+				{/if}
 			</label>
 
 			{#if kind === 'invoice'}
 				<div class="mt-3 grid gap-3 md:grid-cols-2">
 					<label class="text-dark-light-blue text-xs">
 						Date de la prestation ou de la livraison
-						<input name="service_on" class={CHAMP} required type="date" value={today} />
+						<input
+							name="service_on"
+							class={CHAMP}
+							aria-invalid={missing.includes('service_on')}
+							required
+							type="date"
+							value={today}
+						/>
+						{#if missing.includes('service_on')}
+							<span class="mt-1 block text-xs text-red-300">Ce champ est obligatoire.</span>
+						{/if}
 					</label>
 					<label class="text-dark-light-blue text-xs">
 						SIREN du client
@@ -165,18 +197,37 @@
 							placeholder="123 456 789"
 							required
 						/>
+						{#if missing.includes('recipient_siren')}
+							<span class="mt-1 block text-xs text-red-300">Ce champ est obligatoire.</span>
+						{/if}
 					</label>
 					<label class="text-dark-light-blue text-xs">
 						Numéro de bon de commande
-						<input name="purchase_order" class={CHAMP} required />
+						<input
+							name="purchase_order"
+							class={CHAMP}
+							aria-invalid={missing.includes('purchase_order')}
+							required
+						/>
+						{#if missing.includes('purchase_order')}
+							<span class="mt-1 block text-xs text-red-300">Ce champ est obligatoire.</span>
+						{/if}
 					</label>
 					<label class="text-dark-light-blue text-xs">
 						Nature de l'opération
-						<select name="operation_kind" class={CHAMP} required>
+						<select
+							name="operation_kind"
+							class={CHAMP}
+							aria-invalid={missing.includes('operation_kind')}
+							required
+						>
 							{#each INVOICE_OPERATION_KINDS as operation (operation)}
 								<option value={operation}>{INVOICE_OPERATION_LABELS[operation]}</option>
 							{/each}
 						</select>
+						{#if missing.includes('operation_kind')}
+							<span class="mt-1 block text-xs text-red-300">Ce champ est obligatoire.</span>
+						{/if}
 					</label>
 				</div>
 			{/if}
@@ -199,10 +250,22 @@
 								type="date"
 								bind:value={expense.date}
 							/>
+							{#if missing.includes('expense_date')}
+								<span class="mt-1 block text-xs text-red-300">Ce champ est obligatoire.</span>
+							{/if}
 						</label>
 						<label class="text-dark-light-blue flex-1 text-xs">
 							Type de dépense
-							<input name="expense_label" class={CHAMP} bind:value={expense.label} />
+							<input
+								name="expense_label"
+								class={CHAMP}
+								aria-invalid={missing.includes('expense_label')}
+								required
+								bind:value={expense.label}
+							/>
+							{#if missing.includes('expense_label')}
+								<span class="mt-1 block text-xs text-red-300"> Ce champ est obligatoire.</span>
+							{/if}
 						</label>
 						<label class="text-dark-light-blue text-xs">
 							Montant HT
@@ -213,6 +276,9 @@
 								placeholder="0,00"
 								bind:value={expense.ht}
 							/>
+							{#if missing.includes('expense_ht')}
+								<span class="mt-1 block text-xs text-red-300">Ce champ est obligatoire.</span>
+							{/if}
 						</label>
 						<label class="text-dark-light-blue text-xs">
 							Montant TTC
@@ -223,6 +289,9 @@
 								placeholder="0,00"
 								bind:value={expense.ttc}
 							/>
+							{#if missing.includes('expense_ttc')}
+								<span class="mt-1 block text-xs text-red-300">Ce champ est obligatoire.</span>
+							{/if}
 						</label>
 						<Button
 							onclick={() => {
@@ -236,21 +305,9 @@
 
 				<div class="mt-2 flex flex-wrap items-center gap-3">
 					<Button onclick={addExpense} size="sm" variant="secondary">Ajouter une dépense</Button>
-					{#if hasLines}
-						<span class="text-dark-light-blue text-xs">Total TTC : {euro.format(total)}</span>
-					{:else}
-						<label class="text-dark-light-blue text-xs">
-							Montant TTC <span class="text-dark-light-blue/70">(sans détail)</span>
-							<input
-								name="amount_ttc"
-								class="{CHAMP} ml-2 inline-block w-28"
-								inputmode="decimal"
-								placeholder="0,00"
-							/>
-						</label>
-					{/if}
+					<span class="text-dark-light-blue text-xs">Total TTC : {euro.format(total)}</span>
 					<span class="text-dark-light-blue/70 text-xs">
-						Le HT laissé vide vaut le TTC : l'écart entre les deux est la TVA avancée.
+						L'écart entre le HT et le TTC est la TVA avancée.
 					</span>
 				</div>
 			{:else if detailed}
@@ -258,7 +315,16 @@
 					<div class="mb-2 flex flex-wrap items-end gap-2">
 						<label class="text-dark-light-blue flex-1 text-xs">
 							Désignation
-							<input name="line_label" class={CHAMP} bind:value={line.label} />
+							<input
+								name="line_label"
+								class={CHAMP}
+								aria-invalid={missing.includes('line_label')}
+								required
+								bind:value={line.label}
+							/>
+							{#if missing.includes('line_label')}
+								<span class="mt-1 block text-xs text-red-300">Ce champ est obligatoire.</span>
+							{/if}
 						</label>
 						<label class="text-dark-light-blue text-xs">
 							Quantité
@@ -268,6 +334,9 @@
 								inputmode="decimal"
 								bind:value={line.quantity}
 							/>
+							{#if missing.includes('line_quantity')}
+								<span class="mt-1 block text-xs text-red-300">Ce champ est obligatoire.</span>
+							{/if}
 						</label>
 						<label class="text-dark-light-blue text-xs">
 							Prix unitaire
@@ -277,6 +346,9 @@
 								inputmode="decimal"
 								bind:value={line.price}
 							/>
+							{#if missing.includes('line_price')}
+								<span class="mt-1 block text-xs text-red-300">Ce champ est obligatoire.</span>
+							{/if}
 						</label>
 						<Button
 							onclick={() => {
@@ -290,19 +362,7 @@
 
 				<div class="mt-2 flex flex-wrap items-center gap-3">
 					<Button onclick={addLine} size="sm" variant="secondary">Ajouter une ligne</Button>
-					{#if hasLines}
-						<span class="text-dark-light-blue text-xs">Total TTC : {euro.format(total)}</span>
-					{:else}
-						<label class="text-dark-light-blue text-xs">
-							Montant TTC <span class="text-dark-light-blue/70">(sans détail)</span>
-							<input
-								name="amount_ttc"
-								class="{CHAMP} ml-2 inline-block w-28"
-								inputmode="decimal"
-								placeholder="0,00"
-							/>
-						</label>
-					{/if}
+					<span class="text-dark-light-blue text-xs">Total TTC : {euro.format(total)}</span>
 				</div>
 			{:else}
 				<label class="text-dark-light-blue text-xs">
@@ -314,6 +374,9 @@
 						placeholder="0,00"
 						required
 					/>
+					{#if missing.includes('amount_ttc')}
+						<span class="mt-1 block text-xs text-red-300">Ce champ est obligatoire.</span>
+					{/if}
 				</label>
 			{/if}
 		</fieldset>
@@ -325,13 +388,30 @@
 
 			<label class="text-dark-light-blue block text-xs">
 				{SUBJECT_LABEL[kind]}
-				<textarea name="subject" class={CHAMP} rows="2"></textarea>
+				<textarea
+					name="subject"
+					class={CHAMP}
+					aria-invalid={missing.includes('subject')}
+					required
+					rows="2"></textarea>
+				{#if missing.includes('subject')}
+					<span class="mt-1 block text-xs text-red-300">Ce champ est obligatoire.</span>
+				{/if}
 			</label>
 
 			{#if kind === 'expense_report'}
 				<label class="text-dark-light-blue mt-3 block text-xs">
 					IBAN du bénéficiaire
-					<input name="beneficiary_iban" class="{CHAMP} font-mono" placeholder="FR76 ..." />
+					<input
+						name="beneficiary_iban"
+						class="{CHAMP} font-mono"
+						aria-invalid={missing.includes('beneficiary_iban')}
+						placeholder="FR76 ..."
+						required
+					/>
+					{#if missing.includes('beneficiary_iban')}
+						<span class="mt-1 block text-xs text-red-300">Ce champ est obligatoire.</span>
+					{/if}
 					<span class="text-dark-light-blue/70 mt-1 block">
 						Le compte à rembourser change à chaque note : il appartient à la pièce, pas à
 						l'association.
@@ -343,20 +423,36 @@
 				<div class="mt-3 grid gap-3 md:grid-cols-2">
 					<label class="text-dark-light-blue text-xs">
 						Nature du don
-						<select name="donation_nature" class={CHAMP}>
+						<select
+							name="donation_nature"
+							class={CHAMP}
+							aria-invalid={missing.includes('donation_nature')}
+							required
+						>
 							<option value="Numéraire">Numéraire</option>
 							<option value="Titres de sociétés">Titres de sociétés</option>
 							<option value="Don en nature">Don en nature</option>
 						</select>
+						{#if missing.includes('donation_nature')}
+							<span class="mt-1 block text-xs text-red-300">Ce champ est obligatoire.</span>
+						{/if}
 					</label>
 					<label class="text-dark-light-blue text-xs">
 						Mode de versement
-						<select name="donation_method" class={CHAMP}>
+						<select
+							name="donation_method"
+							class={CHAMP}
+							aria-invalid={missing.includes('donation_method')}
+							required
+						>
 							<option value="Virement">Virement</option>
 							<option value="Chèque">Chèque</option>
 							<option value="Espèces">Espèces</option>
 							<option value="Carte bancaire">Carte bancaire</option>
 						</select>
+						{#if missing.includes('donation_method')}
+							<span class="mt-1 block text-xs text-red-300">Ce champ est obligatoire.</span>
+						{/if}
 					</label>
 				</div>
 			{/if}
