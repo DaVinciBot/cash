@@ -211,6 +211,8 @@ export const CASH_ERROR_MESSAGES: Record<string, string> = {
 		"Imputation invalide : budget non feuille, archivé, d'une autre année, ou somme incorrecte.",
 	DVB06: 'Budget dépassé : la commande ne peut pas être passée en attente de livraison.',
 	DVB07: 'Flux incohérent (contrepassation ou règlement invalide).',
+	DVB08:
+		'Fonds insuffisants : le solde du compte sélectionné ne permet pas de régler cette commande.',
 	DVB10: 'Cette ligne est historique : elle se révoque, elle ne se réécrit pas.',
 	'42501': "Vous n'avez pas les droits nécessaires pour cette action.",
 	'22023': 'Paramètre invalide.',
