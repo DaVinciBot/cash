@@ -6,6 +6,10 @@
 // Un porteur de l'une sans l'autre doit voir sa moitié, pas un écran vide —
 // d'où deux périmètres calculés séparément et réunis seulement à l'affichage.
 //
+// Une troisième, `orders.read.project`, ouvre la liste des items du projet et
+// leur état : le CDP comme les membres suivent ainsi les demandes de tous, pas
+// seulement les leurs.
+//
 // Rien de ce qui est lu ici n'est un droit accordé par ce fichier : la RLS
 // tranche ligne par ligne (`cash.budget_readable_by_project`, policies de
 // `cash.items`). Le calcul de périmètre ne sert qu'à ne pas afficher une case
@@ -13,8 +17,10 @@
 
 import {
 	budgetPressure,
+	projectItems,
 	projectsWithPermission,
 	type BudgetPressure,
+	type ProjectItem,
 	type ScopedProject
 } from '$lib/server/cash';
 import { projectReport, type ProjectReportRow } from '$lib/server/reports';
@@ -43,6 +49,11 @@ export interface ProjectOverview {
 	tree: BudgetNode[];
 	/** `null` quand `stats.read.project` n'est pas détenue sur ce projet. */
 	stats: ProjectReportRow | null;
+}
+
+export interface ProjectOverviewWithItems extends ProjectOverview {
+	/** `null` quand `orders.read.project` n'est pas détenue sur ce projet. */
+	items: ProjectItem[] | null;
 }
 
 /** Ligne de rapport à zéro : le projet est lisible, il n'a simplement rien dépensé. */
@@ -133,6 +144,26 @@ export function mergeProjectOverviews(
 }
 
 /**
+ * Rattache à chaque projet ses items, sans lecture : testable seule.
+ *
+ * Même règle que pour les stats : permission détenue sans item derrière donne
+ * une liste vide, jamais `null`.
+ */
+export function attachProjectItems(
+	overviews: ProjectOverview[],
+	ordersProjects: ScopedProject[],
+	items: ProjectItem[]
+): ProjectOverviewWithItems[] {
+	const ordersIds = new Set(ordersProjects.map((p) => p.id));
+	return overviews.map((overview) => ({
+		...overview,
+		items: ordersIds.has(overview.projectId)
+			? items.filter((item) => item.projectId === overview.projectId)
+			: null
+	}));
+}
+
+/**
  * Suivi des projets du membre connecté, pour l'année scolaire demandée.
  *
  * `schoolYearId` à `null` — aucune année ouverte — rend les stats vides plutôt
@@ -143,10 +174,11 @@ export async function projectOverviews(
 	supabase: Client,
 	profileId: string,
 	schoolYearId: number | null
-): Promise<ProjectOverview[]> {
-	const [budgetProjects, statsProjects] = await Promise.all([
+): Promise<ProjectOverviewWithItems[]> {
+	const [budgetProjects, statsProjects, ordersProjects] = await Promise.all([
 		projectsWithPermission(supabase, profileId, 'finance.budget.read.project'),
-		projectsWithPermission(supabase, profileId, 'stats.read.project')
+		projectsWithPermission(supabase, profileId, 'stats.read.project'),
+		projectsWithPermission(supabase, profileId, 'orders.read.project')
 	]);
 
 	if (budgetProjects.length === 0 && statsProjects.length === 0) {
@@ -160,7 +192,7 @@ export async function projectOverviews(
 	// `budgetTree` est celui de l'écran trésorier, délibérément : deux lectures
 	// du consommé divergeraient au premier changement de règle, et c'est le CDP
 	// qui verrait un chiffre que personne d'autre ne voit.
-	const [pressureEntries, report, tree] = await Promise.all([
+	const [pressureEntries, report, tree, items] = await Promise.all([
 		schoolYearId === null
 			? Promise.resolve([] as [number, BudgetPressure | null][])
 			: Promise.all(
@@ -177,14 +209,19 @@ export async function projectOverviews(
 			: projectReport(supabase, schoolYearId),
 		schoolYearId === null || budgetProjects.length === 0
 			? Promise.resolve([] as BudgetNode[])
-			: budgetTree(supabase, schoolYearId)
+			: budgetTree(supabase, schoolYearId),
+		schoolYearId === null
+			? Promise.resolve([] as ProjectItem[])
+			: projectItems(
+					supabase,
+					ordersProjects.map((p) => p.id),
+					schoolYearId
+				)
 	]);
 
-	return mergeProjectOverviews(
-		budgetProjects,
-		statsProjects,
-		new Map(pressureEntries),
-		report,
-		tree
+	return attachProjectItems(
+		mergeProjectOverviews(budgetProjects, statsProjects, new Map(pressureEntries), report, tree),
+		ordersProjects,
+		items
 	);
 }

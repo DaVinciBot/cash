@@ -1,5 +1,9 @@
-import type { BudgetPressure } from '$lib/server/cash';
-import { budgetSubtree, mergeProjectOverviews } from '$lib/server/projectOverview';
+import type { BudgetPressure, ProjectItem } from '$lib/server/cash';
+import {
+	attachProjectItems,
+	budgetSubtree,
+	mergeProjectOverviews
+} from '$lib/server/projectOverview';
 import type { ProjectReportRow } from '$lib/server/reports';
 import type { BudgetNode } from '$lib/server/treasury';
 import { describe, expect, it } from 'vitest';
@@ -166,5 +170,47 @@ describe('sous-arbre budgétaire du projet', () => {
 			'Cartes'
 		]);
 		expect(rows.find((r) => r.projectId === robot.id)?.tree).toEqual([]);
+	});
+});
+
+describe('commandes du suivi projet', () => {
+	function item(id: number, projectId: number): ProjectItem {
+		return {
+			id,
+			name: `Item ${String(id)}`,
+			link: null,
+			unitPriceTtc: 10,
+			quantity: 1,
+			totalTtc: 10,
+			tags: [],
+			note: null,
+			state: 'pending_cdp',
+			campus: 'nantes',
+			projectId,
+			requesterName: 'Ada',
+			refusedReason: null,
+			createdAt: '2026-10-01T00:00:00Z'
+		};
+	}
+
+	it('range chaque item sous son projet, quel qu’en soit le demandeur', () => {
+		const overviews = mergeProjectOverviews([wei, robot], [], new Map(), []);
+		const rows = attachProjectItems(overviews, [wei, robot], [item(1, wei.id), item(2, robot.id)]);
+		expect(rows.find((r) => r.projectId === wei.id)?.items?.map((i) => i.id)).toEqual([1]);
+		expect(rows.find((r) => r.projectId === robot.id)?.items?.map((i) => i.id)).toEqual([2]);
+	});
+
+	it('rend une liste vide quand la permission est détenue sans commande', () => {
+		const [row] = attachProjectItems(mergeProjectOverviews([wei], [], new Map(), []), [wei], []);
+		expect(row?.items).toEqual([]);
+	});
+
+	it('rend null sans orders.read.project sur le projet', () => {
+		const [row] = attachProjectItems(
+			mergeProjectOverviews([wei], [], new Map(), []),
+			[],
+			[item(1, wei.id)]
+		);
+		expect(row?.items).toBeNull();
 	});
 });

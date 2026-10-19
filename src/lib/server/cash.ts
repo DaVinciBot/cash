@@ -227,6 +227,69 @@ export async function myItems(supabase: Client, profileId: string): Promise<MyIt
 	}));
 }
 
+/** Item d'un projet suivi, quel qu'en soit le demandeur. */
+export interface ProjectItem extends Omit<MyItem, 'projectName'> {
+	requesterName: string;
+}
+
+/**
+ * Items d'une année scolaire sur les projets nommés, du plus récent au plus ancien.
+ *
+ * Le filtre sur `project_id` n'est pas redondant avec la RLS : `items_read`
+ * ouvre aussi les items qu'on a soi-même demandés ailleurs et, pour un porteur
+ * d'`orders.read.all`, tous ceux de l'association. Sans lui, un trésorier CDP
+ * d'un seul projet verrait toute l'association sous « son » projet.
+ */
+export async function projectItems(
+	supabase: Client,
+	projectIds: number[],
+	schoolYearId: number
+): Promise<ProjectItem[]> {
+	if (projectIds.length === 0) {
+		return [];
+	}
+
+	const { data, error } = await supabase
+		.schema('cash')
+		.from('items')
+		.select(
+			'id, name, link, unit_price_ttc, quantity, total_ttc, tags, note, state, campus, project_id, requested_by, refused_reason, created_at'
+		)
+		.in('project_id', projectIds)
+		.eq('school_year_id', schoolYearId)
+		.order('created_at', { ascending: false });
+
+	if (error || data.length === 0) {
+		return [];
+	}
+
+	const requesterIds = [...new Set(data.map((i) => i.requested_by))];
+	const { data: profiles } = await supabase
+		.from('profiles')
+		.select('id, username')
+		.in('id', requesterIds);
+	const requesters = new Map(
+		(profiles ?? []).map((p) => [p.id, str(p.username) || 'Membre inconnu'])
+	);
+
+	return data.map((i) => ({
+		id: i.id,
+		name: i.name,
+		link: i.link,
+		unitPriceTtc: i.unit_price_ttc,
+		quantity: i.quantity,
+		totalTtc: num(i.total_ttc),
+		tags: i.tags,
+		note: i.note,
+		state: i.state,
+		campus: i.campus,
+		projectId: i.project_id,
+		requesterName: requesters.get(i.requested_by) ?? 'Membre inconnu',
+		refusedReason: i.refused_reason,
+		createdAt: i.created_at
+	}));
+}
+
 /** Projet sur lequel le membre connecté détient une permission scopée-projet. */
 export interface ScopedProject {
 	id: number;

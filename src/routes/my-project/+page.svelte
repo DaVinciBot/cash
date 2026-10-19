@@ -1,13 +1,20 @@
 <script lang="ts">
+	import { resolve } from '$app/paths';
 	import CampusBadge from '$lib/components/cash/CampusBadge.svelte';
-	import { Checkbox } from '@davincibot/components';
+	import ItemStateBadge from '$lib/components/cash/ItemStateBadge.svelte';
+	import { ITEM_STATE_BADGES, ITEM_STATES, type ItemState } from '$lib/types/domain';
+	import { Button, Checkbox, FilterChip } from '@davincibot/components';
 	import type { PageData } from './$types';
 
 	let { data }: { data: PageData } = $props();
 
 	const euro = new Intl.NumberFormat('fr-FR', { style: 'currency', currency: 'EUR' });
+	const day = new Intl.DateTimeFormat('fr-FR', { dateStyle: 'medium' });
 
 	let showArchived = $state(false);
+
+	/** Filtre d'état propre à chaque projet : un CDP de deux projets ne trie pas les deux d'un coup. */
+	const stateFilters = $state<Record<number, ItemState | 'all'>>({});
 
 	const hasArchived = $derived(
 		data.projects.some((project) => project.tree.some((node) => node.archivedAt))
@@ -34,9 +41,9 @@
 	<header class="mb-6">
 		<h1 class="text-2xl font-bold text-white">Mon projet</h1>
 		<p class="text-dark-light-blue mt-1 text-sm">
-			Le budget des projets dont vous avez la charge, découpé comme le trésorier l'a découpé.
-			Consultation seule : le montant d'une feuille et la forme de l'arbre se changent en
-			trésorerie.
+			Le budget des projets auxquels vous êtes rattaché, découpé comme le trésorier l'a découpé, et
+			les commandes de tous leurs membres avec leur état. Consultation seule : le montant d'une
+			feuille et la forme de l'arbre se changent en trésorerie.
 		</p>
 	</header>
 
@@ -240,6 +247,67 @@
 							<dd class="text-light-blue font-medium">{stats.itemCount}</dd>
 						</div>
 					</dl>
+				{/if}
+
+				{#if project.items}
+					{@const items = project.items}
+					{@const filter = stateFilters[project.projectId] ?? 'all'}
+					{@const visible = items.filter((item) => filter === 'all' || item.state === filter)}
+					<h3 class="text-dark-light-blue mt-6 mb-2 text-sm font-semibold">Commandes du projet</h3>
+					{#if items.length === 0}
+						<p class="text-dark-light-blue/70 text-sm">
+							Aucune commande sur ce projet pour cette année.
+						</p>
+					{:else}
+						<div class="mb-3 flex flex-wrap items-center gap-2">
+							<FilterChip
+								onclick={() => (stateFilters[project.projectId] = 'all')}
+								pressed={filter === 'all'}
+							>
+								Toutes ({items.length})
+							</FilterChip>
+							{#each ITEM_STATES as state (state)}
+								{@const count = items.filter((item) => item.state === state).length}
+								{#if count > 0}
+									<FilterChip
+										onclick={() => (stateFilters[project.projectId] = state)}
+										pressed={filter === state}
+									>
+										{ITEM_STATE_BADGES[state].label} ({count})
+									</FilterChip>
+								{/if}
+							{/each}
+						</div>
+						<ul class="space-y-2">
+							{#each visible as item (item.id)}
+								<li
+									class="border-rule bg-blue-gray/15 flex flex-wrap items-center gap-3 rounded-lg border px-4 py-2.5 text-sm"
+								>
+									<div class="min-w-0 flex-1">
+										<div class="flex flex-wrap items-center gap-2">
+											<span class="truncate font-medium text-white">{item.name}</span>
+											<ItemStateBadge compact state={item.state} />
+										</div>
+										<p class="text-dark-light-blue mt-1 text-xs">
+											{item.requesterName} · {item.quantity} × {euro.format(item.unitPriceTtc)} =
+											<span class="text-light-blue font-medium">{euro.format(item.totalTtc)}</span>
+											· demandé le {day.format(new Date(item.createdAt))}
+										</p>
+										{#if item.refusedReason}
+											<p class="mt-1 text-xs text-red-300">Motif du refus : {item.refusedReason}</p>
+										{/if}
+									</div>
+									<Button
+										href={resolve('/items/[id]', { id: String(item.id) })}
+										size="sm"
+										variant="secondary"
+									>
+										Détail
+									</Button>
+								</li>
+							{/each}
+						</ul>
+					{/if}
 				{/if}
 			</article>
 		{/each}
