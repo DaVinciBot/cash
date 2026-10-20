@@ -4,6 +4,7 @@ allowBuilds:
 minimumReleaseAgeExclude:
   - '@davincibot/*'
 overrides:
+  postcss-selector-parser: ^7.1.6
   source-map-js: '>=1.2.2'
   devalue: '>=5.9.3'
   undici: '>=8.10.2'
