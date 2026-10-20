@@ -89,19 +89,21 @@ export const SLOT_STATUSES = Object.keys(SLOT_STATUS_BADGES) as SlotStatus[];
  * Les listes déroulantes et les filtres lisent le même référentiel que les
  * badges : ajouter une catégorie au-dessus suffit à la voir partout.
  */
-export const categoryOptions: { value: TrainingCategory; text: string; selected?: boolean }[] =
-	TRAINING_CATEGORIES.map((value) => ({
+export const categoryOptions: { value: TrainingCategory; text: string }[] = TRAINING_CATEGORIES.map(
+	(value) => ({
 		value,
-		text: TRAINING_CATEGORY_BADGES[value].label,
-		...(value === 'other' ? { selected: true } : {})
-	}));
+		text: TRAINING_CATEGORY_BADGES[value].label
+	})
+);
 
-export const statusOptions: { value: SlotStatus; text: string; selected?: boolean }[] =
-	SLOT_STATUSES.map((value) => ({
-		value,
-		text: SLOT_STATUS_BADGES[value].label,
-		...(value === 'draft' ? { selected: true } : {})
-	}));
+export const statusOptions: { value: SlotStatus; text: string }[] = SLOT_STATUSES.map((value) => ({
+	value,
+	text: SLOT_STATUS_BADGES[value].label
+}));
+
+export const DEFAULT_TRAINING_CATEGORY: TrainingCategory = 'other';
+
+export const DEFAULT_SLOT_STATUS: SlotStatus = 'draft';
 
 // Pendant iconographique des deux registres ci-dessus. Le champ `emoji` du type
 // StateBadge est laissé vide : il est encore exigé par @davincibot/lib, mais

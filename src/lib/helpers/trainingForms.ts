@@ -1,4 +1,9 @@
-import { categoryOptions, statusOptions } from '$lib/helpers/trainingOptions';
+import {
+	DEFAULT_SLOT_STATUS,
+	DEFAULT_TRAINING_CATEGORY,
+	categoryOptions,
+	statusOptions
+} from '$lib/helpers/trainingOptions';
 import type { TrainingListItem, TrainingSlotListItem } from '@davincibot/lib';
 import { formatParisDatetimeLocal } from '@davincibot/lib';
 
@@ -56,7 +61,10 @@ export function buildTrainingFields(training: TrainingListItem | null) {
 			id: 'category',
 			type: 'select',
 			required: true,
-			options: categoryOptions,
+			options: categoryOptions.map((option) => ({
+				...option,
+				selected: option.value === (training?.category ?? DEFAULT_TRAINING_CATEGORY)
+			})),
 			value: training?.category
 		},
 		{
@@ -221,7 +229,10 @@ export function buildSlotFields({
 			id: 'status',
 			type: 'select',
 			required: true,
-			options: statusOptions,
+			options: statusOptions.map((option) => ({
+				...option,
+				selected: option.value === (slot?.status ?? DEFAULT_SLOT_STATUS)
+			})),
 			value: slot?.status
 		}
 	];
