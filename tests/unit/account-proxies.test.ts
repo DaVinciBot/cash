@@ -1,12 +1,12 @@
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 
-vi.mock('$env/dynamic/public', () => ({
-	env: {
+vi.mock('$app/env/public', async () =>
+	(await import('../envMock.js')).envModule({
 		PUBLIC_SUPABASE_URL: 'https://project.supabase.co',
 		PUBLIC_SUPABASE_PUBLISHABLE_KEY: 'key',
 		PUBLIC_AUTH_BASE_URL: 'https://auth.test/'
-	}
-}));
+	})
+);
 
 const { forwardToAuth } = await import('#lib/server/authProxy.js');
 const { sessionCache } = await import('#lib/server/sessionCacheInstance.js');

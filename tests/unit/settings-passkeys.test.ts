@@ -1,6 +1,6 @@
 import { afterEach, describe, expect, it, vi } from 'vitest';
 
-vi.mock('$env/dynamic/public', () => ({ env: {} }));
+vi.mock('$app/env/public', async () => (await import('../envMock.js')).envModule());
 // URL relative : jsdom ne sait pas naviguer vers un autre domaine.
 vi.mock('@davincibot/lib', () => ({ buildLoginUrl: () => '#login' }));
 

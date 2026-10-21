@@ -1,6 +1,6 @@
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 
-vi.mock('$env/dynamic/public', () => ({ env: {} }));
+vi.mock('$app/env/public', async () => (await import('../envMock.js')).envModule());
 
 const mocks = vi.hoisted(() => ({
 	rpc: vi.fn()

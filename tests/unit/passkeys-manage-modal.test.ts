@@ -4,7 +4,7 @@ import { flushSync, mount, unmount } from 'svelte';
 
 import type * as SettingsModule from '#lib/settings/index.js';
 
-vi.mock('$env/dynamic/public', () => ({ env: {} }));
+vi.mock('$app/env/public', async () => (await import('../envMock.js')).envModule());
 
 const mocks = vi.hoisted(() => ({
 	fetchPasskeys: vi.fn(),

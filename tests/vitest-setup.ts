@@ -1,7 +1,7 @@
 import { vi } from 'vitest';
 
-// @davincibot/lib importe les modules virtuels de SvelteKit ($env, $app) au
-// niveau des modules (ex. config/auth lit `$env/dynamic/public` à l'import du
+// @davincibot/lib importe les modules virtuels de SvelteKit ($app/env, $app/env/public) au
+// niveau des modules (ex. config/auth lit `$app/env/public` à l'import du
 // barrel). Vitest n'exécute pas le plugin SvelteKit sur ces modules virtuels,
 // donc on les stub globalement pour toute la suite. Les valeurs PUBLIC_*
 // reprennent le .env pour que buildLoginUrl / getSupabaseBrowserClient aient
@@ -13,8 +13,7 @@ const publicEnv = {
 	PUBLIC_COOKIE_PREFIX: ''
 };
 
-vi.mock('$env/dynamic/public', () => ({ env: publicEnv }));
-vi.mock('$env/static/public', () => publicEnv);
+vi.mock('$app/env/public', async () => (await import('./envMock.js')).envModule(publicEnv));
 
 vi.mock('$app/env', () => ({
 	browser: true,
