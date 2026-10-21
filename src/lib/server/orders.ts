@@ -12,8 +12,8 @@
 // réinsertion des imputations dans une même transaction, ce qu'un client
 // PostgREST ne sait pas faire (voir la migration 20260809110000).
 
-import { num, str } from '$lib/server/coerce';
-import type { ItemTag, OrderState, ShippingAllocation } from '$lib/types/domain';
+import { num, str } from '#lib/server/coerce.js';
+import type { ItemTag, OrderState, ShippingAllocation } from '#lib/types/domain.js';
 import type { Database } from '@davincibot/database-types';
 import type { Campus } from '@davincibot/lib';
 import type { SupabaseClient } from '@supabase/supabase-js';

@@ -1,4 +1,4 @@
-import { missingDocumentFields, type DocumentFormInput } from '$lib/documents';
+import { missingDocumentFields, type DocumentFormInput } from '#lib/documents.js';
 import { describe, expect, it } from 'vitest';
 
 const complete: DocumentFormInput = {

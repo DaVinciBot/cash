@@ -1,4 +1,4 @@
-import { isMobileUserAgent, parseDeviceLabel } from '$lib/settings';
+import { isMobileUserAgent, parseDeviceLabel } from '#lib/settings/index.js';
 import { describe, expect, it } from 'vitest';
 
 const UA = {

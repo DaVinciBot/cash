@@ -12,8 +12,8 @@
 		countFormat,
 		percentFormat,
 		registerChartJs
-	} from '$lib/components/charts/chartjs';
-	import type { Series } from '$lib/helpers/trainingStatsTypes';
+	} from '#lib/components/charts/chartjs.js';
+	import type { Series } from '#lib/helpers/trainingStatsTypes.js';
 	import { Line } from 'svelte-chartjs';
 
 	interface Props {

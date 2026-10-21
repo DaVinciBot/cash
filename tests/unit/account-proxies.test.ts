@@ -8,8 +8,8 @@ vi.mock('$env/dynamic/public', () => ({
 	}
 }));
 
-const { forwardToAuth } = await import('$lib/server/authProxy');
-const { sessionCache } = await import('$lib/server/sessionCacheInstance');
+const { forwardToAuth } = await import('#lib/server/authProxy.js');
+const { sessionCache } = await import('#lib/server/sessionCacheInstance.js');
 const { GET: getSessions } = await import('../../src/routes/api/account/sessions/+server');
 const { POST: revokeSession } =
 	await import('../../src/routes/api/account/sessions/revoke/+server');

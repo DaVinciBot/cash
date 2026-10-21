@@ -1,6 +1,6 @@
+import { redirectToLoginIfUnauthorized } from '#lib/settings/authGuard.js';
+import { ElevationRequiredError, isElevationRequired } from '#lib/settings/stepUp.js';
 import { resolve } from '$app/paths';
-import { redirectToLoginIfUnauthorized } from '$lib/settings/authGuard';
-import { ElevationRequiredError, isElevationRequired } from '$lib/settings/stepUp';
 
 export interface SessionInfo {
 	id: string;

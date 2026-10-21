@@ -1,9 +1,9 @@
-import { rejection } from '$lib/server/audit';
-import { currentSchoolYear } from '$lib/server/cash';
-import { decimal, text } from '$lib/server/form';
-import { budgetLeaves } from '$lib/server/orders';
-import { accounts, flowList, periods } from '$lib/server/treasury';
-import { FLOW_DIRECTIONS, type FlowDirection } from '$lib/types/domain';
+import { rejection } from '#lib/server/audit.js';
+import { currentSchoolYear } from '#lib/server/cash.js';
+import { decimal, text } from '#lib/server/form.js';
+import { budgetLeaves } from '#lib/server/orders.js';
+import { accounts, flowList, periods } from '#lib/server/treasury.js';
+import { FLOW_DIRECTIONS, type FlowDirection } from '#lib/types/domain.js';
 import { fail } from '@sveltejs/kit';
 import type { Actions, PageServerLoad } from './$types';
 

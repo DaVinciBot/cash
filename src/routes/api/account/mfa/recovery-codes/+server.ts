@@ -1,4 +1,4 @@
-import { forwardToAuth } from '$lib/server/authProxy';
+import { forwardToAuth } from '#lib/server/authProxy.js';
 import type { RequestHandler } from './$types';
 
 // Régénère les codes de récupération (retournés en clair une seule fois).

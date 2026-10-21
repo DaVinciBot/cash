@@ -1,10 +1,10 @@
 <script lang="ts">
 	import { Button, FilterChip } from '@davincibot/components';
 	import { resolve } from '$app/paths';
-	import CampusBadge from '$lib/components/cash/CampusBadge.svelte';
-	import StateBadge from '$lib/components/cash/StateBadge.svelte';
-	import { ORDER_STATE_ICONS } from '$lib/components/cash/stateIcons';
-	import { ORDER_STATE_BADGES, ORDER_STATES, type OrderState } from '$lib/types/domain';
+	import CampusBadge from '#lib/components/cash/CampusBadge.svelte';
+	import StateBadge from '#lib/components/cash/StateBadge.svelte';
+	import { ORDER_STATE_ICONS } from '#lib/components/cash/stateIcons.js';
+	import { ORDER_STATE_BADGES, ORDER_STATES, type OrderState } from '#lib/types/domain.js';
 	import type { PageData } from './$types';
 
 	let { data }: { data: PageData } = $props();

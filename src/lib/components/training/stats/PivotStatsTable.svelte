@@ -13,8 +13,8 @@
 		TABLE,
 		TOTAL_CELL,
 		TOTAL_CELL_NUMBER
-	} from '$lib/components/training/stats/statsTable';
-	import type { PivotTable } from '$lib/helpers/trainingStatsTypes';
+	} from '#lib/components/training/stats/statsTable.js';
+	import type { PivotTable } from '#lib/helpers/trainingStatsTypes.js';
 
 	interface Props {
 		table: PivotTable;

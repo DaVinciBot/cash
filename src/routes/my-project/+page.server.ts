@@ -1,5 +1,5 @@
-import { currentSchoolYear } from '$lib/server/cash';
-import { projectOverviews } from '$lib/server/projectOverview';
+import { currentSchoolYear } from '#lib/server/cash.js';
+import { projectOverviews } from '#lib/server/projectOverview.js';
 import type { PageServerLoad } from './$types';
 
 // Suivi de SON projet, pour qui en porte la charge (CMD-F-50, TRESO-F-62).

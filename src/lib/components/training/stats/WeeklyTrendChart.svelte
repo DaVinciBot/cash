@@ -10,8 +10,8 @@
 		chartPalette,
 		countFormat,
 		registerChartJs
-	} from '$lib/components/charts/chartjs';
-	import type { WeekRow } from '$lib/helpers/trainingStatsTypes';
+	} from '#lib/components/charts/chartjs.js';
+	import type { WeekRow } from '#lib/helpers/trainingStatsTypes.js';
 	import { Line } from 'svelte-chartjs';
 
 	interface Props {

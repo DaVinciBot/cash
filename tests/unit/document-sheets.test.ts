@@ -2,12 +2,12 @@ import { describe, expect, it } from 'vitest';
 
 import { flushSync, mount, unmount, type Component } from 'svelte';
 
-import ExpenseReportSheet from '$lib/components/cash/documents/ExpenseReportSheet.svelte';
-import InvoiceSheet from '$lib/components/cash/documents/InvoiceSheet.svelte';
-import QuoteSheet from '$lib/components/cash/documents/QuoteSheet.svelte';
-import TaxReceiptSheet from '$lib/components/cash/documents/TaxReceiptSheet.svelte';
-import { isValidSiren } from '$lib/documents';
-import type { GeneratedDocument, Organization } from '$lib/server/reports';
+import ExpenseReportSheet from '#lib/components/cash/documents/ExpenseReportSheet.svelte';
+import InvoiceSheet from '#lib/components/cash/documents/InvoiceSheet.svelte';
+import QuoteSheet from '#lib/components/cash/documents/QuoteSheet.svelte';
+import TaxReceiptSheet from '#lib/components/cash/documents/TaxReceiptSheet.svelte';
+import { isValidSiren } from '#lib/documents.js';
+import type { GeneratedDocument, Organization } from '#lib/server/reports.js';
 
 // Les pièces générées partent chez des tiers et consomment un numéro de série :
 // ce qu'elles affichent ne se corrige pas après coup. Ces tests fixent donc les

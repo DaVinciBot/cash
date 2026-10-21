@@ -1,4 +1,4 @@
-import { entityHistory } from '$lib/server/audit';
+import { entityHistory } from '#lib/server/audit.js';
 import { error } from '@sveltejs/kit';
 import type { PageServerLoad } from './$types';
 

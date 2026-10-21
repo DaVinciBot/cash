@@ -1,4 +1,4 @@
-import { forwardToAuth } from '$lib/server/authProxy';
+import { forwardToAuth } from '#lib/server/authProxy.js';
 import type { RequestHandler } from './$types';
 
 // Prépare un step-up : TOTP ou code envoyé par email selon la méthode demandée,

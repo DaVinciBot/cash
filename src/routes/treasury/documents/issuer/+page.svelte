@@ -7,7 +7,7 @@
 	// l'on ne savait plus lequel on était en train de faire.
 	import { enhance } from '$app/forms';
 	import { resolve } from '$app/paths';
-	import { OFFICER_GENDERS, OFFICER_GENDER_LABELS, officerTitle } from '$lib/documents';
+	import { OFFICER_GENDERS, OFFICER_GENDER_LABELS, officerTitle } from '#lib/documents.js';
 	import type { ActionData, PageData } from './$types';
 
 	let { data, form }: { data: PageData; form: ActionData } = $props();

@@ -5,7 +5,7 @@ import {
 	formatHours,
 	formatRangeLabel,
 	formatRatio
-} from '$lib/helpers/trainingStatsFormat';
+} from '#lib/helpers/trainingStatsFormat.js';
 
 // Écriture des grandeurs à l'écran. Le cas qui compte est la valeur indéfinie :
 // un remplissage sans place proposée et une moyenne sans formation ne valent

@@ -1,4 +1,4 @@
-import type { BadgeIcon } from '$lib/components/cash/stateIcons';
+import type { BadgeIcon } from '#lib/components/cash/stateIcons.js';
 import type { SlotStatus, StateBadge, TrainingCategory } from '@davincibot/lib';
 import {
 	Ban,

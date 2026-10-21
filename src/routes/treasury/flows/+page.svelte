@@ -2,9 +2,9 @@
 	import { Button } from '@davincibot/components';
 	import { enhance } from '$app/forms';
 	import { resolve } from '$app/paths';
-	import StateBadge from '$lib/components/cash/StateBadge.svelte';
-	import { FLOW_DIRECTION_ICONS } from '$lib/components/cash/stateIcons';
-	import { FLOW_DIRECTION_BADGES, isFlowGenerated } from '$lib/types/domain';
+	import StateBadge from '#lib/components/cash/StateBadge.svelte';
+	import { FLOW_DIRECTION_ICONS } from '#lib/components/cash/stateIcons.js';
+	import { FLOW_DIRECTION_BADGES, isFlowGenerated } from '#lib/types/domain.js';
 	import type { ActionData, PageData } from './$types';
 
 	let { data, form }: { data: PageData; form: ActionData } = $props();

@@ -1,6 +1,6 @@
 <script lang="ts">
 	import { Button } from '@davincibot/components';
-	import { updateUsername, uploadAvatar } from '$lib/settings';
+	import { updateUsername, uploadAvatar } from '#lib/settings/index.js';
 	import { userdata, type UserData } from '@davincibot/lib';
 	import { onDestroy } from 'svelte';
 

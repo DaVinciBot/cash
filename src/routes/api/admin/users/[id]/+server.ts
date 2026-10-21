@@ -1,4 +1,4 @@
-import { requireEditMembers } from '$lib/server/adminUsers';
+import { requireEditMembers } from '#lib/server/adminUsers.js';
 import type { RequestEvent } from './$types';
 
 const updateProfileStatus = async (

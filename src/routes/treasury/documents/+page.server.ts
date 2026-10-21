@@ -1,5 +1,5 @@
-import { documentList, missingIssuerFields, organization } from '$lib/server/reports';
-import { DOCUMENT_KINDS } from '$lib/types/domain';
+import { documentList, missingIssuerFields, organization } from '#lib/server/reports.js';
+import { DOCUMENT_KINDS } from '#lib/types/domain.js';
 import type { PageServerLoad } from './$types';
 
 // Documents générés (TRESO-F-40 à 43) — la LISTE, et rien d'autre.

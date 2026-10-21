@@ -2,7 +2,7 @@
 	import { Button } from '@davincibot/components';
 	import { enhance } from '$app/forms';
 	import { resolve } from '$app/paths';
-	import HistoryTimeline from '$lib/components/cash/HistoryTimeline.svelte';
+	import HistoryTimeline from '#lib/components/cash/HistoryTimeline.svelte';
 	import { untrack } from 'svelte';
 	import type { ActionData, PageData } from './$types';
 

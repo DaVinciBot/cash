@@ -1,5 +1,5 @@
-import { currentSchoolYear } from '$lib/server/cash';
-import { projectReport, quarterlyReport } from '$lib/server/reports';
+import { currentSchoolYear } from '#lib/server/cash.js';
+import { projectReport, quarterlyReport } from '#lib/server/reports.js';
 import { error } from '@sveltejs/kit';
 import type { RequestHandler } from './$types';
 

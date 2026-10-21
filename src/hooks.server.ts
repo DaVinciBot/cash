@@ -1,7 +1,7 @@
+import { appServerEnvCheck } from '#lib/server/env.js';
+import { sessionCache } from '#lib/server/sessionCacheInstance.js';
 import { building } from '$app/env';
 import { resolve as resolveRoute } from '$app/paths';
-import { appServerEnvCheck } from '$lib/server/env';
-import { sessionCache } from '$lib/server/sessionCacheInstance';
 import { buildLoginUrl, publicEnvCheck } from '@davincibot/lib';
 import { assertEnv } from '@davincibot/lib/env';
 import {

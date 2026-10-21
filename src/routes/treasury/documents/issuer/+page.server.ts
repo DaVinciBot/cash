@@ -1,7 +1,7 @@
-import { isOfficerGender } from '$lib/documents';
-import { rejection } from '$lib/server/audit';
-import { text } from '$lib/server/form';
-import { organization } from '$lib/server/reports';
+import { isOfficerGender } from '#lib/documents.js';
+import { rejection } from '#lib/server/audit.js';
+import { text } from '#lib/server/form.js';
+import { organization } from '#lib/server/reports.js';
 import { fail } from '@sveltejs/kit';
 import type { Actions, PageServerLoad } from './$types';
 

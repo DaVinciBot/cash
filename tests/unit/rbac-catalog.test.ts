@@ -6,7 +6,7 @@ import {
 	GLOBAL_PERMISSION_LABELS,
 	GLOBAL_ROLE_CATEGORIES,
 	OVERRIDE_PERMISSION_CATEGORIES
-} from '$lib/rbacCatalog';
+} from '#lib/rbacCatalog.js';
 
 // Le tiroir « Membres » attribue les permissions en exception à partir de ce
 // catalogue. Une permission absente du catalogue est une permission qu'aucun

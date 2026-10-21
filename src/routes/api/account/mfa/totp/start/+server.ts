@@ -1,4 +1,4 @@
-import { forwardToAuth } from '$lib/server/authProxy';
+import { forwardToAuth } from '#lib/server/authProxy.js';
 import type { RequestHandler } from './$types';
 
 // Démarre l'activation TOTP (secret + URL otpauth pour le QR code).

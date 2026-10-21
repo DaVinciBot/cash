@@ -2,7 +2,7 @@
 	import { Button } from '@davincibot/components';
 	import { enhance } from '$app/forms';
 	import { resolve } from '$app/paths';
-	import CampusBadge from '$lib/components/cash/CampusBadge.svelte';
+	import CampusBadge from '#lib/components/cash/CampusBadge.svelte';
 	import { CAMPUS_BADGES } from '@davincibot/lib';
 	import type { ActionData, PageData } from './$types';
 

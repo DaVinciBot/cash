@@ -11,7 +11,7 @@ import {
 	findTrainingName,
 	formatSlotDate,
 	stateBadgeLabel
-} from '$lib/helpers/trainingTables';
+} from '#lib/helpers/trainingTables.js';
 import type { TrainingListItem } from '@davincibot/lib';
 
 const badgeCell = vi.fn() as unknown as BadgeCell;

@@ -9,7 +9,7 @@ import {
 	totals,
 	trainerRows,
 	weeklyRows
-} from '$lib/server/trainingStats';
+} from '#lib/server/trainingStats.js';
 import { getParisDateKey } from '@davincibot/lib';
 import type { PageServerLoad } from './$types';
 

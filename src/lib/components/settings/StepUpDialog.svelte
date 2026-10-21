@@ -1,7 +1,7 @@
 <script lang="ts">
 	import { Button, CodeInput, OverlayBackdrop } from '@davincibot/components';
-	import { stepUpChallenge, stepUpVerify, stepUpVerifyWebauthn } from '$lib/settings';
-	import { stepUpRequest, type StepUpRequest } from '$lib/settings';
+	import { stepUpChallenge, stepUpVerify, stepUpVerifyWebauthn } from '#lib/settings/index.js';
+	import { stepUpRequest, type StepUpRequest } from '#lib/settings/index.js';
 	import { onDestroy } from 'svelte';
 
 	type DialogMode = 'password' | 'email' | 'totp' | 'recovery' | 'webauthn';

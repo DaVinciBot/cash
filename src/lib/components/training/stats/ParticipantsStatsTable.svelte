@@ -2,7 +2,7 @@
 	// L'assiduité, personne par personne. La liste peut compter une centaine de
 	// lignes : elle défile dans sa propre boîte plutôt que de repousser le reste
 	// de la page hors de vue.
-	import StatsTrendLegend from '$lib/components/training/stats/StatsTrendLegend.svelte';
+	import StatsTrendLegend from '#lib/components/training/stats/StatsTrendLegend.svelte';
 	import {
 		CELL_LABEL,
 		cellNumber,
@@ -12,10 +12,10 @@
 		TABLE,
 		TOTAL_CELL,
 		TOTAL_CELL_NUMBER
-	} from '$lib/components/training/stats/statsTable';
-	import { formatHours } from '$lib/helpers/trainingStatsFormat';
-	import { compareToAverage } from '$lib/helpers/trainingStatsHighlight';
-	import type { ParticipantRow } from '$lib/helpers/trainingStatsTypes';
+	} from '#lib/components/training/stats/statsTable.js';
+	import { formatHours } from '#lib/helpers/trainingStatsFormat.js';
+	import { compareToAverage } from '#lib/helpers/trainingStatsHighlight.js';
+	import type { ParticipantRow } from '#lib/helpers/trainingStatsTypes.js';
 
 	interface Props {
 		rows: ParticipantRow[];

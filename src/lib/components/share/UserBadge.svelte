@@ -2,7 +2,7 @@
 	import { Button } from '@davincibot/components';
 	import type { EffectivePermission, GlobalPermission } from '@davincibot/lib';
 	import { GLOBAL_PERMISSIONS } from '@davincibot/lib';
-	import { openSettings } from '$lib/settings';
+	import { openSettings } from '#lib/settings/index.js';
 	import { userdata, type UserData } from '@davincibot/lib';
 	import { hideOnClickOutside } from '@davincibot/lib';
 	import { onDestroy, onMount } from 'svelte';

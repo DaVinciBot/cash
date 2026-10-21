@@ -6,8 +6,8 @@
 // — jamais la clé de service : c'est la policy `items_insert`
 // (`requested_by = auth.uid()`) qui garantit qu'un membre n'écrit que pour lui.
 
-import { num, str } from '$lib/server/coerce';
-import type { ItemState, ItemTag } from '$lib/types/domain';
+import { num, str } from '#lib/server/coerce.js';
+import type { ItemState, ItemTag } from '#lib/types/domain.js';
 import type { Database } from '@davincibot/database-types';
 import type { Campus, ProjectPermission } from '@davincibot/lib';
 import type { SupabaseClient } from '@supabase/supabase-js';

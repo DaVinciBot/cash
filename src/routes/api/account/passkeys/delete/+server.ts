@@ -1,4 +1,4 @@
-import { forwardToAuth } from '$lib/server/authProxy';
+import { forwardToAuth } from '#lib/server/authProxy.js';
 import type { RequestHandler } from './$types';
 
 export const POST: RequestHandler = async ({ fetch, cookies, request }) => {

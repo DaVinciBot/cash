@@ -1,4 +1,4 @@
-import { orderList } from '$lib/server/orders';
+import { orderList } from '#lib/server/orders.js';
 import type { PageServerLoad } from './$types';
 
 export const load: PageServerLoad = async ({ locals, depends }) => {

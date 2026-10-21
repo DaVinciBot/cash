@@ -1,15 +1,15 @@
 <script lang="ts">
 	import { Button } from '@davincibot/components';
 	import { resolve } from '$app/paths';
-	import CampusBadge from '$lib/components/cash/CampusBadge.svelte';
-	import RecordModal from '$lib/components/modals/RecordModal.svelte';
-	import SucessModal from '$lib/components/modals/InfoModal.svelte';
+	import CampusBadge from '#lib/components/cash/CampusBadge.svelte';
+	import RecordModal from '#lib/components/modals/RecordModal.svelte';
+	import SucessModal from '#lib/components/modals/InfoModal.svelte';
 	import {
 		buildProfileFields,
 		PROFILE_FIELD_KEYS,
 		readProfileEdits
-	} from '$lib/helpers/profileForm';
-	import { GLOBAL_ROLE_CATEGORIES, OVERRIDE_PERMISSION_CATEGORIES } from '$lib/rbacCatalog';
+	} from '#lib/helpers/profileForm.js';
+	import { GLOBAL_ROLE_CATEGORIES, OVERRIDE_PERMISSION_CATEGORIES } from '#lib/rbacCatalog.js';
 	import {
 		Table,
 		UserImportModal,

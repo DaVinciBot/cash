@@ -6,9 +6,9 @@
 	// Les styles d'impression vivent ICI et non dans la page : ils s'appliquent à
 	// du balisage produit par les composants enfants, que la portée d'une feuille
 	// de style de page n'atteindrait pas.
-	import { DOCUMENT_KIND_LABELS } from '$lib/types/domain';
+	import { DOCUMENT_KIND_LABELS } from '#lib/types/domain.js';
 	import type { Snippet } from 'svelte';
-	import type { GeneratedDocument } from '$lib/server/reports';
+	import type { GeneratedDocument } from '#lib/server/reports.js';
 
 	interface Props {
 		doc: GeneratedDocument;
@@ -56,7 +56,7 @@
 <svelte:head>
 	<style>
 		/* La marge basse est RÉSERVÉE au pied de page : c'est là que Chromium
-		   dessine « Page X/Y » au moment du rendu PDF (voir `$lib/server/pdf`).
+		   dessine « Page X/Y » au moment du rendu PDF (voir `#lib/server/pdf.js`).
 		   Sans elle, le numéro se superposerait au bas du contenu. */
 		@page {
 			size: A4;

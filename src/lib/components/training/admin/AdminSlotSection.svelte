@@ -1,8 +1,8 @@
 <script lang="ts">
 	import { Button } from '@davincibot/components';
-	import StateBadge from '$lib/components/cash/StateBadge.svelte';
-	import { statusBadge, stateBadgeLabel } from '$lib/helpers/trainingTables';
-	import { SLOT_STATUS_ICONS } from '$lib/helpers/trainingOptions';
+	import StateBadge from '#lib/components/cash/StateBadge.svelte';
+	import { statusBadge, stateBadgeLabel } from '#lib/helpers/trainingTables.js';
+	import { SLOT_STATUS_ICONS } from '#lib/helpers/trainingOptions.js';
 	import {
 		Table,
 		type DBInfo,

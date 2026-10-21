@@ -11,7 +11,7 @@ import {
 	stepUpVerify,
 	verifyEmailEnrollment,
 	verifyTotpEnrollment
-} from '$lib/settings';
+} from '#lib/settings/index.js';
 
 const jsonResponse = (status: number, body: unknown) => ({
 	ok: status < 400,

@@ -1,5 +1,5 @@
 <script lang="ts">
-	import StatsTrendLegend from '$lib/components/training/stats/StatsTrendLegend.svelte';
+	import StatsTrendLegend from '#lib/components/training/stats/StatsTrendLegend.svelte';
 	import {
 		CELL_LABEL,
 		cellNumber,
@@ -10,10 +10,10 @@
 		TABLE,
 		TOTAL_CELL,
 		TOTAL_CELL_NUMBER
-	} from '$lib/components/training/stats/statsTable';
-	import { formatDecimal, formatHours, formatRatio } from '$lib/helpers/trainingStatsFormat';
-	import { compareToAverage } from '$lib/helpers/trainingStatsHighlight';
-	import type { GroupRow, StatsTotals } from '$lib/helpers/trainingStatsTypes';
+	} from '#lib/components/training/stats/statsTable.js';
+	import { formatDecimal, formatHours, formatRatio } from '#lib/helpers/trainingStatsFormat.js';
+	import { compareToAverage } from '#lib/helpers/trainingStatsHighlight.js';
+	import type { GroupRow, StatsTotals } from '#lib/helpers/trainingStatsTypes.js';
 
 	interface Props {
 		rows: GroupRow[];

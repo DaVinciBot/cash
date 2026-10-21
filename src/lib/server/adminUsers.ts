@@ -1,7 +1,7 @@
 // Socle commun des routes /api/admin/users : le client de service et le contrôle
 // de permission que les trois endpoints (liste, statut, réinvitation) partagent.
 
-import { appServerEnv } from '$lib/server/env';
+import { appServerEnv } from '#lib/server/env.js';
 import type { Database } from '@davincibot/database-types';
 import { publicEnv } from '@davincibot/lib';
 import { createServiceClient } from '@davincibot/lib/server';

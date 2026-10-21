@@ -22,9 +22,9 @@ import {
 	type BudgetPressure,
 	type ProjectItem,
 	type ScopedProject
-} from '$lib/server/cash';
-import { projectReport, type ProjectReportRow } from '$lib/server/reports';
-import { budgetTree, type BudgetNode } from '$lib/server/treasury';
+} from '#lib/server/cash.js';
+import { projectReport, type ProjectReportRow } from '#lib/server/reports.js';
+import { budgetTree, type BudgetNode } from '#lib/server/treasury.js';
 import type { Database } from '@davincibot/database-types';
 import type { Campus } from '@davincibot/lib';
 import type { SupabaseClient } from '@supabase/supabase-js';

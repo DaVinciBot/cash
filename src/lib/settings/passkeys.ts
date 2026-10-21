@@ -1,5 +1,5 @@
+import { throwResponseError } from '#lib/settings/mfa.js';
 import { resolve } from '$app/paths';
-import { throwResponseError } from '$lib/settings/mfa';
 import type { PublicKeyCredentialCreationOptionsJSON } from '@simplewebauthn/browser';
 
 export interface PasskeyInfo {

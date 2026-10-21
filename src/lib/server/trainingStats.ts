@@ -1,4 +1,4 @@
-import { categoryOptions } from '$lib/helpers/trainingOptions';
+import { categoryOptions } from '#lib/helpers/trainingOptions.js';
 import type {
 	GroupRow,
 	ParticipantRow,
@@ -8,8 +8,8 @@ import type {
 	StatsRange,
 	StatsTotals,
 	WeekRow
-} from '$lib/helpers/trainingStatsTypes';
-import { round } from '$lib/numbers';
+} from '#lib/helpers/trainingStatsTypes.js';
+import { round } from '#lib/numbers.js';
 import type { Database } from '@davincibot/database-types';
 import { getParisDateKey, type TrainingCategory } from '@davincibot/lib';
 import type { SupabaseClient } from '@supabase/supabase-js';
@@ -30,7 +30,7 @@ export type {
 	StatsRange,
 	StatsTotals,
 	WeekRow
-} from '$lib/helpers/trainingStatsTypes';
+} from '#lib/helpers/trainingStatsTypes.js';
 
 /** Un créneau tenu, réduit à ce que les statistiques consomment. */
 export interface StatsSlot {

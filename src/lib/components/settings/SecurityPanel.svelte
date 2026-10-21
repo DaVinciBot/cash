@@ -1,11 +1,11 @@
 <script lang="ts">
-	import ConnectionsSection from '$lib/components/settings/ConnectionsSection.svelte';
-	import MfaSection from '$lib/components/settings/MfaSection.svelte';
-	import SessionsSection from '$lib/components/settings/SessionsSection.svelte';
-	import StepUpDialog from '$lib/components/settings/StepUpDialog.svelte';
+	import ConnectionsSection from '#lib/components/settings/ConnectionsSection.svelte';
+	import MfaSection from '#lib/components/settings/MfaSection.svelte';
+	import SessionsSection from '#lib/components/settings/SessionsSection.svelte';
+	import StepUpDialog from '#lib/components/settings/StepUpDialog.svelte';
 	import { Button } from '@davincibot/components';
-	import { changePassword } from '$lib/settings';
-	import { StepUpCancelledError, withStepUp } from '$lib/settings';
+	import { changePassword } from '#lib/settings/index.js';
+	import { StepUpCancelledError, withStepUp } from '#lib/settings/index.js';
 
 	let password = $state('');
 	let confirmation = $state('');

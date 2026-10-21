@@ -1,4 +1,4 @@
-import { requireEditMembers } from '$lib/server/adminUsers';
+import { requireEditMembers } from '#lib/server/adminUsers.js';
 import { publicEnv } from '@davincibot/lib';
 import { sidCookieName } from '@davincibot/lib/server';
 import type { RequestEvent } from './$types';

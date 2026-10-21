@@ -2,11 +2,11 @@
 	import { Button } from '@davincibot/components';
 	// La page ne fait qu'aiguiller : chaque type de pièce a son composant.
 	import { resolve } from '$app/paths';
-	import ExpenseReportSheet from '$lib/components/cash/documents/ExpenseReportSheet.svelte';
-	import InvoiceSheet from '$lib/components/cash/documents/InvoiceSheet.svelte';
-	import QuoteSheet from '$lib/components/cash/documents/QuoteSheet.svelte';
-	import TaxReceiptSheet from '$lib/components/cash/documents/TaxReceiptSheet.svelte';
-	import { DOCUMENT_KIND_LABELS } from '$lib/types/domain';
+	import ExpenseReportSheet from '#lib/components/cash/documents/ExpenseReportSheet.svelte';
+	import InvoiceSheet from '#lib/components/cash/documents/InvoiceSheet.svelte';
+	import QuoteSheet from '#lib/components/cash/documents/QuoteSheet.svelte';
+	import TaxReceiptSheet from '#lib/components/cash/documents/TaxReceiptSheet.svelte';
+	import { DOCUMENT_KIND_LABELS } from '#lib/types/domain.js';
 	import type { PageData } from './$types';
 
 	let { data }: { data: PageData } = $props();

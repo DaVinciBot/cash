@@ -2,8 +2,8 @@
 	import { Button, FilterChip } from '@davincibot/components';
 	import { enhance } from '$app/forms';
 	import { resolve } from '$app/paths';
-	import CampusBadge from '$lib/components/cash/CampusBadge.svelte';
-	import { ITEM_TAGS, type ItemTag } from '$lib/types/domain';
+	import CampusBadge from '#lib/components/cash/CampusBadge.svelte';
+	import { ITEM_TAGS, type ItemTag } from '#lib/types/domain.js';
 	import { untrack } from 'svelte';
 	import type { ActionData, PageData } from './$types';
 

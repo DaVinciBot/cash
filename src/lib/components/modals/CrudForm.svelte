@@ -5,7 +5,7 @@
 		CrudField,
 		DocumentPreview,
 		FieldValue
-	} from '$lib/types/crud';
+	} from '#lib/types/crud.js';
 
 	type SubmitEventHandler = (event: MouseEvent) => void | Promise<void>;
 	type CloseEventHandler = (event: MouseEvent) => void | Promise<void>;

@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest';
 
-import { parseDomains } from '$lib/server/treasury';
+import { parseDomains } from '#lib/server/treasury.js';
 import {
 	ACCOUNT_KIND_LABELS,
 	ACCOUNT_KINDS,
@@ -9,7 +9,7 @@ import {
 	FLOW_DIRECTIONS,
 	FLOW_ORIGINS,
 	isFlowGenerated
-} from '$lib/types/domain';
+} from '#lib/types/domain.js';
 
 describe('référentiel de trésorerie (§6.2, §6.3)', () => {
 	it('couvre exactement les enums de la base', () => {

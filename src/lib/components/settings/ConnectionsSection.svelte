@@ -1,9 +1,9 @@
 <script lang="ts">
 	import { Button } from '@davincibot/components';
 	import { formatParisDateTimeShort } from '@davincibot/lib';
-	import { fetchConnections, revokeConnection } from '$lib/settings';
-	import type { ConnectionInfo } from '$lib/settings';
-	import { alertUnlessCancelled, withStepUp } from '$lib/settings';
+	import { fetchConnections, revokeConnection } from '#lib/settings/index.js';
+	import type { ConnectionInfo } from '#lib/settings/index.js';
+	import { alertUnlessCancelled, withStepUp } from '#lib/settings/index.js';
 	import { AppWindow, Unlink } from '@lucide/svelte';
 	import { onMount } from 'svelte';
 

@@ -1,4 +1,4 @@
-import { businessJournal, rejectedWrites, socleJournal } from '$lib/server/audit';
+import { businessJournal, rejectedWrites, socleJournal } from '#lib/server/audit.js';
 import type { PageServerLoad } from './$types';
 
 // Écran d'audit (TRANS-NF-51/52).

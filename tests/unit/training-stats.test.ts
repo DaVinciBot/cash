@@ -14,7 +14,7 @@ import {
 	weeklyRows,
 	type StatsRange,
 	type StatsSlot
-} from '$lib/server/trainingStats';
+} from '#lib/server/trainingStats.js';
 
 // Statistiques de formation (feuille « Stats » du classeur Planning Formations).
 //

@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest';
 
-import { amountInWords } from '$lib/helpers/amountInWords';
+import { amountInWords } from '#lib/helpers/amountInWords.js';
 
 // Mention obligatoire du reçu fiscal (Cerfa 11580) : le montant s'écrit aussi en
 // toutes lettres. Une mention fausse sur une pièce fiscale coûte plus cher

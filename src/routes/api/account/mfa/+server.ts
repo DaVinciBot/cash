@@ -1,4 +1,4 @@
-import { forwardToAuth } from '$lib/server/authProxy';
+import { forwardToAuth } from '#lib/server/authProxy.js';
 import type { RequestHandler } from './$types';
 
 // État MFA du compte (méthodes actives, codes de récupération restants, élévation).

@@ -7,8 +7,8 @@ vi.mock('@davincibot/lib/supabase', () => ({
 	getSupabaseBrowserClient: () => ({})
 }));
 
-import RecordModal from '$lib/components/modals/RecordModal.svelte';
-import { buildProfileFields, readProfileEdits } from '$lib/helpers/profileForm';
+import RecordModal from '#lib/components/modals/RecordModal.svelte';
+import { buildProfileFields, readProfileEdits } from '#lib/helpers/profileForm.js';
 
 /**
  * La fiche membre traverse deux composants : RecordModal nomme ses contrôles à

@@ -5,7 +5,7 @@ import {
 	ITEM_STATES,
 	REFUSAL_REASON_MIN_LENGTH,
 	refusalReasonError
-} from '$lib/types/domain';
+} from '#lib/types/domain.js';
 import {
 	ADMIN_MENU,
 	canAccessAdminPath,

@@ -1,10 +1,10 @@
 <script lang="ts">
 	import { Button } from '@davincibot/components';
 	import { formatParisDateTimeShort } from '@davincibot/lib';
-	import { isMobileUserAgent, parseDeviceLabel } from '$lib/settings';
-	import { fetchSessions, revokeAllSessions, revokeSession } from '$lib/settings';
-	import type { SessionInfo } from '$lib/settings';
-	import { alertUnlessCancelled, withStepUp } from '$lib/settings';
+	import { isMobileUserAgent, parseDeviceLabel } from '#lib/settings/index.js';
+	import { fetchSessions, revokeAllSessions, revokeSession } from '#lib/settings/index.js';
+	import type { SessionInfo } from '#lib/settings/index.js';
+	import { alertUnlessCancelled, withStepUp } from '#lib/settings/index.js';
 	import { LogOut, Monitor, ShieldCheck, Smartphone } from '@lucide/svelte';
 	import { onMount } from 'svelte';
 

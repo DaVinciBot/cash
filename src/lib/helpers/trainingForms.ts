@@ -3,7 +3,7 @@ import {
 	DEFAULT_TRAINING_CATEGORY,
 	categoryOptions,
 	statusOptions
-} from '$lib/helpers/trainingOptions';
+} from '#lib/helpers/trainingOptions.js';
 import type { TrainingListItem, TrainingSlotListItem } from '@davincibot/lib';
 import { formatParisDatetimeLocal } from '@davincibot/lib';
 

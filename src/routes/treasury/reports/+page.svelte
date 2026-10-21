@@ -1,10 +1,10 @@
 <script lang="ts">
 	import { Button } from '@davincibot/components';
 	import { resolve } from '$app/paths';
-	import { euroFormat } from '$lib/components/charts/chartjs';
-	import GroupedBarsChart from '$lib/components/charts/GroupedBarsChart.svelte';
-	import RankingChart from '$lib/components/charts/RankingChart.svelte';
-	import TrendChart from '$lib/components/charts/TrendChart.svelte';
+	import { euroFormat } from '#lib/components/charts/chartjs.js';
+	import GroupedBarsChart from '#lib/components/charts/GroupedBarsChart.svelte';
+	import RankingChart from '#lib/components/charts/RankingChart.svelte';
+	import TrendChart from '#lib/components/charts/TrendChart.svelte';
 	import type { PageData } from './$types';
 
 	let { data }: { data: PageData } = $props();

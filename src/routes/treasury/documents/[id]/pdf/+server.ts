@@ -1,6 +1,6 @@
-import { renderPagePdf } from '$lib/server/pdf';
-import { documentById } from '$lib/server/reports';
-import { DOCUMENT_KIND_LABELS } from '$lib/types/domain';
+import { renderPagePdf } from '#lib/server/pdf.js';
+import { documentById } from '#lib/server/reports.js';
+import { DOCUMENT_KIND_LABELS } from '#lib/types/domain.js';
 import { sidCookieName } from '@davincibot/lib/server';
 import { error } from '@sveltejs/kit';
 import type { RequestHandler } from './$types';

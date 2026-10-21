@@ -1,13 +1,13 @@
 <script lang="ts">
-	import GroupStatsTable from '$lib/components/training/stats/GroupStatsTable.svelte';
-	import ParticipantsStatsTable from '$lib/components/training/stats/ParticipantsStatsTable.svelte';
-	import PivotStatsTable from '$lib/components/training/stats/PivotStatsTable.svelte';
-	import StackedAreaChart from '$lib/components/training/stats/StackedAreaChart.svelte';
-	import StatsCard from '$lib/components/training/stats/StatsCard.svelte';
-	import StatsRangeForm from '$lib/components/training/stats/StatsRangeForm.svelte';
-	import WeeklyStatsTable from '$lib/components/training/stats/WeeklyStatsTable.svelte';
-	import WeeklyTrendChart from '$lib/components/training/stats/WeeklyTrendChart.svelte';
-	import { formatRangeLabel } from '$lib/helpers/trainingStatsFormat';
+	import GroupStatsTable from '#lib/components/training/stats/GroupStatsTable.svelte';
+	import ParticipantsStatsTable from '#lib/components/training/stats/ParticipantsStatsTable.svelte';
+	import PivotStatsTable from '#lib/components/training/stats/PivotStatsTable.svelte';
+	import StackedAreaChart from '#lib/components/training/stats/StackedAreaChart.svelte';
+	import StatsCard from '#lib/components/training/stats/StatsCard.svelte';
+	import StatsRangeForm from '#lib/components/training/stats/StatsRangeForm.svelte';
+	import WeeklyStatsTable from '#lib/components/training/stats/WeeklyStatsTable.svelte';
+	import WeeklyTrendChart from '#lib/components/training/stats/WeeklyTrendChart.svelte';
+	import { formatRangeLabel } from '#lib/helpers/trainingStatsFormat.js';
 	import { resolve } from '$app/paths';
 	import type { PageData } from './$types';
 

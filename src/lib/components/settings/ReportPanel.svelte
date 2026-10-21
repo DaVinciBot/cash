@@ -8,7 +8,7 @@
 		TOTAL_SIZE_MESSAGE,
 		validateReportImage,
 		type ReportType
-	} from '$lib/settings';
+	} from '#lib/settings/index.js';
 	import { userdata, type UserData } from '@davincibot/lib';
 	import { ChevronDown, ImagePlus, X } from '@lucide/svelte';
 	import { onDestroy } from 'svelte';

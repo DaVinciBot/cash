@@ -11,13 +11,13 @@ const mocks = vi.hoisted(() => ({
 	submitReport: vi.fn()
 }));
 
-vi.mock('$lib/settings', async (importOriginal) => {
+vi.mock('#lib/settings/index.js', async (importOriginal) => {
 	const actual = await importOriginal<typeof reportModule>();
 	return { ...actual, submitReport: mocks.submitReport };
 });
 
-import ReportPanel from '$lib/components/settings/ReportPanel.svelte';
-import type * as reportModule from '$lib/settings';
+import ReportPanel from '#lib/components/settings/ReportPanel.svelte';
+import type * as reportModule from '#lib/settings/index.js';
 import type { UserProfile } from '@davincibot/lib';
 import { userdata } from '@davincibot/lib';
 

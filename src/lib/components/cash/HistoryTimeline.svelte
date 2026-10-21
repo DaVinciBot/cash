@@ -8,7 +8,7 @@
 		isOpaqueField,
 		summarizeActivity,
 		type ActivityEntry
-	} from '$lib/types/audit';
+	} from '#lib/types/audit.js';
 
 	interface Props {
 		entries: ActivityEntry[];

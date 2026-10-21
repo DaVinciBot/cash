@@ -10,8 +10,8 @@
 	import LinesTable from './helpers/LinesTable.svelte';
 	import SubjectBlock from './helpers/SubjectBlock.svelte';
 	import TotalsBlock from './helpers/TotalsBlock.svelte';
-	import { INVOICE_OPERATION_LABELS, formatSiren } from '$lib/documents';
-	import type { GeneratedDocument } from '$lib/server/reports';
+	import { INVOICE_OPERATION_LABELS, formatSiren } from '#lib/documents.js';
+	import type { GeneratedDocument } from '#lib/server/reports.js';
 
 	interface Props {
 		doc: GeneratedDocument;

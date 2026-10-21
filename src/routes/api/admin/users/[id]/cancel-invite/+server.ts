@@ -1,4 +1,4 @@
-import { getAdminClient, requireEditMembers } from '$lib/server/adminUsers';
+import { getAdminClient, requireEditMembers } from '#lib/server/adminUsers.js';
 import type { RequestEvent } from './$types';
 
 interface AdminUser {

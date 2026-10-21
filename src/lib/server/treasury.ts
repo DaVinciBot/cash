@@ -8,9 +8,9 @@
 // `projects.manage.all` porte l'ENTITÉ projet — nom, campus, budget désigné,
 // archivage. Les adhésions relèvent d'une autre permission et d'un autre écran.
 
-import { num, str } from '$lib/server/coerce';
-import type { AccountKind, FlowDirection, FlowOrigin } from '$lib/types/domain';
-import { countsTowardTreasury } from '$lib/types/domain';
+import { num, str } from '#lib/server/coerce.js';
+import type { AccountKind, FlowDirection, FlowOrigin } from '#lib/types/domain.js';
+import { countsTowardTreasury } from '#lib/types/domain.js';
 import type { Database } from '@davincibot/database-types';
 import type { Campus } from '@davincibot/lib';
 import type { SupabaseClient } from '@supabase/supabase-js';

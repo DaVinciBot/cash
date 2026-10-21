@@ -1,5 +1,5 @@
-import { forwardToAuth } from '$lib/server/authProxy';
-import { sessionCache } from '$lib/server/sessionCacheInstance';
+import { forwardToAuth } from '#lib/server/authProxy.js';
+import { sessionCache } from '#lib/server/sessionCacheInstance.js';
 import type { RequestHandler } from './$types';
 
 // Révocation de toutes les autres sessions du compte. Purge complète du cache

@@ -1,4 +1,4 @@
-import { compareToAverage } from '$lib/helpers/trainingStatsHighlight';
+import { compareToAverage } from '#lib/helpers/trainingStatsHighlight.js';
 import { describe, expect, it } from 'vitest';
 
 describe('écart à la moyenne', () => {

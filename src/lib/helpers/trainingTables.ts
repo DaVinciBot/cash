@@ -1,4 +1,4 @@
-import { SLOT_STATUS_BADGES, TRAINING_CATEGORY_BADGES } from '$lib/helpers/trainingOptions';
+import { SLOT_STATUS_BADGES, TRAINING_CATEGORY_BADGES } from '#lib/helpers/trainingOptions.js';
 import type { TableCell, TableRow } from '@davincibot/components';
 import type {
 	SlotStatus,

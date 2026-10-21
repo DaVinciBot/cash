@@ -1,7 +1,7 @@
 <script lang="ts">
 	import { Button, CodeInput, OverlayBackdrop } from '@davincibot/components';
-	import { startEmailEnrollment, verifyEmailEnrollment } from '$lib/settings';
-	import { StepUpCancelledError, withStepUp } from '$lib/settings';
+	import { startEmailEnrollment, verifyEmailEnrollment } from '#lib/settings/index.js';
+	import { StepUpCancelledError, withStepUp } from '#lib/settings/index.js';
 	import { onMount } from 'svelte';
 
 	interface Props {

@@ -1,10 +1,10 @@
 <script lang="ts">
 	import { Button } from '@davincibot/components';
 	import { resolve } from '$app/paths';
-	import CampusBadge from '$lib/components/cash/CampusBadge.svelte';
-	import HistoryTimeline from '$lib/components/cash/HistoryTimeline.svelte';
-	import ItemStateBadge from '$lib/components/cash/ItemStateBadge.svelte';
-	import { isItemEditableByMember, isItemRefused } from '$lib/types/domain';
+	import CampusBadge from '#lib/components/cash/CampusBadge.svelte';
+	import HistoryTimeline from '#lib/components/cash/HistoryTimeline.svelte';
+	import ItemStateBadge from '#lib/components/cash/ItemStateBadge.svelte';
+	import { isItemEditableByMember, isItemRefused } from '#lib/types/domain.js';
 	import type { PageData } from './$types';
 
 	let { data }: { data: PageData } = $props();

@@ -1,6 +1,6 @@
-import { currentSchoolYear } from '$lib/server/cash';
-import { charts, projectReport, quarterlyReport } from '$lib/server/reports';
-import { periods } from '$lib/server/treasury';
+import { currentSchoolYear } from '#lib/server/cash.js';
+import { charts, projectReport, quarterlyReport } from '#lib/server/reports.js';
+import { periods } from '#lib/server/treasury.js';
 import type { PageServerLoad } from './$types';
 
 // Rapports trimestriels et par projet (TRESO-F-62), graphiques (TRESO-F-50).

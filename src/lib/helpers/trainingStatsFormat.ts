@@ -4,7 +4,7 @@
 // jamais zéro. Un remplissage sans place proposée et une moyenne sans formation
 // ne sont pas des contre-performances, ce sont des mesures qui n'existent pas.
 
-import type { StatsRange } from '$lib/helpers/trainingStatsTypes';
+import type { StatsRange } from '#lib/helpers/trainingStatsTypes.js';
 
 /** Ce que l'on écrit à la place d'un nombre qui n'a pas de sens ici. */
 const UNDEFINED_VALUE = '—';

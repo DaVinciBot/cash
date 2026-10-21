@@ -1,4 +1,4 @@
-import { myItems } from '$lib/server/cash';
+import { myItems } from '#lib/server/cash.js';
 import { error, fail } from '@sveltejs/kit';
 import type { Actions, PageServerLoad } from './$types';
 

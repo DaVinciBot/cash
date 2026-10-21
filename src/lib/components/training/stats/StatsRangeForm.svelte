@@ -3,7 +3,7 @@
 	// La plage vit dans l'URL, donc le formulaire est un simple GET : le
 	// rechargement refait le calcul côté serveur, et le lien obtenu montre à qui
 	// le reçoit exactement ce que l'expéditeur avait sous les yeux.
-	import type { StatsRange } from '$lib/helpers/trainingStatsTypes';
+	import type { StatsRange } from '#lib/helpers/trainingStatsTypes.js';
 
 	interface Props {
 		range: StatsRange;

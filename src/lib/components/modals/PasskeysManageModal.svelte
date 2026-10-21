@@ -1,7 +1,7 @@
 <script lang="ts">
 	import { Button, OverlayBackdrop } from '@davincibot/components';
-	import PasskeyNameModal from '$lib/components/modals/PasskeyNameModal.svelte';
-	import RecoveryCodesModal from '$lib/components/modals/RecoveryCodesModal.svelte';
+	import PasskeyNameModal from '#lib/components/modals/PasskeyNameModal.svelte';
+	import RecoveryCodesModal from '#lib/components/modals/RecoveryCodesModal.svelte';
 	import { formatParisDateTimeShort } from '@davincibot/lib';
 	import {
 		deletePasskey,
@@ -9,8 +9,8 @@
 		registerPasskey,
 		renamePasskey,
 		type PasskeyInfo
-	} from '$lib/settings';
-	import { alertUnlessCancelled, withStepUp } from '$lib/settings';
+	} from '#lib/settings/index.js';
+	import { alertUnlessCancelled, withStepUp } from '#lib/settings/index.js';
 	import { FingerprintPattern, Pencil, Trash } from '@lucide/svelte';
 	import { onMount } from 'svelte';
 

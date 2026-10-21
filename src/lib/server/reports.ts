@@ -4,10 +4,10 @@
 // (finance.read / finance.documents.generate) et `organization_read` /
 // `organization_write` (finance.read / finance.write) tranchent.
 
-import type { InvoiceOperationKind, OfficerGender } from '$lib/documents';
-import { round } from '$lib/numbers';
-import { num } from '$lib/server/coerce';
-import type { DocumentKind } from '$lib/types/domain';
+import type { InvoiceOperationKind, OfficerGender } from '#lib/documents.js';
+import { round } from '#lib/numbers.js';
+import { num } from '#lib/server/coerce.js';
+import type { DocumentKind } from '#lib/types/domain.js';
 import type { Database } from '@davincibot/database-types';
 import type { SupabaseClient } from '@supabase/supabase-js';
 

@@ -11,8 +11,8 @@
 // tables se lisent côte à côte et ne peuvent pas diverger sans que TypeScript
 // le signale.
 
-import type { ActivityKind } from '$lib/types/audit';
-import type { FlowDirection, ItemState, OrderState } from '$lib/types/domain';
+import type { ActivityKind } from '#lib/types/audit.js';
+import type { FlowDirection, ItemState, OrderState } from '#lib/types/domain.js';
 import type { Campus } from '@davincibot/lib';
 import {
 	Ban,

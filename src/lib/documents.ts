@@ -2,7 +2,7 @@
 //
 // Ces constantes ne vivent pas dans `@davincibot/lib` : elles ne servent qu'ici,
 // et les faire transiter par un paquet publié imposerait un cycle de version à
-// chaque libellé retouché. Elles ne vivent pas non plus dans `$lib/server` : le
+// chaque libellé retouché. Elles ne vivent pas non plus dans `#lib/server` : le
 // formulaire d'émission en a besoin dans le navigateur pour peupler son menu.
 
 import type { Database } from '@davincibot/database-types';

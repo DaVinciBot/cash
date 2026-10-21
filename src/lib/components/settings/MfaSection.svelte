@@ -1,9 +1,9 @@
 <script lang="ts">
-	import MfaEnrollModal from '$lib/components/modals/MfaEnrollModal.svelte';
-	import PasskeyNameModal from '$lib/components/modals/PasskeyNameModal.svelte';
-	import PasskeysManageModal from '$lib/components/modals/PasskeysManageModal.svelte';
-	import RecoveryCodesModal from '$lib/components/modals/RecoveryCodesModal.svelte';
-	import TotpEnrollModal from '$lib/components/modals/TotpEnrollModal.svelte';
+	import MfaEnrollModal from '#lib/components/modals/MfaEnrollModal.svelte';
+	import PasskeyNameModal from '#lib/components/modals/PasskeyNameModal.svelte';
+	import PasskeysManageModal from '#lib/components/modals/PasskeysManageModal.svelte';
+	import RecoveryCodesModal from '#lib/components/modals/RecoveryCodesModal.svelte';
+	import TotpEnrollModal from '#lib/components/modals/TotpEnrollModal.svelte';
 	import { Button } from '@davincibot/components';
 	import {
 		disableMfaMethod,
@@ -13,9 +13,9 @@
 		startTotpEnrollment,
 		type MfaState,
 		type TotpEnrollmentInfo
-	} from '$lib/settings';
-	import { registerPasskey } from '$lib/settings';
-	import { alertUnlessCancelled, withStepUp } from '$lib/settings';
+	} from '#lib/settings/index.js';
+	import { registerPasskey } from '#lib/settings/index.js';
+	import { alertUnlessCancelled, withStepUp } from '#lib/settings/index.js';
 	import { FingerprintPattern, KeyRound, Mail, Smartphone } from '@lucide/svelte';
 	import { onMount } from 'svelte';
 

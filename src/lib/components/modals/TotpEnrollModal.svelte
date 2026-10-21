@@ -1,7 +1,7 @@
 <script lang="ts">
 	import { Button, CodeInput, OverlayBackdrop } from '@davincibot/components';
-	import { verifyTotpEnrollment, type TotpEnrollmentInfo } from '$lib/settings';
-	import { StepUpCancelledError, withStepUp } from '$lib/settings';
+	import { verifyTotpEnrollment, type TotpEnrollmentInfo } from '#lib/settings/index.js';
+	import { StepUpCancelledError, withStepUp } from '#lib/settings/index.js';
 	import { Copy } from '@lucide/svelte';
 	import QRCode from 'qrcode';
 	import { onMount } from 'svelte';

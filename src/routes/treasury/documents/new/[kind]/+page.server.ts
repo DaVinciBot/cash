@@ -1,16 +1,16 @@
-import { resolve } from '$app/paths';
 import {
 	INCOMPLETE_DOCUMENT_MESSAGE,
 	isInvoiceOperationKind,
 	isValidSiren,
 	missingDocumentFields
-} from '$lib/documents';
-import { round } from '$lib/numbers';
-import { rejection } from '$lib/server/audit';
-import { decimal, text, textAll } from '$lib/server/form';
-import { missingIssuerFields, organization, type ExpenseLine } from '$lib/server/reports';
-import { flowList, periods } from '$lib/server/treasury';
-import { DOCUMENT_KINDS, documentFollowsFlow, type DocumentKind } from '$lib/types/domain';
+} from '#lib/documents.js';
+import { round } from '#lib/numbers.js';
+import { rejection } from '#lib/server/audit.js';
+import { decimal, text, textAll } from '#lib/server/form.js';
+import { missingIssuerFields, organization, type ExpenseLine } from '#lib/server/reports.js';
+import { flowList, periods } from '#lib/server/treasury.js';
+import { DOCUMENT_KINDS, documentFollowsFlow, type DocumentKind } from '#lib/types/domain.js';
+import { resolve } from '$app/paths';
 import { error, fail, redirect } from '@sveltejs/kit';
 import type { Actions, PageServerLoad } from './$types';
 

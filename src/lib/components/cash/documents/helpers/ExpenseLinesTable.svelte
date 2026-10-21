@@ -4,7 +4,7 @@
 	//
 	// La date de la dépense n'est pas décorative : c'est elle qui rattache le
 	// justificatif à la note, et elle diffère toujours de la date d'émission.
-	import type { ExpenseLine } from '$lib/server/reports';
+	import type { ExpenseLine } from '#lib/server/reports.js';
 
 	interface Props {
 		lines: ExpenseLine[];

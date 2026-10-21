@@ -8,9 +8,9 @@
 	import SignatureBlock from './helpers/SignatureBlock.svelte';
 	import SubjectBlock from './helpers/SubjectBlock.svelte';
 	import TotalsBlock from './helpers/TotalsBlock.svelte';
-	import { round } from '$lib/numbers';
-	import { officerTitle } from '$lib/documents';
-	import type { GeneratedDocument } from '$lib/server/reports';
+	import { round } from '#lib/numbers.js';
+	import { officerTitle } from '#lib/documents.js';
+	import type { GeneratedDocument } from '#lib/server/reports.js';
 
 	interface Props {
 		doc: GeneratedDocument;

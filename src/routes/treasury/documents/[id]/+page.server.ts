@@ -1,4 +1,4 @@
-import { documentById } from '$lib/server/reports';
+import { documentById } from '#lib/server/reports.js';
 import { error } from '@sveltejs/kit';
 import type { PageServerLoad } from './$types';
 

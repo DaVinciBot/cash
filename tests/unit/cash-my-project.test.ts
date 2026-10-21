@@ -1,11 +1,11 @@
-import type { BudgetPressure, ProjectItem } from '$lib/server/cash';
+import type { BudgetPressure, ProjectItem } from '#lib/server/cash.js';
 import {
 	attachProjectItems,
 	budgetSubtree,
 	mergeProjectOverviews
-} from '$lib/server/projectOverview';
-import type { ProjectReportRow } from '$lib/server/reports';
-import type { BudgetNode } from '$lib/server/treasury';
+} from '#lib/server/projectOverview.js';
+import type { ProjectReportRow } from '#lib/server/reports.js';
+import type { BudgetNode } from '#lib/server/treasury.js';
 import { describe, expect, it } from 'vitest';
 
 // Suivi projet (CMD-F-50, TRESO-F-62). Les deux permissions de lecture

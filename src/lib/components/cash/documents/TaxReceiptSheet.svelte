@@ -5,9 +5,9 @@
 	import DocumentSheet from './DocumentSheet.svelte';
 	import SignatureBlock from './helpers/SignatureBlock.svelte';
 	import SubjectBlock from './helpers/SubjectBlock.svelte';
-	import { officerTitle } from '$lib/documents';
-	import { amountInWords } from '$lib/helpers/amountInWords';
-	import type { GeneratedDocument } from '$lib/server/reports';
+	import { officerTitle } from '#lib/documents.js';
+	import { amountInWords } from '#lib/helpers/amountInWords.js';
+	import type { GeneratedDocument } from '#lib/server/reports.js';
 
 	interface Props {
 		doc: GeneratedDocument;

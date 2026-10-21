@@ -1,7 +1,7 @@
 <script lang="ts">
 	// Tableau des lignes — colonnes et ordre des modèles : la quantité vient en
 	// premier, la désignation ensuite.
-	import type { DocumentLine } from '$lib/server/reports';
+	import type { DocumentLine } from '#lib/server/reports.js';
 
 	interface Props {
 		lines: DocumentLine[];

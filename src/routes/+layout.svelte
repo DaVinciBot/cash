@@ -8,14 +8,14 @@
 		parseSettingsCategory,
 		settingsModal,
 		type SettingsModalState
-	} from '$lib/settings';
+	} from '#lib/settings/index.js';
 	import { hasAnyPermission, userdata } from '@davincibot/lib';
 	import { onDestroy, untrack, type Snippet } from 'svelte';
 	import type { PageData } from './$types';
 	import { Button, DevRbacPanel, SideBar } from '@davincibot/components';
 	import { Menu, Plus } from '@lucide/svelte';
-	import SettingsModal from '$lib/components/settings/SettingsModal.svelte';
-	import UserBadge from '$lib/components/share/UserBadge.svelte';
+	import SettingsModal from '#lib/components/settings/SettingsModal.svelte';
+	import UserBadge from '#lib/components/share/UserBadge.svelte';
 	import '../app.css';
 
 	let { data, children }: { data: PageData; children?: Snippet } = $props();

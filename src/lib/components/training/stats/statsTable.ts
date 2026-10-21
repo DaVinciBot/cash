@@ -6,7 +6,7 @@
 // dans chaque composant les aurait fait diverger dès le premier ajustement
 // d'espacement.
 
-import type { Trend } from '$lib/helpers/trainingStatsHighlight';
+import type { Trend } from '#lib/helpers/trainingStatsHighlight.js';
 
 export const TABLE = 'w-full min-w-[36rem] border-collapse text-sm';
 

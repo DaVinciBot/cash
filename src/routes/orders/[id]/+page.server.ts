@@ -1,8 +1,8 @@
-import { entityHistory, rejection } from '$lib/server/audit';
-import { decimal, text, textAll } from '$lib/server/form';
-import { budgetLeaves, campusAddress, orderDetail } from '$lib/server/orders';
-import { accounts } from '$lib/server/treasury';
-import { SHIPPING_ALLOCATIONS, type ShippingAllocation } from '$lib/types/domain';
+import { entityHistory, rejection } from '#lib/server/audit.js';
+import { decimal, text, textAll } from '#lib/server/form.js';
+import { budgetLeaves, campusAddress, orderDetail } from '#lib/server/orders.js';
+import { accounts } from '#lib/server/treasury.js';
+import { SHIPPING_ALLOCATIONS, type ShippingAllocation } from '#lib/types/domain.js';
 import { error, fail } from '@sveltejs/kit';
 import type { Actions, PageServerLoad } from './$types';
 

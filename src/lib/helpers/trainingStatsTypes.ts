@@ -1,6 +1,6 @@
 // Modèle de vue des statistiques de formation.
 //
-// Ces types vivent hors de `$lib/server` parce que les composants les
+// Ces types vivent hors de `#lib/server` parce que les composants les
 // consomment : le calcul reste au serveur, la forme de son résultat est
 // publique. Sans cette séparation, un simple `import type` dans un composant
 // tirerait un module serveur dans le graphe client.

@@ -1,7 +1,7 @@
-import { rejection } from '$lib/server/audit';
-import { currentSchoolYear } from '$lib/server/cash';
-import { text } from '$lib/server/form';
-import { budgetTree, projectList } from '$lib/server/treasury';
+import { rejection } from '#lib/server/audit.js';
+import { currentSchoolYear } from '#lib/server/cash.js';
+import { text } from '#lib/server/form.js';
+import { budgetTree, projectList } from '#lib/server/treasury.js';
 import { CAMPUS_BADGES, type Campus } from '@davincibot/lib';
 import { fail } from '@sveltejs/kit';
 import type { Actions, PageServerLoad } from './$types';

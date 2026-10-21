@@ -14,7 +14,7 @@ vi.mock('$app/navigation', () => ({
 	replaceState: vi.fn()
 }));
 
-import SettingsModal from '$lib/components/settings/SettingsModal.svelte';
+import SettingsModal from '#lib/components/settings/SettingsModal.svelte';
 import type { UserProfile } from '@davincibot/lib';
 import { userdata } from '@davincibot/lib';
 import Layout from '../../src/routes/+layout.svelte';

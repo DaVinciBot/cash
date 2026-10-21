@@ -1,4 +1,4 @@
-import type { SettingsCategory } from '$lib/settings/categories';
+import type { SettingsCategory } from '#lib/settings/categories.js';
 import { writable, type Writable } from 'svelte/store';
 
 export interface SettingsModalState {

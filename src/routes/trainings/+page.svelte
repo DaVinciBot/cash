@@ -1,28 +1,28 @@
 <script lang="ts">
 	import { Button } from '@davincibot/components';
 	import { resolve } from '$app/paths';
-	import StateBadge from '$lib/components/cash/StateBadge.svelte';
-	import CrudForm from '$lib/components/modals/CrudForm.svelte';
-	import AdminHeader from '$lib/components/training/admin/AdminHeader.svelte';
-	import AdminSlotSection from '$lib/components/training/admin/AdminSlotSection.svelte';
-	import AdminTrainingSection from '$lib/components/training/admin/AdminTrainingSection.svelte';
+	import StateBadge from '#lib/components/cash/StateBadge.svelte';
+	import CrudForm from '#lib/components/modals/CrudForm.svelte';
+	import AdminHeader from '#lib/components/training/admin/AdminHeader.svelte';
+	import AdminSlotSection from '#lib/components/training/admin/AdminSlotSection.svelte';
+	import AdminTrainingSection from '#lib/components/training/admin/AdminTrainingSection.svelte';
 	import {
 		buildSlotFields,
 		buildSummaryFields,
 		buildTrainingFields,
 		type ProfileOption,
 		type SlotFieldsConfig
-	} from '$lib/helpers/trainingForms';
-	import { categoryOptions, statusOptions } from '$lib/helpers/trainingOptions';
+	} from '#lib/helpers/trainingForms.js';
+	import { categoryOptions, statusOptions } from '#lib/helpers/trainingOptions.js';
 	import {
 		createSlotTableItems,
 		createTrainingTableItems,
 		findTrainingName,
 		formatSlotDate
-	} from '$lib/helpers/trainingTables';
+	} from '#lib/helpers/trainingTables.js';
 	import type { TableCell, TableRow } from '@davincibot/components';
 	import type { StateBadge as StateBadgeData } from '@davincibot/lib';
-	import type { CrudField } from '$lib/types/crud';
+	import type { CrudField } from '#lib/types/crud.js';
 	import {
 		createTraining,
 		createTrainingSlot,

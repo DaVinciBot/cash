@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest';
 
-import { resolveCampus } from '$lib/server/cash';
+import { resolveCampus } from '#lib/server/cash.js';
 import {
 	cashErrorMessage,
 	isItemDeletableByMember,
@@ -8,7 +8,7 @@ import {
 	isItemRefused,
 	ITEM_STATE_BADGES,
 	ITEM_STATES
-} from '$lib/types/domain';
+} from '#lib/types/domain.js';
 import { CAMPUS_BADGES } from '@davincibot/lib';
 
 describe('résolution du campus de destination (CMD-F-43 / CMD-F-46)', () => {

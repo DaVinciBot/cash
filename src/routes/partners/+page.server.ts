@@ -1,7 +1,7 @@
-import { rejection } from '$lib/server/audit';
-import { currentSchoolYear } from '$lib/server/cash';
-import { decimal, text } from '$lib/server/form';
-import { accounts, parseDomains, partnerships } from '$lib/server/treasury';
+import { rejection } from '#lib/server/audit.js';
+import { currentSchoolYear } from '#lib/server/cash.js';
+import { decimal, text } from '#lib/server/form.js';
+import { accounts, parseDomains, partnerships } from '#lib/server/treasury.js';
 import { fail } from '@sveltejs/kit';
 import type { Actions, PageServerLoad } from './$types';
 

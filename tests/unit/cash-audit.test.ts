@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest';
 
-import { orderIdsFrom, type SearchHit } from '$lib/server/audit';
+import { orderIdsFrom, type SearchHit } from '#lib/server/audit.js';
 import {
 	ACTIVITY_BADGES,
 	ACTIVITY_KINDS,
@@ -12,7 +12,7 @@ import {
 	isOpaqueField,
 	summarizeActivity,
 	type ActivityEntry
-} from '$lib/types/audit';
+} from '#lib/types/audit.js';
 
 function entry(over: Partial<ActivityEntry> = {}): ActivityEntry {
 	return {
