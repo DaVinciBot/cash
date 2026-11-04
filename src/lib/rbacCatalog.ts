@@ -72,7 +72,10 @@ export const GLOBAL_PERMISSION_LABELS: Record<GlobalPermission, string> = {
 	// audit.* / infra.*
 	'audit.logs.read': 'Consulter les journaux',
 	'audit.events.export': 'Exporter les journaux',
-	'infra.environments.access': 'Accéder aux environnements de pré-production'
+	'infra.environments.access': 'Accéder aux environnements de pré-production',
+	// absences.*
+	'absences.requests.manage.self': "Demander une excuse d'absence",
+	'absences.requests.review': "Traiter les demandes d'excuse"
 };
 
 /**
@@ -120,6 +123,10 @@ const PERMISSION_GROUPS: { title: string; permissions: GlobalPermission[] }[] = 
 			'training.summary.discord.send',
 			'training.story.discord.send'
 		]
+	},
+	{
+		title: 'Absences',
+		permissions: ['absences.requests.manage.self', 'absences.requests.review']
 	},
 	{
 		title: 'Commandes',

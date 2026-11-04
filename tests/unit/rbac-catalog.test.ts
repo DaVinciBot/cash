@@ -64,3 +64,15 @@ describe('catalogue RBAC du panneau admin', () => {
 		}
 	});
 });
+
+// Les demandes d'excuse forment leur propre domaine : rangées dans « Autres »,
+// le Secrétaire chercherait la permission de traitement sans la trouver.
+describe("permissions des demandes d'excuse", () => {
+	it('sont regroupées dans une section Absences', () => {
+		const absences = buildPermissionCategories()['Absences'] ?? [];
+		expect(absences.map((entry) => entry.value)).toEqual([
+			'absences.requests.manage.self',
+			'absences.requests.review'
+		]);
+	});
+});
