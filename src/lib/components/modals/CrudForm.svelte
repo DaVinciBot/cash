@@ -20,6 +20,7 @@
 		submitLabel?: string;
 		submitLoadingLabel?: string;
 		submitting?: boolean;
+		error?: string | null;
 		onSubmit?: SubmitEventHandler;
 		onClose?: CloseEventHandler;
 	}
@@ -36,6 +37,7 @@
 		submitLabel = title,
 		submitLoadingLabel = 'Chargement...',
 		submitting = false,
+		error = null,
 		onSubmit = noop,
 		onClose = noop
 	}: Props = $props();
@@ -130,7 +132,7 @@
 				<form action="#">
 					<div class="mb-4 grid gap-4 sm:grid-cols-2">
 						{#each fields as field (fieldId(field))}
-							<div class={field.wide ? 'col-span-2' : ''}>
+							<div class={[field.wide && 'col-span-2', field.error && 'field-invalid']}>
 								{#if field.type === 'document' || field.type === 'img'}
 									<p
 										class="mb-2 block text-sm font-medium text-white"
@@ -595,9 +597,20 @@
 										value={inputValue(field.value)}
 									/>
 								{/if}
+								{#if field.error}
+									<p class="mt-1.5 text-xs text-red-300" role="alert">{field.error}</p>
+								{/if}
 							</div>
 						{/each}
 					</div>
+					{#if error}
+						<p
+							class="mb-4 rounded-xl bg-red-500/15 px-4 py-3 text-sm text-red-300 ring-1 ring-red-500/30"
+							role="alert"
+						>
+							{error}
+						</p>
+					{/if}
 					<Button
 						class={submitting ? 'cursor-not-allowed opacity-60' : ''}
 						disabled={submitting}
@@ -629,3 +642,9 @@
 		</div>
 	</div>
 </div>
+
+<style>
+	.field-invalid :is(input, select, textarea) {
+		border-color: var(--color-red-400);
+	}
+</style>

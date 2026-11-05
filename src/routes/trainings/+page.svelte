@@ -47,6 +47,13 @@
 		return typeof val === 'string' ? val : '';
 	}
 
+	function applyFieldErrors(fields: CrudField[], errors: Record<string, string>) {
+		for (const field of fields) {
+			field.error = field.id ? errors[field.id] : undefined;
+		}
+		return Object.keys(errors).length > 0;
+	}
+
 	let trainings: TrainingListItem[] = $state([]);
 	let slots: TrainingSlotListItem[] = $state([]);
 	let profiles: ProfileOption[] = [];
@@ -297,8 +304,15 @@ DVBisous ! :robot:`;
 		const description = getFormString(formData, 'description').trim() || null;
 		const prerequisites = getFormString(formData, 'prerequisites').trim() || null;
 
-		if (!name || !category) {
-			formError = 'Nom et catégorie obligatoires.';
+		formError = null;
+		const trainingErrors: Record<string, string> = {};
+		if (!name) {
+			trainingErrors.name = 'Le nom est obligatoire.';
+		}
+		if (!category) {
+			trainingErrors.category = 'La catégorie est obligatoire.';
+		}
+		if (applyFieldErrors(trainingFields, trainingErrors)) {
 			return;
 		}
 
@@ -364,8 +378,24 @@ DVBisous ! :robot:`;
 		const baseDescription = baseTraining?.description ?? null;
 		const basePrerequisites = baseTraining?.prerequisites ?? null;
 
-		if (!trainingId || !startIso || !duration || !trainerId) {
-			formError = 'Formation, formateur·ice, date et durée sont obligatoires.';
+		formError = null;
+		const slotErrors: Record<string, string> = {};
+		if (!trainingId) {
+			slotErrors.training_id = 'La formation est obligatoire.';
+		}
+		if (!trainerId) {
+			slotErrors.trainer_id = 'Le ou la formateur·ice est obligatoire.';
+		}
+		if (!startIso) {
+			slotErrors.start = 'La date de début est obligatoire.';
+		}
+		if (!duration || duration <= 0) {
+			slotErrors.duration_hours = 'La durée est obligatoire.';
+		}
+		if (!statusOptions.some((option) => option.value === statusStr)) {
+			slotErrors.status = 'Le statut est obligatoire.';
+		}
+		if (applyFieldErrors(slotFields, slotErrors)) {
 			return;
 		}
 
@@ -643,12 +673,6 @@ DVBisous ! :robot:`;
 		upcomingCount={upcomingSlots.length}
 	/>
 
-	{#if formError}
-		<p class="mb-4 rounded-xl bg-red-500/15 px-4 py-3 text-sm text-red-300 ring-1 ring-red-500/30">
-			{formError}
-		</p>
-	{/if}
-
 	<!-- La synthèse part d'abord sur le webhook de test, et n'atteint le salon
 	     réel qu'après confirmation : un ping de masse ne se rattrape pas. -->
 	<div class="border-rule bg-blue-gray/15 mb-8 rounded-2xl border p-4 sm:p-5">
@@ -723,6 +747,7 @@ DVBisous ! :robot:`;
 	<CrudForm
 		id="SlotModal"
 		action={editingSlot ? 'Modifier' : 'Ajouter'}
+		error={formError}
 		fields={slotFields}
 		onClose={closeSlotModal}
 		onSubmit={handleSlotSubmit}
@@ -735,6 +760,7 @@ DVBisous ! :robot:`;
 	<CrudForm
 		id="TrainingModal"
 		action={editingTraining ? 'Modifier' : 'Ajouter'}
+		error={formError}
 		fields={trainingFields}
 		onClose={closeTrainingModal}
 		onSubmit={handleTrainingSubmit}

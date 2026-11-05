@@ -42,4 +42,5 @@ export interface CrudField {
 	completion?: AutocompleteCompletion[];
 	image?: string | null;
 	checked?: boolean;
+	error?: string;
 }
