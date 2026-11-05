@@ -109,21 +109,26 @@
 			class="border-rule bg-blue-gray/15 mb-6 flex items-start gap-3 rounded-lg border px-4 py-3"
 		>
 			<pre class="text-dark-light-blue flex-1 text-sm whitespace-pre-wrap">{data.address}</pre>
-			{#if copied}
-				<span class="text-xs text-emerald-300">Adresse copiée</span>
-			{/if}
 			<button
-				class="text-dark-light-blue hover:text-light-blue shrink-0 cursor-pointer"
+				class="hover:text-light-blue relative size-4 shrink-0 cursor-pointer transition-colors {copied
+					? 'text-emerald-300'
+					: 'text-dark-light-blue'}"
 				aria-label="Copier l'adresse de livraison"
 				onclick={copyAddress}
 				title="Copier l'adresse de livraison"
 				type="button"
 			>
-				{#if copied}
-					<Check class="size-4" />
-				{:else}
-					<Copy class="size-4" />
-				{/if}
+				<!-- Les deux icônes restent superposées ; on bascule de l'une à l'autre. -->
+				<Copy
+					class="absolute inset-0 size-4 transition-all duration-300 ease-out {copied
+						? 'scale-50 rotate-90 opacity-0'
+						: 'scale-100 rotate-0 opacity-100'}"
+				/>
+				<Check
+					class="absolute inset-0 size-4 transition-all duration-300 ease-out {copied
+						? 'scale-100 rotate-0 opacity-100'
+						: 'scale-50 -rotate-90 opacity-0'}"
+				/>
 			</button>
 		</div>
 	{/if}
