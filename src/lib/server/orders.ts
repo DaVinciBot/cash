@@ -349,6 +349,90 @@ export async function orderList(supabase: Client): Promise<OrderSummary[]> {
 		});
 }
 
+export interface DraftOrder {
+	id: number;
+	schoolYearId: number;
+	campus: Campus | null;
+	itemCount: number;
+	amountTtc: number;
+}
+
+/**
+ * Commandes en attente du trésorier : les seules qui acceptent encore un item
+ * de la file de regroupement.
+ */
+export async function draftOrders(supabase: Client): Promise<DraftOrder[]> {
+	const { data: orders } = await supabase
+		.schema('cash')
+		.from('orders')
+		.select('id, school_year_id, amount_ttc')
+		.eq('state', 'pending_treso')
+		.order('id', { ascending: false });
+
+	if (!orders || orders.length === 0) {
+		return [];
+	}
+
+	const { data: items } = await supabase
+		.schema('cash')
+		.from('items')
+		.select('order_id, campus')
+		.in(
+			'order_id',
+			orders.map((o) => o.id)
+		);
+
+	const stats = new Map<number, { count: number; campus: Campus }>();
+	for (const i of items ?? []) {
+		if (i.order_id === null) {
+			continue;
+		}
+		const s = stats.get(i.order_id) ?? { count: 0, campus: i.campus };
+		s.count += 1;
+		stats.set(i.order_id, s);
+	}
+
+	return orders.map((o) => ({
+		id: o.id,
+		schoolYearId: o.school_year_id,
+		campus: stats.get(o.id)?.campus ?? null,
+		itemCount: stats.get(o.id)?.count ?? 0,
+		amountTtc: o.amount_ttc
+	}));
+}
+
+/**
+ * Imputation par défaut des items qui viennent d'entrer dans une commande
+ * (CMD-F-18). Une feuille introuvable n'est pas une erreur :
+ * `check_order_imputation` empêchera le passage tant que le trésorier n'aura pas
+ * tranché lui-même.
+ */
+export async function allocateDefaultLeaves(
+	supabase: Client,
+	schoolYearId: number,
+	items: { id: number; project_id: number; total_ttc: number | null }[]
+): Promise<void> {
+	const { nodes, leaves } = await budgetLeaves(supabase, schoolYearId);
+	const leafIds = new Set(leaves.map((l) => l.id));
+	const { data: projects } = await supabase
+		.from('projects')
+		.select('id, budget_id')
+		.in('id', [...new Set(items.map((i) => i.project_id))]);
+	const budgetOfProject = new Map((projects ?? []).map((p) => [p.id, p.budget_id]));
+
+	for (const item of items) {
+		const leaf = defaultLeafFor(nodes, leafIds, budgetOfProject.get(item.project_id) ?? null);
+		if (leaf === null) {
+			continue;
+		}
+		await supabase.schema('cash').rpc('set_item_allocations', {
+			p_item_id: item.id,
+			p_budget_ids: [leaf],
+			p_amounts: [item.total_ttc ?? 0]
+		});
+	}
+}
+
 export interface OrderItem extends BundlableItem {
 	state: Database['cash']['Tables']['items']['Row']['state'];
 	allocations: { budgetId: number; amountTtc: number }[];

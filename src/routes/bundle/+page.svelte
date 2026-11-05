@@ -28,6 +28,16 @@
 	const chosenCampuses = $derived(new SvelteSet(chosen.map((i) => i.campus)));
 	const campusConflict = $derived(chosenCampuses.size > 1);
 
+	// Commandes qui acceptent encore la sélection : en attente du trésorier, et
+	// vers le même campus (CMD-F-45). Le campus d'une commande est celui de ses items.
+	const drafts = $derived(
+		data.drafts.filter(
+			(d) => d.campus === null || chosenCampuses.size === 0 || chosenCampuses.has(d.campus)
+		)
+	);
+	let target = $state('');
+	const targetValid = $derived(drafts.some((d) => String(d.id) === target));
+
 	// Groupes construits en tableau plutôt qu'en Map : la valeur est recalculée
 	// entièrement à chaque dépendance, donc aucune réactivité de collection n'est
 	// en jeu — et `svelte/prefer-svelte-reactivity` ne distingue pas les deux cas.
@@ -129,6 +139,32 @@
 			</span>
 
 			<div class="ml-auto flex flex-wrap items-center gap-2">
+				{#if data.drafts.length > 0}
+					<form class="flex items-center gap-2" action="?/add" method="POST" use:enhance>
+						{#each chosen as item (item.id)}
+							<input name="id" type="hidden" value={item.id} />
+						{/each}
+						<select
+							name="order"
+							class="border-rule-strong bg-dark-blue/60 rounded-lg border px-2 py-1 text-sm text-white"
+							aria-label="Commande à compléter"
+							bind:value={target}
+						>
+							<option value="">Commande à compléter…</option>
+							{#each drafts as draft (draft.id)}
+								<option value={String(draft.id)}>
+									Commande #{draft.id} · {draft.itemCount} item(s) · {euro.format(draft.amountTtc)}
+								</option>
+							{/each}
+						</select>
+						<Button
+							disabled={selected.size === 0 || campusConflict || !targetValid}
+							size="sm"
+							type="submit"
+							variant="secondary">Ajouter</Button
+						>
+					</form>
+				{/if}
 				<form action="?/create" method="POST" use:enhance>
 					{#each chosen as item (item.id)}
 						<input name="id" type="hidden" value={item.id} />

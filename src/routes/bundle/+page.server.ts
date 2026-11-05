@@ -1,7 +1,7 @@
 import { rejection } from '#lib/server/audit.js';
 import { currentSchoolYear } from '#lib/server/cash.js';
 import { text, textAll } from '#lib/server/form.js';
-import { budgetLeaves, bundlingQueue, defaultLeafFor } from '#lib/server/orders.js';
+import { allocateDefaultLeaves, bundlingQueue, draftOrders } from '#lib/server/orders.js';
 import { refusalReasonError } from '#lib/types/domain.js';
 import { resolve } from '$app/paths';
 import { error, fail, redirect } from '@sveltejs/kit';
@@ -22,16 +22,15 @@ export const load: PageServerLoad = async ({ locals, depends }) => {
 	const items = await bundlingQueue(locals.supabase);
 	const year = await currentSchoolYear(locals.supabase);
 
-	return { items, schoolYearLabel: year?.label ?? null };
+	return { items, drafts: await draftOrders(locals.supabase), schoolYearLabel: year?.label ?? null };
 };
 
 export const actions: Actions = {
 	/**
 	 * Constitution d'une commande à partir de la sélection.
 	 *
-	 * L'ordre des écritures suit les contraintes de la base : la commande
-	 * d'abord, puis le rattachement des items — `item_order_link` interdit un
-	 * item `bundled` sans commande —, puis l'imputation par défaut.
+	 * `create_order` crée la commande et y rattache ses items d'un seul tenant ;
+	 * l'imputation par défaut vient ensuite.
 	 */
 	create: async ({ locals, request }) => {
 		const { user } = await locals.safeGetSession();
@@ -57,9 +56,8 @@ export const actions: Actions = {
 			return fail(400, { message: 'Ces items ne sont plus disponibles au regroupement.' });
 		}
 
-		// Les deux invariants sont tenus par des triggers, mais un DVB01 tombé au
-		// milieu d'une commande déjà créée laisserait une coquille vide derrière
-		// lui : on préfère refuser avant d'écrire quoi que ce soit.
+		// Les deux invariants sont tenus par la base ; on refuse ici d'abord pour
+		// donner un message plus précis que celui du trigger.
 		const campuses = new Set(chosen.map((i) => i.campus));
 		if (campuses.size > 1) {
 			return fail(400, {
@@ -79,12 +77,11 @@ export const actions: Actions = {
 			return fail(400, { message: 'Ces items ne sont plus disponibles au regroupement.' });
 		}
 
-		const { data: order, error: createError } = await locals.supabase
+		// Commande et rattachement des items dans une seule transaction : une
+		// commande n'existe jamais sans item.
+		const { data: orderId, error: createError } = await locals.supabase
 			.schema('cash')
-			.from('orders')
-			.insert({ school_year_id: schoolYearId })
-			.select('id')
-			.single();
+			.rpc('create_order', { p_item_ids: chosen.map((i) => i.id) });
 
 		if (createError) {
 			return fail(400, {
@@ -99,58 +96,65 @@ export const actions: Actions = {
 			});
 		}
 
-		const { error: attachError } = await locals.supabase
+		await allocateDefaultLeaves(locals.supabase, schoolYearId, chosen);
+
+		// `resolve` et non un chemin nu : l'app est servie sous /admin, et un
+		// Location sans ce préfixe enverrait le navigateur sur le site public.
+		redirect(303, resolve('/orders/[id]', { id: String(orderId) }));
+	},
+
+	/** Ajout d'items de la file à une commande encore en attente du trésorier. */
+	add: async ({ locals, request }) => {
+		const { user } = await locals.safeGetSession();
+		if (!user?.id) {
+			error(401, 'Session expirée.');
+		}
+
+		const form = await request.formData();
+		const ids = selectedIds(form);
+		const targetId = Number(text(form, 'order'));
+		if (ids.length === 0) {
+			return fail(400, { message: 'Aucun item sélectionné.' });
+		}
+		if (!Number.isSafeInteger(targetId) || targetId <= 0) {
+			return fail(400, { message: 'Choisissez la commande à compléter.' });
+		}
+
+		const { data: chosen, error: readError } = await locals.supabase
 			.schema('cash')
 			.from('items')
-			.update({ order_id: order.id, state: 'bundled' })
-			.in(
-				'id',
-				chosen.map((i) => i.id)
-			)
-			.eq('state', 'pending_bundled');
+			.select('id, project_id, total_ttc, school_year_id')
+			.in('id', ids)
+			.eq('state', 'pending_bundled')
+			.is('order_id', null);
 
-		if (attachError) {
-			// La commande vide n'a plus de raison d'être ; sa suppression est sans
-			// effet de bord, aucun item ne la référence.
-			await locals.supabase.schema('cash').from('orders').delete().eq('id', order.id);
+		if (readError || chosen.length === 0) {
+			return fail(400, { message: 'Ces items ne sont plus disponibles au regroupement.' });
+		}
+
+		const { error: addError } = await locals.supabase
+			.schema('cash')
+			.rpc('add_items_to_order', { p_order_id: targetId, p_item_ids: chosen.map((i) => i.id) });
+
+		if (addError) {
 			return fail(400, {
 				message: await rejection(
 					locals.supabase,
-					attachError,
-					"Ces items n'ont pas pu être regroupés.",
+					addError,
+					"Ces items n'ont pas pu être ajoutés à la commande.",
 					{
-						entityType: 'item'
+						entityType: 'order'
 					}
 				)
 			});
 		}
 
-		// Imputation par défaut (CMD-F-18). Une feuille introuvable n'est pas une
-		// erreur : `check_order_imputation` empêchera le passage tant que le
-		// trésorier n'aura pas tranché lui-même.
-		const { nodes, leaves } = await budgetLeaves(locals.supabase, schoolYearId);
-		const leafIds = new Set(leaves.map((l) => l.id));
-		const { data: projects } = await locals.supabase
-			.from('projects')
-			.select('id, budget_id')
-			.in('id', [...new Set(chosen.map((i) => i.project_id))]);
-		const budgetOfProject = new Map((projects ?? []).map((p) => [p.id, p.budget_id]));
-
-		for (const item of chosen) {
-			const leaf = defaultLeafFor(nodes, leafIds, budgetOfProject.get(item.project_id) ?? null);
-			if (leaf === null) {
-				continue;
-			}
-			await locals.supabase.schema('cash').rpc('set_item_allocations', {
-				p_item_id: item.id,
-				p_budget_ids: [leaf],
-				p_amounts: [item.total_ttc ?? 0]
-			});
+		const schoolYearId = chosen[0]?.school_year_id;
+		if (schoolYearId !== undefined) {
+			await allocateDefaultLeaves(locals.supabase, schoolYearId, chosen);
 		}
 
-		// `resolve` et non un chemin nu : l'app est servie sous /admin, et un
-		// Location sans ce préfixe enverrait le navigateur sur le site public.
-		redirect(303, resolve('/orders/[id]', { id: String(order.id) }));
+		redirect(303, resolve('/orders/[id]', { id: String(targetId) }));
 	},
 
 	/** Veto du trésorier depuis la file des items validés (CMD-F-29). */

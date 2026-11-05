@@ -416,10 +416,17 @@
 							</form>
 						{/if}
 						{#if item.state === 'bundled' && order.state === 'pending_treso'}
-							<form action="?/detach" method="POST" use:enhance>
-								<input name="item" type="hidden" value={item.id} />
-								<Button size="sm" type="submit" variant="secondary">Retirer</Button>
-							</form>
+							<!-- Le dernier item ne se retire pas : la base le refuse (DVB09). -->
+							{#if order.items.length > 1}
+								<form action="?/detach" method="POST" use:enhance>
+									<input name="item" type="hidden" value={item.id} />
+									<Button size="sm" type="submit" variant="secondary">Retirer</Button>
+								</form>
+							{:else}
+								<span class="text-dark-light-blue/70 text-xs">
+									Dernier item : annulez la commande pour le libérer.
+								</span>
+							{/if}
 						{/if}
 					</div>
 				</div>
