@@ -2,7 +2,6 @@
 	import { Button, FilterChip } from '@davincibot/components';
 	import { enhance } from '$app/forms';
 	import { resolve } from '$app/paths';
-	import CampusBadge from '#lib/components/cash/CampusBadge.svelte';
 	import { CAMPUS_BADGES, type Campus } from '@davincibot/lib';
 	import { ITEM_TAGS, type ItemTag } from '#lib/types/domain.js';
 	import { untrack } from 'svelte';
@@ -54,12 +53,13 @@
 
 	const project = $derived(data.projects.find((p) => p.id === projectId) ?? null);
 
-	// CMD-F-46 : la question n'est posée que si elle se pose. Quand le projet et le
-	// profil concordent — ou que l'un des deux seulement porte un campus — la
-	// destination se déduit et le membre n'a rien à trancher.
+	// CMD-F-46 : la question n'est obligatoire que si elle se pose. Quand le projet et
+	// le profil concordent — ou que l'un des deux seulement porte un campus — la
+	// destination se déduit et sert de valeur par défaut, mais le membre peut
+	// toujours la changer.
 	const needsCampusChoice = $derived(project?.needsChoice ?? true);
 	const effectiveCampus = $derived<Campus | null>(
-		needsCampusChoice ? chosenCampus || null : (project?.campus ?? null)
+		chosenCampus || (needsCampusChoice ? null : (project?.campus ?? null))
 	);
 
 	/**
@@ -172,23 +172,28 @@
 					<span class="text-dark-light-blue mb-1 block text-sm font-medium"
 						>Campus de livraison</span
 					>
+					<!--
+						CMD-F-46 : en cas de divergence, la question va à la personne qui demande à
+						se faire livrer et l'item ne peut pas être créé tant qu'elle n'a pas été
+						tranchée. Sinon le campus déduit est présélectionné, mais reste modifiable.
+					-->
+					<select
+						name="campus"
+						class="bg-dark-blue/60 w-full rounded-lg border p-2.5 text-white {needsCampusChoice
+							? 'border-amber-500/60'
+							: 'border-rule-strong'}"
+						onchange={(e) => {
+							chosenCampus = e.currentTarget.value as Campus | '';
+						}}
+						required
+						value={effectiveCampus ?? ''}
+					>
+						<option disabled value="">À choisir…</option>
+						{#each Object.entries(CAMPUS_BADGES) as [value, badge] (value)}
+							<option {value}>{badge.label}</option>
+						{/each}
+					</select>
 					{#if needsCampusChoice}
-						<!--
-							CMD-F-46 : la divergence n'est pas arbitrée par une règle. La question va à la
-							personne qui demande à se faire livrer. L'item ne peut pas être créé tant qu'elle
-							n'a pas été tranchée.
-						-->
-						<select
-							name="campus"
-							class="bg-dark-blue/60 w-full rounded-lg border border-amber-500/60 p-2.5 text-white"
-							required
-							bind:value={chosenCampus}
-						>
-							<option disabled value="">À choisir…</option>
-							{#each Object.entries(CAMPUS_BADGES) as [value, badge] (value)}
-								<option {value}>{badge.label}</option>
-							{/each}
-						</select>
 						<p class="mt-1 text-xs text-amber-300">
 							{#if project?.diverges}
 								Votre campus et celui du projet diffèrent : indiquez où vous voulez être livré.
@@ -196,11 +201,6 @@
 								Ni le projet ni votre profil ne portent de campus : indiquez la destination.
 							{/if}
 						</p>
-					{:else if effectiveCampus}
-						<div class="flex h-[42px] items-center">
-							<CampusBadge campus={effectiveCampus} />
-						</div>
-						<input name="campus" type="hidden" value={effectiveCampus} />
 					{/if}
 				</div>
 			</div>
@@ -342,7 +342,7 @@
 					<span class="text-lg font-medium text-white">Total : {euro.format(total)}</span>
 					<Button href={resolve('/')} size="md" variant="secondary">Annuler</Button>
 					<Button
-						disabled={submitting || (needsCampusChoice && !chosenCampus)}
+						disabled={submitting || (!effectiveCampus)}
 						size="md"
 						type="submit"
 						variant="primary">{submitting ? 'Envoi…' : 'Envoyer la demande'}</Button

@@ -187,9 +187,10 @@ export const actions: Actions = {
 			.maybeSingle();
 
 		const resolved = resolveCampus(project.campus, profile?.campus ?? null);
-		// Le membre tranche, et son choix prime : c'est exactement ce que le trigger
-		// `resolve_item_campus` attend quand il reçoit un campus non nul (CMD-F-46).
-		const campus = resolved.needsChoice ? chosenCampus : (resolved.campus ?? chosenCampus);
+		// Le membre tranche, et son choix prime même quand un campus se déduit : c'est
+		// exactement ce que le trigger `resolve_item_campus` attend quand il reçoit un
+		// campus non nul (CMD-F-46).
+		const campus = chosenCampus ?? (resolved.needsChoice ? null : resolved.campus);
 		if (!campus) {
 			return fail(400, {
 				message: 'Indiquez le campus de livraison : le projet et votre profil ne concordent pas.'
