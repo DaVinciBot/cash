@@ -1,5 +1,4 @@
 import { absenceRequestErrors, isOwnProofPath } from '#lib/absences.js';
-import { myRequests } from '#lib/server/absences.js';
 import { rejection } from '#lib/server/audit.js';
 import { text } from '#lib/server/form.js';
 import { error, fail } from '@sveltejs/kit';
@@ -11,15 +10,9 @@ import type { Actions, PageServerLoad } from './$types';
 // chemin. Les règles de fond — créneau ordonné, motif non vide, pièce dans le
 // dossier du membre, statut initial — sont aussi tenues par la base.
 
-export const load: PageServerLoad = async ({ locals, depends }) => {
-	depends('cash:absences');
-
+export const load: PageServerLoad = async ({ locals }) => {
 	const { user } = await locals.safeGetSession();
-	if (!user?.id) {
-		return { requests: [], email: '' };
-	}
-
-	return { requests: await myRequests(locals.supabase, user.id), email: user.email ?? '' };
+	return { email: user?.email ?? '' };
 };
 
 export const actions: Actions = {

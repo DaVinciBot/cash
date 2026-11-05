@@ -1,7 +1,23 @@
 <script lang="ts">
-	import { Button, Checkbox } from '@davincibot/components';
+	import {
+		Button,
+		Checkbox,
+		Table,
+		type ParseItems,
+		type TableCell,
+		type TableColumn
+	} from '@davincibot/components';
+	import RowMenu from '#lib/components/cash/RowMenu.svelte';
+	import { triggerTableRefresh } from '@davincibot/lib';
 	import { getSupabaseBrowserClient } from '@davincibot/lib/supabase';
 	import { enhance, type SubmitFunction } from '$app/forms';
+	import {
+		absenceFilters,
+		hm,
+		parseAbsenceRows,
+		type AbsenceRow,
+		ABSENCE_TABLE_DB
+	} from '#lib/absenceTable.js';
 	import {
 		ABSENCE_ATTESTATION,
 		ABSENCE_STATUS_LABELS,
@@ -16,7 +32,6 @@
 
 	let { data, form }: { data: PageData; form: ActionData } = $props();
 
-	const requests = $derived(data.requests);
 	const identity = $derived(nameFromEmail(data.email));
 
 	let open = $state(false);
@@ -34,14 +49,61 @@
 	const values = $derived(form && 'values' in form ? form.values : null);
 
 	const day = new Intl.DateTimeFormat('fr-FR', { dateStyle: 'full' });
-
-	/** `HH:MM:SS` renvoyé par Postgres → `HH:MM`. */
-	const hm = (time: string) => time.slice(0, 5);
+	const stamp = new Intl.DateTimeFormat('fr-FR', { dateStyle: 'short', timeStyle: 'short' });
 
 	const STATUS_CLASSES: Record<AbsenceStatus, string> = {
 		pending: 'bg-amber-500/15 text-amber-300 ring-amber-500/30',
 		approved: 'bg-emerald-500/15 text-emerald-300 ring-emerald-500/30',
 		refused: 'bg-red-500/15 text-red-300 ring-red-500/30'
+	};
+
+	const TABLE_TOPIC = 'absences';
+
+	const columns: TableColumn[] = [
+		{
+			key: 'absence_date',
+			label: 'Date',
+			width: '12rem',
+			sortable: true,
+			csv: (row) => {
+				const { date, startTime, endTime } = request(row[0]);
+				return `${date} ${hm(startTime)}-${hm(endTime)}`;
+			}
+		},
+		{ key: 'reason', label: 'Motif', csv: (row) => request(row[2]).reason },
+		{
+			key: 'status',
+			label: 'Statut',
+			width: '7rem',
+			sortable: true,
+			csv: (row) => ABSENCE_STATUS_LABELS[request(row[1]).status]
+		},
+		{ key: 'id', label: 'Actions', width: '5rem', align: 'right', csv: () => '' }
+	];
+
+	// Une page de membre ne montre que ses demandes, même pour qui peut toutes les voir.
+	const filters = $derived(
+		absenceFilters(data.user?.id ? { requesterId: data.user.id } : undefined)
+	);
+
+	const request = (cell: TableCell | undefined) => cell?.value as AbsenceRow;
+
+	const parseRequests: ParseItems = async (rows) =>
+		(await parseAbsenceRows(rows)).map((value) => [
+			{ value, data: value.id, cell: dateCell },
+			{ value, cell: reasonCell },
+			{ value, cell: statusCell },
+			{ value, cell: actionCell }
+		]);
+
+	/** Annulation d'une demande en attente : la table se recharge une fois l'action passée. */
+	const cancel: SubmitFunction = () => {
+		return async ({ result, update }) => {
+			await update();
+			if (result.type === 'success') {
+				triggerTableRefresh(TABLE_TOPIC);
+			}
+		};
 	};
 
 	/**
@@ -106,6 +168,7 @@
 			submitting = false;
 			if (result.type === 'success') {
 				open = false;
+				triggerTableRefresh(TABLE_TOPIC, { resetPage: true });
 			} else if (uploaded) {
 				void getSupabaseBrowserClient().storage.from('absence-proofs').remove([uploaded]);
 			}
@@ -113,6 +176,65 @@
 		};
 	};
 </script>
+
+{#snippet dateCell(cell: TableCell)}
+	{@const row = request(cell)}
+	<div>
+		<p class="first-letter:uppercase">{day.format(new Date(`${row.date}T00:00:00`))}</p>
+		<p class="text-dark-light-blue/70 text-xs">{hm(row.startTime)} – {hm(row.endTime)}</p>
+	</div>
+{/snippet}
+
+{#snippet reasonCell(cell: TableCell)}
+	{@const row = request(cell)}
+	<div class="min-w-0">
+		<p class="whitespace-pre-line">{row.reason}</p>
+		{#if row.proofUrl}
+			<!-- eslint-disable svelte/no-navigation-without-resolve -- URL signée du bucket, hors routes de l'app -->
+			<a
+				class="text-light-blue mt-1 inline-block text-xs hover:underline"
+				href={row.proofUrl}
+				rel="noopener noreferrer"
+				target="_blank">Voir le justificatif</a
+			>
+			<!-- eslint-enable svelte/no-navigation-without-resolve -->
+		{/if}
+		{#if row.status === 'refused' && row.refusalReason}
+			<p class="mt-1 rounded bg-red-500/10 px-2 py-1 text-xs text-red-300">
+				Motif du refus : {row.refusalReason}
+			</p>
+		{/if}
+		{#if row.resolvedAt}
+			<p class="text-dark-light-blue/70 mt-1 text-xs">
+				{row.status === 'approved' ? 'Validée' : 'Refusée'} le {stamp.format(
+					new Date(row.resolvedAt)
+				)}
+				{#if row.resolvedBy}par {row.resolvedBy}{/if}
+			</p>
+		{/if}
+	</div>
+{/snippet}
+
+{#snippet statusCell(cell: TableCell)}
+	{@const row = request(cell)}
+	<span class="rounded-full px-2 py-0.5 text-xs ring-1 {STATUS_CLASSES[row.status]}">
+		{ABSENCE_STATUS_LABELS[row.status]}
+	</span>
+{/snippet}
+
+{#snippet actionCell(cell: TableCell)}
+	{@const row = request(cell)}
+	{#if row.status === 'pending'}
+		<RowMenu>
+			<form action="?/cancel" method="POST" use:enhance={cancel}>
+				<input name="id" type="hidden" value={row.id} />
+				<Button class="w-full justify-start" size="sm" type="submit" variant="secondary"
+					>Annuler la demande</Button
+				>
+			</form>
+		</RowMenu>
+	{/if}
+{/snippet}
 
 <svelte:head><title>Demandes d'excuse — DaVinciBot</title></svelte:head>
 
@@ -205,7 +327,7 @@
 				<textarea
 					name="reason"
 					class="border-rule-strong bg-dark-blue/60 placeholder:text-muted mt-1 w-full rounded-lg border p-2 text-sm text-white"
-					placeholder="Ex. : Coupe de France de robotique, stand de l'association."
+					placeholder="Ex. : Coupe de France de robotique, réunion d'association."
 					rows="3">{values?.reason ?? ''}</textarea
 				>
 				{#if errors.reason}
@@ -258,60 +380,17 @@
 		</form>
 	{/if}
 
-	<h2 class="mb-3 text-lg font-semibold text-white">Mes demandes</h2>
+	<h2 class="mb-3 text-lg font-semibold text-white">Demandes</h2>
 
-	{#if requests.length === 0}
-		<p
-			class="border-rule text-dark-light-blue/70 rounded-xl border border-dashed px-4 py-12 text-center"
-		>
-			Aucune demande pour l'instant.
-		</p>
-	{:else}
-		<ul class="space-y-3">
-			{#each requests as request (request.id)}
-				<li class="border-rule bg-blue-gray/15 rounded-2xl border p-4 sm:p-5">
-					<div class="flex flex-wrap items-start gap-3">
-						<div class="min-w-0 flex-1">
-							<div class="flex flex-wrap items-center gap-2">
-								<span class="font-medium text-white first-letter:uppercase">
-									{day.format(new Date(`${request.absenceDate}T00:00:00`))}
-								</span>
-								<span class="text-light-blue text-sm">
-									{hm(request.startTime)} – {hm(request.endTime)}
-								</span>
-								<span
-									class="rounded-full px-2 py-0.5 text-xs ring-1 {STATUS_CLASSES[request.status]}"
-								>
-									{ABSENCE_STATUS_LABELS[request.status]}
-								</span>
-							</div>
-							<p class="text-dark-light-blue mt-2 text-sm whitespace-pre-line">{request.reason}</p>
-							{#if request.proofUrl}
-								<!-- eslint-disable svelte/no-navigation-without-resolve -- URL signée du bucket, hors routes de l'app -->
-								<a
-									class="text-light-blue mt-2 inline-block text-sm hover:underline"
-									href={request.proofUrl}
-									rel="noopener noreferrer"
-									target="_blank">Voir le justificatif</a
-								>
-								<!-- eslint-enable svelte/no-navigation-without-resolve -->
-							{/if}
-							{#if request.status === 'refused' && request.refusalReason}
-								<p class="mt-2 rounded bg-red-500/10 px-2 py-1 text-sm text-red-300">
-									Motif du refus : {request.refusalReason}
-								</p>
-							{/if}
-						</div>
-
-						{#if request.status === 'pending'}
-							<form action="?/cancel" method="POST" use:enhance>
-								<input name="id" type="hidden" value={request.id} />
-								<Button size="sm" type="submit" variant="secondary">Annuler la demande</Button>
-							</form>
-						{/if}
-					</div>
-				</li>
-			{/each}
-		</ul>
-	{/if}
+	<div class="overflow-x-auto">
+		<Table
+			{columns}
+			dbInfo={ABSENCE_TABLE_DB}
+			{filters}
+			pageSize={10}
+			parseItems={parseRequests}
+			refreshTopic={TABLE_TOPIC}
+			searchable="reason"
+		/>
+	</div>
 </section>
