@@ -16,6 +16,7 @@
 		SHIPPING_ALLOCATION_LABELS,
 		SHIPPING_ALLOCATIONS
 	} from '#lib/types/domain.js';
+	import { Check, Copy } from '@lucide/svelte';
 	import { untrack } from 'svelte';
 	import type { ActionData, PageData } from './$types';
 
@@ -85,18 +86,7 @@
 		<h1 class="text-2xl font-bold text-white">Commande #{order.id}</h1>
 		<StateBadge badge={ORDER_STATE_BADGES[order.state]} icon={ORDER_STATE_ICONS[order.state]} />
 		{#if order.campus}
-			<!-- CMD-F-41 — le badge campus est aussi le bouton qui copie l'adresse. -->
-			<Button
-				onclick={copyAddress}
-				size="icon"
-				title="Copier l'adresse de livraison"
-				variant="icon"
-			>
-				<StateBadge badge={CAMPUS_BADGES[order.campus]} icon={CAMPUS_ICONS[order.campus]} />
-			</Button>
-			{#if copied}
-				<span class="text-xs text-emerald-300">Adresse copiée</span>
-			{/if}
+			<StateBadge badge={CAMPUS_BADGES[order.campus]} icon={CAMPUS_ICONS[order.campus]} />
 		{/if}
 		<span class="ml-auto text-lg font-semibold text-white">{euro.format(total)}</span>
 	</header>
@@ -115,8 +105,27 @@
 	</p>
 
 	{#if data.address}
-		<pre
-			class="border-rule bg-blue-gray/15 text-dark-light-blue mb-6 rounded-lg border px-4 py-3 text-sm whitespace-pre-wrap">{data.address}</pre>
+		<div
+			class="border-rule bg-blue-gray/15 mb-6 flex items-start gap-3 rounded-lg border px-4 py-3"
+		>
+			<pre class="text-dark-light-blue flex-1 text-sm whitespace-pre-wrap">{data.address}</pre>
+			{#if copied}
+				<span class="text-xs text-emerald-300">Adresse copiée</span>
+			{/if}
+			<button
+				class="text-dark-light-blue hover:text-light-blue shrink-0 cursor-pointer"
+				aria-label="Copier l'adresse de livraison"
+				onclick={copyAddress}
+				title="Copier l'adresse de livraison"
+				type="button"
+			>
+				{#if copied}
+					<Check class="size-4" />
+				{:else}
+					<Copy class="size-4" />
+				{/if}
+			</button>
+		</div>
 	{/if}
 
 	<!-- Actions de cycle de vie -->
