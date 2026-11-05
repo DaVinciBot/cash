@@ -1,5 +1,10 @@
 import { rejection } from '#lib/server/audit.js';
-import { budgetPressure, currentSchoolYear, memberProjects, resolveCampus } from '#lib/server/cash.js';
+import {
+	budgetPressure,
+	currentSchoolYear,
+	memberProjects,
+	resolveCampus
+} from '#lib/server/cash.js';
 import { jsonArray, text, textAll } from '#lib/server/form.js';
 import { cashErrorMessage, type ItemTag } from '#lib/types/domain.js';
 import { resolve } from '$app/paths';
