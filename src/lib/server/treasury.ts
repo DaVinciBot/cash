@@ -29,9 +29,17 @@ export interface BudgetNode {
 	/** Profondeur dans l'arbre, pour l'indentation de la liste. */
 	depth: number;
 	isLeaf: boolean;
-	/** Alloué et consommé, sommes des descendants pour un nœud (TRESO-F-04). */
+	/**
+	 * Les quatre montants du suivi, sommes des descendants pour un nœud (TRESO-F-04).
+	 *
+	 * - `allocatedTtc` (prévu) : le budget de base, avant toute commande ;
+	 * - `committedTtc` (engagé) : commandé (terminé ou non), port compris ;
+	 * - `realTtc` (réel) : la part des commandes terminées, comprise dans l'engagé ;
+	 * - `remainingTtc` (reste) : prévu moins engagé.
+	 */
 	allocatedTtc: number;
-	consumedTtc: number;
+	committedTtc: number;
+	realTtc: number;
 	remainingTtc: number;
 	/** Projets qui désignent ce nœud — un nœud peut n'en avoir aucun. */
 	projects: string[];
@@ -47,22 +55,35 @@ export interface BudgetNode {
  * deux lectures divergeraient au premier changement de règle.
  */
 export async function budgetTree(supabase: Client, schoolYearId: number): Promise<BudgetNode[]> {
-	const [{ data: budgets }, { data: consumption }, { data: projects }] = await Promise.all([
-		supabase
-			.schema('cash')
-			.from('budgets')
-			.select('id, name, parent_id, school_year_id, amount_ttc, is_default, archived_at')
-			.eq('school_year_id', schoolYearId),
-		supabase
-			.schema('cash')
-			.from('budget_consumption')
-			.select('budget_id, allocated_ttc, consumed_ttc, remaining_ttc')
-			.eq('school_year_id', schoolYearId),
-		supabase.from('projects').select('id, name, budget_id').is('archived_at', null)
-	]);
+	const [{ data: budgets }, { data: consumption }, { data: projects }, { data: shares }] =
+		await Promise.all([
+			supabase
+				.schema('cash')
+				.from('budgets')
+				.select('id, name, parent_id, school_year_id, amount_ttc, is_default, archived_at')
+				.eq('school_year_id', schoolYearId),
+			supabase
+				.schema('cash')
+				.from('budget_consumption')
+				.select('budget_id, allocated_ttc, consumed_ttc')
+				.eq('school_year_id', schoolYearId),
+			supabase.from('projects').select('id, name, budget_id').is('archived_at', null),
+			// Le réel : les quotes-parts des commandes terminées. `budget_consumption`
+			// ne distingue pas l'état de la commande, d'où cette lecture à part.
+			supabase
+				.schema('cash')
+				.from('order_budget_shares')
+				.select('budget_id, total_share, orders!inner(state)')
+				.eq('orders.state', 'completed')
+		]);
 
 	const rows = budgets ?? [];
 	const usage = new Map((consumption ?? []).map((c) => [num(c.budget_id), c]));
+
+	const ownReal = new Map<number, number>();
+	for (const s of shares ?? []) {
+		ownReal.set(s.budget_id, (ownReal.get(s.budget_id) ?? 0) + num(s.total_share));
+	}
 
 	const projectsOf = new Map<number, string[]>();
 	for (const p of projects ?? []) {
@@ -88,6 +109,19 @@ export async function budgetTree(supabase: Client, schoolYearId: number): Promis
 		list.sort((a, b) => a.name.localeCompare(b.name, 'fr'));
 	}
 
+	// Somme d'une valeur propre à chaque nœud sur sa descendance, pour les deux
+	// montants que la vue ne remonte pas. Mêmes bornes que `walk` contre un cycle.
+	const rollUp = (own: Map<number, number>, id: number, depth = 0): number => {
+		if (depth > 32) {
+			return 0;
+		}
+		let total = own.get(id) ?? 0;
+		for (const child of childrenOf.get(id) ?? []) {
+			total += rollUp(own, child.id, depth + 1);
+		}
+		return total;
+	};
+
 	const out: BudgetNode[] = [];
 	const walk = (parentId: number | null, depth: number) => {
 		// `check_budget_tree` interdit déjà les cycles ; la borne de profondeur
@@ -97,6 +131,9 @@ export async function budgetTree(supabase: Client, schoolYearId: number): Promis
 		}
 		for (const b of childrenOf.get(parentId) ?? []) {
 			const c = usage.get(b.id);
+			const allocatedTtc = num(c?.allocated_ttc ?? 0);
+			const committedTtc = num(c?.consumed_ttc ?? 0);
+			const realTtc = rollUp(ownReal, b.id);
 			out.push({
 				id: b.id,
 				name: b.name,
@@ -107,9 +144,10 @@ export async function budgetTree(supabase: Client, schoolYearId: number): Promis
 				archivedAt: b.archived_at,
 				depth,
 				isLeaf: !hasLiveChild.has(b.id),
-				allocatedTtc: num(c?.allocated_ttc ?? 0),
-				consumedTtc: num(c?.consumed_ttc ?? 0),
-				remainingTtc: num(c?.remaining_ttc ?? 0),
+				allocatedTtc,
+				committedTtc,
+				realTtc,
+				remainingTtc: allocatedTtc - committedTtc,
 				projects: projectsOf.get(b.id) ?? []
 			});
 			walk(b.id, depth + 1);

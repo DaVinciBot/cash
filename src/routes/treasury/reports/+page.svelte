@@ -246,7 +246,7 @@
 				<h3 class="text-light-blue mb-3 text-sm font-medium">Budget par branche</h3>
 				<GroupedBarsChart
 					format={euroFormat}
-					labels={['Alloué', 'Consommé']}
+					labels={['Prévu', 'Engagé']}
 					pair="neutral"
 					rows={data.charts.budgetRoots.map((b) => ({
 						label: b.label,

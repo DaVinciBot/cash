@@ -104,7 +104,9 @@
 							commande.
 						</p>
 					{:else}
-						{@const overrun = budget.remainingTtc < 0}
+						{@const real = project.tree.find((node) => node.id === budget.budgetId)?.realTtc ?? 0}
+						{@const remaining = budget.allocatedTtc - budget.consumedTtc}
+						{@const overrun = remaining < 0}
 						<div class="bg-dark-blue/80 h-2 w-full overflow-hidden rounded-full">
 							<div
 								style="width: {usedRatio(
@@ -118,7 +120,7 @@
 
 						<dl class="mt-3 grid grid-cols-2 gap-3 text-sm sm:grid-cols-4">
 							<div>
-								<dt class="text-dark-light-blue/70 text-xs">Alloué</dt>
+								<dt class="text-dark-light-blue/70 text-xs">Prévu</dt>
 								<dd class="text-light-blue font-medium">{euro.format(budget.allocatedTtc)}</dd>
 							</div>
 							<div>
@@ -126,21 +128,23 @@
 								<dd class="text-light-blue font-medium">{euro.format(budget.consumedTtc)}</dd>
 							</div>
 							<div>
-								<dt class="text-dark-light-blue/70 text-xs">Demandé, non imputé</dt>
-								<dd class="text-light-blue font-medium">{euro.format(budget.requestedTtc)}</dd>
+								<dt class="text-dark-light-blue/70 text-xs">Réel</dt>
+								<dd class="text-light-blue font-medium">
+									{euro.format(real)}
+								</dd>
 							</div>
 							<div>
-								<dt class="text-dark-light-blue/70 text-xs">Restant</dt>
+								<dt class="text-dark-light-blue/70 text-xs">Reste</dt>
 								<dd class="font-medium {overrun ? 'text-red-300' : 'text-emerald-300'}">
-									{euro.format(budget.remainingTtc)}
+									{euro.format(remaining)}
 								</dd>
 							</div>
 						</dl>
 
 						{#if overrun}
 							<p class="mt-3 text-sm text-red-300">
-								Budget dépassé de {euro.format(-budget.remainingTtc)}. Le dépassement ne bloque
-								aucune commande, mais le trésorier le voit aussi.
+								Budget dépassé de {euro.format(-remaining)}. Le dépassement ne bloque aucune
+								commande, mais le trésorier le voit aussi.
 							</p>
 						{/if}
 
@@ -191,17 +195,19 @@
 
 										<span class="ml-auto text-right">
 											<span class="text-dark-light-blue">{euro.format(node.allocatedTtc)}</span>
-											<span class="text-dark-light-blue/70"> alloués · </span>
+											<span class="text-dark-light-blue/70"> prévu · </span>
 											<span class="text-light-blue font-medium"
-												>{euro.format(node.consumedTtc)}</span
+												>{euro.format(node.committedTtc)}</span
 											>
-											<span class="text-dark-light-blue/70"> consommés · </span>
+											<span class="text-dark-light-blue/70"> engagé · </span>
+											<span class="text-dark-light-blue">{euro.format(node.realTtc)}</span>
+											<span class="text-dark-light-blue/70"> réel · </span>
 											<span
 												class={node.remainingTtc < 0
 													? 'font-medium text-red-400'
 													: 'text-dark-light-blue'}>{euro.format(node.remainingTtc)}</span
 											>
-											<span class="text-dark-light-blue/70"> restants</span>
+											<span class="text-dark-light-blue/70"> reste</span>
 										</span>
 									</li>
 								{/each}

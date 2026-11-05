@@ -50,8 +50,8 @@
 				{#each data.overdrawn as budget (budget.id)}
 					<li>
 						{budget.name} <span class="text-dark-light-blue/70 text-xs">({budget.year})</span> —
-						{euro.format(budget.consumedTtc)} consommés pour {euro.format(budget.allocatedTtc)}
-						alloués,
+						{euro.format(budget.consumedTtc)} engagés pour {euro.format(budget.allocatedTtc)}
+						prévus,
 						<span class="font-medium text-red-300"
 							>dépassé de {euro.format(budget.consumedTtc - budget.allocatedTtc)}</span
 						>
@@ -195,14 +195,16 @@
 
 						<span class="ml-auto text-right">
 							<span class="text-dark-light-blue">{euro.format(node.allocatedTtc)}</span>
-							<span class="text-dark-light-blue/70"> alloués · </span>
-							<span class="text-dark-light-blue">{euro.format(node.consumedTtc)}</span>
-							<span class="text-dark-light-blue/70"> consommés · </span>
+							<span class="text-dark-light-blue/70"> prévu · </span>
+							<span class="text-dark-light-blue">{euro.format(node.committedTtc)}</span>
+							<span class="text-dark-light-blue/70"> engagé · </span>
+							<span class="text-dark-light-blue">{euro.format(node.realTtc)}</span>
+							<span class="text-dark-light-blue/70"> réel · </span>
 							<span
 								class={node.remainingTtc < 0 ? 'font-medium text-red-400' : 'text-dark-light-blue'}
 								>{euro.format(node.remainingTtc)}</span
 							>
-							<span class="text-dark-light-blue/70"> restants</span>
+							<span class="text-dark-light-blue/70"> reste</span>
 						</span>
 					</div>
 

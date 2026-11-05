@@ -117,7 +117,8 @@ describe('sous-arbre budgétaire du projet', () => {
 			depth,
 			isLeaf: false,
 			allocatedTtc: 0,
-			consumedTtc: 0,
+			committedTtc: 0,
+			realTtc: 0,
 			remainingTtc: 0,
 			projects: []
 		};

@@ -215,7 +215,7 @@
 					<div class="flex flex-wrap items-center justify-between gap-2">
 						<span>
 							Budget <span class="font-medium">{budget.name}</span> :
-							{euro.format(budget.allocatedTtc)} alloués, {euro.format(budget.consumedTtc)} engagés,
+							{euro.format(budget.allocatedTtc)} prévus, {euro.format(budget.consumedTtc)} engagés,
 							{euro.format(budget.requestedTtc)} déjà demandés.
 						</span>
 						<span class="font-medium">
