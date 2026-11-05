@@ -1,10 +1,5 @@
 import type { AbsenceStatus } from '#lib/absences.js';
-import {
-	isReviewer,
-	parseReviewFilters,
-	requesters,
-	reviewRequests
-} from '#lib/server/absences.js';
+import { isReviewer } from '#lib/server/absences.js';
 import { rejection } from '#lib/server/audit.js';
 import { text } from '#lib/server/form.js';
 import { refusalReasonError } from '#lib/types/domain.js';
@@ -22,17 +17,8 @@ async function assertReviewer(supabase: App.Locals['supabase']) {
 	}
 }
 
-export const load: PageServerLoad = async ({ locals, url, depends }) => {
-	depends('cash:absences:review');
+export const load: PageServerLoad = async ({ locals }) => {
 	await assertReviewer(locals.supabase);
-
-	const filters = parseReviewFilters(url.searchParams);
-	const [requests, members] = await Promise.all([
-		reviewRequests(locals.supabase, filters),
-		requesters(locals.supabase)
-	]);
-
-	return { filters, requests, members };
 };
 
 /** Change le statut d'une demande ; le trigger date et attribue la décision. */
