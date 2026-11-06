@@ -173,6 +173,9 @@
 	let pendingInvitesLoading = $state<boolean>(false);
 	let pendingInvitesError = $state('');
 	let reinvitingUserId = $state<string | null>(null);
+	// Invitations cochées dans la table, et traitement groupé en cours.
+	let selectedInvites = $state<AuthUser[]>([]);
+	let bulkBusy = $state<'reinvite' | 'cancel' | null>(null);
 	let cancelingUserId = $state<string | null>(null);
 	let pendingInvitesInitialized = $state<boolean>(false);
 
@@ -342,6 +345,66 @@
 		} finally {
 			pendingInvitesLoading = false;
 		}
+	}
+
+	function selectInvites(_row: TableRow, _selected: boolean, rows: TableRow[]) {
+		selectedInvites = rows.map((row) => row[2]?.value as AuthUser);
+	}
+
+	/**
+	 * Applique `action` à chaque invitation cochée, une à la fois : l'API admin d'auth est
+	 * limitée en débit, et un échec isolé ne doit pas arrêter les suivantes. Les échecs sont
+	 * rapportés ensemble à la fin.
+	 */
+	async function runBulk(kind: 'reinvite' | 'cancel', action: (id: string) => Promise<ApiPayload>) {
+		const targets = selectedInvites.filter((user) => user.id && user.email);
+		if (!canReinvite || targets.length === 0 || bulkBusy) {
+			return;
+		}
+		bulkBusy = kind;
+		const failures: string[] = [];
+		for (const user of targets) {
+			try {
+				await action(user.id);
+			} catch (error) {
+				failures.push(`${user.email ?? user.id} : ${(error as Error | null)?.message ?? 'échec'}`);
+			}
+		}
+		bulkBusy = null;
+
+		const done = targets.length - failures.length;
+		const verb = kind === 'reinvite' ? 'renvoyée' : 'annulée';
+		if (done > 0) {
+			mountClosable(SucessModal, {
+				target: document.body,
+				props: {
+					message: `${String(done)} invitation${done > 1 ? 's' : ''} ${verb}${done > 1 ? 's' : ''}.`,
+					onClose: () => {
+						/* no-op */
+					}
+				}
+			});
+		}
+		if (failures.length > 0) {
+			alert(`${String(failures.length)} échec(s) :\n${failures.join('\n')}`);
+		}
+		selectedInvites = [];
+		await loadPendingInvites();
+	}
+
+	function reinviteSelected() {
+		void runBulk('reinvite', reinviteAuthUser);
+	}
+
+	function cancelSelected() {
+		if (
+			!confirm(
+				`Voulez-vous vraiment annuler ${String(selectedInvites.length)} invitation(s) ? Les comptes en attente seront supprimés.`
+			)
+		) {
+			return;
+		}
+		void runBulk('cancel', cancelAuthUserInvite);
 	}
 
 	async function reinvitePendingUser(authUser: AuthUser) {
@@ -1255,7 +1318,7 @@
 	{@const authUser = cell.value as AuthUser}
 	<div class="flex w-full flex-wrap justify-end gap-2">
 		<Button
-			disabled={reinvitingUserId !== null || cancelingUserId !== null}
+			disabled={reinvitingUserId !== null || cancelingUserId !== null || bulkBusy !== null}
 			onclick={() => {
 				void reinvitePendingUser(authUser);
 			}}
@@ -1265,7 +1328,7 @@
 			{reinvitingUserId === authUser.id ? 'Envoi...' : 'Réinviter'}
 		</Button>
 		<Button
-			disabled={reinvitingUserId !== null || cancelingUserId !== null}
+			disabled={reinvitingUserId !== null || cancelingUserId !== null || bulkBusy !== null}
 			onclick={() => {
 				void cancelPendingInvite(authUser);
 			}}
@@ -1314,16 +1377,29 @@
 		<div class="bg-blue-gray/15 rounded-lg p-4">
 			<div class="mb-4 flex items-center justify-between gap-3">
 				<h3 class="text-xl font-semibold text-white">Invitations en attente</h3>
-				<Button
-					disabled={pendingInvitesLoading || reinvitingUserId !== null || cancelingUserId !== null}
-					onclick={() => {
-						void loadPendingInvites();
-					}}
-					size="sm"
-					variant="secondary"
-				>
-					Rafraîchir
-				</Button>
+				<div class="flex flex-wrap items-center gap-2">
+					{#if selectedInvites.length > 0}
+						<span class="text-dark-light-blue text-sm"
+							>{selectedInvites.length} sélectionnée{selectedInvites.length > 1 ? 's' : ''}</span
+						>
+						<Button
+							disabled={bulkBusy !== null}
+							onclick={reinviteSelected}
+							size="sm"
+							variant="primary"
+						>
+							{bulkBusy === 'reinvite' ? 'Envoi...' : 'Réinviter'}
+						</Button>
+						<Button
+							disabled={bulkBusy !== null}
+							onclick={cancelSelected}
+							size="sm"
+							variant="danger"
+						>
+							{bulkBusy === 'cancel' ? 'Annulation...' : 'Annuler'}
+						</Button>
+					{/if}
+				</div>
 			</div>
 
 			{#if pendingInvitesError}
@@ -1343,6 +1419,7 @@
 					columns={pendingInvitesColumns}
 					dbInfo={pendingInvitesDbInfo}
 					devData={pendingInvites}
+					onRowSelect={selectInvites}
 					pageSize={PENDING_INVITES_PAGE_SIZE}
 					parseItems={parsePendingInvites}
 					searchable="email"
