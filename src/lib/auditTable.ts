@@ -4,6 +4,7 @@
 
 import {
 	CASH_ENTITY_LABELS,
+	FORMATION_ENTITY_LABELS,
 	SOCLE_ENTITY_LABELS,
 	type ActivityEntry,
 	type JournalChange
@@ -13,7 +14,7 @@ import type { DBInfo, Filter } from '@davincibot/components';
 import type { Json } from '@davincibot/database-types';
 import { getSupabaseBrowserClient } from '@davincibot/lib/supabase';
 
-export type AuditTab = 'socle' | 'metier' | 'rejets';
+export type AuditTab = 'socle' | 'cash' | 'formation' | 'rejets';
 
 const CHANGES = 'field,old_value,new_value';
 
@@ -25,10 +26,16 @@ export const AUDIT_DB: Record<AuditTab, DBInfo> = {
 	},
 	// `actor_id` pointe vers un autre schéma : PostgREST n'embarque pas au travers,
 	// les noms se résolvent donc à part, dans `parseCashActivities`.
-	metier: {
+	cash: {
 		schema: 'cash',
 		table: 'cash_activities',
 		key: `id,entity_type,entity_id,kind,actor_id,occurred_at,cash_activity_changes(${CHANGES})`,
+		ordering: 'occurred_at:desc'
+	},
+	formation: {
+		schema: 'formation',
+		table: 'formation_activities',
+		key: `id,entity_type,entity_id,kind,actor_id,occurred_at,formation_activity_changes(${CHANGES})`,
 		ordering: 'occurred_at:desc'
 	},
 	rejets: {
@@ -40,8 +47,9 @@ export const AUDIT_DB: Record<AuditTab, DBInfo> = {
 
 /** Colonne sur laquelle porte la recherche de chaque table. */
 export const AUDIT_SEARCH: Record<AuditTab, string> = {
-	socle: 'entity_type',
-	metier: 'entity_type',
+	socle: 'entity_id',
+	cash: 'entity_id',
+	formation: 'entity_id',
 	rejets: 'message'
 };
 
@@ -52,8 +60,9 @@ export const AUDIT_FILTERS: Record<AuditTab, Filter[]> = {
 	socle: [
 		{ category: 'Entité', value: 'entity_type', options: entityOptions(SOCLE_ENTITY_LABELS) }
 	],
-	metier: [
-		{ category: 'Entité', value: 'entity_type', options: entityOptions(CASH_ENTITY_LABELS) }
+	cash: [{ category: 'Entité', value: 'entity_type', options: entityOptions(CASH_ENTITY_LABELS) }],
+	formation: [
+		{ category: 'Entité', value: 'entity_type', options: entityOptions(FORMATION_ENTITY_LABELS) }
 	],
 	rejets: [
 		{
@@ -95,6 +104,7 @@ interface ActivityDbRow {
 	profiles?: { username: string | null } | null;
 	socle_activity_changes?: ChangeRow[];
 	cash_activity_changes?: ChangeRow[];
+	formation_activity_changes?: ChangeRow[];
 }
 
 const toChanges = (rows: ChangeRow[] | undefined): JournalChange[] =>
@@ -115,7 +125,15 @@ export const parseSocleActivities = (rows: unknown[]): ActivityRow[] =>
 		return value;
 	});
 
-export async function parseCashActivities(rows: unknown[]): Promise<ActivityRow[]> {
+/**
+ * Activités des journaux `cash` et `formation`. `actor_id` y pointe vers un autre
+ * schéma : PostgREST n'embarque pas au travers, les noms se résolvent à part.
+ */
+async function parseActivities(
+	rows: unknown[],
+	labels: Record<string, string>,
+	changesOf: (row: ActivityDbRow) => ChangeRow[] | undefined
+): Promise<ActivityRow[]> {
 	const list = rows as ActivityDbRow[];
 	const ids = [...new Set(list.map((row) => row.actor_id).filter((id): id is string => !!id))];
 	const names = new Map<string, string | null>();
@@ -135,13 +153,19 @@ export async function parseCashActivities(rows: unknown[]): Promise<ActivityRow[
 			actorId: row.actor_id ?? null,
 			actorName: row.actor_id ? (names.get(row.actor_id) ?? null) : null,
 			occurredAt: row.occurred_at,
-			changes: toChanges(row.cash_activity_changes),
-			entity: CASH_ENTITY_LABELS[row.entity_type] ?? row.entity_type,
+			changes: toChanges(changesOf(row)),
+			entity: labels[row.entity_type] ?? row.entity_type,
 			entityId: String(row.entity_id)
 		};
 		return value;
 	});
 }
+
+export const parseCashActivities = (rows: unknown[]) =>
+	parseActivities(rows, CASH_ENTITY_LABELS, (row) => row.cash_activity_changes);
+
+export const parseFormationActivities = (rows: unknown[]) =>
+	parseActivities(rows, FORMATION_ENTITY_LABELS, (row) => row.formation_activity_changes);
 
 interface RejectedDbRow {
 	sqlstate: string;

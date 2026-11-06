@@ -13,7 +13,7 @@ import type { PageServerLoad } from './$types';
 // n'arriverait pas jusqu'ici, et s'il y arrivait, il verrait trois tableaux vides.
 // Redoubler la règle en TypeScript créerait un troisième endroit à tenir aligné.
 
-const TABS: AuditTab[] = ['socle', 'metier', 'rejets'];
+const TABS: AuditTab[] = ['socle', 'cash', 'formation', 'rejets'];
 
 export const load: PageServerLoad = ({ url }) => {
 	const asked = url.searchParams.get('tab');

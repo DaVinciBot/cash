@@ -69,6 +69,13 @@ export const CASH_ENTITY_LABELS: Record<string, string> = {
 	generated_document: 'Document'
 };
 
+/** Types d'entité journalisés dans `formation.formation_activities`. */
+export const FORMATION_ENTITY_LABELS: Record<string, string> = {
+	training: 'Formation',
+	training_slot: 'Créneau',
+	registration: 'Inscription'
+};
+
 /** Types d'entité journalisés dans `public.socle_activities` (TRANS-NF-51). */
 export const SOCLE_ENTITY_LABELS: Record<string, string> = {
 	profiles: 'Profil',

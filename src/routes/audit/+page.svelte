@@ -12,6 +12,7 @@
 		AUDIT_FILTERS,
 		AUDIT_SEARCH,
 		parseCashActivities,
+		parseFormationActivities,
 		parseRejected,
 		parseSocleActivities,
 		type ActivityRow,
@@ -32,7 +33,8 @@
 
 	const TABS = [
 		{ id: 'socle', label: 'Socle', hint: 'Permissions, rattachements, blog' },
-		{ id: 'metier', label: 'Métier', hint: 'Commandes et trésorerie' },
+		{ id: 'cash', label: 'Cash', hint: 'Commandes et trésorerie' },
+		{ id: 'formation', label: 'Formation', hint: 'Formations, créneaux et inscriptions' },
 		{ id: 'rejets', label: 'Écritures rejetées', hint: 'Ce que les règles ont refusé' }
 	] as const;
 
@@ -74,6 +76,9 @@
 	];
 
 	const parseSocle: ParseItems = (rows) => parseSocleActivities(rows).map(activityCells);
+
+	const parseFormation: ParseItems = async (rows) =>
+		(await parseFormationActivities(rows)).map(activityCells);
 
 	const parseCash: ParseItems = async (rows) =>
 		(await parseCashActivities(rows)).map(activityCells);
@@ -117,7 +122,7 @@
 	const isFilled = (change: JournalChange) =>
 		!isOpaqueField(change.field) && (change.new ?? change.old) !== null;
 
-	const parse = $derived(data.tab === 'metier' ? parseCash : parseSocle);
+	const parsers = { socle: parseSocle, cash: parseCash, formation: parseFormation } as const;
 </script>
 
 <svelte:head><title>Audit — DaVinciBot</title></svelte:head>
@@ -159,7 +164,7 @@
 				dbInfo={AUDIT_DB[data.tab]}
 				filters={AUDIT_FILTERS[data.tab]}
 				pageSize={20}
-				parseItems={parse}
+				parseItems={parsers[data.tab]}
 				searchable={AUDIT_SEARCH[data.tab]}
 			/>
 		{/if}
