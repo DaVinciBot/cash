@@ -22,7 +22,11 @@ export const load: PageServerLoad = async ({ locals, depends }) => {
 	const items = await bundlingQueue(locals.supabase);
 	const year = await currentSchoolYear(locals.supabase);
 
-	return { items, drafts: await draftOrders(locals.supabase), schoolYearLabel: year?.label ?? null };
+	return {
+		items,
+		drafts: await draftOrders(locals.supabase),
+		schoolYearLabel: year?.label ?? null
+	};
 };
 
 export const actions: Actions = {

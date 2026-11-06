@@ -342,7 +342,7 @@
 					<span class="text-lg font-medium text-white">Total : {euro.format(total)}</span>
 					<Button href={resolve('/')} size="md" variant="secondary">Annuler</Button>
 					<Button
-						disabled={submitting || (!effectiveCampus)}
+						disabled={submitting || !effectiveCampus}
 						size="md"
 						type="submit"
 						variant="primary">{submitting ? 'Envoi…' : 'Envoyer la demande'}</Button
