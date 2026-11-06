@@ -12,7 +12,6 @@ import { num, str } from '#lib/server/coerce.js';
 import type { AccountKind, FlowDirection, FlowOrigin } from '#lib/types/domain.js';
 import { countsTowardTreasury } from '#lib/types/domain.js';
 import type { Database } from '@davincibot/database-types';
-import type { Campus } from '@davincibot/lib';
 import type { SupabaseClient } from '@supabase/supabase-js';
 
 type Client = SupabaseClient<Database>;
@@ -558,55 +557,4 @@ export async function partnerships(supabase: Client): Promise<Partnership[]> {
 			archivedAt: p.archived_at
 		};
 	});
-}
-
-export interface ProjectRow {
-	id: number;
-	name: string;
-	campus: Campus | null;
-	budgetId: number | null;
-	budgetPath: string | null;
-	archivedAt: string | null;
-	/** Un projet référencé par des items ne se supprime pas — il s'archive. */
-	itemCount: number;
-}
-
-/** Projets, avec le nœud budgétaire qu'ils désignent (TRESO-F-01/02). */
-export async function projectList(supabase: Client): Promise<ProjectRow[]> {
-	const [{ data: rows }, { data: budgets }, { data: items }] = await Promise.all([
-		supabase.from('projects').select('id, name, campus, budget_id, archived_at').order('name'),
-		supabase.schema('cash').from('budgets').select('id, name, parent_id'),
-		supabase.schema('cash').from('items').select('project_id')
-	]);
-
-	const byId = new Map((budgets ?? []).map((b) => [b.id, b]));
-	const path = (id: number | null): string | null => {
-		if (id === null) {
-			return null;
-		}
-		const parts: string[] = [];
-		let current = byId.get(id);
-		let depth = 0;
-		while (current && depth < 32) {
-			parts.unshift(current.name);
-			current = current.parent_id === null ? undefined : byId.get(current.parent_id);
-			depth += 1;
-		}
-		return parts.length > 0 ? parts.join(' › ') : null;
-	};
-
-	const counts = new Map<number, number>();
-	for (const i of items ?? []) {
-		counts.set(i.project_id, (counts.get(i.project_id) ?? 0) + 1);
-	}
-
-	return (rows ?? []).map((p) => ({
-		id: p.id,
-		name: str(p.name),
-		campus: p.campus,
-		budgetId: p.budget_id,
-		budgetPath: path(p.budget_id),
-		archivedAt: p.archived_at,
-		itemCount: counts.get(p.id) ?? 0
-	}));
 }

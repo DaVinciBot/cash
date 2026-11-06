@@ -1,7 +1,7 @@
 import { rejection } from '#lib/server/audit.js';
 import { currentSchoolYear } from '#lib/server/cash.js';
 import { text } from '#lib/server/form.js';
-import { budgetTree, projectList } from '#lib/server/treasury.js';
+import { budgetTree } from '#lib/server/treasury.js';
 import { CAMPUS_BADGES, type Campus } from '@davincibot/lib';
 import { fail } from '@sveltejs/kit';
 import type { Actions, PageServerLoad } from './$types';
@@ -23,12 +23,9 @@ export const load: PageServerLoad = async ({ locals, depends }) => {
 	depends('cash:projects');
 
 	const schoolYear = await currentSchoolYear(locals.supabase);
-	const [projects, tree] = await Promise.all([
-		projectList(locals.supabase),
-		schoolYear ? budgetTree(locals.supabase, schoolYear.id) : Promise.resolve([])
-	]);
+	const tree = schoolYear ? await budgetTree(locals.supabase, schoolYear.id) : [];
 
-	return { projects, tree: tree.filter((b) => !b.archivedAt), schoolYear };
+	return { tree: tree.filter((b) => !b.archivedAt), schoolYear };
 };
 
 /** Lit les champs communs à la création et à la modification d'un projet. */
