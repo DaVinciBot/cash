@@ -54,6 +54,14 @@ export const ACTIVITY_BADGES: Record<ActivityKind, ActivityBadge> = {
 	}
 };
 
+/** Nature d'un événement, telle qu'on la dit dans une colonne « Action ». */
+export const ACTION_LABELS: Record<ActivityKind, string> = {
+	created: 'Création',
+	updated: 'Modification',
+	state_changed: "Changement d'état",
+	deleted: 'Suppression'
+};
+
 /** Types d'entité journalisés dans `cash.cash_activities` (§9 du schéma). */
 export const CASH_ENTITY_LABELS: Record<string, string> = {
 	item: 'Item',

@@ -3,10 +3,12 @@
 // que trier.
 
 import {
+	ACTION_LABELS,
 	CASH_ENTITY_LABELS,
 	FORMATION_ENTITY_LABELS,
 	SOCLE_ENTITY_LABELS,
 	type ActivityEntry,
+	type ActivityKind,
 	type JournalChange
 } from '#lib/types/audit.js';
 import { CASH_ERROR_MESSAGES } from '#lib/types/domain.js';
@@ -56,12 +58,25 @@ export const AUDIT_SEARCH: Record<AuditTab, string> = {
 const entityOptions = (labels: Record<string, string>) =>
 	Object.entries(labels).map(([value, name]) => ({ value, name }));
 
+const actionOptions = (kinds: ActivityKind[]) =>
+	kinds.map((kind) => ({ value: kind, name: ACTION_LABELS[kind] }));
+
+// L'enum du socle n'a pas de `state_changed` : il n'y a pas d'état à changer sur
+// un rôle ou un rattachement, seulement une révocation.
+const SOCLE_ACTIONS: ActivityKind[] = ['created', 'updated', 'deleted'];
+const ACTIONS: ActivityKind[] = ['created', 'updated', 'state_changed', 'deleted'];
+
 export const AUDIT_FILTERS: Record<AuditTab, Filter[]> = {
 	socle: [
+		{ category: 'Action', value: 'kind', options: actionOptions(SOCLE_ACTIONS) },
 		{ category: 'Entité', value: 'entity_type', options: entityOptions(SOCLE_ENTITY_LABELS) }
 	],
-	cash: [{ category: 'Entité', value: 'entity_type', options: entityOptions(CASH_ENTITY_LABELS) }],
+	cash: [
+		{ category: 'Action', value: 'kind', options: actionOptions(ACTIONS) },
+		{ category: 'Entité', value: 'entity_type', options: entityOptions(CASH_ENTITY_LABELS) }
+	],
 	formation: [
+		{ category: 'Action', value: 'kind', options: actionOptions(ACTIONS) },
 		{ category: 'Entité', value: 'entity_type', options: entityOptions(FORMATION_ENTITY_LABELS) }
 	],
 	rejets: [

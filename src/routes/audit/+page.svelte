@@ -19,6 +19,7 @@
 		type RejectedRow
 	} from '#lib/auditTable.js';
 	import {
+		ACTION_LABELS,
 		ACTIVITY_BADGES,
 		actorLabel,
 		fieldLabel,
@@ -94,13 +95,6 @@
 
 	const activity = (cell: TableCell | undefined) => cell?.value as ActivityRow;
 	const rejected = (cell: TableCell | undefined) => cell?.value as RejectedRow;
-
-	const ACTION_LABELS = {
-		created: 'Création',
-		updated: 'Modification',
-		state_changed: "Changement d'état",
-		deleted: 'Suppression'
-	} as const;
 
 	// Les identifiants du socle sont parfois un uuid, un slug ou un rôle : « n° » ne
 	// se dit que d'un numéro.
