@@ -1,7 +1,7 @@
 import { rejection } from '#lib/server/audit.js';
 import { currentSchoolYear } from '#lib/server/cash.js';
 import { decimal, text } from '#lib/server/form.js';
-import { accounts, parseDomains, partnerships } from '#lib/server/treasury.js';
+import { parseDomains } from '#lib/server/treasury.js';
 import { fail } from '@sveltejs/kit';
 import type { Actions, PageServerLoad } from './$types';
 
@@ -15,13 +15,19 @@ import type { Actions, PageServerLoad } from './$types';
 export const load: PageServerLoad = async ({ locals, depends }) => {
 	depends('cash:partners');
 
-	const [rows, accountRows, year] = await Promise.all([
-		partnerships(locals.supabase),
-		accounts(locals.supabase),
-		currentSchoolYear(locals.supabase)
+	const [year, { data: years }] = await Promise.all([
+		currentSchoolYear(locals.supabase),
+		locals.supabase
+			.schema('cash')
+			.from('school_years')
+			.select('id, label')
+			.order('starts_on', { ascending: false })
 	]);
 
-	return { partnerships: rows, accounts: accountRows, schoolYearId: year?.id ?? null };
+	return {
+		schoolYearId: year?.id ?? null,
+		schoolYears: (years ?? []).map((y) => ({ id: y.id, label: y.label }))
+	};
 };
 
 export const actions: Actions = {
@@ -153,6 +159,35 @@ export const actions: Actions = {
 					locals.supabase,
 					error,
 					"Ce partenariat n'a pas pu être archivé.",
+					{
+						entityType: 'partnership'
+					}
+				)
+			});
+		}
+		return { saved: 'partner' };
+	},
+
+	/** Désarchivage : le partenariat redevient reconnu dans les liens. */
+	unarchive: async ({ locals, request }) => {
+		const form = await request.formData();
+		const id = Number(form.get('id'));
+		if (!Number.isSafeInteger(id)) {
+			return fail(400, { message: 'Partenariat invalide.' });
+		}
+
+		const { error } = await locals.supabase
+			.schema('cash')
+			.from('partnerships')
+			.update({ archived_at: null })
+			.eq('id', id);
+
+		if (error) {
+			return fail(400, {
+				message: await rejection(
+					locals.supabase,
+					error,
+					"Ce partenariat n'a pas pu être désarchivé.",
 					{
 						entityType: 'partnership'
 					}

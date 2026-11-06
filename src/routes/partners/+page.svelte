@@ -1,6 +1,22 @@
 <script lang="ts">
-	import { Button, Checkbox } from '@davincibot/components';
-	import { enhance } from '$app/forms';
+	import {
+		Button,
+		Checkbox,
+		Table,
+		type Filter,
+		type ParseItems,
+		type TableCell,
+		type TableColumn
+	} from '@davincibot/components';
+	import { enhance, type SubmitFunction } from '$app/forms';
+	import RowMenu from '#lib/components/cash/RowMenu.svelte';
+	import {
+		ACTIVE_PARTNERSHIPS_DB,
+		ARCHIVED_PARTNERSHIPS_DB,
+		parsePartnershipRows,
+		type PartnershipRow
+	} from '#lib/partnershipTable.js';
+	import { triggerTableRefresh } from '@davincibot/lib';
 	import type { ActionData, PageData } from './$types';
 
 	let { data, form }: { data: PageData; form: ActionData } = $props();
@@ -9,17 +25,62 @@
 
 	const failure = $derived(form && 'message' in form ? form.message : null);
 
-	let editing = $state<number | null>(null);
+	const TABLE_TOPIC = 'partnerships';
+
+	let editing = $state<PartnershipRow | null>(null);
 	let creating = $state(false);
 	let withEnvelope = $state(false);
 
-	const active = $derived(data.partnerships.filter((p) => !p.archivedAt));
-	const archived = $derived(data.partnerships.filter((p) => p.archivedAt));
+	const columns: TableColumn[] = [
+		{ key: 'name', label: 'Partenariat', sortable: true },
+		{ key: 'school_year_id', label: 'Année', width: '8rem' },
+		{ key: 'domains', label: 'Domaines' },
+		{ key: 'account_id', label: 'Enveloppe', width: '14rem' },
+		{ key: 'id', label: 'Actions', width: '5rem', align: 'right' }
+	];
+
+	// Un archivé n'a qu'un geste : le désarchiver.
+	const archivedColumns: TableColumn[] = columns.map((column) =>
+		column.key === 'id' ? { ...column, label: 'Action', width: '9rem', align: 'left' } : column
+	);
+
+	// Les archivés se retrouvent par année : un partenariat éteint reste lié à la sienne.
+	const archivedFilters = $derived<Filter[]>([
+		{
+			category: 'Année',
+			value: 'school_year_id',
+			options: data.schoolYears.map((year) => ({ name: year.label, value: String(year.id) }))
+		}
+	]);
+
+	const partner = (cell: TableCell | undefined) => cell?.value as PartnershipRow;
+
+	const parsePartnerships: ParseItems = async (rows) =>
+		(await parsePartnershipRows(rows)).map((value) => [
+			{ value, cell: nameCell },
+			{ value, cell: yearCell },
+			{ value, cell: domainsCell },
+			{ value, cell: envelopeCell },
+			{ value, cell: actionsCell }
+		]);
+
+	/** Après une action réussie, les tables se rechargent et les formulaires se ferment. */
+	const submit: SubmitFunction = () => {
+		return async ({ result, update }) => {
+			await update();
+			if (result.type === 'success') {
+				creating = false;
+				withEnvelope = false;
+				editing = null;
+				triggerTableRefresh(TABLE_TOPIC);
+			}
+		};
+	};
 </script>
 
 <svelte:head><title>Partenariats — DaVinciBot</title></svelte:head>
 
-<section class="mx-auto max-w-4xl">
+<section class="mx-auto max-w-5xl">
 	<header class="mb-6 flex flex-wrap items-end justify-between gap-4">
 		<div>
 			<h1 class="text-2xl font-bold text-white">Partenariats</h1>
@@ -44,12 +105,7 @@
 			class="border-rule bg-blue-gray/15 mb-4 rounded-lg border p-4"
 			action="?/create"
 			method="POST"
-			use:enhance={() =>
-				({ update }) => {
-					creating = false;
-					withEnvelope = false;
-					return update();
-				}}
+			use:enhance={submit}
 		>
 			<input name="school_year_id" type="hidden" value={data.schoolYearId} />
 			<div class="flex flex-wrap items-end gap-3">
@@ -100,108 +156,144 @@
 		</form>
 	{/if}
 
-	{#if active.length === 0}
-		<p
-			class="border-rule text-dark-light-blue/70 rounded-xl border border-dashed px-4 py-12 text-center"
-		>
-			Aucun partenariat actif.
-		</p>
-	{:else}
-		<ul class="space-y-2">
-			{#each active as partner (partner.id)}
-				<li class="border-rule bg-blue-gray/15 rounded-2xl border p-4 sm:p-5">
-					<div class="flex flex-wrap items-center gap-3">
-						<span class="font-medium text-white">{partner.name}</span>
-						<span class="text-dark-light-blue/70 text-xs">{partner.schoolYearLabel}</span>
-						{#each partner.domains as domain (domain)}
-							<span class="bg-dark-blue/60 text-dark-light-blue rounded-full px-2 py-0.5 text-xs"
-								>{domain}</span
-							>
-						{/each}
-						{#if partner.domains.length === 0}
-							<span class="text-xs text-amber-300">aucun domaine — non reconnu dans les liens</span>
-						{/if}
-						{#if partner.accountName}
-							<span class="ml-auto text-sm">
-								<span class="text-dark-light-blue">{partner.accountName} :</span>
-								<span class="text-light-blue font-medium"
-									>{euro.format(partner.accountBalance ?? 0)}</span
-								>
-							</span>
-						{/if}
-					</div>
-					{#if partner.notes}
-						<p class="bg-dark-blue/40 text-dark-light-blue mt-2 rounded px-2 py-1 text-sm">
-							{partner.notes}
-						</p>
-					{/if}
-					<div class="mt-3 flex flex-wrap items-center gap-2">
-						<Button
-							onclick={() => (editing = editing === partner.id ? null : partner.id)}
-							size="sm"
-							variant="ghost">modifier</Button
-						>
-						<form action="?/archive" method="POST" use:enhance>
-							<input name="id" type="hidden" value={partner.id} />
-							<Button size="sm" type="submit" variant="danger-ghost">archiver</Button>
-						</form>
-					</div>
-
-					{#if editing === partner.id}
-						<form
-							class="border-rule-strong bg-dark-blue/60 mt-3 rounded-lg border p-3"
-							action="?/update"
-							method="POST"
-							use:enhance={() =>
-								({ update }) => {
-									editing = null;
-									return update();
-								}}
-						>
-							<input name="id" type="hidden" value={partner.id} />
-							<div class="flex flex-wrap items-end gap-3">
-								<label class="text-dark-light-blue text-xs">
-									Nom
-									<input
-										name="name"
-										class="border-rule-strong bg-dark-blue/60 text-light-blue placeholder:text-muted focus:border-light-blue/70 focus-visible:ring-light-blue/60 mt-1 block rounded-xl border p-2.5 text-sm focus:outline-none focus-visible:ring-2 disabled:opacity-50"
-										required
-										value={partner.name}
-									/>
-								</label>
-								<label class="text-dark-light-blue flex-1 text-xs">
-									Domaines
-									<input
-										name="domains"
-										class="border-rule-strong bg-dark-blue/60 text-light-blue placeholder:text-muted focus:border-light-blue/70 focus-visible:ring-light-blue/60 mt-1 block w-full rounded-xl border p-2.5 text-sm focus:outline-none focus-visible:ring-2 disabled:opacity-50"
-										value={partner.domains.join(', ')}
-									/>
-								</label>
-							</div>
-							<label class="text-dark-light-blue mt-3 block text-xs">
-								Notes
-								<textarea
-									name="notes"
-									class="border-rule-strong bg-dark-blue/60 text-light-blue placeholder:text-muted focus:border-light-blue/70 focus-visible:ring-light-blue/60 mt-1 block w-full rounded-xl border p-2.5 text-sm focus:outline-none focus-visible:ring-2 disabled:opacity-50"
-									rows="2">{partner.notes ?? ''}</textarea
-								>
-							</label>
-							<Button class="mt-3" size="sm" type="submit" variant="primary">Enregistrer</Button>
-						</form>
-					{/if}
-				</li>
-			{/each}
-		</ul>
+	{#if editing}
+		{#key editing.id}
+			<form
+				class="border-rule-strong bg-dark-blue/60 mb-4 rounded-lg border p-3"
+				action="?/update"
+				method="POST"
+				use:enhance={submit}
+			>
+				<input name="id" type="hidden" value={editing.id} />
+				<div class="flex flex-wrap items-end gap-3">
+					<label class="text-dark-light-blue text-xs">
+						Nom
+						<input
+							name="name"
+							class="border-rule-strong bg-dark-blue/60 text-light-blue placeholder:text-muted focus:border-light-blue/70 focus-visible:ring-light-blue/60 mt-1 block rounded-xl border p-2.5 text-sm focus:outline-none focus-visible:ring-2 disabled:opacity-50"
+							required
+							value={editing.name}
+						/>
+					</label>
+					<label class="text-dark-light-blue flex-1 text-xs">
+						Domaines
+						<input
+							name="domains"
+							class="border-rule-strong bg-dark-blue/60 text-light-blue placeholder:text-muted focus:border-light-blue/70 focus-visible:ring-light-blue/60 mt-1 block w-full rounded-xl border p-2.5 text-sm focus:outline-none focus-visible:ring-2 disabled:opacity-50"
+							value={editing.domains.join(', ')}
+						/>
+					</label>
+				</div>
+				<label class="text-dark-light-blue mt-3 block text-xs">
+					Notes
+					<textarea
+						name="notes"
+						class="border-rule-strong bg-dark-blue/60 text-light-blue placeholder:text-muted focus:border-light-blue/70 focus-visible:ring-light-blue/60 mt-1 block w-full rounded-xl border p-2.5 text-sm focus:outline-none focus-visible:ring-2 disabled:opacity-50"
+						rows="2">{editing.notes ?? ''}</textarea
+					>
+				</label>
+				<div class="mt-3 flex gap-2">
+					<Button size="sm" type="submit" variant="primary">Enregistrer</Button>
+					<Button onclick={() => (editing = null)} size="sm" variant="secondary">Annuler</Button>
+				</div>
+			</form>
+		{/key}
 	{/if}
 
-	{#if archived.length > 0}
-		<h2 class="text-dark-light-blue mt-8 mb-2 text-sm font-semibold tracking-wide uppercase">
-			Archivés
-		</h2>
-		<ul class="text-dark-light-blue/70 space-y-1 text-sm">
-			{#each archived as partner (partner.id)}
-				<li>{partner.name} · {partner.domains.join(', ') || 'aucun domaine'}</li>
-			{/each}
-		</ul>
-	{/if}
+	<div class="overflow-x-auto">
+		<Table
+			{columns}
+			dbInfo={ACTIVE_PARTNERSHIPS_DB}
+			pageSize={20}
+			parseItems={parsePartnerships}
+			refreshTopic={TABLE_TOPIC}
+			searchable="name"
+		/>
+	</div>
+
+	<h2 class="text-dark-light-blue mt-8 mb-2 text-sm font-semibold tracking-wide uppercase">
+		Archivés
+	</h2>
+	<div class="overflow-x-auto">
+		<Table
+			columns={archivedColumns}
+			dbInfo={ARCHIVED_PARTNERSHIPS_DB}
+			filters={archivedFilters}
+			pageSize={10}
+			parseItems={parsePartnerships}
+			refreshTopic={TABLE_TOPIC}
+			searchable="name"
+		/>
+	</div>
 </section>
+
+{#snippet nameCell(cell: TableCell)}
+	{@const row = partner(cell)}
+	<div class="min-w-0">
+		<p class={row.archivedAt ? 'text-dark-light-blue/70' : 'font-medium text-white'}>{row.name}</p>
+		{#if row.notes}
+			<p class="text-dark-light-blue mt-1 text-xs whitespace-pre-line">{row.notes}</p>
+		{/if}
+	</div>
+{/snippet}
+
+{#snippet yearCell(cell: TableCell)}
+	<span class="text-dark-light-blue/70 text-xs">{partner(cell).schoolYearLabel}</span>
+{/snippet}
+
+{#snippet domainsCell(cell: TableCell)}
+	{@const row = partner(cell)}
+	{#if row.domains.length === 0}
+		<span class="text-xs text-amber-300">aucun domaine — non reconnu dans les liens</span>
+	{:else}
+		<span class="flex flex-wrap gap-1.5">
+			{#each row.domains as domain (domain)}
+				<span class="bg-dark-blue/60 text-dark-light-blue rounded-full px-2 py-0.5 text-xs"
+					>{domain}</span
+				>
+			{/each}
+		</span>
+	{/if}
+{/snippet}
+
+{#snippet envelopeCell(cell: TableCell)}
+	{@const row = partner(cell)}
+	{#if row.accountName}
+		<span class="text-sm">
+			<span class="text-dark-light-blue">{row.accountName} :</span>
+			<span class="text-light-blue font-medium">{euro.format(row.accountBalance ?? 0)}</span>
+		</span>
+	{:else}
+		<span class="text-dark-light-blue/70">—</span>
+	{/if}
+{/snippet}
+
+{#snippet actionsCell(cell: TableCell)}
+	{@const row = partner(cell)}
+	{#if !row.archivedAt}
+		<RowMenu>
+			{#snippet children(close: () => void)}
+				<Button
+					class="w-full justify-start"
+					onclick={() => {
+						editing = row;
+						close();
+					}}
+					size="sm"
+					variant="secondary">Modifier</Button
+				>
+				<form action="?/archive" method="POST" use:enhance={submit}>
+					<input name="id" type="hidden" value={row.id} />
+					<Button class="w-full justify-start" size="sm" type="submit" variant="secondary"
+						>Archiver</Button
+					>
+				</form>
+			{/snippet}
+		</RowMenu>
+	{:else}
+		<form action="?/unarchive" method="POST" use:enhance={submit}>
+			<input name="id" type="hidden" value={row.id} />
+			<Button size="sm" type="submit" variant="primary">Désarchiver</Button>
+		</form>
+	{/if}
+{/snippet}
