@@ -1,5 +1,7 @@
 <script lang="ts">
+
     import type { PageData } from './$types';
+    import { ChevronRight } from '@lucide/svelte';
 
     let { data }: { data: PageData } = $props();
 
@@ -7,22 +9,25 @@
         operational: 'Opérationnel',
         unavailable: 'Indisponible',
         unknown: 'Statut inconnu',
-        loading: 'Vérification...'
+        loading: 'Vérification...',
+        pending: 'En attente',
     };
 
     const badgeClasses: Record<string, string> = {
         operational: 'text-emerald-400 border-emerald-500/20',
         unavailable: 'text-red-400 border-red-500/20',
         unknown: 'text-slate-400 border-slate-500/20',
-        loading: 'text-blue-400 border-blue-500/20'
+        loading: 'text-blue-400 border-blue-500/20',
+        pending: 'text-orange-400 border-orange-500/20',
     };
 
-	const dotColors: Record<string, string> = {
-    operational: '#34d399',
-    unavailable: '#f87171',
-    unknown: '#94a3b8',
-    loading: '#60a5fa'
-};
+    const dotColors: Record<string, string> = {
+        operational: '#34d399',
+        unavailable: '#f87171',
+        unknown: '#94a3b8',
+        loading: '#60a5fa',
+        pending: '#fb923c',
+    };
 </script>
 
 <svelte:head>
@@ -46,43 +51,44 @@
                 target="_blank"
             >
                 <div class="flex items-start justify-between gap-4">
-                    <h2 class="text-lg font-semibold text-white">{service.name}</h2>
-                    <span
-                        class="text-light-blue text-2xl font-bold transition-transform group-hover:translate-x-1.5"
-                        aria-hidden="true"
-                    >→</span>
+                    <h2 class="text-xl font-semibold text-white">{service.name}</h2>
+                    <ChevronRight 
+                        size={32} 
+                        strokeWidth={2.5} 
+                        class="text-light-blue transition-transform group-hover:translate-x-1.5"
+                    />
                 </div>
 
-                <p class="text-dark-light-blue mt-2 flex-grow max-w-xs text-sm leading-6">
+                <p class="text-dark-light-blue my-auto max-w-xs text-sm leading-6 py-4">
                     {service.description}
                 </p>
 
-                <div class="relative mt-6 flex h-8 items-center overflow-hidden">
-					{#await service.healthPromise}
-						<span
-							class={`status-badge ${badgeClasses.loading}`}
-							style={`--dot-color: ${dotColors.loading}`}
-						>
-							<span class="status-dot"></span>
-							{healthLabels.loading}
-						</span>
-					{:then health}
-						<span
-							class={`status-badge ${badgeClasses[health] ?? badgeClasses.unknown}`}
-							style={`--dot-color: ${dotColors[health] ?? dotColors.unknown}`}
-						>
-							<span class="status-dot"></span>
-							{healthLabels[health] ?? healthLabels.unknown}
-						</span>
-					{/await}
-				</div>
+                <div class="relative flex h-8 items-center overflow-hidden">
+                    {#await service.healthPromise}
+                        <span
+                            class={`status-badge ${badgeClasses.loading}`}
+                            style={`--dot-color: ${dotColors.loading}`}
+                        >
+                            <span class="status-dot"></span>
+                            {healthLabels.loading}
+                        </span>
+                    {:then health}
+                        <span
+                            class={`status-badge ${badgeClasses[health] ?? badgeClasses.unknown}`}
+                            style={`--dot-color: ${dotColors[health] ?? dotColors.unknown}`}
+                        >
+                            <span class={['unavailable', 'unknown'].includes(health) ? 'status-dot-offline' : 'status-dot'}></span>
+                            {healthLabels[health] ?? healthLabels.unknown}
+                        </span>
+                    {/await}
+                </div>
             </a>
         {/each}
     </div>
 </section>
 
 <style>
-	.status-badge {
+.status-badge {
     position: absolute;
     display: inline-flex;
     align-items: center;
@@ -90,6 +96,16 @@
     padding: 6px 12px;
     font-size: 12px;
     font-weight: 500;
+}
+
+.status-dot-offline {
+    position: relative;
+    display: inline-block;
+    flex: 0 0 8px;
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+    background-color: var(--dot-color);
 }
 
 .status-dot {
