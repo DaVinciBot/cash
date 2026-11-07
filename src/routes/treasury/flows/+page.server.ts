@@ -2,10 +2,13 @@ import { rejection } from '#lib/server/audit.js';
 import { currentSchoolYear } from '#lib/server/cash.js';
 import { decimal, text } from '#lib/server/form.js';
 import { budgetLeaves } from '#lib/server/orders.js';
+import type { DatabaseWithFlowExecutor } from '#lib/server/treasury.js';
 import { accounts, flowList, periods } from '#lib/server/treasury.js';
 import { FLOW_DIRECTIONS, type FlowDirection } from '#lib/types/domain.js';
 import { fail } from '@sveltejs/kit';
 import type { Actions, PageServerLoad } from './$types';
+
+const PROFILE_ID = /^[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i;
 
 // Dépenses et recettes (TRESO-F-20), avec leurs justificatifs (TRESO-F-30/31).
 //
@@ -26,7 +29,10 @@ function flowId(form: FormData): number | null {
 export const load: PageServerLoad = async ({ locals, url, depends }) => {
 	depends('cash:flows');
 
-	const periodRows = await periods(locals.supabase);
+	const [{ user }, periodRows] = await Promise.all([
+		locals.safeGetSession(),
+		periods(locals.supabase)
+	]);
 	const requested = Number(url.searchParams.get('year'));
 	// Par défaut, l'exercice qui COUVRE aujourd'hui — et non le premier exercice
 	// ouvert. Les exercices sont listés du plus récent au plus ancien, et 2027
@@ -40,15 +46,24 @@ export const load: PageServerLoad = async ({ locals, url, depends }) => {
 		Number.isSafeInteger(requested) && requested > 0 ? requested : (current?.id ?? null);
 
 	const year = await currentSchoolYear(locals.supabase);
-	const [flows, accountRows, leaves] = await Promise.all([
+	const [flows, accountRows, leaves, userRows] = await Promise.all([
 		flowList(locals.supabase, fiscalYearId),
 		accounts(locals.supabase),
 		year
 			? budgetLeaves(locals.supabase, year.id).then((r) => r.leaves)
-			: Promise.resolve([] as Awaited<ReturnType<typeof budgetLeaves>>['leaves'])
+			: Promise.resolve([] as Awaited<ReturnType<typeof budgetLeaves>>['leaves']),
+		locals.supabase.from('profiles').select('id, username').order('username')
 	]);
 
-	return { flows, accounts: accountRows, leaves, periods: periodRows, fiscalYearId };
+	return {
+		flows,
+		accounts: accountRows,
+		leaves,
+		users: (userRows.data ?? []).filter((user) => user.username),
+		currentUserId: user?.id ?? null,
+		periods: periodRows,
+		fiscalYearId
+	};
 };
 
 /** Champs communs à la création et à la modification d'un flux. */
@@ -61,6 +76,7 @@ function readFlow(form: FormData) {
 	const fiscalYearId = Number(form.get('fiscal_year_id'));
 	const rawBudget = text(form, 'budget_id');
 	const budgetId = rawBudget === '' ? null : Number(rawBudget);
+	const executorId = text(form, 'executor_id') || null;
 
 	if (!FLOW_DIRECTIONS.includes(direction as FlowDirection)) {
 		return { error: 'Sens du mouvement inconnu.' as const };
@@ -80,6 +96,9 @@ function readFlow(form: FormData) {
 	if (budgetId !== null && !Number.isSafeInteger(budgetId)) {
 		return { error: 'Budget invalide.' as const };
 	}
+	if (executorId !== null && !PROFILE_ID.test(executorId)) {
+		return { error: 'Exécutant invalide.' as const };
+	}
 
 	return {
 		values: {
@@ -89,7 +108,8 @@ function readFlow(form: FormData) {
 			label,
 			account_id: accountId,
 			fiscal_year_id: fiscalYearId,
-			budget_id: budgetId
+			budget_id: budgetId,
+			executor_id: executorId
 		}
 	};
 }
@@ -102,7 +122,9 @@ export const actions: Actions = {
 			return fail(400, { message: parsed.error });
 		}
 
-		const { error } = await locals.supabase
+		const flowClient =
+			locals.supabase as import('@supabase/supabase-js').SupabaseClient<DatabaseWithFlowExecutor>;
+		const { error } = await flowClient
 			.schema('cash')
 			.from('flows')
 			.insert({ ...parsed.values, origin: 'manual' });
@@ -133,7 +155,9 @@ export const actions: Actions = {
 			return fail(400, { message: parsed.error });
 		}
 
-		const { error } = await locals.supabase
+		const flowClient =
+			locals.supabase as import('@supabase/supabase-js').SupabaseClient<DatabaseWithFlowExecutor>;
+		const { error } = await flowClient
 			.schema('cash')
 			.from('flows')
 			.update(parsed.values)

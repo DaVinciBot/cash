@@ -1,8 +1,10 @@
 import { entityHistory, rejection } from '#lib/server/audit.js';
 import { decimal, text, textAll } from '#lib/server/form.js';
 import { budgetLeaves, campusAddress, orderDetail } from '#lib/server/orders.js';
+import type { DatabaseWithFlowExecutor } from '#lib/server/treasury.js';
 import { accounts } from '#lib/server/treasury.js';
 import { SHIPPING_ALLOCATIONS, type ShippingAllocation } from '#lib/types/domain.js';
+import type { SupabaseClient } from '@supabase/supabase-js';
 import { error, fail } from '@sveltejs/kit';
 import type { Actions, PageServerLoad } from './$types';
 
@@ -17,6 +19,21 @@ function orderId(params: { id: string }): number {
 		error(404, 'Commande introuvable.');
 	}
 	return id;
+}
+
+async function assignFlowExecutor(
+	supabase: SupabaseClient<DatabaseWithFlowExecutor>,
+	orderId: number,
+	executorId: string
+): Promise<{ message: string } | null> {
+	const { error: executorError } = await supabase
+		.schema('cash')
+		.from('flows')
+		.update({ executor_id: executorId })
+		.eq('order_id', orderId)
+		.eq('origin', 'auto');
+
+	return executorError ? { message: executorError.message } : null;
 }
 
 export const load: PageServerLoad = async ({ locals, params, depends }) => {
@@ -93,6 +110,10 @@ export const actions: Actions = {
 	 */
 	pass: async ({ locals, params, request }) => {
 		const id = orderId(params);
+		const { user } = await locals.safeGetSession();
+		if (!user) {
+			return fail(401, { message: 'Session utilisateur absente.' });
+		}
 
 		// Le trigger dira DVB05, mais avec le message générique de l'imputation
 		// invalide — qui n'apprend rien à qui a simplement oublié un item. On
@@ -143,6 +164,16 @@ export const actions: Actions = {
 					)
 				});
 			}
+			const executorError = await assignFlowExecutor(
+				locals.supabase as SupabaseClient<DatabaseWithFlowExecutor>,
+				id,
+				user.id
+			);
+			if (executorError) {
+				return fail(400, {
+					message: "La commande est passée, mais l'exécutant du flux n'a pas pu être enregistré."
+				});
+			}
 			return { saved: 'passed' };
 		}
 
@@ -166,6 +197,16 @@ export const actions: Actions = {
 					}
 				),
 				blocked: updateError.code
+			});
+		}
+		const executorError = await assignFlowExecutor(
+			locals.supabase as SupabaseClient<DatabaseWithFlowExecutor>,
+			id,
+			user.id
+		);
+		if (executorError) {
+			return fail(400, {
+				message: "La commande est passée, mais l'exécutant du flux n'a pas pu être enregistré."
 			});
 		}
 		return { saved: 'passed' };
