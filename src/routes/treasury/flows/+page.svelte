@@ -182,9 +182,21 @@
 						disabled={flow !== null && isFlowGenerated(flow.origin)}
 						value={flow?.budgetId ?? ''}
 					>
-						<option value="">— aucun —</option>
 						{#each data.leaves as leaf (leaf.id)}
 							<option value={leaf.id}>{leaf.path}</option>
+						{/each}
+					</select>
+				</label>
+				<label class="text-dark-light-blue flex-1 text-xs">
+					Exécutant
+					<select
+						name="executor_id"
+						class="border-rule-strong bg-dark-blue/60 text-light-blue placeholder:text-muted focus:border-light-blue/70 focus-visible:ring-light-blue/60 mt-1 block w-full rounded-xl border p-2.5 text-sm focus:outline-none focus-visible:ring-2 disabled:opacity-50"
+						disabled={flow !== null && isFlowGenerated(flow.origin)}
+						value={flow?.executorId ?? data.currentUserId ?? ''}
+					>
+						{#each data.users as user (user.id)}
+							<option value={user.id}>{user.username}</option>
 						{/each}
 					</select>
 				</label>
@@ -242,7 +254,8 @@
 						>
 					</div>
 					<p class="text-dark-light-blue mt-1 text-sm">
-						{day.format(new Date(flow.occurredOn))} · {flow.accountName} · {flow.fiscalYearLabel}
+						{day.format(new Date(flow.occurredOn))} · {flow.accountName} · {flow.fiscalYearLabel} · Exécuté par
+						 {flow.executorName ?? 'à remplir'}
 						{#if flow.budgetName}· {flow.budgetName}{/if}
 						{#if flow.isReconciled}· <span class="text-emerald-300">pointé</span>{/if}
 					</p>
