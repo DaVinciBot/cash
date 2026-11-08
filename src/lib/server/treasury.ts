@@ -15,6 +15,19 @@ import type { Database } from '@davincibot/database-types';
 import type { SupabaseClient } from '@supabase/supabase-js';
 
 type Client = SupabaseClient<Database>;
+type FlowTable = Database['cash']['Tables']['flows'];
+export type DatabaseWithFlowExecutor = Omit<Database, 'cash'> & {
+	cash: Omit<Database['cash'], 'Tables'> & {
+		Tables: Omit<Database['cash']['Tables'], 'flows'> & {
+			flows: {
+				Row: FlowTable['Row'] & { executor_id: string | null };
+				Insert: FlowTable['Insert'] & { executor_id?: string | null };
+				Update: FlowTable['Update'] & { executor_id?: string | null };
+				Relationships: FlowTable['Relationships'];
+			};
+		};
+	};
+};
 
 export interface BudgetNode {
 	id: number;
@@ -345,6 +358,8 @@ export interface Flow {
 	isReconciled: boolean;
 	reversesFlowId: number | null;
 	proofs: Proof[];
+	executorId: string | null;
+	executorName: string | null;
 }
 
 /**
@@ -356,11 +371,12 @@ export interface Flow {
  * plus pour chaque pièce.
  */
 export async function flowList(supabase: Client, fiscalYearId: number | null): Promise<Flow[]> {
-	let query = supabase
+	const flowClient = supabase as SupabaseClient<DatabaseWithFlowExecutor>;
+	let query = flowClient
 		.schema('cash')
 		.from('flows')
 		.select(
-			'id, direction, amount_ttc, occurred_on, label, account_id, fiscal_year_id, budget_id, order_id, origin, is_reconciled, reverses_flow_id'
+			'id, direction, amount_ttc, occurred_on, label, account_id, fiscal_year_id, budget_id, order_id, origin, is_reconciled, reverses_flow_id, executor_id'
 		)
 		.order('occurred_on', { ascending: false })
 		.order('id', { ascending: false });
@@ -369,18 +385,25 @@ export async function flowList(supabase: Client, fiscalYearId: number | null): P
 		query = query.eq('fiscal_year_id', fiscalYearId);
 	}
 
-	const [{ data: rows }, { data: accountRows }, { data: yearRows }, { data: budgetRows }] =
-		await Promise.all([
-			query,
-			supabase.schema('cash').from('bank_accounts').select('id, name'),
-			supabase.schema('cash').from('fiscal_years').select('id, label'),
-			supabase.schema('cash').from('budgets').select('id, name')
-		]);
+	const [
+		{ data: rows },
+		{ data: accountRows },
+		{ data: yearRows },
+		{ data: budgetRows },
+		{ data: userRows }
+	] = await Promise.all([
+		query,
+		supabase.schema('cash').from('bank_accounts').select('id, name'),
+		supabase.schema('cash').from('fiscal_years').select('id, label'),
+		supabase.schema('cash').from('budgets').select('id, name'),
+		supabase.from('profiles').select('id, username').order('username')
+	]);
 
 	const flows = rows ?? [];
 	const accountNames = new Map((accountRows ?? []).map((a) => [a.id, a.name]));
 	const yearNames = new Map((yearRows ?? []).map((y) => [y.id, y.label]));
 	const budgetNames = new Map((budgetRows ?? []).map((b) => [b.id, b.name]));
+	const userNames = new Map((userRows ?? []).map((u) => [u.id, u.username]));
 
 	const proofsByFlow = new Map<number, Proof[]>();
 	if (flows.length > 0) {
@@ -433,7 +456,9 @@ export async function flowList(supabase: Client, fiscalYearId: number | null): P
 		origin: f.origin,
 		isReconciled: f.is_reconciled,
 		reversesFlowId: f.reverses_flow_id,
-		proofs: proofsByFlow.get(f.id) ?? []
+		proofs: proofsByFlow.get(f.id) ?? [],
+		executorId: f.executor_id,
+		executorName: f.executor_id === null ? null : (userNames.get(f.executor_id) ?? '—')
 	}));
 }
 

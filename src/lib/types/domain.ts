@@ -239,7 +239,7 @@ export function isItemEditableByMember(state: ItemState): boolean {
  * Un refus reste dans l'historique : seul un item encore en revue se retire.
  */
 export function isItemDeletableByMember(state: ItemState): boolean {
-	return state === 'pending_cdp';
+	return state === 'pending_bundled' || state === 'pending_cdp';
 }
 
 /** Un item refusé est terminal, quel que soit l'auteur du refus. */
