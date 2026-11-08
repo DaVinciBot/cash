@@ -19,10 +19,13 @@
         unknown: 'text-slate-400 border-slate-500/20',
         loading: 'text-blue-400 border-blue-500/20',
         pending: 'text-orange-400 border-orange-500/20',
+        none: 'text-slate-400 border-slate-500/20',
+
     };
 
     const dotColors: Record<string, string> = {
         operational: '#34d399',
+        none: '#94a3b8',
         unavailable: '#f87171',
         unknown: '#94a3b8',
         loading: '#60a5fa',
@@ -73,13 +76,23 @@
                             {healthLabels.loading}
                         </span>
                     {:then health}
-                        <span
-                            class={`status-badge ${badgeClasses[health] ?? badgeClasses.unknown}`}
-                            style={`--dot-color: ${dotColors[health] ?? dotColors.unknown}`}
-                        >
-                            <span class={['unavailable', 'unknown'].includes(health) ? 'status-dot-offline' : 'status-dot'}></span>
-                            {healthLabels[health] ?? healthLabels.unknown}
-                        </span>
+                        {#if health === 'none'}
+                            <span
+                                class={`status-badge ${badgeClasses.none}`}
+                                style={`--dot-color: ${dotColors.none}`}
+                            >
+                                <span class="status-dot"></span>
+                                Pas hébergé par l'association
+                            </span>
+                        {:else}
+                            <span
+                                class={`status-badge ${badgeClasses[health] ?? badgeClasses.unknown}`}
+                                style={`--dot-color: ${dotColors[health] ?? dotColors.unknown}`}
+                            >
+                                <span class={['unavailable', 'maintenance', 'unknown'].includes(health) ? 'status-dot-offline' : 'status-dot'}></span>
+                                {healthLabels[health] ?? healthLabels.unknown}
+                            </span>
+                        {/if}
                     {/await}
                 </div>
             </a>
