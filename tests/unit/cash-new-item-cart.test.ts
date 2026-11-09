@@ -31,14 +31,14 @@ const data = {
 	partnerships: []
 };
 
-function mountPage() {
+function mountPage(pageData: unknown = data) {
 	const target = document.createElement('div');
 	document.body.appendChild(target);
 	const instance = mount(NewItemPage, {
 		target,
 		// Le composant ne lit que `data` et `form` ; le typage complet de PageData
 		// n'apporte rien au test et masquerait la régression derrière du bruit.
-		props: { data, form: null } as never
+		props: { data: pageData, form: null } as never
 	});
 	flushSync();
 	cleanup = () => {
@@ -124,5 +124,49 @@ describe('panier de création de commande', () => {
 		fill(target, 'unit_price_ttc', '');
 
 		expect(normalise(target.textContent)).toContain('Total : 0,00 €');
+	});
+
+	it('exige un lien pour chaque composant', () => {
+		const target = mountPage();
+		const link = target.querySelector<HTMLInputElement>('input[name="link"]');
+
+		expect(link?.required).toBe(true);
+	});
+
+	// Le reste du budget suit le panier en direct : il était figé tant que le
+	// calcul du total plantait au premier prix saisi.
+	it('met à jour le budget restant à chaque modification du panier', () => {
+		const target = mountPage({
+			...data,
+			projects: [
+				{
+					...data.projects[0],
+					budget: {
+						name: 'Budget test',
+						allocatedTtc: 100,
+						consumedTtc: 20,
+						requestedTtc: 10,
+						remainingTtc: 70
+					}
+				}
+			]
+		});
+		expect(normalise(target.textContent)).toContain('Reste après ce panier : 70,00 €');
+
+		fill(target, 'unit_price_ttc', '15');
+		fill(target, 'quantity', '2');
+		expect(normalise(target.textContent)).toContain('Reste après ce panier : 40,00 €');
+
+		buttonByText(target, 'Ajouter un composant')?.click();
+		flushSync();
+		fill(target, 'unit_price_ttc', '50', 1);
+		expect(normalise(target.textContent)).toContain('Reste après ce panier : -10,00 €');
+		expect(target.textContent).toContain("dépasse l'enveloppe");
+
+		[...target.querySelectorAll('button')]
+			.filter((b) => b.textContent.includes('Retirer'))[1]
+			?.click();
+		flushSync();
+		expect(normalise(target.textContent)).toContain('Reste après ce panier : 40,00 €');
 	});
 });
