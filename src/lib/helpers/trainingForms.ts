@@ -93,6 +93,32 @@ export interface SlotFieldsConfig {
 	searchProfiles: (search: string) => Promise<{ value: string; text: string; image?: string }[]>;
 	onTrainerChange?: (nextId: string | null) => void;
 	onTrainingChange?: (nextId: number | null) => void;
+	/** formation#47 — places séparées par modalité, ou communes aux deux. */
+	capacityMode?: CapacityMode;
+	onCapacityModeChange?: (mode: CapacityMode) => void;
+}
+
+export type CapacityMode = 'separate' | 'shared';
+
+export const CAPACITY_MODE_OPTIONS: { value: CapacityMode; text: string }[] = [
+	{ value: 'separate', text: 'Places séparées (sur site / à distance)' },
+	{ value: 'shared', text: 'Places communes (sur site ou à distance)' }
+];
+
+/**
+ * `shared_seats` arrive avec la prochaine version de `@davincibot/lib`
+ * (DaVinciBot/packages#66) : d'ici là, il se lit par ce type local.
+ */
+interface SlotCapacity {
+	shared_seats?: number | null;
+}
+
+const sharedSeatsOf = (slot: object | null) =>
+	slot === null ? null : ((slot as SlotCapacity).shared_seats ?? null);
+
+/** Mode d'une session existante : communes dès qu'une capacité commune est posée. */
+export function capacityModeOf(slot: object | null): CapacityMode {
+	return sharedSeatsOf(slot) === null ? 'separate' : 'shared';
 }
 
 export function buildSlotFields({
@@ -103,7 +129,9 @@ export function buildSlotFields({
 	searchTrainings,
 	searchProfiles,
 	onTrainerChange,
-	onTrainingChange
+	onTrainingChange,
+	capacityMode = capacityModeOf(slot),
+	onCapacityModeChange
 }: SlotFieldsConfig) {
 	const baseTrainingId = selectedTrainingId ?? slot?.training_id ?? null;
 	const baseTraining = baseTrainingId
@@ -198,19 +226,48 @@ export function buildSlotFields({
 			value: slot?.location ?? ''
 		},
 		{
-			name: 'Places sur site',
-			id: 'on_site_seats',
-			type: 'number',
-			min: 0,
-			value: slot?.on_site_seats ?? ''
+			name: 'Type de capacité',
+			id: 'capacity_mode',
+			type: 'select',
+			required: true,
+			options: CAPACITY_MODE_OPTIONS.map((option) => ({
+				...option,
+				selected: option.value === capacityMode
+			})),
+			value: capacityMode,
+			onChange: (event: Event) => {
+				const value = (event.target as HTMLSelectElement | null)?.value;
+				onCapacityModeChange?.(value === 'shared' ? 'shared' : 'separate');
+				return undefined;
+			}
 		},
-		{
-			name: 'Places en distanciel',
-			id: 'remote_seats',
-			type: 'number',
-			min: 0,
-			value: slot?.remote_seats ?? ''
-		},
+		...(capacityMode === 'shared'
+			? [
+					{
+						name: 'Places (sur site ou à distance)',
+						id: 'shared_seats',
+						type: 'number',
+						min: 0,
+						required: true,
+						value: sharedSeatsOf(slot) ?? slot?.on_site_seats ?? ''
+					}
+				]
+			: [
+					{
+						name: 'Places sur site',
+						id: 'on_site_seats',
+						type: 'number',
+						min: 0,
+						value: slot?.on_site_seats ?? ''
+					},
+					{
+						name: 'Places en distanciel',
+						id: 'remote_seats',
+						type: 'number',
+						min: 0,
+						value: slot?.remote_seats ?? ''
+					}
+				]),
 		{
 			name: 'Lien visio',
 			id: 'video_conference_link',

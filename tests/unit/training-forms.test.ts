@@ -7,7 +7,8 @@ vi.mock('@davincibot/lib', () => ({
 import {
 	buildSlotFields,
 	buildSummaryFields,
-	buildTrainingFields
+	buildTrainingFields,
+	capacityModeOf
 } from '../../src/lib/helpers/trainingForms';
 
 describe('training form helpers', () => {
@@ -115,5 +116,36 @@ describe('training form helpers', () => {
 		trainerField?.onSelect?.('trainer-2');
 		expect(onTrainerChange).toHaveBeenLastCalledWith('trainer-2');
 		expect(startField?.value).toBe('local:2025-01-10T10:00:00.000Z');
+	});
+});
+
+describe('type de capacité (formation#47)', () => {
+	const base = {
+		trainings: [],
+		profiles: [],
+		searchTrainings: () => Promise.resolve([]),
+		searchProfiles: () => Promise.resolve([])
+	};
+	const ids = (fields: { id?: string }[]) => fields.map((field) => field.id);
+
+	it('propose des places séparées par défaut', () => {
+		const fields = buildSlotFields({ ...base, slot: null });
+		expect(ids(fields)).toContain('capacity_mode');
+		expect(ids(fields)).toContain('on_site_seats');
+		expect(ids(fields)).toContain('remote_seats');
+		expect(ids(fields)).not.toContain('shared_seats');
+	});
+
+	it('remplace les deux champs par un seul en places communes', () => {
+		const fields = buildSlotFields({ ...base, slot: null, capacityMode: 'shared' });
+		expect(ids(fields)).toContain('shared_seats');
+		expect(ids(fields)).not.toContain('on_site_seats');
+		expect(ids(fields)).not.toContain('remote_seats');
+	});
+
+	it('reconnaît une session en places communes', () => {
+		expect(capacityModeOf({ shared_seats: 5 })).toBe('shared');
+		expect(capacityModeOf({ shared_seats: null })).toBe('separate');
+		expect(capacityModeOf(null)).toBe('separate');
 	});
 });
