@@ -308,7 +308,7 @@ export const NOTIFICATION_TEMPLATE_LABELS: Record<string, string> = {
 	trainer_reminder: 'Rappel au formateur',
 	empty_training: 'Formation sans inscrit',
 	full_training: 'Formation complète',
-	training_manager_summary: 'Bilan au responsable',
+	training_director_summary: 'Bilan au responsable',
 	training_feedback_request: 'Demande de retour',
 	training_request_created: 'Demande de formation reçue'
 };
