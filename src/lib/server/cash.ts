@@ -505,3 +505,32 @@ export async function reviewBudgets(
 		];
 	});
 }
+
+/**
+ * Projets sur lesquels l'utilisateur peut faire une demande. Un membre ne voit
+ * que les siens ; le trésorier (`orders.bundle.manage`) commande pour n'importe
+ * quel projet actif, pour ensuite le valider en urgence (#100).
+ */
+export async function orderableProjects(
+	supabase: Client,
+	profileId: string
+): Promise<{ projects: ProjectChoice[]; treasurer: boolean }> {
+	const { data: treasurer } = await supabase.rpc('has_permission', {
+		p_permission: 'orders.bundle.manage'
+	});
+	if (!treasurer) {
+		return { projects: await memberProjects(supabase, profileId), treasurer: false };
+	}
+
+	const { data } = await supabase
+		.from('projects')
+		.select('id, name, campus, budget_id')
+		.is('archived_at', null)
+		.order('name');
+	return {
+		treasurer: true,
+		projects: (data ?? [])
+			.map((p) => ({ id: p.id, name: p.name ?? '', campus: p.campus, budgetId: p.budget_id }))
+			.sort((a, b) => a.name.localeCompare(b.name, 'fr'))
+	};
+}
