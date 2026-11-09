@@ -1,5 +1,6 @@
 import { rejection } from '#lib/server/audit.js';
 import { currentSchoolYear } from '#lib/server/cash.js';
+import { fastTrackItems, fastTracks } from '#lib/server/fastTrack.js';
 import { text, textAll } from '#lib/server/form.js';
 import { allocateDefaultLeaves, bundlingQueue, draftOrders } from '#lib/server/orders.js';
 import { refusalReasonError } from '#lib/types/domain.js';
@@ -27,8 +28,14 @@ export const load: PageServerLoad = async ({ locals, depends }) => {
 		draftOrders(locals.supabase)
 	]);
 
+	// #100 — un item validé en urgence garde son badge jusque dans la file.
+	const traces = await fastTracks(
+		locals.supabase,
+		items.map((item) => item.id)
+	);
+
 	return {
-		items,
+		items: items.map((item) => ({ ...item, fastTrack: traces.get(item.id) ?? null })),
 		upcoming,
 		drafts,
 		schoolYearLabel: year?.label ?? null
@@ -165,6 +172,34 @@ export const actions: Actions = {
 		}
 
 		redirect(303, resolve('/orders/[id]', { id: String(targetId) }));
+	},
+
+	/**
+	 * #100 — validation d'urgence : le trésorier valide à la place du CDP. La base
+	 * pose la trace et prévient chaque CDP du projet par mail ; l'item rejoint la
+	 * file de regroupement avec un badge qui le distingue d'une validation CDP.
+	 */
+	fastTrack: async ({ locals, request }) => {
+		const form = await request.formData();
+		const ids = selectedIds(form);
+		if (ids.length === 0) {
+			return fail(400, { message: 'Aucun item sélectionné.' });
+		}
+
+		const { count, error: fastTrackError } = await fastTrackItems(locals.supabase, ids);
+		if (fastTrackError) {
+			return fail(400, {
+				message: await rejection(
+					locals.supabase,
+					fastTrackError,
+					"Ces items n'ont pas pu être validés en urgence.",
+					{
+						entityType: 'item'
+					}
+				)
+			});
+		}
+		return { fastTracked: count, ignored: ids.length - count };
 	},
 
 	/** Veto du trésorier depuis la file des items validés (CMD-F-29). */

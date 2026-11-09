@@ -38,6 +38,21 @@
 		{/if}
 	</header>
 
+	{#if item.fastTrack}
+		<!-- #100 — une validation d'urgence ne se confond pas avec une validation CDP. -->
+		<div class="mb-6 rounded-lg bg-orange-500/10 p-4 ring-1 ring-orange-500/30">
+			<p class="text-xs font-semibold tracking-wide text-orange-300 uppercase">
+				Validation d'urgence par la trésorerie
+			</p>
+			<p class="text-light-blue mt-1 text-sm">
+				Validé par {item.fastTrack.byName} le {new Intl.DateTimeFormat('fr-FR', {
+					dateStyle: 'medium',
+					timeStyle: 'short'
+				}).format(new Date(item.fastTrack.at))}, sans attendre la revue du chef de projet.
+			</p>
+		</div>
+	{/if}
+
 	{#if isItemRefused(item.state) && item.refusedReason}
 		<!-- CMD-F-29 — le motif est la seule chose que le membre lit pour
 		     comprendre la décision : il passe avant le reste. -->
