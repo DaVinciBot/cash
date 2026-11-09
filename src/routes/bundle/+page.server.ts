@@ -19,12 +19,18 @@ function selectedIds(form: FormData): number[] {
 export const load: PageServerLoad = async ({ locals, depends }) => {
 	depends('cash:bundle');
 
-	const items = await bundlingQueue(locals.supabase);
-	const year = await currentSchoolYear(locals.supabase);
+	const [items, upcoming, year, drafts] = await Promise.all([
+		bundlingQueue(locals.supabase),
+		// #62 — ce que les CDP n'ont pas encore validé : les décaissements à venir.
+		bundlingQueue(locals.supabase, 'pending_cdp'),
+		currentSchoolYear(locals.supabase),
+		draftOrders(locals.supabase)
+	]);
 
 	return {
 		items,
-		drafts: await draftOrders(locals.supabase),
+		upcoming,
+		drafts,
 		schoolYearLabel: year?.label ?? null
 	};
 };

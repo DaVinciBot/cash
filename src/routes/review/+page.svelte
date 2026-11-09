@@ -3,6 +3,7 @@
 	import { enhance } from '$app/forms';
 	import CampusBadge from '#lib/components/cash/CampusBadge.svelte';
 	import { REFUSAL_REASON_MIN_LENGTH, refusalReasonError } from '#lib/types/domain.js';
+	import { CircleAlert } from '@lucide/svelte';
 	import { SvelteSet } from 'svelte/reactivity';
 	import type { ActionData, PageData } from './$types';
 
@@ -30,6 +31,23 @@
 	);
 
 	const refusedItems = $derived(items.filter((i) => refusing.includes(i.id)));
+
+	// #64 — l'impact financier se lit avant de valider. Un dépassement est
+	// signalé, jamais bloquant : le CDP reste décisionnaire.
+	const budgets = $derived(
+		data.budgets.filter((b) => projectFilter === 'all' || b.projectId === projectFilter)
+	);
+	const budgetOf = (projectId: number) => data.budgets.find((b) => b.projectId === projectId);
+	/** Total de la sélection pour un projet. */
+	const selectedTotal = (projectId: number) =>
+		items
+			.filter((i) => i.projectId === projectId && selected.has(i.id))
+			.reduce((sum, i) => sum + i.totalTtc, 0);
+	/** Dépassement qu'entraînerait la validation de cet item seul, 0 sinon. */
+	const overrunIfApproved = (item: { projectId: number; totalTtc: number }) => {
+		const budget = budgetOf(item.projectId);
+		return budget ? Math.max(0, budget.validatedTtc + item.totalTtc - budget.allocatedTtc) : 0;
+	};
 	const reasonError = $derived(reason.length > 0 ? refusalReasonError(reason) : null);
 
 	function toggle(id: number) {
@@ -133,6 +151,47 @@
 					>
 						{project.name} ({items.filter((i) => i.projectId === project.id).length})
 					</FilterChip>
+				{/each}
+			</div>
+		{/if}
+
+		{#if budgets.length > 0}
+			<div class="mb-4 grid gap-3 sm:grid-cols-2">
+				{#each budgets as budget (budget.projectId)}
+					{@const withSelection = budget.validatedTtc + selectedTotal(budget.projectId)}
+					{@const over = withSelection > budget.allocatedTtc}
+					<div
+						class="rounded-xl px-4 py-3 text-sm ring-1 {over
+							? 'bg-amber-500/10 ring-amber-500/30'
+							: 'bg-blue-gray/15 ring-rule'}"
+					>
+						<p class="text-dark-light-blue">
+							{projects.find((p) => p.id === budget.projectId)?.name} · budget
+							<span class="text-light-blue">{budget.budgetName}</span>
+						</p>
+						<p class="mt-1 text-white">
+							Déjà validé : <span class="font-semibold">{euro.format(budget.validatedTtc)}</span>
+							sur {euro.format(budget.allocatedTtc)}
+						</p>
+						<div class="bg-dark-blue/60 mt-2 h-1.5 overflow-hidden rounded-full">
+							<div
+								style:width="{Math.min(
+									100,
+									budget.allocatedTtc > 0 ? (withSelection / budget.allocatedTtc) * 100 : 100
+								)}%"
+								class="h-full {over ? 'bg-amber-400' : 'bg-light-blue/70'}"
+							></div>
+						</div>
+						{#if selectedTotal(budget.projectId) > 0}
+							<p class="mt-2 text-xs {over ? 'text-amber-200' : 'text-dark-light-blue'}">
+								Avec la sélection : {euro.format(withSelection)}
+								{#if over}
+									— dépasse le budget de {euro.format(withSelection - budget.allocatedTtc)}. La
+									validation reste possible.
+								{/if}
+							</p>
+						{/if}
+					</div>
 				{/each}
 			</div>
 		{/if}
@@ -272,6 +331,14 @@
 								{#if item.note}
 									<p class="bg-dark-blue/40 text-dark-light-blue mt-2 rounded px-2 py-1 text-sm">
 										{item.note}
+									</p>
+								{/if}
+								{#if overrunIfApproved(item) > 0}
+									<p class="mt-2 inline-flex items-center gap-1 text-xs text-amber-300">
+										<CircleAlert class="size-3.5" />
+										Le valider dépasse le budget du projet de {euro.format(
+											overrunIfApproved(item)
+										)}.
 									</p>
 								{/if}
 							</div>
