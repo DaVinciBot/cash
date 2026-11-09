@@ -3,7 +3,7 @@
 // CMD-F-20 impose un ensemble d'états FERMÉ et UNIQUE, identique dans les tables,
 // les filtres et l'affichage détail ; TRANS-NF-40 impose des repères visuels
 // cohérents dans toute l'application. Les deux exigences se tiennent par ce
-// fichier : toute couleur, tout libellé et tout emoji d'état s'y lisent, et
+// fichier : toute couleur et tout libellé d'état s'y lisent, et
 // nulle part ailleurs. Un écran qui invente son propre libellé reproduit le
 // défaut n° 10 (statuts incohérents entre tables, filtres et affichage).
 //
@@ -60,12 +60,10 @@ export type FlowDirection = (typeof FLOW_DIRECTIONS)[number];
 export const FLOW_DIRECTION_BADGES: Record<FlowDirection, StateBadge> = {
 	debit: {
 		label: 'Débit',
-		emoji: '↘',
 		className: 'bg-rose-500/15 text-rose-300 ring-1 ring-rose-500/30'
 	},
 	credit: {
 		label: 'Crédit',
-		emoji: '↗',
 		className: 'bg-emerald-500/15 text-emerald-300 ring-1 ring-emerald-500/30'
 	}
 };
@@ -124,8 +122,6 @@ export function documentFollowsFlow(kind: DocumentKind): boolean {
 	return kind === 'invoice' || kind === 'tax_receipt';
 }
 
-// TODO: émoji -> lucide icon
-
 /**
  * Repères visuels des états d'item.
  *
@@ -136,62 +132,48 @@ export function documentFollowsFlow(kind: DocumentKind): boolean {
 export const ITEM_STATE_BADGES: Record<ItemState, StateBadge> = {
 	pending_cdp: {
 		label: 'En revue par le CDP',
-		emoji: '🕓',
 		className: 'bg-amber-500/15 text-amber-300 ring-1 ring-amber-500/30'
 	},
 	pending_bundled: {
 		label: 'Validé',
-		emoji: '✅',
 		className: 'bg-sky-500/15 text-sky-300 ring-1 ring-sky-500/30'
 	},
 	bundled: {
 		label: 'Regroupé',
-		emoji: '📦',
 		className: 'bg-violet-500/15 text-violet-300 ring-1 ring-violet-500/30'
 	},
 	received: {
 		label: 'Reçu',
-		emoji: '🎉',
 		className: 'bg-emerald-500/15 text-emerald-300 ring-1 ring-emerald-500/30'
 	},
 	refused_cdp: {
 		label: 'Refusé par le CDP',
-		emoji: '🚫',
 		className: 'bg-rose-500/15 text-rose-300 ring-1 ring-rose-500/30'
 	},
 	refused_treso: {
 		label: 'Refusé par le trésorier',
-		emoji: '💸',
 		className: 'bg-orange-600/15 text-orange-300 ring-1 ring-orange-600/30'
 	}
 };
 
-// TODO: émoji -> lucide icon
-
 export const ORDER_STATE_BADGES: Record<OrderState, StateBadge> = {
 	pending_treso: {
 		label: 'En attente du trésorier',
-		emoji: '🕓',
 		className: 'bg-amber-500/15 text-amber-300 ring-1 ring-amber-500/30'
 	},
 	pending_delivery: {
 		label: 'En attente de livraison',
-		emoji: '🚚',
 		className: 'bg-sky-500/15 text-sky-300 ring-1 ring-sky-500/30'
 	},
 	completed: {
 		label: 'Terminée',
-		emoji: '🎉',
 		className: 'bg-emerald-500/15 text-emerald-300 ring-1 ring-emerald-500/30'
 	},
 	canceled: {
 		label: 'Annulée',
-		emoji: '🚫',
 		className: 'bg-gray-500/15 text-gray-300 ring-1 ring-gray-500/30'
 	}
 };
-
-// TODO: émoji -> badge ker juliette
 
 /**
  * Codes d'erreur métier de la base (Supabased/docs/ERROR_CODES.md).

@@ -21,9 +21,6 @@
 	redeviendraient incohérents entre les tables, les filtres et le détail
 	(défaut n° 10).
 
-	Le champ `emoji` du référentiel n'est plus rendu : son dessin dépendait de la
-	police du système et il n'héritait pas de la couleur du badge.
-
 	La couleur n'est jamais le seul porteur d'information : le libellé est toujours
 	écrit, ce qui garde les états lisibles en cas de daltonisme.
 -->

@@ -1,11 +1,8 @@
 // Repères iconographiques des états, en pendant des registres de couleurs de
 // @davincibot/lib.
 //
-// Ces registres portent un champ `emoji` hérité du premier jet (CMD-F-22). Un
-// emoji dépend de la police du système : il change de dessin d'un poste à
-// l'autre, ne s'aligne pas sur la grille typographique et n'hérite pas de la
-// couleur du texte. Les icônes Lucide, elles, sont des SVG qui prennent la
-// teinte du badge et gardent la même allure partout.
+// Les icônes Lucide sont des SVG : elles prennent la teinte du badge, s'alignent
+// sur la grille typographique et gardent la même allure d'un poste à l'autre.
 //
 // La clé est la même que celle du registre de couleurs correspondant : les deux
 // tables se lisent côte à côte et ne peuvent pas diverger sans que TypeScript

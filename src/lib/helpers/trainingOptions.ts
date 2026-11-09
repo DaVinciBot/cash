@@ -24,27 +24,22 @@ import {
 export const TRAINING_CATEGORY_BADGES: Record<TrainingCategory, StateBadge> = {
 	code: {
 		label: 'Code',
-		emoji: '',
 		className: 'bg-sky-500/15 text-sky-300 ring-1 ring-sky-500/30'
 	},
 	electronics: {
 		label: 'Électronique',
-		emoji: '',
 		className: 'bg-amber-500/15 text-amber-300 ring-1 ring-amber-500/30'
 	},
 	robotic: {
 		label: 'Robotique',
-		emoji: '',
 		className: 'bg-violet-500/15 text-violet-300 ring-1 ring-violet-500/30'
 	},
 	software: {
 		label: 'Logiciel',
-		emoji: '',
 		className: 'bg-emerald-500/15 text-emerald-300 ring-1 ring-emerald-500/30'
 	},
 	other: {
 		label: 'Autre',
-		emoji: '',
 		className: 'bg-blue-gray/15 text-dark-light-blue ring-1 ring-rule'
 	}
 };
@@ -56,27 +51,22 @@ export const TRAINING_CATEGORY_BADGES: Record<TrainingCategory, StateBadge> = {
 export const SLOT_STATUS_BADGES: Record<SlotStatus, StateBadge> = {
 	draft: {
 		label: 'Brouillon',
-		emoji: '',
 		className: 'bg-blue-gray/15 text-dark-light-blue ring-1 ring-rule'
 	},
 	pending: {
 		label: 'Planifiée',
-		emoji: '',
 		className: 'bg-sky-500/15 text-sky-300 ring-1 ring-sky-500/30'
 	},
 	done: {
 		label: 'Terminée',
-		emoji: '',
 		className: 'bg-emerald-500/15 text-emerald-300 ring-1 ring-emerald-500/30'
 	},
 	postponed: {
 		label: 'Reportée',
-		emoji: '',
 		className: 'bg-amber-500/15 text-amber-300 ring-1 ring-amber-500/30'
 	},
 	canceled: {
 		label: 'Annulée',
-		emoji: '',
 		className: 'bg-rose-500/15 text-rose-300 ring-1 ring-rose-500/30'
 	}
 };
@@ -105,10 +95,7 @@ export const DEFAULT_TRAINING_CATEGORY: TrainingCategory = 'other';
 
 export const DEFAULT_SLOT_STATUS: SlotStatus = 'draft';
 
-// Pendant iconographique des deux registres ci-dessus. Le champ `emoji` du type
-// StateBadge est laissé vide : il est encore exigé par @davincibot/lib, mais
-// plus rien ne le rend — un emoji change de dessin d'un poste à l'autre et
-// n'hérite pas de la couleur du badge, là où un SVG Lucide fait les deux.
+// Pendant iconographique des deux registres ci-dessus.
 export const TRAINING_CATEGORY_ICONS: Record<TrainingCategory, BadgeIcon> = {
 	code: Code,
 	electronics: CircuitBoard,

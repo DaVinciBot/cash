@@ -19,7 +19,6 @@ export type ActivityKind = (typeof ACTIVITY_KINDS)[number];
 
 interface ActivityBadge {
 	label: string;
-	emoji: string;
 	className: string;
 }
 
@@ -34,22 +33,18 @@ interface ActivityBadge {
 export const ACTIVITY_BADGES: Record<ActivityKind, ActivityBadge> = {
 	created: {
 		label: 'Création',
-		emoji: '✨',
 		className: 'bg-green-500/15 text-green-300 ring-1 ring-green-500/30'
 	},
 	updated: {
 		label: 'Modification',
-		emoji: '✏️',
 		className: 'bg-sky-500/15 text-sky-300 ring-1 ring-sky-500/30'
 	},
 	state_changed: {
 		label: "Changement d'état",
-		emoji: '🔁',
 		className: 'bg-amber-500/15 text-amber-300 ring-1 ring-amber-500/30'
 	},
 	deleted: {
 		label: 'Suppression',
-		emoji: '🗑️',
 		className: 'bg-rose-500/15 text-rose-300 ring-1 ring-rose-500/30'
 	}
 };
@@ -280,3 +275,52 @@ export function actorLabel(entry: Pick<ActivityEntry, 'actorId' | 'actorName'>):
 	}
 	return entry.actorName ?? 'Compte supprimé';
 }
+
+/** Enum public.notification_channel. */
+export const NOTIFICATION_CHANNEL_LABELS: Record<string, string> = {
+	email: 'Mail',
+	discord: 'Discord',
+	webhook: 'Webhook'
+};
+
+/** Enum public.notification_status. */
+export const NOTIFICATION_STATUSES: Record<string, ActivityBadge> = {
+	pending: {
+		label: 'En attente',
+		className: 'bg-amber-500/15 text-amber-300 ring-1 ring-amber-500/30'
+	},
+	sent: {
+		label: 'Envoyée',
+		className: 'bg-green-500/15 text-green-300 ring-1 ring-green-500/30'
+	},
+	failed: {
+		label: 'Échec',
+		className: 'bg-rose-500/15 text-rose-300 ring-1 ring-rose-500/30'
+	}
+};
+
+/** Gabarits émis vers `public.notification_log`. */
+export const NOTIFICATION_TEMPLATE_LABELS: Record<string, string> = {
+	registration_confirmed: 'Inscription confirmée',
+	registration_canceled: 'Inscription annulée',
+	waitlist_promoted: "Sortie de liste d'attente",
+	member_reminder: 'Rappel au membre',
+	trainer_reminder: 'Rappel au formateur',
+	empty_training: 'Formation sans inscrit',
+	full_training: 'Formation complète',
+	training_manager_summary: 'Bilan au responsable',
+	training_feedback_request: 'Demande de retour',
+	training_request_created: 'Demande de formation reçue'
+};
+
+/** Entités auxquelles une notification se rattache. */
+export const NOTIFICATION_ENTITY_LABELS: Record<string, string> = {
+	training_slot: 'Créneau',
+	training_request: 'Demande de formation'
+};
+
+/** Destinataires désignés par leur rôle plutôt que par une adresse. */
+export const NOTIFICATION_TARGET_LABELS: Record<string, string> = {
+	training_director: 'Responsable formation',
+	training_request_managers: 'Gestionnaires des demandes'
+};

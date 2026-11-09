@@ -13,9 +13,11 @@
 		AUDIT_SEARCH,
 		parseCashActivities,
 		parseFormationActivities,
+		parseNotifications,
 		parseRejected,
 		parseSocleActivities,
 		type ActivityRow,
+		type NotificationRow,
 		type RejectedRow
 	} from '#lib/auditTable.js';
 	import {
@@ -25,6 +27,7 @@
 		fieldLabel,
 		formatJournalValue,
 		isOpaqueField,
+		NOTIFICATION_STATUSES,
 		type JournalChange
 	} from '#lib/types/audit.js';
 	import { CASH_ERROR_MESSAGES } from '#lib/types/domain.js';
@@ -36,7 +39,8 @@
 		{ id: 'socle', label: 'Socle', hint: 'Permissions, rattachements, blog' },
 		{ id: 'cash', label: 'Cash', hint: 'Commandes et trésorerie' },
 		{ id: 'formation', label: 'Formation', hint: 'Formations, créneaux et inscriptions' },
-		{ id: 'rejets', label: 'Écritures rejetées', hint: 'Ce que les règles ont refusé' }
+		{ id: 'rejets', label: 'Écritures rejetées', hint: 'Ce que les règles ont refusé' },
+		{ id: 'notifications', label: 'Notifications', hint: 'Mails et messages émis' }
 	] as const;
 
 	const moment = new Intl.DateTimeFormat('fr-FR', { dateStyle: 'short', timeStyle: 'short' });
@@ -63,6 +67,14 @@
 		{ key: 'refusal', label: 'Refus' },
 		{ key: 'target', label: 'Cible', width: '12rem' },
 		{ key: 'actor', label: 'Auteur', width: '10rem' }
+	];
+
+	const notificationColumns: TableColumn[] = [
+		{ key: 'created_at', label: 'Émise', sortable: true, width: '9rem' },
+		{ key: 'template', label: 'Notification' },
+		{ key: 'entity', label: 'Cible', width: '12rem' },
+		{ key: 'recipient', label: 'Destinataire', width: '12rem' },
+		{ key: 'status', label: 'Statut', sortable: true, width: '12rem' }
 	];
 
 	// Une activité tient sur une ligne : ses champs modifiés se lisent en liste dans
@@ -93,8 +105,18 @@
 			{ value, cell: rejectedActorCell }
 		]);
 
+	const parseNotificationRows: ParseItems = (rows) =>
+		parseNotifications(rows).map((value) => [
+			{ value, cell: notificationDateCell },
+			{ value, cell: templateCell },
+			{ value, cell: notificationTargetCell },
+			{ value, cell: recipientCell },
+			{ value, cell: statusCell }
+		]);
+
 	const activity = (cell: TableCell | undefined) => cell?.value as ActivityRow;
 	const rejected = (cell: TableCell | undefined) => cell?.value as RejectedRow;
+	const notification = (cell: TableCell | undefined) => cell?.value as NotificationRow;
 
 	// Les identifiants du socle sont parfois un uuid, un slug ou un rôle : « n° » ne
 	// se dit que d'un numéro.
@@ -151,6 +173,15 @@
 				pageSize={20}
 				parseItems={parseRejectedRows}
 				searchable={AUDIT_SEARCH.rejets}
+			/>
+		{:else if data.tab === 'notifications'}
+			<Table
+				columns={notificationColumns}
+				dbInfo={AUDIT_DB.notifications}
+				filters={AUDIT_FILTERS.notifications}
+				pageSize={20}
+				parseItems={parseNotificationRows}
+				searchable={AUDIT_SEARCH.notifications}
 			/>
 		{:else}
 			<Table
@@ -255,4 +286,44 @@
 
 {#snippet rejectedActorCell(cell: TableCell)}
 	{rejected(cell).actor}
+{/snippet}
+
+{#snippet notificationDateCell(cell: TableCell)}
+	<time class="whitespace-nowrap" datetime={notification(cell).createdAt}
+		>{moment.format(new Date(notification(cell).createdAt))}</time
+	>
+{/snippet}
+
+{#snippet templateCell(cell: TableCell)}
+	{@const row = notification(cell)}
+	<span>
+		<span class="text-light-blue">{row.template}</span>
+		<span class="text-dark-light-blue/70 text-xs">{row.channel}</span>
+	</span>
+{/snippet}
+
+{#snippet notificationTargetCell(cell: TableCell)}
+	{@const row = notification(cell)}
+	{row.entity}
+	{#if isNumeric(row.entityId)}
+		<span class="text-dark-light-blue/70">n° {row.entityId}</span>
+	{:else}
+		<span class="text-dark-light-blue/70">{row.entityId}</span>
+	{/if}
+{/snippet}
+
+{#snippet recipientCell(cell: TableCell)}
+	{notification(cell).recipient}
+{/snippet}
+
+{#snippet statusCell(cell: TableCell)}
+	{@const row = notification(cell)}
+	{@const badge = NOTIFICATION_STATUSES[row.status]}
+	<span
+		class="rounded px-1.5 py-0.5 text-xs font-medium {badge?.className ?? ''}"
+		title={row.error ?? undefined}>{badge?.label ?? row.status}</span
+	>
+	{#if row.error}
+		<p class="mt-1 text-xs text-red-400">{row.error}</p>
+	{/if}
 {/snippet}

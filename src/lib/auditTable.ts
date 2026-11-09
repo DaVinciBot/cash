@@ -6,6 +6,11 @@ import {
 	ACTION_LABELS,
 	CASH_ENTITY_LABELS,
 	FORMATION_ENTITY_LABELS,
+	NOTIFICATION_CHANNEL_LABELS,
+	NOTIFICATION_ENTITY_LABELS,
+	NOTIFICATION_STATUSES,
+	NOTIFICATION_TARGET_LABELS,
+	NOTIFICATION_TEMPLATE_LABELS,
 	SOCLE_ENTITY_LABELS,
 	type ActivityEntry,
 	type ActivityKind,
@@ -16,7 +21,7 @@ import type { DBInfo, Filter } from '@davincibot/components';
 import type { Json } from '@davincibot/database-types';
 import { getSupabaseBrowserClient } from '@davincibot/lib/supabase';
 
-export type AuditTab = 'socle' | 'cash' | 'formation' | 'rejets';
+export type AuditTab = 'socle' | 'cash' | 'formation' | 'rejets' | 'notifications';
 
 const CHANGES = 'field,old_value,new_value';
 
@@ -44,6 +49,11 @@ export const AUDIT_DB: Record<AuditTab, DBInfo> = {
 		table: 'error_events',
 		key: 'id,sqlstate,message,entity_type,entity_id,actor_id,occurred_at,profiles(username)',
 		ordering: 'occurred_at:desc'
+	},
+	notifications: {
+		table: 'notification_log',
+		key: 'id,channel,template,entity_type,entity_id,recipient_id,target,status,error,created_at,profiles(username)',
+		ordering: 'created_at:desc'
 	}
 };
 
@@ -52,7 +62,8 @@ export const AUDIT_SEARCH: Record<AuditTab, string> = {
 	socle: 'entity_id',
 	cash: 'entity_id',
 	formation: 'entity_id',
-	rejets: 'message'
+	rejets: 'message',
+	notifications: 'entity_id'
 };
 
 const entityOptions = (labels: Record<string, string>) =>
@@ -84,6 +95,27 @@ export const AUDIT_FILTERS: Record<AuditTab, Filter[]> = {
 			category: 'Code',
 			value: 'sqlstate',
 			options: Object.keys(CASH_ERROR_MESSAGES).map((code) => ({ value: code, name: code }))
+		}
+	],
+	notifications: [
+		{
+			category: 'Statut',
+			value: 'status',
+			options: Object.entries(NOTIFICATION_STATUSES).map(([value, { label }]) => ({
+				value,
+				name: label
+			}))
+		},
+		{ category: 'Canal', value: 'channel', options: entityOptions(NOTIFICATION_CHANNEL_LABELS) },
+		{
+			category: 'Gabarit',
+			value: 'template',
+			options: entityOptions(NOTIFICATION_TEMPLATE_LABELS)
+		},
+		{
+			category: 'Entité',
+			value: 'entity_type',
+			options: entityOptions(NOTIFICATION_ENTITY_LABELS)
 		}
 	]
 };
@@ -201,6 +233,57 @@ export const parseRejected = (rows: unknown[]): RejectedRow[] =>
 			entityId: row.entity_id,
 			actor: row.profiles?.username ?? (row.actor_id ? 'Compte supprimé' : 'Système'),
 			occurredAt: row.occurred_at
+		};
+		return value;
+	});
+
+export interface NotificationRow {
+	channel: string;
+	template: string;
+	entity: string;
+	entityId: string;
+	recipient: string;
+	status: string;
+	error: string | null;
+	createdAt: string;
+}
+
+interface NotificationDbRow {
+	channel: string;
+	template: string;
+	entity_type: string;
+	entity_id: string;
+	recipient_id: string | null;
+	target: string | null;
+	status: string;
+	error: string | null;
+	created_at: string;
+	profiles: { username: string | null } | null;
+}
+
+// Un membre se nomme par son profil ; une diffusion n'a pas de profil et garde
+// l'adresse effective de l'émission, ou le rôle qu'elle visait.
+function recipientLabel(row: NotificationDbRow): string {
+	if (row.recipient_id) {
+		return row.profiles?.username ?? 'Compte supprimé';
+	}
+	if (row.target) {
+		return NOTIFICATION_TARGET_LABELS[row.target] ?? row.target;
+	}
+	return '—';
+}
+
+export const parseNotifications = (rows: unknown[]): NotificationRow[] =>
+	(rows as NotificationDbRow[]).map((row) => {
+		const value: NotificationRow = {
+			channel: NOTIFICATION_CHANNEL_LABELS[row.channel] ?? row.channel,
+			template: NOTIFICATION_TEMPLATE_LABELS[row.template] ?? row.template,
+			entity: NOTIFICATION_ENTITY_LABELS[row.entity_type] ?? row.entity_type,
+			entityId: row.entity_id,
+			recipient: recipientLabel(row),
+			status: row.status,
+			error: row.error,
+			createdAt: row.created_at
 		};
 		return value;
 	});

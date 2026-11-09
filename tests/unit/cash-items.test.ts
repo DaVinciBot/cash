@@ -70,7 +70,6 @@ describe("référentiel des états d'item (CMD-F-20 / CMD-F-22)", () => {
 	it('donne un badge à chaque état, sans trou', () => {
 		for (const state of ITEM_STATES) {
 			expect(ITEM_STATE_BADGES[state].label).toBeTruthy();
-			expect(ITEM_STATE_BADGES[state].emoji).toBeTruthy();
 			expect(ITEM_STATE_BADGES[state].className).toBeTruthy();
 		}
 	});
