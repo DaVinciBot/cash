@@ -1,7 +1,12 @@
 import { rejection } from '#lib/server/audit.js';
 import { currentSchoolYear } from '#lib/server/cash.js';
 import { text, textAll } from '#lib/server/form.js';
-import { allocateDefaultLeaves, bundlingQueue, draftOrders } from '#lib/server/orders.js';
+import {
+	allocateDefaultLeaves,
+	bundlingQueue,
+	draftOrders,
+	orderList
+} from '#lib/server/orders.js';
 import { refusalReasonError } from '#lib/types/domain.js';
 import { resolve } from '$app/paths';
 import { error, fail, redirect } from '@sveltejs/kit';
@@ -19,12 +24,21 @@ function selectedIds(form: FormData): number[] {
 export const load: PageServerLoad = async ({ locals, depends }) => {
 	depends('cash:bundle');
 
-	const items = await bundlingQueue(locals.supabase);
-	const year = await currentSchoolYear(locals.supabase);
+	const [items, year, drafts, orders] = await Promise.all([
+		bundlingQueue(locals.supabase),
+		currentSchoolYear(locals.supabase),
+		draftOrders(locals.supabase),
+		orderList(locals.supabase)
+	]);
 
 	return {
 		items,
-		drafts: await draftOrders(locals.supabase),
+		drafts,
+		// #53 — les commandes à faire avancer, sur la même page que la file : le
+		// trésorier passe, réceptionne et regroupe sans changer d'onglet.
+		activeOrders: orders.filter(
+			(order) => order.state === 'pending_treso' || order.state === 'pending_delivery'
+		),
 		schoolYearLabel: year?.label ?? null
 	};
 };
