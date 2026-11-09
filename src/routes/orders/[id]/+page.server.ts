@@ -1,6 +1,12 @@
 import { entityHistory, rejection } from '#lib/server/audit.js';
 import { decimal, text, textAll } from '#lib/server/form.js';
-import { budgetLeaves, campusAddress, orderDetail } from '#lib/server/orders.js';
+import {
+	allocateDefaultLeaves,
+	budgetLeaves,
+	bundlingQueue,
+	campusAddress,
+	orderDetail
+} from '#lib/server/orders.js';
 import { accounts } from '#lib/server/treasury.js';
 import { SHIPPING_ALLOCATIONS, type ShippingAllocation } from '#lib/types/domain.js';
 import { error, fail } from '@sveltejs/kit';
@@ -28,23 +34,115 @@ export const load: PageServerLoad = async ({ locals, params, depends }) => {
 		error(404, 'Commande introuvable.');
 	}
 
-	const [{ leaves }, address, accountRows, history] = await Promise.all([
+	const editable = order.state === 'pending_treso';
+	const [{ leaves }, address, accountRows, history, queue, { data: flowRows }] = await Promise.all([
 		budgetLeaves(locals.supabase, order.schoolYearId),
 		order.campus ? campusAddress(locals.supabase, order.campus) : Promise.resolve(null),
 		accounts(locals.supabase),
-		entityHistory(locals.supabase, 'order', id)
+		entityHistory(locals.supabase, 'order', id),
+		editable ? bundlingQueue(locals.supabase) : Promise.resolve([]),
+		locals.supabase
+			.schema('cash')
+			.from('flows')
+			.select('account_id, direction, amount_ttc')
+			.eq('order_id', id)
 	]);
+
+	// #83 — seuls les items de la file qui peuvent rejoindre CETTE commande :
+	// même campus (CMD-F-45) et même année scolaire. La base le revérifie.
+	const sameCampus = queue.filter((item) => !order.campus || item.campus === order.campus);
+	const { data: sameYear } =
+		sameCampus.length > 0
+			? await locals.supabase
+					.schema('cash')
+					.from('items')
+					.select('id')
+					.in(
+						'id',
+						sameCampus.map((item) => item.id)
+					)
+					.eq('school_year_id', order.schoolYearId)
+			: { data: [] };
+	const inYear = new Set((sameYear ?? []).map((row) => row.id));
+
+	// #97 — le compte qui a le plus payé la commande est le plus probable du
+	// remboursement : il est proposé par défaut.
+	const paidByAccount = new Map<number, number>();
+	for (const flow of flowRows ?? []) {
+		const signed = flow.direction === 'debit' ? flow.amount_ttc : -flow.amount_ttc;
+		paidByAccount.set(flow.account_id, (paidByAccount.get(flow.account_id) ?? 0) + signed);
+	}
+	const refundAccountId =
+		[...paidByAccount.entries()].sort((a, b) => b[1] - a[1]).at(0)?.[0] ?? null;
 
 	return {
 		order,
 		leaves,
 		address,
 		accounts: accountRows.filter((a) => !a.archivedAt),
-		history
+		history,
+		addable: sameCampus.filter((item) => inYear.has(item.id)),
+		refundAccountId
 	};
 };
 
 export const actions: Actions = {
+	/**
+	 * #83 — compléter une commande en attente avec des items déjà validés de la
+	 * file, sans repasser par « Items à regrouper ». `add_items_to_order` tient
+	 * les invariants (commande en attente, campus unique) ; l'imputation par
+	 * défaut suit, comme à la constitution d'une commande.
+	 */
+	addItems: async ({ locals, params, request }) => {
+		const id = orderId(params);
+		const form = await request.formData();
+		const ids = [
+			...new Set(
+				textAll(form, 'item')
+					.map(Number)
+					.filter((value) => Number.isSafeInteger(value) && value > 0)
+			)
+		];
+		if (ids.length === 0) {
+			return fail(400, { message: 'Aucun item sélectionné.' });
+		}
+
+		const { data: chosen, error: readError } = await locals.supabase
+			.schema('cash')
+			.from('items')
+			.select('id, project_id, total_ttc, school_year_id')
+			.in('id', ids)
+			.eq('state', 'pending_bundled')
+			.is('order_id', null);
+
+		if (readError || chosen.length === 0) {
+			return fail(400, { message: 'Ces items ne sont plus disponibles au regroupement.' });
+		}
+
+		const { error: addError } = await locals.supabase
+			.schema('cash')
+			.rpc('add_items_to_order', { p_order_id: id, p_item_ids: chosen.map((i) => i.id) });
+
+		if (addError) {
+			return fail(400, {
+				message: await rejection(
+					locals.supabase,
+					addError,
+					"Ces items n'ont pas pu être ajoutés à la commande.",
+					{
+						entityType: 'order'
+					}
+				)
+			});
+		}
+
+		const schoolYearId = chosen[0]?.school_year_id;
+		if (schoolYearId !== undefined) {
+			await allocateDefaultLeaves(locals.supabase, schoolYearId, chosen);
+		}
+		return { saved: 'added', count: chosen.length };
+	},
+
 	/** Frais de port et mode de répartition (CMD-F-12, §7.2). */
 	shipping: async ({ locals, params, request }) => {
 		const id = orderId(params);
@@ -104,7 +202,7 @@ export const actions: Actions = {
 				message: 'Impossible de valider : la commande doit contenir au moins un item.'
 			});
 		}
-		const orphans = detail?.items.filter((i) => i.allocations.length === 0) ?? [];
+		const orphans = detail.items.filter((i) => i.allocations.length === 0);
 		if (orphans.length > 0) {
 			return fail(400, {
 				message: `Sans budget d'imputation : ${orphans.map((i) => i.name).join(', ')}. Ouvrez chaque item pour lui désigner un poste de dépense.`
@@ -177,11 +275,36 @@ export const actions: Actions = {
 	 *
 	 * On la décoche quand l'argent est réellement parti et ne reviendra pas :
 	 * annuler la commande dans l'outil ne rappelle pas un virement.
+	 *
+	 * #97 — une commande PARTIELLEMENT reçue ne se contrepasse pas en entier : les
+	 * articles reçus ont été payés et acquis. Le trésorier saisit alors le
+	 * montant réellement remboursé (proposé : le total des items non reçus), qui
+	 * entre en recette sur le compte choisi. Une contrepassation reprend toujours
+	 * le montant exact du flux d'origine (DVB07) : elle ne sait pas être partielle.
 	 */
 	cancel: async ({ locals, params, request }) => {
 		const id = orderId(params);
 		const form = await request.formData();
 		const reverse = text(form, 'reverse') === '1';
+
+		const detail = await orderDetail(locals.supabase, id);
+		const partial = detail?.items.some((item) => item.state === 'received') ?? false;
+		const refund = Math.round(decimal(form, 'refund_ttc') * 100) / 100;
+		const refundAccount = Number(form.get('refund_account_id'));
+		if (partial && reverse) {
+			if (!Number.isFinite(refund) || refund < 0) {
+				return fail(400, { message: 'Le montant remboursé doit être un montant positif.' });
+			}
+			const cost = (detail?.amountTtc ?? 0) + (detail?.shippingCostTtc ?? 0);
+			if (refund > cost) {
+				return fail(400, {
+					message: 'Le remboursement ne peut pas dépasser ce que la commande a coûté.'
+				});
+			}
+			if (refund > 0 && !Number.isSafeInteger(refundAccount)) {
+				return fail(400, { message: 'Choisissez le compte qui reçoit le remboursement.' });
+			}
+		}
 
 		const { error: updateError } = await locals.supabase
 			.schema('cash')
@@ -201,6 +324,52 @@ export const actions: Actions = {
 					}
 				)
 			});
+		}
+
+		if (reverse && partial) {
+			if (refund === 0) {
+				return { saved: 'canceled', reversed: 0 };
+			}
+			const today = new Date().toISOString().slice(0, 10);
+			const { data: fiscalYear } = await locals.supabase
+				.schema('cash')
+				.from('fiscal_years')
+				.select('id')
+				.lte('starts_on', today)
+				.gte('ends_on', today)
+				.maybeSingle();
+			if (!fiscalYear) {
+				return fail(400, {
+					message:
+						"La commande est annulée, mais aucun exercice ne couvre aujourd'hui : saisissez le remboursement dans les mouvements."
+				});
+			}
+			const { error: refundError } = await locals.supabase
+				.schema('cash')
+				.from('flows')
+				.insert({
+					direction: 'credit',
+					amount_ttc: refund,
+					occurred_on: today,
+					label: `Remboursement partiel commande #${String(id)}`,
+					account_id: refundAccount,
+					fiscal_year_id: fiscalYear.id,
+					order_id: id,
+					origin: 'auto'
+				});
+			if (refundError) {
+				return fail(400, {
+					message: await rejection(
+						locals.supabase,
+						refundError,
+						"La commande est annulée, mais le remboursement n'a pas pu être enregistré : saisissez-le dans les mouvements.",
+						{
+							entityType: 'order'
+						}
+					)
+				});
+			}
+			return { saved: 'canceled', reversed: 1 };
 		}
 
 		if (reverse) {
