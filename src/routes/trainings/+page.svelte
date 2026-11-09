@@ -11,7 +11,9 @@
 		buildSummaryFields,
 		buildTrainingFields,
 		type ProfileOption,
-		type SlotFieldsConfig
+		type SlotFieldsConfig,
+		defaultAnnouncementWeek,
+		matchProfiles
 	} from '#lib/helpers/trainingForms.js';
 	import { categoryOptions, statusOptions } from '#lib/helpers/trainingOptions.js';
 	import {
@@ -26,7 +28,6 @@
 	import {
 		createTraining,
 		createTrainingSlot,
-		getParisDateKey,
 		getTrainingList,
 		getTrainingSlots,
 		parseParisDatetimeLocal,
@@ -106,19 +107,26 @@ DVBisous ! :robot:`;
 	let trainingIndex = new Map<number, TrainingListItem>();
 	let slotIndex = new Map<number, TrainingSlotListItem>();
 
-	async function searchProfiles(search: string) {
-		const supabaseClient = getSupabaseBrowserClient();
-		const { data, error } = await supabaseClient
-			.from('profiles')
-			.select('id, username, avatar_url')
-			.ilike('username', `%${search}%`)
-			.range(0, 4);
+	// #35 — `ilike` distingue « é » de « e » : la liste des profils se charge une
+	// fois, et la recherche se fait ici, accents et casse ignorés.
+	let profileDirectory:
+		{ id: string; username: string | null; avatar_url: string | null }[] | null = null;
 
-		if (error) {
-			return [];
+	async function searchProfiles(search: string) {
+		if (!profileDirectory) {
+			const supabaseClient = getSupabaseBrowserClient();
+			const { data, error } = await supabaseClient
+				.from('profiles')
+				.select('id, username, avatar_url')
+				.not('username', 'is', null)
+				.order('username');
+			if (error) {
+				return [];
+			}
+			profileDirectory = data;
 		}
 
-		return data.map(
+		return matchProfiles(profileDirectory, search).map(
 			(profile: { id: string; username: string | null; avatar_url: string | null }) => ({
 				id: profile.id,
 				value: profile.id,
@@ -638,11 +646,13 @@ DVBisous ! :robot:`;
 	const draftSlots = $derived(slots.filter((slot) => slot.status === 'draft'));
 
 	onMount(() => {
+		// #39 — par défaut, l'annonce couvre une semaine de cours, du lundi au vendredi.
+		const week = defaultAnnouncementWeek(new Date());
 		if (!summaryFrom) {
-			summaryFrom = getParisDateKey(new Date());
+			summaryFrom = week.from;
 		}
 		if (!summaryTo) {
-			summaryTo = getParisDateKey(new Date(Date.now() + 7 * 24 * 60 * 60 * 1000));
+			summaryTo = week.to;
 		}
 		if (!summaryText) {
 			summaryText = defaultSummaryText;

@@ -47,6 +47,24 @@
 	let autocompleteImages: Record<string, string | null> = $state({});
 	let autocompleteRequestIds: Record<string, number> = $state({});
 
+	/**
+	 * La zone de texte grandit avec son contenu (#38) : une annonce Discord ou une
+	 * description de formation se relit d'un bloc, sans ascenseur de trois lignes.
+	 */
+	function autogrow(node: HTMLTextAreaElement) {
+		const fit = () => {
+			node.style.height = 'auto';
+			node.style.height = `${String(node.scrollHeight + 2)}px`;
+		};
+		fit();
+		node.addEventListener('input', fit);
+		return {
+			destroy() {
+				node.removeEventListener('input', fit);
+			}
+		};
+	}
+
 	function fieldId(field: CrudField): string {
 		return field.id ?? field.name.toLowerCase();
 	}
@@ -193,11 +211,12 @@
 									<textarea
 										id={fieldId(field)}
 										name={fieldId(field)}
-										class=" focus:border-light-blue/70 border-rule-strong bg-dark-blue/60 placeholder:text-muted block w-full rounded-lg border p-2.5 text-sm text-white"
+										class=" focus:border-light-blue/70 border-rule-strong bg-dark-blue/60 placeholder:text-muted block max-h-[60vh] min-h-24 w-full resize-y rounded-lg border p-2.5 text-sm text-white"
 										placeholder={field.placeholder ?? field.name.toLowerCase()}
 										readonly={field.readonly ?? false}
 										required={field.required}
-										value={stringValue(field.value)}></textarea>
+										value={stringValue(field.value)}
+										use:autogrow></textarea>
 								{:else if field.type === 'img'}
 									<input
 										id={fieldId(field)}
