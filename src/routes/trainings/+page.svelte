@@ -15,6 +15,11 @@
 		type CapacityMode,
 		type SlotFieldsConfig
 	} from '#lib/helpers/trainingForms.js';
+	import {
+		priorityGroupOptions,
+		saveSlotPriorityGroups,
+		slotPriorityGroups
+	} from '#lib/helpers/priorityGroups.js';
 	import { categoryOptions, statusOptions } from '#lib/helpers/trainingOptions.js';
 	import {
 		createSlotTableItems,
@@ -23,7 +28,7 @@
 		formatSlotDate
 	} from '#lib/helpers/trainingTables.js';
 	import type { TableCell, TableRow } from '@davincibot/components';
-	import type { StateBadge as StateBadgeData } from '@davincibot/lib';
+	import type { SelectOption, StateBadge as StateBadgeData } from '@davincibot/lib';
 	import type { CrudField } from '#lib/types/crud.js';
 	import {
 		createTraining,
@@ -196,9 +201,22 @@ DVBisous ! :robot:`;
 
 	// formation#47 — mode de capacité du formulaire de session ouvert.
 	let capacityMode = $state<CapacityMode>('separate');
+	// formation#52 — groupes prioritaires proposés et choisis.
+	let priorityOptions = $state<SelectOption[]>([]);
+	let priorityGroups = $state<string[]>([]);
 
-	function openSlotModal(slot: TrainingSlotListItem | null = null) {
+	async function openSlotModal(slot: TrainingSlotListItem | null = null) {
 		formError = null;
+		const supabaseClient = getSupabaseBrowserClient();
+		try {
+			[priorityOptions, priorityGroups] = await Promise.all([
+				priorityGroupOptions(supabaseClient),
+				slot ? slotPriorityGroups(supabaseClient, slot.slot_id) : Promise.resolve([])
+			]);
+		} catch {
+			priorityOptions = [];
+			priorityGroups = [];
+		}
 		editingSlot = slot;
 		capacityMode = capacityModeOf(slot);
 		selectedTrainerId = slot?.trainer_id ?? null;
@@ -216,6 +234,11 @@ DVBisous ! :robot:`;
 				onCapacityModeChange: (mode: CapacityMode) => {
 					capacityMode = mode;
 					rebuildSlotFields(selectedTrainingId);
+				},
+				priorityOptions,
+				priorityGroups,
+				onPriorityGroupsChange: (values: string[]) => {
+					priorityGroups = values;
 				},
 				onTrainerChange: (nextId: string | null) => {
 					selectedTrainerId = nextId;
@@ -264,6 +287,11 @@ DVBisous ! :robot:`;
 			onCapacityModeChange: (mode: CapacityMode) => {
 				capacityMode = mode;
 				rebuildSlotFields(selectedTrainingId);
+			},
+			priorityOptions,
+			priorityGroups,
+			onPriorityGroupsChange: (values: string[]) => {
+				priorityGroups = values;
 			},
 			onTrainerChange: (nextId: string | null) => {
 				selectedTrainerId = nextId;
@@ -382,6 +410,9 @@ DVBisous ! :robot:`;
 		const location = getFormString(formData, 'location').trim() || null;
 		const videoLink = getFormString(formData, 'video_conference_link').trim() || null;
 		const excusable = formData.has('excusable');
+		const chosenPriorityGroups = formData
+			.getAll('priority_groups')
+			.filter((value): value is string => typeof value === 'string' && value !== 'NULL');
 		const startIso = startInput ? parseParisDatetimeLocal(startInput) : '';
 		// formation#47 — en places communes, une seule capacité, et les deux modalités
 		// sont proposées : la base décompte chaque inscription du total commun.
@@ -464,6 +495,7 @@ DVBisous ! :robot:`;
 				await updateTrainingSlot(supabaseClient, editingSlot.slot_id, {
 					...updates
 				});
+				await saveSlotPriorityGroups(supabaseClient, editingSlot.slot_id, chosenPriorityGroups);
 			} else {
 				const payload = {
 					shared_seats: sharedSeats,
@@ -485,7 +517,12 @@ DVBisous ! :robot:`;
 					excusable,
 					status
 				};
-				await createTrainingSlot(supabaseClient, payload);
+				const created = (await createTrainingSlot(supabaseClient, payload)) as {
+					id?: number;
+				} | null;
+				if (typeof created?.id === 'number' && chosenPriorityGroups.length > 0) {
+					await saveSlotPriorityGroups(supabaseClient, created.id, chosenPriorityGroups);
+				}
 			}
 			await loadData();
 			triggerTableRefresh(slotTableTopic);
@@ -650,7 +687,7 @@ DVBisous ! :robot:`;
 		const id = Number(row[0]?.data);
 		const slot = slotIndex.get(id) ?? slots.find((item) => item.slot_id === id) ?? null;
 		if (slot) {
-			openSlotModal(slot);
+			void openSlotModal(slot);
 		}
 	}
 
@@ -698,7 +735,7 @@ DVBisous ! :robot:`;
 		calendarHref="/formation"
 		draftCount={draftSlots.length}
 		onAddSlot={() => {
-			openSlotModal();
+			void openSlotModal();
 		}}
 		onAddTraining={() => {
 			openTrainingModal();
@@ -749,10 +786,10 @@ DVBisous ! :robot:`;
 			{findTrainingName}
 			{formatSlotDate}
 			onAddSlot={() => {
-				openSlotModal();
+				void openSlotModal();
 			}}
 			onEditSlot={(slot: TrainingSlotListItem) => {
-				openSlotModal(slot);
+				void openSlotModal(slot);
 			}}
 			{onSlotRowClick}
 			{parseSlotItems}

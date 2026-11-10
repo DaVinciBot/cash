@@ -154,9 +154,10 @@
 										name={fieldId(field)}
 										class="almarai-regular focus:border-light-blue/70 border-rule-strong bg-dark-blue/60 placeholder:text-muted block w-full cursor-pointer rounded-lg border p-2.5 text-sm text-white"
 										disabled={field.readonly ?? false}
+										multiple={field.multiple ?? false}
 										onchange={field.onChange ?? null}
 									>
-										{#if !field.readonly && !field.required}<option
+										{#if !field.readonly && !field.required && !field.multiple}<option
 												selected={!field.autoselect}
 												value="NULL">----------</option
 											>
