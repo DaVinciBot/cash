@@ -4,7 +4,7 @@ import {
 	categoryOptions,
 	statusOptions
 } from '#lib/helpers/trainingOptions.js';
-import type { TrainingListItem, TrainingSlotListItem } from '@davincibot/lib';
+import type { SelectOption, TrainingListItem, TrainingSlotListItem } from '@davincibot/lib';
 import { formatParisDatetimeLocal } from '@davincibot/lib';
 
 export interface SummaryFieldsConfig {
@@ -96,6 +96,11 @@ export interface SlotFieldsConfig {
 	/** formation#47 — places séparées par modalité, ou communes aux deux. */
 	capacityMode?: CapacityMode;
 	onCapacityModeChange?: (mode: CapacityMode) => void;
+	/** formation#52 — associations et projets proposables comme groupes prioritaires. */
+	priorityOptions?: SelectOption[];
+	/** Valeurs choisies (`a:<id>`, `p:<id>`). */
+	priorityGroups?: string[];
+	onPriorityGroupsChange?: (values: string[]) => void;
 }
 
 export type CapacityMode = 'separate' | 'shared';
@@ -131,7 +136,10 @@ export function buildSlotFields({
 	onTrainerChange,
 	onTrainingChange,
 	capacityMode = capacityModeOf(slot),
-	onCapacityModeChange
+	onCapacityModeChange,
+	priorityOptions = [],
+	priorityGroups = [],
+	onPriorityGroupsChange
 }: SlotFieldsConfig) {
 	const baseTrainingId = selectedTrainingId ?? slot?.training_id ?? null;
 	const baseTraining = baseTrainingId
@@ -281,6 +289,32 @@ export function buildSlotFields({
 			type: 'checkbox',
 			checked: slot?.excusable ?? true
 		},
+		// formation#52 — jusqu'à 24 h avant le début, seuls les membres de ces
+		// groupes prennent une place ; les autres attendent la libération. Sans
+		// options (lecture impossible), le champ n'est pas proposé : un formulaire
+		// vide effacerait les groupes existants.
+		...(priorityOptions.length === 0
+			? []
+			: [
+					{
+						name: 'Groupes prioritaires (facultatif)',
+						id: 'priority_groups',
+						type: 'select',
+						multiple: true,
+						wide: true,
+						options: priorityOptions.map((option) => ({
+							...option,
+							selected: priorityGroups.includes(option.value)
+						})),
+						onChange: (event: Event) => {
+							const select = event.target as HTMLSelectElement;
+							onPriorityGroupsChange?.(
+								Array.from(select.selectedOptions, (option) => option.value)
+							);
+							return undefined;
+						}
+					}
+				]),
 		{
 			name: 'Statut',
 			id: 'status',
