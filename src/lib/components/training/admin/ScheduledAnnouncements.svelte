@@ -38,7 +38,8 @@
 			period_from: string;
 			period_to: string;
 			text: string | null;
-		}) => PromiseLike<{ error: { message: string } | null }>;
+			include_stories: boolean;
+		}) => PromiseLike<{ error: { code?: string; message: string } | null }>;
 		update: (values: { status: 'canceled' }) => {
 			eq: (column: 'id', value: number) => PromiseLike<{ error: { message: string } | null }>;
 		};
@@ -74,6 +75,8 @@
 	let from = $state(week.from);
 	let to = $state(week.to);
 	let text = $state('');
+	// Les stories ne partent qu'à la demande, et seulement pour qui en a le droit.
+	let includeStories = $state(true);
 	// Par défaut, le dimanche soir qui précède la semaine annoncée.
 	let sendAt = $state(`${defaultSendDay(week.from)}T18:00`);
 
@@ -114,11 +117,15 @@
 			send_at: when.toISOString(),
 			period_from: from,
 			period_to: to,
-			text: text.trim() || null
+			text: text.trim() || null,
+			include_stories: includeStories
 		});
 		busy = false;
 		if (insertError) {
-			error = "L'annonce n'a pas pu être planifiée.";
+			error =
+				insertError.code === '42501' && includeStories
+					? "Vous n'avez pas le droit d'envoyer les stories : décochez « Envoyer aussi les stories »."
+					: "L'annonce n'a pas pu être planifiée.";
 			return;
 		}
 		open = false;
@@ -177,6 +184,10 @@
 			<label class="text-dark-light-blue text-xs sm:col-span-3">
 				Texte (facultatif : le message habituel sinon)
 				<textarea class={FIELD} rows="3" bind:value={text}></textarea>
+			</label>
+			<label class="text-dark-light-blue flex items-center gap-2 text-sm sm:col-span-3">
+				<input class="size-4" type="checkbox" bind:checked={includeStories} />
+				Envoyer aussi les stories
 			</label>
 			<div class="sm:col-span-3">
 				<Button disabled={busy} size="sm" type="submit" variant="primary"
