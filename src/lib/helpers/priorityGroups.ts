@@ -21,13 +21,13 @@ interface Untyped {
 	from: (table: string) => {
 		select: (columns: string) => {
 			order: (column: string) => Result<{ id: number; name: string | null }[]>;
-			eq: (column: string, value: number) => Result<PriorityGroupRow[]>;
+			eq: (column: string, value: number) => Result<(PriorityGroupRow & { id: number })[]>;
 			is: (
 				column: string,
 				value: null
 			) => { order: (column: string) => Result<{ id: number; name: string | null }[]> };
 		};
-		delete: () => { eq: (column: string, value: number) => Result<null> };
+		delete: () => { in: (column: string, values: number[]) => Result<null> };
 		insert: (rows: (PriorityGroupRow & { slot_id: number })[]) => Result<null>;
 	};
 	schema: (name: 'formation') => Pick<Untyped, 'from'>;
@@ -73,36 +73,55 @@ export async function priorityGroupOptions(supabase: Client): Promise<SelectOpti
 	];
 }
 
-/** Valeurs des groupes prioritaires d'une session. */
-export async function slotPriorityGroups(supabase: Client, slotId: number): Promise<string[]> {
-	const { data } = await untyped(supabase)
+async function currentGroups(supabase: Client, slotId: number) {
+	const { data, error } = await untyped(supabase)
 		.schema('formation')
 		.from('slot_priority_group')
-		.select('association_id, project_id')
+		.select('id, association_id, project_id')
 		.eq('slot_id', slotId);
-	return (data ?? []).map(priorityValue);
+	if (error) {
+		throw new Error(error.message);
+	}
+	return data ?? [];
 }
 
-/** Remplace les groupes prioritaires d'une session par `values`. */
+/** Valeurs des groupes prioritaires d'une session ; lève si la lecture échoue. */
+export async function slotPriorityGroups(supabase: Client, slotId: number): Promise<string[]> {
+	return (await currentGroups(supabase, slotId)).map(priorityValue);
+}
+
+/**
+ * Remplace les groupes prioritaires d'une session par `values`. Les groupes
+ * manquants sont ajoutés avant que les groupes retirés soient supprimés : une
+ * erreur en route laisse au pire des groupes en trop, jamais une session
+ * ouverte à tous par accident.
+ */
 export async function saveSlotPriorityGroups(
 	supabase: Client,
 	slotId: number,
 	values: string[]
 ): Promise<void> {
 	const table = () => untyped(supabase).schema('formation').from('slot_priority_group');
-	const rows = [...new Set(values)]
+	const wantedRows = values
 		.map(parsePriorityValue)
-		.filter((row): row is PriorityGroupRow => row !== null)
-		.map((row) => ({ ...row, slot_id: slotId }));
-	const { error: deleteError } = await table().delete().eq('slot_id', slotId);
-	if (deleteError) {
-		throw new Error(deleteError.message);
+		.filter((row): row is PriorityGroupRow => row !== null);
+	const wanted = new Set(wantedRows.map(priorityValue));
+	const current = await currentGroups(supabase, slotId);
+	const present = new Set(current.map(priorityValue));
+	const toInsert = [...new Map(wantedRows.map((row) => [priorityValue(row), row])).entries()]
+		.filter(([value]) => !present.has(value))
+		.map(([, row]) => ({ ...row, slot_id: slotId }));
+	const toDelete = current.filter((row) => !wanted.has(priorityValue(row))).map((row) => row.id);
+	if (toInsert.length > 0) {
+		const { error } = await table().insert(toInsert);
+		if (error) {
+			throw new Error(error.message);
+		}
 	}
-	if (rows.length === 0) {
-		return;
-	}
-	const { error: insertError } = await table().insert(rows);
-	if (insertError) {
-		throw new Error(insertError.message);
+	if (toDelete.length > 0) {
+		const { error } = await table().delete().in('id', toDelete);
+		if (error) {
+			throw new Error(error.message);
+		}
 	}
 }

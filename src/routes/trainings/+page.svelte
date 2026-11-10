@@ -204,6 +204,8 @@ DVBisous ! :robot:`;
 	// formation#52 — groupes prioritaires proposés et choisis.
 	let priorityOptions = $state<SelectOption[]>([]);
 	let priorityGroups = $state<string[]>([]);
+	// Faux quand les groupes n'ont pas pu être lus : on n'y touche alors pas.
+	let priorityLoaded = $state(false);
 
 	async function openSlotModal(slot: TrainingSlotListItem | null = null) {
 		formError = null;
@@ -213,9 +215,11 @@ DVBisous ! :robot:`;
 				priorityGroupOptions(supabaseClient),
 				slot ? slotPriorityGroups(supabaseClient, slot.slot_id) : Promise.resolve([])
 			]);
+			priorityLoaded = priorityOptions.length > 0;
 		} catch {
 			priorityOptions = [];
 			priorityGroups = [];
+			priorityLoaded = false;
 		}
 		editingSlot = slot;
 		capacityMode = capacityModeOf(slot);
@@ -495,7 +499,9 @@ DVBisous ! :robot:`;
 				await updateTrainingSlot(supabaseClient, editingSlot.slot_id, {
 					...updates
 				});
-				await saveSlotPriorityGroups(supabaseClient, editingSlot.slot_id, chosenPriorityGroups);
+				if (priorityLoaded) {
+					await saveSlotPriorityGroups(supabaseClient, editingSlot.slot_id, chosenPriorityGroups);
+				}
 			} else {
 				const payload = {
 					shared_seats: sharedSeats,
@@ -520,7 +526,7 @@ DVBisous ! :robot:`;
 				const created = (await createTrainingSlot(supabaseClient, payload)) as {
 					id?: number;
 				} | null;
-				if (typeof created?.id === 'number' && chosenPriorityGroups.length > 0) {
+				if (priorityLoaded && typeof created?.id === 'number' && chosenPriorityGroups.length > 0) {
 					await saveSlotPriorityGroups(supabaseClient, created.id, chosenPriorityGroups);
 				}
 			}

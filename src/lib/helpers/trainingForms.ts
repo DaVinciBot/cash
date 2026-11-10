@@ -290,23 +290,31 @@ export function buildSlotFields({
 			checked: slot?.excusable ?? true
 		},
 		// formation#52 — jusqu'à 24 h avant le début, seuls les membres de ces
-		// groupes prennent une place ; les autres attendent la libération.
-		{
-			name: 'Groupes prioritaires (facultatif)',
-			id: 'priority_groups',
-			type: 'select',
-			multiple: true,
-			wide: true,
-			options: priorityOptions.map((option) => ({
-				...option,
-				selected: priorityGroups.includes(option.value)
-			})),
-			onChange: (event: Event) => {
-				const select = event.target as HTMLSelectElement;
-				onPriorityGroupsChange?.(Array.from(select.selectedOptions, (option) => option.value));
-				return undefined;
-			}
-		},
+		// groupes prennent une place ; les autres attendent la libération. Sans
+		// options (lecture impossible), le champ n'est pas proposé : un formulaire
+		// vide effacerait les groupes existants.
+		...(priorityOptions.length === 0
+			? []
+			: [
+					{
+						name: 'Groupes prioritaires (facultatif)',
+						id: 'priority_groups',
+						type: 'select',
+						multiple: true,
+						wide: true,
+						options: priorityOptions.map((option) => ({
+							...option,
+							selected: priorityGroups.includes(option.value)
+						})),
+						onChange: (event: Event) => {
+							const select = event.target as HTMLSelectElement;
+							onPriorityGroupsChange?.(
+								Array.from(select.selectedOptions, (option) => option.value)
+							);
+							return undefined;
+						}
+					}
+				]),
 		{
 			name: 'Statut',
 			id: 'status',
