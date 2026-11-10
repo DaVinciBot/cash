@@ -6,7 +6,9 @@ import type { DBInfo, Filter } from '@davincibot/components';
 import { CAMPUS_BADGES, type Campus } from '@davincibot/lib';
 import { getSupabaseBrowserClient } from '@davincibot/lib/supabase';
 
-const PROJECT_KEY = 'id,name,campus,budget_id,archived_at';
+// `protected` et `skip_review` (cash#55) : Asso et Bureau ne s'archivent ni ne se
+// suppriment, et leurs demandes ne passent pas par la revue CDP.
+const PROJECT_KEY = 'id,name,campus,budget_id,archived_at,protected,skip_review';
 
 export const ACTIVE_PROJECTS_DB: DBInfo = {
 	table: 'active_projects',
@@ -37,6 +39,8 @@ interface ProjectDbRow {
 	campus: Campus | null;
 	budget_id: number | null;
 	archived_at: string | null;
+	protected?: boolean;
+	skip_review?: boolean;
 }
 
 export interface ProjectRow {
@@ -48,6 +52,10 @@ export interface ProjectRow {
 	archivedAt: string | null;
 	/** Un projet référencé par des items ne se supprime pas — il s'archive. */
 	itemCount: number;
+	/** Asso et Bureau (cash#55) : ni archivage, ni suppression. */
+	locked: boolean;
+	/** Les demandes partent chez le trésorier sans revue CDP (cash#55). */
+	skipsReview: boolean;
 }
 
 /** Met en forme les projets d'une page, avec le chemin de leur budget et leur nombre d'items. */
@@ -97,6 +105,8 @@ export async function parseProjectRows(rows: unknown[]): Promise<ProjectRow[]> {
 		budgetId: row.budget_id,
 		budgetPath: path(row.budget_id),
 		archivedAt: row.archived_at,
-		itemCount: counts.get(row.id) ?? 0
+		itemCount: counts.get(row.id) ?? 0,
+		locked: row.protected === true,
+		skipsReview: row.skip_review === true
 	}));
 }
