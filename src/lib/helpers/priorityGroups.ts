@@ -61,6 +61,10 @@ export async function priorityGroupOptions(supabase: Client): Promise<SelectOpti
 		client.from('associations').select('id, name').order('name'),
 		client.from('projects').select('id, name').is('archived_at', null).order('name')
 	]);
+	const failure = associations.error ?? projects.error;
+	if (failure) {
+		throw new Error(failure.message);
+	}
 	return [
 		...(associations.data ?? []).map((row) => ({
 			value: `a:${String(row.id)}`,
@@ -94,12 +98,14 @@ export async function slotPriorityGroups(supabase: Client, slotId: number): Prom
  * Remplace les groupes prioritaires d'une session par `values`. Les groupes
  * manquants sont ajoutés avant que les groupes retirés soient supprimés : une
  * erreur en route laisse au pire des groupes en trop, jamais une session
- * ouverte à tous par accident.
+ * ouverte à tous par accident. Seul un groupe que le formulaire proposait
+ * (`known`) peut être retiré : un groupe sur un projet archivé depuis reste en place.
  */
 export async function saveSlotPriorityGroups(
 	supabase: Client,
 	slotId: number,
-	values: string[]
+	values: string[],
+	known: ReadonlySet<string>
 ): Promise<void> {
 	const table = () => untyped(supabase).schema('formation').from('slot_priority_group');
 	const wantedRows = values
@@ -111,7 +117,9 @@ export async function saveSlotPriorityGroups(
 	const toInsert = [...new Map(wantedRows.map((row) => [priorityValue(row), row])).entries()]
 		.filter(([value]) => !present.has(value))
 		.map(([, row]) => ({ ...row, slot_id: slotId }));
-	const toDelete = current.filter((row) => !wanted.has(priorityValue(row))).map((row) => row.id);
+	const toDelete = current
+		.filter((row) => known.has(priorityValue(row)) && !wanted.has(priorityValue(row)))
+		.map((row) => row.id);
 	if (toInsert.length > 0) {
 		const { error } = await table().insert(toInsert);
 		if (error) {

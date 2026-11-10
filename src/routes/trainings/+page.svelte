@@ -215,7 +215,7 @@ DVBisous ! :robot:`;
 				priorityGroupOptions(supabaseClient),
 				slot ? slotPriorityGroups(supabaseClient, slot.slot_id) : Promise.resolve([])
 			]);
-			priorityLoaded = priorityOptions.length > 0;
+			priorityLoaded = true;
 		} catch {
 			priorityOptions = [];
 			priorityGroups = [];
@@ -500,7 +500,12 @@ DVBisous ! :robot:`;
 					...updates
 				});
 				if (priorityLoaded) {
-					await saveSlotPriorityGroups(supabaseClient, editingSlot.slot_id, chosenPriorityGroups);
+					await saveSlotPriorityGroups(
+						supabaseClient,
+						editingSlot.slot_id,
+						chosenPriorityGroups,
+						new Set(priorityOptions.map((option) => option.value))
+					);
 				}
 			} else {
 				const payload = {
@@ -527,7 +532,12 @@ DVBisous ! :robot:`;
 					id?: number;
 				} | null;
 				if (priorityLoaded && typeof created?.id === 'number' && chosenPriorityGroups.length > 0) {
-					await saveSlotPriorityGroups(supabaseClient, created.id, chosenPriorityGroups);
+					await saveSlotPriorityGroups(
+						supabaseClient,
+						created.id,
+						chosenPriorityGroups,
+						new Set(priorityOptions.map((option) => option.value))
+					);
 				}
 			}
 			await loadData();
