@@ -192,6 +192,9 @@
 	<span class={row.archivedAt ? 'text-dark-light-blue/70' : 'font-medium text-white'}>
 		{row.name}
 	</span>
+	{#if row.skipsReview}
+		<span class="text-dark-light-blue ml-2 text-xs">sans revue CDP</span>
+	{/if}
 {/snippet}
 
 {#snippet campusCell(cell: TableCell)}
@@ -229,24 +232,30 @@
 				size="sm"
 				variant="secondary">Modifier</Button
 			>
-			<form action="?/toggleArchive" method="POST" use:enhance={submit}>
-				<input name="id" type="hidden" value={row.id} />
-				<input name="archive" type="hidden" value={row.archivedAt ? '0' : '1'} />
-				<Button
-					class="w-full justify-start"
-					size="sm"
-					type="submit"
-					variant={row.archivedAt ? 'primary' : 'secondary'}
-					>{row.archivedAt ? 'Réactiver' : 'Archiver'}</Button
-				>
-			</form>
-			{#if row.itemCount === 0}
-				<form action="?/remove" method="POST" use:enhance={submit}>
+			{#if row.locked}
+				<p class="text-dark-light-blue px-2 py-1 text-xs">
+					Projet de l'association : il ne s'archive ni ne se supprime.
+				</p>
+			{:else}
+				<form action="?/toggleArchive" method="POST" use:enhance={submit}>
 					<input name="id" type="hidden" value={row.id} />
-					<Button class="w-full justify-start" size="sm" type="submit" variant="danger"
-						>Supprimer</Button
+					<input name="archive" type="hidden" value={row.archivedAt ? '0' : '1'} />
+					<Button
+						class="w-full justify-start"
+						size="sm"
+						type="submit"
+						variant={row.archivedAt ? 'primary' : 'secondary'}
+						>{row.archivedAt ? 'Réactiver' : 'Archiver'}</Button
 					>
 				</form>
+				{#if row.itemCount === 0}
+					<form action="?/remove" method="POST" use:enhance={submit}>
+						<input name="id" type="hidden" value={row.id} />
+						<Button class="w-full justify-start" size="sm" type="submit" variant="danger"
+							>Supprimer</Button
+						>
+					</form>
+				{/if}
 			{/if}
 		{/snippet}
 	</RowMenu>

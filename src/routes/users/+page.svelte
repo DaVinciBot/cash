@@ -68,8 +68,13 @@
 	interface MemberOfRow {
 		role: string;
 		revoked_at: string | null;
-		project: { id: number; name: string } | null;
+		// `auto_membership` (cash#55) : le rattachement à Asso suit le rôle membre,
+		// il ne s'affiche ni ne se gère ici.
+		project: { id: number; name: string; auto_membership?: boolean } | null;
 	}
+
+	const isManualMembership = (m: MemberOfRow) =>
+		!m.revoked_at && m.project?.auto_membership !== true;
 
 	interface GlobalRoleRow {
 		role: string;
@@ -154,7 +159,7 @@
 	// filtrer l'embed affiché masquerait les autres projets et rôles des membres retenus.
 	const dbInfo = {
 		table: 'profiles',
-		key: 'id, username, avatar_url, campus, status, member_of!membre_projet_profile_fkey(project!inner(id, name), revoked_at), project_filter:member_of!membre_projet_profile_fkey(project, revoked_at), profile_global_roles!profile_global_roles_profile_fkey(role, revoked_at), role_filter:profile_global_roles!profile_global_roles_profile_fkey(role, revoked_at)'
+		key: 'id, username, avatar_url, campus, status, member_of!membre_projet_profile_fkey(project!inner(id, name, auto_membership), revoked_at), project_filter:member_of!membre_projet_profile_fkey(project, revoked_at), profile_global_roles!profile_global_roles_profile_fkey(role, revoked_at), role_filter:profile_global_roles!profile_global_roles_profile_fkey(role, revoked_at)'
 	};
 
 	let canEditProfile = $state<boolean>(false);
@@ -565,7 +570,7 @@
 		const items: TableRow[] = [];
 		for (const el of typedData) {
 			const project = el.member_of
-				.filter((m) => !m.revoked_at)
+				.filter(isManualMembership)
 				.map((m) => m.project?.name ?? '')
 				.join(', ');
 			// PostgREST ne garantit pas l'ordre de l'embed : on le fige sur le rang de l'enum,
@@ -942,10 +947,16 @@
 	): Promise<void> {
 		const { data: memberData, error: memberError } = (await supabase
 			.from('member_of')
-			.select('project, role')
+			.select('project, role, project_info:project(auto_membership)')
 			.eq('profile', profileId)
-			.is('revoked_at', null)) as {
-			data: { project: string | number; role: string }[] | null;
+			.is('revoked_at', null)) as unknown as {
+			data:
+				| {
+						project: string | number;
+						role: string;
+						project_info: { auto_membership?: boolean } | null;
+				  }[]
+				| null;
 			error: unknown;
 		};
 		if (memberError) {
@@ -955,7 +966,9 @@
 			);
 		}
 
-		const memberRows = memberData ?? [];
+		// Le rattachement automatique (Asso) n'est pas dans le formulaire : il ne
+		// compte ni comme retrait ni comme conservation.
+		const memberRows = (memberData ?? []).filter((m) => m.project_info?.auto_membership !== true);
 		const currentProjectIds = memberRows.map((m) => m.project.toString());
 		// Une ligne sans projet est une ligne que l'utilisateur a ajoutée puis
 		// laissée vide : elle ne compte ni comme ajout ni comme conservation.
@@ -1014,7 +1027,7 @@
 		const { data, error } = (await supabase
 			.from('profiles')
 			.select(
-				'id, username, campus, permissions, status, profile_global_roles!profile_global_roles_profile_fkey(role, revoked_at), member_of!membre_projet_profile_fkey(role, revoked_at, project(id,name)), avatar_url'
+				'id, username, campus, permissions, status, profile_global_roles!profile_global_roles_profile_fkey(role, revoked_at), member_of!membre_projet_profile_fkey(role, revoked_at, project(id,name,auto_membership)), avatar_url'
 			)
 			.eq('id', id)
 			.single()) as {
@@ -1033,7 +1046,7 @@
 		const overridePermissions = (data.permissions ?? []).filter(Boolean);
 
 		const projectsData = data.member_of
-			.filter((m) => !m.revoked_at)
+			.filter(isManualMembership)
 			.map((m) => ({
 				project_id: m.project === null ? undefined : String(m.project.id),
 				role: (m.role || 'project_member') as ProjectRole
@@ -1052,7 +1065,7 @@
 		});
 
 		const projectBadges = data.member_of
-			.filter((m) => !m.revoked_at)
+			.filter(isManualMembership)
 			.map((m) => {
 				if (!m.project) {
 					return null;
