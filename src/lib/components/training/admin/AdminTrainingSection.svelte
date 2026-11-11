@@ -1,8 +1,6 @@
 <script lang="ts">
 	import { Button } from '@davincibot/components';
-	import StateBadge from '#lib/components/cash/StateBadge.svelte';
-	import { categoryBadge, stateBadgeLabel } from '#lib/helpers/trainingTables.js';
-	import { TRAINING_CATEGORY_ICONS } from '#lib/helpers/trainingOptions.js';
+	import { stateBadgeLabel } from '#lib/helpers/trainingTables.js';
 	import {
 		Table,
 		type DBInfo,
@@ -12,9 +10,9 @@
 		type TableRow
 	} from '@davincibot/components';
 	import type { TrainingListItem } from '@davincibot/lib';
+	import { Plus } from '@lucide/svelte';
 
 	const noop = () => undefined;
-	const noopTraining: (training: TrainingListItem) => void = () => undefined;
 
 	interface Props {
 		trainings?: TrainingListItem[];
@@ -28,14 +26,12 @@
 	}
 
 	let {
-		trainings = [],
-		trainingDbInfo,
-		onTrainingRowClick,
-		trainingFilters = [],
-		trainingTableTopic = '',
-		parseTrainingItems,
 		onAddTraining = noop,
-		onEditTraining = noopTraining
+		onTrainingRowClick,
+		parseTrainingItems,
+		trainingDbInfo,
+		trainingFilters = [],
+		trainingTableTopic = ''
 	}: Props = $props();
 
 	const columns: TableColumn[] = [
@@ -55,10 +51,19 @@
 				Les contenus de référence dont héritent les sessions.
 			</p>
 		</div>
-		<Button onclick={onAddTraining} size="sm" variant="secondary">Ajouter</Button>
+		<Button
+			class="mr-2"
+			aria-label="Ajouter une formation"
+			onclick={onAddTraining}
+			size="md"
+			variant="primary"
+		>
+			<Plus class="size-4 shrink-0" />
+			<span class="hidden sm:block">Ajouter une formation</span>
+		</Button>
 	</div>
 
-	<div class="border-rule bg-blue-gray/15 hidden rounded-lg border md:block">
+	<div class="border-rule bg-blue-gray/15 block rounded-lg border">
 		<Table
 			{columns}
 			dbInfo={trainingDbInfo}
@@ -69,43 +74,5 @@
 			refreshTopic={trainingTableTopic}
 			searchable="name"
 		/>
-	</div>
-
-	<div class="md:hidden">
-		{#if trainings.length === 0}
-			<p
-				class="border-rule text-dark-light-blue/70 rounded-xl border border-dashed px-4 py-12 text-center"
-			>
-				Aucune formation
-			</p>
-		{:else}
-			<ul class="space-y-2">
-				{#each trainings as training (training.training_id)}
-					<li class="border-rule bg-blue-gray/15 rounded-2xl border p-4 sm:p-5">
-						<div class="flex flex-wrap items-start justify-between gap-3">
-							<div class="min-w-0 flex-1">
-								<div class="flex flex-wrap items-center gap-2">
-									<span class="font-medium text-white">{training.name}</span>
-									<StateBadge
-										badge={categoryBadge(training.category)}
-										icon={TRAINING_CATEGORY_ICONS[training.category]}
-									/>
-								</div>
-								<p class="text-dark-light-blue mt-1 text-sm">
-									{training.description ?? 'Aucune description'}
-								</p>
-							</div>
-							<Button
-								onclick={() => {
-									onEditTraining(training);
-								}}
-								size="sm"
-								variant="secondary">Éditer</Button
-							>
-						</div>
-					</li>
-				{/each}
-			</ul>
-		{/if}
 	</div>
 </div>

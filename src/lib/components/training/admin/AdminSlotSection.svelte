@@ -1,8 +1,6 @@
 <script lang="ts">
 	import { Button } from '@davincibot/components';
-	import StateBadge from '#lib/components/cash/StateBadge.svelte';
-	import { statusBadge, stateBadgeLabel } from '#lib/helpers/trainingTables.js';
-	import { SLOT_STATUS_ICONS } from '#lib/helpers/trainingOptions.js';
+	import { stateBadgeLabel } from '#lib/helpers/trainingTables.js';
 	import {
 		Table,
 		type DBInfo,
@@ -12,9 +10,9 @@
 		type TableRow
 	} from '@davincibot/components';
 	import type { TrainingListItem, TrainingSlotListItem } from '@davincibot/lib';
+	import { Plus } from '@lucide/svelte';
 
 	const noop = () => undefined;
-	const noopSlot: (slot: TrainingSlotListItem) => void = () => undefined;
 
 	interface Props {
 		slots?: TrainingSlotListItem[];
@@ -31,17 +29,12 @@
 	}
 
 	let {
-		slots = [],
-		slotDbInfo,
-		onSlotRowClick,
-		slotFilters = [],
-		slotTableTopic = '',
-		parseSlotItems,
 		onAddSlot = noop,
-		onEditSlot = noopSlot,
-		formatSlotDate,
-		findTrainingName,
-		trainings = []
+		onSlotRowClick,
+		parseSlotItems,
+		slotDbInfo,
+		slotFilters = [],
+		slotTableTopic = ''
 	}: Props = $props();
 
 	const columns: TableColumn[] = [
@@ -60,12 +53,19 @@
 			</h2>
 			<p class="text-dark-light-blue/70 mt-1 text-xs">Planifiez, suivez et ajustez les sessions.</p>
 		</div>
-		<Button onclick={onAddSlot} size="sm" variant="secondary">Ajouter</Button>
+		<Button
+			class="mr-2"
+			aria-label="Ajouter une session"
+			onclick={onAddSlot}
+			size="md"
+			variant="primary"
+		>
+			<Plus class="size-4 shrink-0" />
+			<span class="hidden sm:block">Ajouter une session</span>
+		</Button>
 	</div>
 
-	<!-- La table paginée reste au clavier et à la souris ; sous 768 px elle
-	     déborderait, d'où la même liste rendue en cartes. -->
-	<div class="border-rule bg-blue-gray/15 hidden rounded-lg border md:block">
+	<div class="border-rule bg-blue-gray/15 block rounded-lg border">
 		<Table
 			{columns}
 			dbInfo={slotDbInfo}
@@ -76,46 +76,5 @@
 			refreshTopic={slotTableTopic}
 			searchable="name"
 		/>
-	</div>
-
-	<div class="md:hidden">
-		{#if slots.length === 0}
-			<p
-				class="border-rule text-dark-light-blue/70 rounded-xl border border-dashed px-4 py-12 text-center"
-			>
-				Aucune session
-			</p>
-		{:else}
-			<ul class="space-y-2">
-				{#each slots as slot (slot.slot_id)}
-					<li class="border-rule bg-blue-gray/15 rounded-2xl border p-4 sm:p-5">
-						<div class="flex flex-wrap items-start justify-between gap-3">
-							<div class="min-w-0 flex-1">
-								<p class="font-medium text-white">{formatSlotDate(slot.start)}</p>
-								<p class="text-dark-light-blue mt-1 text-sm">
-									{findTrainingName(slot.training_id, trainings)}
-								</p>
-							</div>
-							<Button
-								onclick={() => {
-									onEditSlot(slot);
-								}}
-								size="sm"
-								variant="secondary">Éditer</Button
-							>
-						</div>
-						<div class="text-dark-light-blue mt-3 flex flex-wrap items-center gap-3 text-sm">
-							<span class="flex items-center gap-2">
-								{#if slot.trainer_avatar_url}
-									<img class="h-6 w-6 rounded-full" alt="" src={slot.trainer_avatar_url} />
-								{/if}
-								{slot.trainer_username ?? 'À définir'}
-							</span>
-							<StateBadge badge={statusBadge(slot.status)} icon={SLOT_STATUS_ICONS[slot.status]} />
-						</div>
-					</li>
-				{/each}
-			</ul>
-		{/if}
 	</div>
 </div>
