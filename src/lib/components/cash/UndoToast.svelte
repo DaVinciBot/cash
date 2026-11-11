@@ -11,22 +11,22 @@
 
 {#if queue.pending.length > 0}
 	<div
-		class="fixed right-4 bottom-4 left-4 z-50 flex flex-col items-end gap-2 sm:left-auto"
+		class="pointer-events-none fixed inset-x-4 bottom-6 z-50 flex flex-col items-center gap-2"
 		aria-live="polite"
 		role="status"
 	>
 		{#each queue.pending as entry (entry.key)}
 			<div
-				class="border-rule bg-surface-modal relative w-full overflow-hidden rounded-xl border px-4 py-3 shadow-lg sm:w-96"
+				class="bg-main-blue shadow-main-blue/40 pointer-events-auto relative w-full max-w-md overflow-hidden rounded-xl px-4 py-3 shadow-xl ring-1 ring-white/15"
 			>
 				<div class="flex items-center justify-between gap-3">
-					<p class="text-light-blue min-w-0 truncate text-sm">{entry.label}</p>
+					<p class="min-w-0 truncate text-sm font-medium text-white">{entry.label}</p>
 					<Button
 						onclick={() => {
 							queue.undo(entry.key);
 						}}
 						size="sm"
-						variant="secondary"
+						variant="primary"
 					>
 						<Undo2 class="size-4" />
 						Annuler
@@ -34,7 +34,7 @@
 				</div>
 				<span
 					style:animation-duration="{queue.delayMs}ms"
-					class="undo-countdown bg-light-blue/60 absolute bottom-0 left-0 h-0.5 w-full origin-left"
+					class="undo-countdown absolute bottom-0 left-0 h-0.5 w-full origin-left bg-white/70"
 				></span>
 			</div>
 		{/each}
