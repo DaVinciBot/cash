@@ -1,3 +1,4 @@
+import { periodFor } from '#lib/periods.js';
 import { rejection } from '#lib/server/audit.js';
 import { currentSchoolYear } from '#lib/server/cash.js';
 import { decimal, text } from '#lib/server/form.js';
@@ -18,6 +19,9 @@ const ISO_DAY = /^\d{4}-\d{2}-\d{2}$/;
 const PROOF_TYPES = ['image/png', 'image/jpeg', 'application/pdf'];
 const PROOF_MAX_BYTES = 5 * 1024 * 1024;
 
+/** Découpage de la liste : exercice fiscal, ou année scolaire de septembre à août (#69). */
+type FlowView = 'fiscal' | 'school';
+
 function flowId(form: FormData): number | null {
 	const id = Number(form.get('id'));
 	return Number.isSafeInteger(id) && id > 0 ? id : null;
@@ -27,28 +31,48 @@ export const load: PageServerLoad = async ({ locals, url, depends }) => {
 	depends('cash:flows');
 
 	const periodRows = await periods(locals.supabase);
+	const view: FlowView = url.searchParams.get('view') === 'school' ? 'school' : 'fiscal';
 	const requested = Number(url.searchParams.get('year'));
-	// Par défaut, l'exercice qui COUVRE aujourd'hui — et non le premier exercice
-	// ouvert. Les exercices sont listés du plus récent au plus ancien, et 2027
-	// est ouvert bien avant d'avoir le moindre mouvement : s'y poser d'office
-	// donnerait une page vide pour toute réponse.
+	// Par défaut, la période qui COUVRE aujourd'hui — et non la première période
+	// ouverte. Les périodes sont listées de la plus récente à la plus ancienne,
+	// et la suivante est ouverte bien avant d'avoir le moindre mouvement : s'y
+	// poser d'office donnerait une page vide pour toute réponse.
 	const today = new Date().toISOString().slice(0, 10);
+	const candidates = view === 'school' ? periodRows.schoolYears : periodRows.fiscalYears;
 	const current =
-		periodRows.fiscalYears.find((y) => y.startsOn <= today && today <= y.endsOn) ??
-		periodRows.fiscalYears.find((y) => !y.closedAt);
-	const fiscalYearId =
-		Number.isSafeInteger(requested) && requested > 0 ? requested : (current?.id ?? null);
+		periodFor(today, candidates) ?? candidates.find((period) => !period.closedAt) ?? null;
+	const selected =
+		(Number.isSafeInteger(requested) && requested > 0
+			? candidates.find((period) => period.id === requested)
+			: null) ?? current;
+
+	// Une année scolaire chevauche deux exercices : elle se filtre par dates.
+	const scope =
+		selected === null
+			? null
+			: view === 'school'
+				? { from: selected.startsOn, to: selected.endsOn }
+				: selected.id;
 
 	const year = await currentSchoolYear(locals.supabase);
 	const [flows, accountRows, leaves] = await Promise.all([
-		flowList(locals.supabase, fiscalYearId),
+		flowList(locals.supabase, scope),
 		accounts(locals.supabase),
 		year
 			? budgetLeaves(locals.supabase, year.id).then((r) => r.leaves)
 			: Promise.resolve([] as Awaited<ReturnType<typeof budgetLeaves>>['leaves'])
 	]);
 
-	return { flows, accounts: accountRows, leaves, periods: periodRows, fiscalYearId };
+	return {
+		flows,
+		accounts: accountRows,
+		leaves,
+		periods: periodRows,
+		view,
+		periodId: selected?.id ?? null,
+		// Conservé pour les écrans qui lisent encore l'exercice sélectionné.
+		fiscalYearId: view === 'fiscal' ? (selected?.id ?? null) : null
+	};
 };
 
 /** Champs communs à la création et à la modification d'un flux. */

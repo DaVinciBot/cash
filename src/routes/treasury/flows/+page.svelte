@@ -1,5 +1,5 @@
 <script lang="ts">
-	import { Button } from '@davincibot/components';
+	import { Button, FilterChip } from '@davincibot/components';
 	import { enhance } from '$app/forms';
 	import { resolve } from '$app/paths';
 	import StateBadge from '#lib/components/cash/StateBadge.svelte';
@@ -24,6 +24,10 @@
 		data.periods.fiscalYears.find((y) => y.id === data.fiscalYearId) ?? data.periods.fiscalYears[0]
 	);
 
+	const periodsOfView = $derived(
+		data.view === 'school' ? data.periods.schoolYears : data.periods.fiscalYears
+	);
+
 	const totals = $derived(
 		data.flows.reduce(
 			(acc, f) => {
@@ -37,6 +41,8 @@
 			{ credit: 0, debit: 0 }
 		)
 	);
+
+	const viewHref = (view: 'fiscal' | 'school') => `${resolve('/treasury/flows')}?view=${view}`;
 </script>
 
 <!-- eslint-disable @typescript-eslint/no-confusing-void-expression -- {@render} est vu comme une expression void imbriquée par la règle ; les snippets sont pourtant la bonne forme ici -->
@@ -52,7 +58,7 @@
 		<div>
 			<h1 class="text-2xl font-bold text-white">Dépenses et recettes</h1>
 			<p class="text-dark-light-blue mt-1 text-sm">
-				Les mouvements de l'exercice. Ceux qui portent un numéro de commande ont été générés au
+				Les mouvements de la période. Ceux qui portent un numéro de commande ont été générés au
 				passage de celle-ci.
 			</p>
 		</div>
@@ -67,18 +73,27 @@
 		</p>
 	{/if}
 
-	<!-- CMD-F-82 — délimitation par exercice fiscal -->
-	<form class="mb-4 flex flex-wrap items-center gap-3" method="GET">
+	<!-- CMD-F-82 — délimitation par exercice fiscal, ou par année scolaire (#69) -->
+	<form class="mb-4 flex flex-wrap items-end gap-3" method="GET">
+		<div class="flex gap-2" aria-label="Découpage" role="group">
+			<FilterChip href={viewHref('fiscal')} pressed={data.view === 'fiscal'}
+				>Exercice fiscal</FilterChip
+			>
+			<FilterChip href={viewHref('school')} pressed={data.view === 'school'}
+				>Année scolaire</FilterChip
+			>
+		</div>
+		<input name="view" type="hidden" value={data.view} />
 		<label class="text-dark-light-blue text-xs">
-			Exercice
+			{data.view === 'school' ? 'Année scolaire' : 'Exercice'}
 			<select
 				name="year"
 				class="border-rule-strong bg-dark-blue/60 text-light-blue placeholder:text-muted focus:border-light-blue/70 focus-visible:ring-light-blue/60 mt-1 block rounded-xl border p-2.5 text-sm focus:outline-none focus-visible:ring-2 disabled:opacity-50"
 				onchange={(event) => event.currentTarget.form?.requestSubmit()}
-				value={data.fiscalYearId ?? ''}
+				value={data.periodId ?? ''}
 			>
-				{#each data.periods.fiscalYears as year (year.id)}
-					<option value={year.id}>{year.label}{year.closedAt ? ' (clos)' : ''}</option>
+				{#each periodsOfView as period (period.id)}
+					<option value={period.id}>{period.label}{period.closedAt ? ' (clos)' : ''}</option>
 				{/each}
 			</select>
 		</label>
@@ -210,7 +225,7 @@
 		<p
 			class="border-rule text-dark-light-blue/70 rounded-xl border border-dashed px-4 py-12 text-center"
 		>
-			Aucun mouvement sur cet exercice.
+			Aucun mouvement sur cette période.
 		</p>
 	{:else}
 		<ul class="space-y-2">

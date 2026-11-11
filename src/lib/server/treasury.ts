@@ -348,6 +348,12 @@ export interface Flow {
 }
 
 /**
+ * Périmètre d'une liste de flux : un exercice fiscal, une plage de dates (une
+ * année scolaire, qui chevauche deux exercices), ou tout.
+ */
+export type FlowScope = number | { from: string; to: string } | null;
+
+/**
  * Flux d'un exercice, du plus récent au plus ancien.
  *
  * Les justificatifs viennent avec leur URL signée : le bucket `proof` est privé,
@@ -355,7 +361,7 @@ export interface Flow {
  * liste. Signer à la demande plutôt qu'à l'affichage ferait un aller-retour de
  * plus pour chaque pièce.
  */
-export async function flowList(supabase: Client, fiscalYearId: number | null): Promise<Flow[]> {
+export async function flowList(supabase: Client, scope: FlowScope): Promise<Flow[]> {
 	let query = supabase
 		.schema('cash')
 		.from('flows')
@@ -365,8 +371,10 @@ export async function flowList(supabase: Client, fiscalYearId: number | null): P
 		.order('occurred_on', { ascending: false })
 		.order('id', { ascending: false });
 
-	if (fiscalYearId !== null) {
-		query = query.eq('fiscal_year_id', fiscalYearId);
+	if (typeof scope === 'number') {
+		query = query.eq('fiscal_year_id', scope);
+	} else if (scope) {
+		query = query.gte('occurred_on', scope.from).lte('occurred_on', scope.to);
 	}
 
 	const [{ data: rows }, { data: accountRows }, { data: yearRows }, { data: budgetRows }] =
