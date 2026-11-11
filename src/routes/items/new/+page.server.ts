@@ -7,6 +7,7 @@ import {
 	resolveCampus
 } from '#lib/server/cash.js';
 import { jsonArray, text, textAll } from '#lib/server/form.js';
+import { promoCodes } from '#lib/server/promoCodes.js';
 import { cashErrorMessage, type ItemTag } from '#lib/types/domain.js';
 import { resolve } from '$app/paths';
 import { type Campus } from '@davincibot/lib';
@@ -143,7 +144,9 @@ export const load: PageServerLoad = async ({ depends, locals }) => {
 		})),
 		memberCampus,
 		schoolYear,
-		partnerships: partnerships ?? []
+		partnerships: partnerships ?? [],
+		// #98 — les codes en cours, pour avertir dès qu'un lien vise leur site.
+		promoCodes: await promoCodes(locals.supabase)
 	};
 };
 

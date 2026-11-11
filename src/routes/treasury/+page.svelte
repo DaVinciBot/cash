@@ -40,6 +40,9 @@
 			>
 			<Button href={resolve('/treasury/reports')} size="md" variant="secondary">Rapports</Button>
 			<Button href={resolve('/treasury/documents')} size="md" variant="secondary">Documents</Button>
+			<Button href={resolve('/treasury/promo-codes')} size="md" variant="secondary"
+				>Codes promo</Button
+			>
 		</div>
 	</header>
 

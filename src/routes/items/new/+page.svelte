@@ -4,6 +4,7 @@
 	import { resolve } from '$app/paths';
 	import { CAMPUS_BADGES, type Campus } from '@davincibot/lib';
 	import { ITEM_TAGS, type ItemTag } from '#lib/types/domain.js';
+	import { promoCodesFor } from '#lib/promoCodes.js';
 	import { untrack } from 'svelte';
 	import type { ActionData, PageData } from './$types';
 
@@ -114,6 +115,7 @@
 	}
 
 	const euro = new Intl.NumberFormat('fr-FR', { style: 'currency', currency: 'EUR' });
+	const today = new Date().toISOString().slice(0, 10);
 </script>
 
 <svelte:head><title>Faire une commande — DaVinciBot</title></svelte:head>
@@ -301,6 +303,19 @@
 								/>
 							</label>
 						</div>
+
+						{#each promoCodesFor(line.link, data.promoCodes, today) as promo (promo.id)}
+							<!-- #98 — un code existe pour ce site : le dire avant la commande, pas après. -->
+							<p
+								class="mt-3 rounded-lg bg-amber-500/10 px-3 py-2 text-sm text-amber-200 ring-1 ring-amber-500/30"
+								role="note"
+							>
+								L'association dispose d'un code promo pour {promo.supplier} :
+								<span class="font-mono font-semibold text-white">{promo.code}</span>
+								({promo.discount}{promo.conditions ? ` — ${promo.conditions}` : ''}). Indiquez-le en
+								note pour la trésorerie.
+							</p>
+						{/each}
 
 						<div class="mt-3 grid gap-3 sm:grid-cols-12">
 							<div class="sm:col-span-4">

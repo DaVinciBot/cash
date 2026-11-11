@@ -7,6 +7,7 @@ import {
 	campusAddress,
 	orderDetail
 } from '#lib/server/orders.js';
+import { promoCodes } from '#lib/server/promoCodes.js';
 import { accounts } from '#lib/server/treasury.js';
 import { SHIPPING_ALLOCATIONS, type ShippingAllocation } from '#lib/types/domain.js';
 import { error, fail } from '@sveltejs/kit';
@@ -35,18 +36,29 @@ export const load: PageServerLoad = async ({ locals, params, depends }) => {
 	}
 
 	const editable = order.state === 'pending_treso';
-	const [{ leaves }, address, accountRows, history, queue, { data: flowRows }] = await Promise.all([
-		budgetLeaves(locals.supabase, order.schoolYearId),
-		order.campus ? campusAddress(locals.supabase, order.campus) : Promise.resolve(null),
-		accounts(locals.supabase),
-		entityHistory(locals.supabase, 'order', id),
-		editable ? bundlingQueue(locals.supabase) : Promise.resolve([]),
-		locals.supabase
-			.schema('cash')
-			.from('flows')
-			.select('account_id, direction, amount_ttc')
-			.eq('order_id', id)
-	]);
+	const [{ leaves }, address, accountRows, history, queue, { data: flowRows }, codes] =
+		await Promise.all([
+			budgetLeaves(locals.supabase, order.schoolYearId),
+			order.campus ? campusAddress(locals.supabase, order.campus) : Promise.resolve(null),
+			accounts(locals.supabase),
+			entityHistory(locals.supabase, 'order', id),
+			editable ? bundlingQueue(locals.supabase) : Promise.resolve([]),
+			locals.supabase
+				.schema('cash')
+				.from('flows')
+				.select('account_id, direction, amount_ttc')
+				.eq('order_id', id),
+			promoCodes(locals.supabase)
+		]);
+	// #98 — codes actifs pour les sites des items de la commande.
+	const today = new Date().toISOString().slice(0, 10);
+	const domains = new Set(order.items.map((item) => item.domain).filter((d) => d !== null));
+	const applicableCodes = codes.filter(
+		(code) =>
+			domains.has(code.domain) &&
+			code.archivedAt === null &&
+			(code.expiresOn === null || code.expiresOn >= today)
+	);
 
 	// #83 — seuls les items de la file qui peuvent rejoindre CETTE commande :
 	// même campus (CMD-F-45) et même année scolaire. La base le revérifie.
@@ -82,7 +94,8 @@ export const load: PageServerLoad = async ({ locals, params, depends }) => {
 		accounts: accountRows.filter((a) => !a.archivedAt),
 		history,
 		addable: sameCampus.filter((item) => inYear.has(item.id)),
-		refundAccountId
+		refundAccountId,
+		applicableCodes
 	};
 };
 
