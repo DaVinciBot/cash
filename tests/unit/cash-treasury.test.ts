@@ -73,3 +73,49 @@ describe('normalisation des domaines de partenariat (TRESO-F-12)', () => {
 		expect(parseDomains('  ,  ')).toEqual([]);
 	});
 });
+
+describe('campagnes HelloAsso (helloasso-webhooks#1)', () => {
+	it('exige un WEI entièrement désigné quand il est actif', async () => {
+		const { campaignProblem } = await import('#lib/server/helloasso.js');
+		expect(
+			campaignProblem({
+				handler: 'wei',
+				enabled: true,
+				formType: 'Event',
+				formSlug: '',
+				capacity: 100
+			})
+		).toMatch(/WEI actif/);
+		expect(
+			campaignProblem({
+				handler: 'wei',
+				enabled: false,
+				formType: '',
+				formSlug: '',
+				capacity: null
+			})
+		).toBeNull();
+	});
+
+	it('refuse un slug ou une capacité mal formés', async () => {
+		const { campaignProblem } = await import('#lib/server/helloasso.js');
+		expect(
+			campaignProblem({
+				handler: 'membership',
+				enabled: true,
+				formType: 'Membership',
+				formSlug: 'Adhésion 2026',
+				capacity: null
+			})
+		).toMatch(/slug/);
+		expect(
+			campaignProblem({
+				handler: 'wei',
+				enabled: true,
+				formType: 'Event',
+				formSlug: 'wei-2026',
+				capacity: 0
+			})
+		).toMatch(/capacité/);
+	});
+});
