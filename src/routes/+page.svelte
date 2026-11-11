@@ -1,9 +1,12 @@
 <script lang="ts">
 	import { Button, FilterChip } from '@davincibot/components';
-	import { enhance } from '$app/forms';
+	import { applyAction, deserialize } from '$app/forms';
+	import { invalidate } from '$app/navigation';
 	import { resolve } from '$app/paths';
 	import CampusBadge from '#lib/components/cash/CampusBadge.svelte';
 	import ItemStateBadge from '#lib/components/cash/ItemStateBadge.svelte';
+	import UndoToast from '#lib/components/cash/UndoToast.svelte';
+	import { UndoQueue } from '#lib/undoQueue.svelte.js';
 	import {
 		ITEM_STATE_BADGES,
 		ITEM_STATES,
@@ -11,11 +14,49 @@
 		isItemEditableByMember,
 		type ItemState
 	} from '#lib/types/domain.js';
+	import { onDestroy } from 'svelte';
 	import type { ActionData, PageData } from './$types';
 
 	let { data, form }: { data: PageData; form: ActionData } = $props();
 
-	const items = $derived(data.items);
+	// La suppression d'un composant passe par un toast « Annuler » : l'item
+	// disparaît tout de suite, et la requête ne part qu'au bout du délai.
+	const deletions = new UndoQueue();
+	onDestroy(() => {
+		deletions.flush();
+	});
+
+	const items = $derived(data.items.filter((item) => !deletions.has(String(item.id))));
+
+	const deleteBody = (id: number) => {
+		const body = new FormData();
+		body.set('id', String(id));
+		return body;
+	};
+	const deleteUrl = () => new URL('?/delete', window.location.href).href;
+
+	function scheduleDelete(item: { id: number; name: string }) {
+		deletions.schedule(
+			String(item.id),
+			`« ${item.name} » retiré de vos demandes.`,
+			async () => {
+				const response = await fetch(deleteUrl(), {
+					method: 'POST',
+					body: deleteBody(item.id),
+					headers: { 'x-sveltekit-action': 'true' }
+				});
+				const result = deserialize(await response.text());
+				if (result.type === 'success') {
+					await invalidate('cash:items');
+				} else {
+					await applyAction(result);
+				}
+			},
+			() => {
+				navigator.sendBeacon(deleteUrl(), deleteBody(item.id));
+			}
+		);
+	}
 
 	let stateFilter = $state<ItemState | 'all'>('all');
 	let search = $state('');
@@ -158,10 +199,13 @@
 								</Button>
 							{/if}
 							{#if isItemDeletableByMember(item.state)}
-								<form action="?/delete" method="POST" use:enhance>
-									<input name="id" type="hidden" value={item.id} />
-									<Button size="sm" type="submit" variant="danger">Supprimer</Button>
-								</form>
+								<Button
+									onclick={() => {
+										scheduleDelete(item);
+									}}
+									size="sm"
+									variant="danger">Supprimer</Button
+								>
 							{/if}
 						</div>
 					</div>
@@ -170,3 +214,11 @@
 		</ul>
 	{/if}
 </section>
+
+<svelte:window
+	onpagehide={() => {
+		deletions.flushOnUnload();
+	}}
+/>
+
+<UndoToast queue={deletions} />

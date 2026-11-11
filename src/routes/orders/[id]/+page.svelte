@@ -3,6 +3,7 @@
 	import { enhance } from '$app/forms';
 	import { resolve } from '$app/paths';
 	import CampusBadge from '#lib/components/cash/CampusBadge.svelte';
+	import ConfirmDialog from '#lib/components/cash/ConfirmDialog.svelte';
 	import HistoryTimeline from '#lib/components/cash/HistoryTimeline.svelte';
 	import ItemStateBadge from '#lib/components/cash/ItemStateBadge.svelte';
 	import StateBadge from '#lib/components/cash/StateBadge.svelte';
@@ -37,6 +38,9 @@
 	let raiseAmount = $state('');
 	let passing = $state(false);
 	let canceling = $state(false);
+	// Item dont la réception attend confirmation : le statut « Reçu » ne se
+	// retire plus une fois posé, un clic égaré ne doit pas suffire.
+	let receiving = $state<{ id: number; name: string } | null>(null);
 
 	const receivedCount = $derived(order.items.filter((i) => i.state === 'received').length);
 	const total = $derived(order.amountTtc + order.shippingCostTtc);
@@ -415,10 +419,13 @@
 							</Button>
 						{/if}
 						{#if item.state === 'bundled' && order.state === 'pending_delivery'}
-							<form action="?/receive" method="POST" use:enhance>
-								<input name="item" type="hidden" value={item.id} />
-								<Button size="sm" type="submit" variant="primary">Marquer reçu</Button>
-							</form>
+							<Button
+								onclick={() => {
+									receiving = { id: item.id, name: item.name };
+								}}
+								size="sm"
+								variant="primary">Marquer reçu</Button
+							>
 						{/if}
 						{#if item.state === 'bundled' && order.state === 'pending_treso'}
 							<!-- Le dernier item ne se retire pas : la base le refuse (DVB09). -->
@@ -486,3 +493,23 @@
 		<HistoryTimeline entries={data.history} />
 	</div>
 </section>
+
+{#if receiving}
+	<ConfirmDialog
+		action="?/receive"
+		confirmLabel="Marquer comme reçu"
+		fields={{ item: receiving.id }}
+		onClose={() => {
+			receiving = null;
+		}}
+		title="Confirmer la réception"
+		tone="primary"
+	>
+		<p>
+			Marquer « <span class="font-medium text-white">{receiving.name}</span> » comme reçu ?
+		</p>
+		<p class="text-dark-light-blue mt-2">
+			Cette action est définitive : le statut « Reçu » ne pourra pas être retiré.
+		</p>
+	</ConfirmDialog>
+{/if}

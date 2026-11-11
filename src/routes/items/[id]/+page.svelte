@@ -5,6 +5,7 @@
 	import HistoryTimeline from '#lib/components/cash/HistoryTimeline.svelte';
 	import ItemStateBadge from '#lib/components/cash/ItemStateBadge.svelte';
 	import { isItemEditableByMember, isItemRefused } from '#lib/types/domain.js';
+	import { ExternalLink } from '@lucide/svelte';
 	import type { PageData } from './$types';
 
 	let { data }: { data: PageData } = $props();
@@ -12,7 +13,6 @@
 	const item = $derived(data.item);
 
 	const euro = new Intl.NumberFormat('fr-FR', { style: 'currency', currency: 'EUR' });
-	const moment = new Intl.DateTimeFormat('fr-FR', { dateStyle: 'medium', timeStyle: 'short' });
 </script>
 
 <svelte:head><title>{item.name} — DaVinciBot</title></svelte:head>
@@ -68,10 +68,6 @@
 			<dt class="text-dark-light-blue/70 text-xs">Marchand</dt>
 			<dd class="text-light-blue">{item.domain ?? '—'}</dd>
 		</div>
-		<div>
-			<dt class="text-dark-light-blue/70 text-xs">Demandé le</dt>
-			<dd class="text-light-blue">{moment.format(new Date(item.createdAt))}</dd>
-		</div>
 		{#if item.tags.length > 0}
 			<div class="col-span-2 sm:col-span-3">
 				<dt class="text-dark-light-blue/70 text-xs">Tags</dt>
@@ -87,15 +83,20 @@
 		{#if item.link}
 			<div class="col-span-2 sm:col-span-3">
 				<dt class="text-dark-light-blue/70 text-xs">Lien</dt>
-				<dd class="truncate">
-					<!-- eslint-disable svelte/no-navigation-without-resolve -- URL marchande externe -->
-					<a
-						class="text-sky-400 hover:underline"
+				<dd class="mt-1">
+					<!-- Une URL marchande fait souvent plusieurs centaines de caractères : on
+					     n'en montre que le bouton, l'adresse complète reste au survol. -->
+					<Button
 						href={item.link}
 						rel="noreferrer noopener"
-						target="_blank">{item.link}</a
+						size="sm"
+						target="_blank"
+						title={item.link}
+						variant="secondary"
 					>
-					<!-- eslint-enable svelte/no-navigation-without-resolve -->
+						<ExternalLink class="size-4" />
+						Ouvrir le lien
+					</Button>
 				</dd>
 			</div>
 		{/if}

@@ -9,6 +9,7 @@
 	import { enhance, type SubmitFunction } from '$app/forms';
 	import { resolve } from '$app/paths';
 	import CampusBadge from '#lib/components/cash/CampusBadge.svelte';
+	import ConfirmDialog from '#lib/components/cash/ConfirmDialog.svelte';
 	import RowMenu from '#lib/components/cash/RowMenu.svelte';
 	import {
 		PROJECT_FILTERS,
@@ -29,6 +30,8 @@
 	// Un seul formulaire, au-dessus de la table : `null` le ferme, `'new'` crée,
 	// un projet se modifie.
 	let editing = $state<ProjectRow | 'new' | null>(null);
+	// Projet dont la suppression attend confirmation : elle est définitive.
+	let removing = $state<ProjectRow | null>(null);
 	const target = $derived(editing === 'new' ? null : editing);
 	const campuses = Object.keys(CAMPUS_BADGES) as (keyof typeof CAMPUS_BADGES)[];
 
@@ -187,6 +190,27 @@
 	</p>
 </section>
 
+{#if removing}
+	<ConfirmDialog
+		action="?/remove"
+		confirmLabel="Supprimer le projet"
+		fields={{ id: removing.id }}
+		onClose={() => {
+			removing = null;
+		}}
+		{submit}
+		title="Supprimer un projet"
+	>
+		<p>
+			Êtes-vous sûr de vouloir supprimer le projet
+			<span class="font-medium text-white">{removing.name}</span> ?
+		</p>
+		<p class="text-dark-light-blue mt-2">
+			Cette action est irréversible. Pour le retirer sans le perdre, archivez-le plutôt.
+		</p>
+	</ConfirmDialog>
+{/if}
+
 {#snippet nameCell(cell: TableCell)}
 	{@const row = project(cell)}
 	<span class={row.archivedAt ? 'text-dark-light-blue/70' : 'font-medium text-white'}>
@@ -241,12 +265,15 @@
 				>
 			</form>
 			{#if row.itemCount === 0}
-				<form action="?/remove" method="POST" use:enhance={submit}>
-					<input name="id" type="hidden" value={row.id} />
-					<Button class="w-full justify-start" size="sm" type="submit" variant="danger"
-						>Supprimer</Button
-					>
-				</form>
+				<Button
+					class="w-full justify-start"
+					onclick={() => {
+						removing = row;
+						close();
+					}}
+					size="sm"
+					variant="danger">Supprimer</Button
+				>
 			{/if}
 		{/snippet}
 	</RowMenu>
