@@ -1,6 +1,12 @@
 import { rejection } from '#lib/server/audit.js';
 import { decimal, text } from '#lib/server/form.js';
-import { accounts, balancesOn, movementsBetween, periods } from '#lib/server/treasury.js';
+import {
+	accounts,
+	balancesOn,
+	movementsBetween,
+	periods,
+	unreconciledByFiscalYear
+} from '#lib/server/treasury.js';
 import { ACCOUNT_KINDS, type AccountKind } from '#lib/types/domain.js';
 import { fail } from '@sveltejs/kit';
 import type { Actions, PageServerLoad } from './$types';
@@ -33,14 +39,24 @@ export const load: PageServerLoad = async ({ locals, url, depends }) => {
 	const from = day(url.searchParams.get('from'), firstOfMonth);
 	const to = day(url.searchParams.get('to'), now);
 
-	const [accountRows, snapshots, movements, periodRows] = await Promise.all([
+	const [accountRows, snapshots, movements, periodRows, unreconciled] = await Promise.all([
 		accounts(locals.supabase),
 		balancesOn(locals.supabase, on),
 		movementsBetween(locals.supabase, from, to),
-		periods(locals.supabase)
+		periods(locals.supabase),
+		unreconciledByFiscalYear(locals.supabase)
 	]);
 
-	return { accounts: accountRows, snapshots, movements, periods: periodRows, on, from, to };
+	return {
+		accounts: accountRows,
+		snapshots,
+		movements,
+		periods: periodRows,
+		unreconciled,
+		on,
+		from,
+		to
+	};
 };
 
 export const actions: Actions = {
@@ -157,7 +173,13 @@ export const actions: Actions = {
 		return { saved: 'period' };
 	},
 
-	/** Clôture ou réouverture d'une période (TRANS-NF-31/32). */
+	/**
+	 * Clôture ou réouverture d'une période (TRANS-NF-31/32).
+	 *
+	 * Un exercice fiscal ne se clôt qu'une fois tous ses flux pointés (DVB45), et
+	 * sa clôture est définitive (DVB44) : il ne se rouvre pas. Une année scolaire,
+	 * elle, se rouvre toujours.
+	 */
 	togglePeriod: async ({ locals, request }) => {
 		const form = await request.formData();
 		const kind = text(form, 'kind');
@@ -169,6 +191,11 @@ export const actions: Actions = {
 		}
 		if (!Number.isSafeInteger(id)) {
 			return fail(400, { message: 'Période invalide.' });
+		}
+		if (kind === 'fiscal' && !close) {
+			return fail(409, {
+				message: 'Un exercice fiscal clos ne se rouvre pas : sa clôture est définitive.'
+			});
 		}
 
 		const { error } = await locals.supabase

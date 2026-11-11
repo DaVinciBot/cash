@@ -345,6 +345,8 @@ export interface Flow {
 	isReconciled: boolean;
 	reversesFlowId: number | null;
 	proofs: Proof[];
+	/** Exercice clos : le flux est en lecture seule (DVB41), justificatifs compris. */
+	fiscalYearClosed: boolean;
 	/** État de la commande d'origine : un flux de commande ne se pointe qu'une fois elle finalisée. */
 	orderState: OrderState | null;
 	/** Budgets sur lesquels la commande d'origine est imputée, avec leur quote-part. */
@@ -385,13 +387,14 @@ export async function flowList(supabase: Client, scope: FlowScope): Promise<Flow
 		await Promise.all([
 			query,
 			supabase.schema('cash').from('bank_accounts').select('id, name'),
-			supabase.schema('cash').from('fiscal_years').select('id, label'),
+			supabase.schema('cash').from('fiscal_years').select('id, label, closed_at'),
 			supabase.schema('cash').from('budgets').select('id, name')
 		]);
 
 	const flows = rows ?? [];
 	const accountNames = new Map((accountRows ?? []).map((a) => [a.id, a.name]));
 	const yearNames = new Map((yearRows ?? []).map((y) => [y.id, y.label]));
+	const closedYears = new Set((yearRows ?? []).filter((y) => y.closed_at).map((y) => y.id));
 	const budgetNames = new Map((budgetRows ?? []).map((b) => [b.id, b.name]));
 
 	// Un flux de commande ne porte pas de budget (`flows_auto_has_no_budget`) :
@@ -474,6 +477,7 @@ export async function flowList(supabase: Client, scope: FlowScope): Promise<Flow
 		isReconciled: f.is_reconciled,
 		reversesFlowId: f.reverses_flow_id,
 		proofs: proofsByFlow.get(f.id) ?? [],
+		fiscalYearClosed: closedYears.has(f.fiscal_year_id),
 		orderState: f.order_id === null ? null : (orderStates.get(f.order_id) ?? null),
 		orderBudgets: f.order_id === null ? [] : (sharesByOrder.get(f.order_id) ?? [])
 	}));
@@ -554,4 +558,21 @@ export function parseDomains(raw: string): string[] {
 				.filter((domain) => domain.length > 0)
 		)
 	];
+}
+
+/**
+ * Nombre de flux non pointés par exercice : un exercice ne se clôt qu'une fois
+ * tous ses flux pointés (DVB45), l'écran le dit avant le clic.
+ */
+export async function unreconciledByFiscalYear(supabase: Client): Promise<Record<number, number>> {
+	const { data } = await supabase
+		.schema('cash')
+		.from('flows')
+		.select('fiscal_year_id')
+		.eq('is_reconciled', false);
+	const counts: Record<number, number> = {};
+	for (const row of data ?? []) {
+		counts[row.fiscal_year_id] = (counts[row.fiscal_year_id] ?? 0) + 1;
+	}
+	return counts;
 }

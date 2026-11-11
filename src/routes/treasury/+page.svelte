@@ -354,6 +354,7 @@
 					</h3>
 					<ul class="space-y-2">
 						{#each group.rows as period (period.id)}
+							{@const pending = group.kind === 'fiscal' ? (data.unreconciled[period.id] ?? 0) : 0}
 							<li class="flex items-center gap-2 text-sm">
 								<span class="text-light-blue font-medium">{period.label}</span>
 								<span class="text-dark-light-blue/70 text-xs">
@@ -365,14 +366,28 @@
 										>Close</span
 									>
 								{/if}
-								<form class="ml-auto" action="?/togglePeriod" method="POST" use:enhance>
-									<input name="kind" type="hidden" value={group.kind} />
-									<input name="id" type="hidden" value={period.id} />
-									<input name="close" type="hidden" value={period.closedAt ? '0' : '1'} />
-									<Button size="sm" type="submit" variant="secondary"
-										>{period.closedAt ? 'Rouvrir' : 'Clore'}</Button
+								{#if group.kind === 'fiscal' && period.closedAt}
+									<!-- #75 — la clôture d'un exercice est définitive. -->
+									<span class="text-dark-light-blue/70 ml-auto text-xs">Clos définitivement</span>
+								{:else if pending > 0}
+									<!-- #74 — tous les flux pointés avant de clore. -->
+									<a
+										class="ml-auto text-xs text-amber-300 hover:underline"
+										href="{resolve('/treasury/flows')}?view=fiscal&year={period.id}"
+										title="Pointez tous les mouvements de l'exercice avant de le clore"
+										>{pending} mouvement(s) à pointer</a
 									>
-								</form>
+									<Button disabled size="sm" variant="secondary">Clore</Button>
+								{:else}
+									<form class="ml-auto" action="?/togglePeriod" method="POST" use:enhance>
+										<input name="kind" type="hidden" value={group.kind} />
+										<input name="id" type="hidden" value={period.id} />
+										<input name="close" type="hidden" value={period.closedAt ? '0' : '1'} />
+										<Button size="sm" type="submit" variant="secondary"
+											>{period.closedAt ? 'Rouvrir' : 'Clore'}</Button
+										>
+									</form>
+								{/if}
 							</li>
 						{/each}
 					</ul>

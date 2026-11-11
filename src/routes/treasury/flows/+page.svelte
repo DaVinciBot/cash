@@ -6,7 +6,7 @@
 	import StateBadge from '#lib/components/cash/StateBadge.svelte';
 	import { FLOW_DIRECTION_ICONS } from '#lib/components/cash/stateIcons.js';
 	import { FLOW_DIRECTION_BADGES, isOrderFinalized } from '#lib/types/domain.js';
-	import { CircleAlert } from '@lucide/svelte';
+	import { CircleAlert, Lock } from '@lucide/svelte';
 	import type { ActionData, PageData } from './$types';
 
 	let { data, form }: { data: PageData; form: ActionData } = $props();
@@ -34,8 +34,8 @@
 
 	/** Une dépense sans pièce est à relancer (#71). Une recette n'en exige pas. */
 	const unproven = (flow: Flow) => flow.direction === 'debit' && flow.proofs.length === 0;
-	/** Pointé : plus rien ne se modifie (#72). */
-	const locked = (flow: Flow) => flow.isReconciled;
+	/** Pointé ou d'un exercice clos : plus rien ne se modifie (#72, #75). */
+	const locked = (flow: Flow) => flow.isReconciled || flow.fiscalYearClosed;
 	/** Un flux de commande ne se pointe qu'une fois la commande finalisée (#94). */
 	const awaitingOrder = (flow: Flow) =>
 		flow.orderState !== null && !isOrderFinalized(flow.orderState);
@@ -208,6 +208,15 @@
 								Justificatif manquant
 							</span>
 						{/if}
+						{#if flow.fiscalYearClosed}
+							<span
+								class="bg-dark-blue/60 text-dark-light-blue inline-flex items-center gap-1 rounded-full px-2 py-0.5 text-xs"
+								title="L'exercice est clos : ce mouvement est en lecture seule"
+							>
+								<Lock class="size-3" />
+								Exercice clos
+							</span>
+						{/if}
 						<span
 							class="ml-auto font-semibold {flow.direction === 'credit'
 								? 'text-emerald-300'
@@ -281,57 +290,59 @@
 						</form>
 					{/if}
 
-					<div class="mt-3 flex flex-wrap items-center gap-2">
-						{#if !flow.isReconciled}
-							<Button
-								onclick={() => (editing = editing === flow.id ? null : flow.id)}
-								size="sm"
-								variant="secondary">Modifier</Button
-							>
-							<Button
-								onclick={() => (uploading = uploading === flow.id ? null : flow.id)}
-								size="sm"
-								variant="secondary">Justificatif</Button
-							>
-						{/if}
-						{#if flow.isReconciled}
-							<form action="?/toggleReconciled" method="POST" use:enhance>
-								<input name="id" type="hidden" value={flow.id} />
-								<input name="reconciled" type="hidden" value="0" />
-								<Button size="sm" type="submit" variant="secondary">Dépointer</Button>
-							</form>
-						{:else if awaitingOrder(flow)}
-							<span title="Impossible de pointer : la commande doit d'abord être finalisée">
-								<Button disabled size="sm" variant="secondary">Pointer</Button>
-							</span>
-						{:else if unproven(flow)}
-							<Button
-								onclick={() => (forcing = forcing === flow.id ? null : flow.id)}
-								size="sm"
-								variant="secondary">Pointer</Button
-							>
-						{:else}
-							<form action="?/toggleReconciled" method="POST" use:enhance>
-								<input name="id" type="hidden" value={flow.id} />
-								<input name="reconciled" type="hidden" value="1" />
-								<Button size="sm" type="submit" variant="secondary">Pointer</Button>
-							</form>
-						{/if}
-						<!-- #70 — le règlement d'une commande ne se supprime pas : la commande s'annule. -->
-						{#if flow.orderId === null && !flow.isReconciled}
-							<form action="?/delete" method="POST" use:enhance>
-								<input name="id" type="hidden" value={flow.id} />
-								<Button size="sm" type="submit" variant="danger">Supprimer</Button>
-							</form>
-						{/if}
-					</div>
+					{#if !flow.fiscalYearClosed}
+						<div class="mt-3 flex flex-wrap items-center gap-2">
+							{#if !flow.isReconciled}
+								<Button
+									onclick={() => (editing = editing === flow.id ? null : flow.id)}
+									size="sm"
+									variant="secondary">Modifier</Button
+								>
+								<Button
+									onclick={() => (uploading = uploading === flow.id ? null : flow.id)}
+									size="sm"
+									variant="secondary">Justificatif</Button
+								>
+							{/if}
+							{#if flow.isReconciled}
+								<form action="?/toggleReconciled" method="POST" use:enhance>
+									<input name="id" type="hidden" value={flow.id} />
+									<input name="reconciled" type="hidden" value="0" />
+									<Button size="sm" type="submit" variant="secondary">Dépointer</Button>
+								</form>
+							{:else if awaitingOrder(flow)}
+								<span title="Impossible de pointer : la commande doit d'abord être finalisée">
+									<Button disabled size="sm" variant="secondary">Pointer</Button>
+								</span>
+							{:else if unproven(flow)}
+								<Button
+									onclick={() => (forcing = forcing === flow.id ? null : flow.id)}
+									size="sm"
+									variant="secondary">Pointer</Button
+								>
+							{:else}
+								<form action="?/toggleReconciled" method="POST" use:enhance>
+									<input name="id" type="hidden" value={flow.id} />
+									<input name="reconciled" type="hidden" value="1" />
+									<Button size="sm" type="submit" variant="secondary">Pointer</Button>
+								</form>
+							{/if}
+							<!-- #70 — le règlement d'une commande ne se supprime pas : la commande s'annule. -->
+							{#if flow.orderId === null && !flow.isReconciled}
+								<form action="?/delete" method="POST" use:enhance>
+									<input name="id" type="hidden" value={flow.id} />
+									<Button size="sm" type="submit" variant="danger">Supprimer</Button>
+								</form>
+							{/if}
+						</div>
+					{/if}
 
 					{#if awaitingOrder(flow) && !flow.isReconciled}
 						<p class="text-dark-light-blue/70 mt-2 text-xs">
 							Commande non finalisée : ce montant suivra automatiquement toute correction de la
 							commande. Le pointage sera possible une fois la commande reçue ou annulée.
 						</p>
-					{:else if flow.isReconciled}
+					{:else if flow.isReconciled && !flow.fiscalYearClosed}
 						<p class="text-dark-light-blue/70 mt-2 text-xs">
 							Pointé : ce mouvement est verrouillé. Dépointez-le pour le corriger.
 						</p>

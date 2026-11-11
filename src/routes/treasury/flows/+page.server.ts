@@ -18,7 +18,8 @@ import type { Actions, PageServerLoad } from './$types';
 //   - l'exercice d'un flux se déduit de sa date, et une date d'exercice clos est
 //     refusée (DVB41) ; celui d'un flux de commande est hérité de la commande ;
 //   - un flux pointé est figé, justificatifs compris, jusqu'à son dépointage (DVB42) ;
-//   - un flux de commande ne se pointe qu'une fois la commande finalisée (DVB43).
+//   - un flux de commande ne se pointe qu'une fois la commande finalisée (DVB43) ;
+//   - un exercice clos est en lecture seule, définitivement (DVB44).
 // Seule l'exigence d'un justificatif pour pointer une dépense est une règle
 // d'écran : elle admet une dérogation explicite, cochée par le trésorier.
 
