@@ -2,7 +2,7 @@
 	import { enhance } from '$app/forms';
 	import { resolve } from '$app/paths';
 	import { Button } from '@davincibot/components';
-	import { ACCOUNT_KIND_LABELS, ACCOUNT_KINDS } from '#lib/types/domain.js';
+	import { ACCOUNT_KIND_LABELS, TREASURY_ACCOUNT_KINDS } from '#lib/types/domain.js';
 	import type { ActionData, PageData } from './$types';
 
 	let { data, form }: { data: PageData; form: ActionData } = $props();
@@ -22,6 +22,14 @@
 	let openPeriod = $state(false);
 	// Compte dont l'archivage attend confirmation. `null` = aucun panneau ouvert.
 	let archiving = $state<number | null>(null);
+
+	// Les commandes se règlent sur le compte courant : le dernier ouvert ne
+	// s'archive pas (DVB40), on ne propose donc pas le geste.
+	const openCurrent = $derived(
+		data.accounts.filter((account) => account.kind === 'current' && !account.archivedAt)
+	);
+	const isLastCurrent = (account: { id: number; kind: string }) =>
+		account.kind === 'current' && openCurrent.length === 1 && openCurrent[0]?.id === account.id;
 </script>
 
 <svelte:head><title>Trésorerie — DaVinciBot</title></svelte:head>
@@ -184,7 +192,7 @@
 						name="kind"
 						class="border-rule-strong bg-dark-blue/60 text-light-blue placeholder:text-muted focus:border-light-blue/70 focus-visible:ring-light-blue/60 mt-1 block rounded-xl border p-2.5 text-sm focus:outline-none focus-visible:ring-2 disabled:opacity-50"
 					>
-						{#each ACCOUNT_KINDS as kind (kind)}
+						{#each TREASURY_ACCOUNT_KINDS as kind (kind)}
 							<option value={kind}>{ACCOUNT_KIND_LABELS[kind]}</option>
 						{/each}
 					</select>
@@ -199,6 +207,10 @@
 					/>
 				</label>
 				<Button size="sm" type="submit" variant="primary">Créer</Button>
+				<p class="text-dark-light-blue/70 w-full text-xs">
+					Une enveloppe partenaire se crée avec son partenariat, depuis la page
+					<a class="text-sky-400 hover:underline" href={resolve('/partners')}>Partenariats</a>.
+				</p>
 			</form>
 		{/if}
 
@@ -215,7 +227,21 @@
 						>
 					{/if}
 					<span class="text-light-blue ml-auto font-medium">{euro.format(account.balance)}</span>
-					{#if account.archivedAt}
+					{#if account.kind === 'partner_credit'}
+						<!-- L'enveloppe s'archive et se rouvre avec son partenariat. -->
+						<a
+							class="text-dark-light-blue text-xs hover:underline"
+							href={resolve('/partners')}
+							title="L'enveloppe s'archive et se réactive avec son partenariat"
+							>Suit son partenariat</a
+						>
+					{:else if isLastCurrent(account)}
+						<span
+							class="text-dark-light-blue text-xs"
+							title="Les commandes se règlent sur le compte courant : ouvrez-en un autre avant d'archiver celui-ci"
+							>Compte principal</span
+						>
+					{:else if account.archivedAt}
 						<form action="?/toggleArchiveAccount" method="POST" use:enhance>
 							<input name="id" type="hidden" value={account.id} />
 							<input name="archive" type="hidden" value="0" />

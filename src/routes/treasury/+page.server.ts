@@ -1,7 +1,7 @@
 import { rejection } from '#lib/server/audit.js';
 import { decimal, text } from '#lib/server/form.js';
 import { accounts, balancesOn, movementsBetween, periods } from '#lib/server/treasury.js';
-import { ACCOUNT_KINDS, type AccountKind } from '#lib/types/domain.js';
+import { TREASURY_ACCOUNT_KINDS } from '#lib/types/domain.js';
 import { fail } from '@sveltejs/kit';
 import type { Actions, PageServerLoad } from './$types';
 
@@ -54,7 +54,14 @@ export const actions: Actions = {
 		if (name.length === 0) {
 			return fail(400, { message: 'Le nom du compte est obligatoire.' });
 		}
-		if (!ACCOUNT_KINDS.includes(kind as AccountKind)) {
+		if (kind === 'partner_credit') {
+			return fail(400, {
+				message:
+					'Une enveloppe partenaire se crée avec son partenariat, depuis la page « Partenariats ».'
+			});
+		}
+		const treasuryKind = TREASURY_ACCOUNT_KINDS.find((k) => k === kind);
+		if (!treasuryKind) {
 			return fail(400, { message: 'Type de compte inconnu.' });
 		}
 		if (!Number.isFinite(opening)) {
@@ -64,7 +71,7 @@ export const actions: Actions = {
 		const { error } = await locals.supabase
 			.schema('cash')
 			.from('bank_accounts')
-			.insert({ name, kind: kind as AccountKind, opening_balance: opening });
+			.insert({ name, kind: treasuryKind, opening_balance: opening });
 
 		if (error) {
 			return fail(400, {
@@ -95,6 +102,22 @@ export const actions: Actions = {
 		const archive = text(form, 'archive') === '1';
 		if (!Number.isSafeInteger(id)) {
 			return fail(400, { message: 'Compte invalide.' });
+		}
+
+		// Une enveloppe suit son partenariat (trigger `partnerships_sync_envelope_archive`) :
+		// l'archiver d'ici la rendrait inactive alors que le partenariat vit encore.
+		// Le dernier compte courant, lui, est protégé en base (DVB40).
+		const { data: account } = await locals.supabase
+			.schema('cash')
+			.from('bank_accounts')
+			.select('kind')
+			.eq('id', id)
+			.maybeSingle();
+		if (account?.kind === 'partner_credit') {
+			return fail(400, {
+				message:
+					"Une enveloppe partenaire s'archive avec son partenariat, depuis la page « Partenariats »."
+			});
 		}
 
 		const { error } = await locals.supabase
