@@ -12,6 +12,7 @@
 		type TableRow
 	} from '@davincibot/components';
 	import type { TrainingListItem } from '@davincibot/lib';
+	import { Plus } from '@lucide/svelte';
 
 	const noop = () => undefined;
 	const noopTraining: (training: TrainingListItem) => void = () => undefined;
@@ -55,7 +56,16 @@
 				Les contenus de référence dont héritent les sessions.
 			</p>
 		</div>
-		<Button onclick={onAddTraining} size="sm" variant="secondary">Ajouter</Button>
+		<Button
+			class="mr-2"
+			aria-label="Ajouter une formation"
+			onclick={onAddTraining}
+			size="md"
+			variant="primary"
+		>
+			<Plus class="size-4 shrink-0" />
+			<span class="hidden sm:block">Ajouter une formation</span>
+		</Button>
 	</div>
 
 	<div class="border-rule bg-blue-gray/15 hidden rounded-lg border md:block">

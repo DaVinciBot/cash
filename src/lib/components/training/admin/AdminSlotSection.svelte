@@ -1,4 +1,5 @@
 <script lang="ts">
+	import { resolve } from '$app/paths';
 	import { Button } from '@davincibot/components';
 	import StateBadge from '#lib/components/cash/StateBadge.svelte';
 	import { statusBadge, stateBadgeLabel } from '#lib/helpers/trainingTables.js';
@@ -12,6 +13,7 @@
 		type TableRow
 	} from '@davincibot/components';
 	import type { TrainingListItem, TrainingSlotListItem } from '@davincibot/lib';
+	import { Plus } from '@lucide/svelte';
 
 	const noop = () => undefined;
 	const noopSlot: (slot: TrainingSlotListItem) => void = () => undefined;
@@ -60,7 +62,16 @@
 			</h2>
 			<p class="text-dark-light-blue/70 mt-1 text-xs">Planifiez, suivez et ajustez les sessions.</p>
 		</div>
-		<Button onclick={onAddSlot} size="sm" variant="secondary">Ajouter</Button>
+		<Button
+			class="mr-2"
+			aria-label="Ajouter une session"
+			onclick={onAddSlot}
+			size="md"
+			variant="primary"
+		>
+			<Plus class="size-4 shrink-0" />
+			<span class="hidden sm:block">Ajouter une session</span>
+		</Button>
 	</div>
 
 	<!-- La table paginée reste au clavier et à la souris ; sous 768 px elle
