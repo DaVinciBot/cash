@@ -22,6 +22,14 @@
 	let openPeriod = $state(false);
 	// Compte dont l'archivage attend confirmation. `null` = aucun panneau ouvert.
 	let archiving = $state<number | null>(null);
+
+	// Les commandes se règlent sur le compte courant : le dernier ouvert ne
+	// s'archive pas (DVB40), on ne propose donc pas le geste.
+	const openCurrent = $derived(
+		data.accounts.filter((account) => account.kind === 'current' && !account.archivedAt)
+	);
+	const isLastCurrent = (account: { id: number; kind: string }) =>
+		account.kind === 'current' && openCurrent.length === 1 && openCurrent[0]?.id === account.id;
 </script>
 
 <svelte:head><title>Trésorerie — DaVinciBot</title></svelte:head>
@@ -215,7 +223,13 @@
 						>
 					{/if}
 					<span class="text-light-blue ml-auto font-medium">{euro.format(account.balance)}</span>
-					{#if account.archivedAt}
+					{#if isLastCurrent(account)}
+						<span
+							class="text-dark-light-blue text-xs"
+							title="Les commandes se règlent sur le compte courant : ouvrez-en un autre avant d'archiver celui-ci"
+							>Compte principal</span
+						>
+					{:else if account.archivedAt}
 						<form action="?/toggleArchiveAccount" method="POST" use:enhance>
 							<input name="id" type="hidden" value={account.id} />
 							<input name="archive" type="hidden" value="0" />

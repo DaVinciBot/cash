@@ -197,6 +197,8 @@ export const CASH_ERROR_MESSAGES: Record<string, string> = {
 		'Fonds insuffisants : le solde du compte sélectionné ne permet pas de régler cette commande.',
 	DVB09: 'Une commande ne peut pas être vide : annulez-la plutôt que de retirer son dernier item.',
 	DVB10: 'Cette ligne est historique : elle se révoque, elle ne se réécrit pas.',
+	DVB40:
+		"C'est le dernier compte courant ouvert : les commandes se règlent dessus, il ne peut pas être archivé.",
 	'42501': "Vous n'avez pas les droits nécessaires pour cette action.",
 	'22023': 'Paramètre invalide.',
 	P0002: 'Élément introuvable.',
