@@ -41,7 +41,7 @@
 
 	// Un archivé n'a qu'un geste : le désarchiver.
 	const archivedColumns: TableColumn[] = columns.map((column) =>
-		column.key === 'id' ? { ...column, label: 'Action', width: '9rem', align: 'left' } : column
+		column.key === 'id' ? { key: column.key, label: 'Action', width: '9rem' } : column
 	);
 
 	// Les archivés se retrouvent par année : un partenariat éteint reste lié à la sienne.
