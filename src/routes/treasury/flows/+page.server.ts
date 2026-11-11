@@ -1,4 +1,4 @@
-import { periodFor } from '#lib/periods.js';
+import { fiscalYearProblem, periodFor } from '#lib/periods.js';
 import { rejection } from '#lib/server/audit.js';
 import { currentSchoolYear } from '#lib/server/cash.js';
 import { decimal, text } from '#lib/server/form.js';
@@ -14,6 +14,9 @@ import type { Actions, PageServerLoad } from './$types';
 // supprimable (TRESO-F-23), mais tant qu'il n'est pas POINTÉ il se recale seul
 // sur le total de sa commande. Le pointer, c'est en prendre la responsabilité —
 // et c'est ce que l'écran dit.
+//
+// L'exercice d'un flux se déduit de sa date, et une date d'exercice clos est
+// refusée (DVB41) ; celui d'un flux de commande est hérité de la commande.
 
 const ISO_DAY = /^\d{4}-\d{2}-\d{2}$/;
 const PROOF_TYPES = ['image/png', 'image/jpeg', 'application/pdf'];
@@ -82,7 +85,6 @@ function readFlow(form: FormData) {
 	const occurredOn = text(form, 'occurred_on');
 	const label = text(form, 'label');
 	const accountId = Number(form.get('account_id'));
-	const fiscalYearId = Number(form.get('fiscal_year_id'));
 	const rawBudget = text(form, 'budget_id');
 	const budgetId = rawBudget === '' ? null : Number(rawBudget);
 
@@ -98,8 +100,8 @@ function readFlow(form: FormData) {
 	if (label.length === 0) {
 		return { error: 'Le libellé est obligatoire.' as const };
 	}
-	if (!Number.isSafeInteger(accountId) || !Number.isSafeInteger(fiscalYearId)) {
-		return { error: 'Compte ou exercice invalide.' as const };
+	if (!Number.isSafeInteger(accountId)) {
+		return { error: 'Compte invalide.' as const };
 	}
 	if (budgetId !== null && !Number.isSafeInteger(budgetId)) {
 		return { error: 'Budget invalide.' as const };
@@ -112,10 +114,20 @@ function readFlow(form: FormData) {
 			occurred_on: occurredOn,
 			label,
 			account_id: accountId,
-			fiscal_year_id: fiscalYearId,
 			budget_id: budgetId
 		}
 	};
+}
+
+/** Ce qu'il faut savoir d'un flux avant d'y toucher. */
+async function flowState(supabase: App.Locals['supabase'], id: number) {
+	const { data } = await supabase
+		.schema('cash')
+		.from('flows')
+		.select('id, direction, order_id, is_reconciled, fiscal_year_id')
+		.eq('id', id)
+		.maybeSingle();
+	return data;
 }
 
 export const actions: Actions = {
@@ -126,10 +138,20 @@ export const actions: Actions = {
 			return fail(400, { message: parsed.error });
 		}
 
+		// L'exercice se déduit de la date (#77) : la base le recalcule de toute
+		// façon, on le calcule ici pour refuser une date d'exercice clos avec un
+		// message clair plutôt qu'un code.
+		const { fiscalYears } = await periods(locals.supabase);
+		const problem = fiscalYearProblem(parsed.values.occurred_on, fiscalYears);
+		const fiscalYear = periodFor(parsed.values.occurred_on, fiscalYears);
+		if (problem || !fiscalYear) {
+			return fail(400, { message: problem ?? 'Exercice introuvable.' });
+		}
+
 		const { error } = await locals.supabase
 			.schema('cash')
 			.from('flows')
-			.insert({ ...parsed.values, origin: 'manual' });
+			.insert({ ...parsed.values, fiscal_year_id: fiscalYear.id, origin: 'manual' });
 
 		if (error) {
 			return fail(400, {
@@ -157,10 +179,32 @@ export const actions: Actions = {
 			return fail(400, { message: parsed.error });
 		}
 
+		const flow = await flowState(locals.supabase, id);
+		if (!flow) {
+			return fail(404, { message: 'Mouvement introuvable.' });
+		}
+
+		// Un flux de commande garde l'exercice de sa commande (#91) : on ne
+		// l'envoie pas, et la base le fige de toute façon. Les autres suivent leur date.
+		let fiscalYearId: number | undefined;
+		if (flow.order_id === null) {
+			const { fiscalYears } = await periods(locals.supabase);
+			const problem = fiscalYearProblem(parsed.values.occurred_on, fiscalYears);
+			const fiscalYear = periodFor(parsed.values.occurred_on, fiscalYears);
+			if (problem || !fiscalYear) {
+				return fail(400, { message: problem ?? 'Exercice introuvable.' });
+			}
+			fiscalYearId = fiscalYear.id;
+		}
+
 		const { error } = await locals.supabase
 			.schema('cash')
 			.from('flows')
-			.update(parsed.values)
+			.update(
+				fiscalYearId === undefined
+					? parsed.values
+					: { ...parsed.values, fiscal_year_id: fiscalYearId }
+			)
 			.eq('id', id);
 
 		if (error) {

@@ -2,12 +2,15 @@
 	import { Button, FilterChip } from '@davincibot/components';
 	import { enhance } from '$app/forms';
 	import { resolve } from '$app/paths';
+	import FlowFields from '#lib/components/cash/FlowFields.svelte';
 	import StateBadge from '#lib/components/cash/StateBadge.svelte';
 	import { FLOW_DIRECTION_ICONS } from '#lib/components/cash/stateIcons.js';
-	import { FLOW_DIRECTION_BADGES, isFlowGenerated } from '#lib/types/domain.js';
+	import { FLOW_DIRECTION_BADGES } from '#lib/types/domain.js';
 	import type { ActionData, PageData } from './$types';
 
 	let { data, form }: { data: PageData; form: ActionData } = $props();
+
+	type Flow = (typeof data.flows)[number];
 
 	const euro = new Intl.NumberFormat('fr-FR', { style: 'currency', currency: 'EUR' });
 	const day = new Intl.DateTimeFormat('fr-FR', { dateStyle: 'medium' });
@@ -20,9 +23,6 @@
 	let uploading = $state<number | null>(null);
 
 	const today = new Date().toISOString().slice(0, 10);
-	const openYear = $derived(
-		data.periods.fiscalYears.find((y) => y.id === data.fiscalYearId) ?? data.periods.fiscalYears[0]
-	);
 
 	const periodsOfView = $derived(
 		data.view === 'school' ? data.periods.schoolYears : data.periods.fiscalYears
@@ -108,7 +108,7 @@
 		</p>
 	</form>
 
-	{#snippet flowForm(flow: (typeof data.flows)[number] | null)}
+	{#snippet flowForm(flow: Flow | null)}
 		<form
 			class="border-rule bg-blue-gray/15 mb-3 rounded-lg border p-4"
 			action={flow ? '?/update' : '?/create'}
@@ -122,98 +122,14 @@
 			{#if flow}
 				<input name="id" type="hidden" value={flow.id} />
 			{/if}
-			<div class="flex flex-wrap items-end gap-3">
-				<label class="text-dark-light-blue text-xs">
-					Sens
-					<select
-						name="direction"
-						class="border-rule-strong bg-dark-blue/60 text-light-blue placeholder:text-muted focus:border-light-blue/70 focus-visible:ring-light-blue/60 mt-1 block rounded-xl border p-2.5 text-sm focus:outline-none focus-visible:ring-2 disabled:opacity-50"
-						value={flow?.direction ?? 'debit'}
-					>
-						<option value="debit">Dépense (débit)</option>
-						<option value="credit">Recette (crédit)</option>
-					</select>
-				</label>
-				<label class="text-dark-light-blue text-xs">
-					Montant TTC
-					<input
-						name="amount_ttc"
-						class="border-rule-strong bg-dark-blue/60 mt-1 block w-32 rounded-xl border p-2.5 text-sm"
-						inputmode="decimal"
-						required
-						value={flow ? flow.amountTtc.toFixed(2).replace('.', ',') : ''}
-					/>
-				</label>
-				<label class="text-dark-light-blue text-xs">
-					Date
-					<input
-						name="occurred_on"
-						class="border-rule-strong bg-dark-blue/60 text-light-blue placeholder:text-muted focus:border-light-blue/70 focus-visible:ring-light-blue/60 mt-1 block rounded-xl border p-2.5 text-sm focus:outline-none focus-visible:ring-2 disabled:opacity-50"
-						required
-						type="date"
-						value={flow?.occurredOn ?? today}
-					/>
-				</label>
-				<label class="text-dark-light-blue flex-1 text-xs">
-					Libellé
-					<input
-						name="label"
-						class="border-rule-strong bg-dark-blue/60 text-light-blue placeholder:text-muted focus:border-light-blue/70 focus-visible:ring-light-blue/60 mt-1 block w-full rounded-xl border p-2.5 text-sm focus:outline-none focus-visible:ring-2 disabled:opacity-50"
-						required
-						value={flow?.label ?? ''}
-					/>
-				</label>
-			</div>
-			<div class="mt-3 flex flex-wrap items-end gap-3">
-				<label class="text-dark-light-blue text-xs">
-					Compte
-					<select
-						name="account_id"
-						class="border-rule-strong bg-dark-blue/60 text-light-blue placeholder:text-muted focus:border-light-blue/70 focus-visible:ring-light-blue/60 mt-1 block rounded-xl border p-2.5 text-sm focus:outline-none focus-visible:ring-2 disabled:opacity-50"
-						value={flow?.accountId ?? data.accounts.at(0)?.id}
-					>
-						{#each data.accounts as account (account.id)}
-							<option value={account.id}>{account.name}</option>
-						{/each}
-					</select>
-				</label>
-				<label class="text-dark-light-blue text-xs">
-					Exercice
-					<select
-						name="fiscal_year_id"
-						class="border-rule-strong bg-dark-blue/60 text-light-blue placeholder:text-muted focus:border-light-blue/70 focus-visible:ring-light-blue/60 mt-1 block rounded-xl border p-2.5 text-sm focus:outline-none focus-visible:ring-2 disabled:opacity-50"
-						value={flow?.fiscalYearId ?? openYear?.id}
-					>
-						{#each data.periods.fiscalYears as year (year.id)}
-							<option value={year.id}>{year.label}</option>
-						{/each}
-					</select>
-				</label>
-				<label class="text-dark-light-blue flex-1 text-xs">
-					Budget imputé
-					<select
-						name="budget_id"
-						class="border-rule-strong bg-dark-blue/60 text-light-blue placeholder:text-muted focus:border-light-blue/70 focus-visible:ring-light-blue/60 mt-1 block w-full rounded-xl border p-2.5 text-sm focus:outline-none focus-visible:ring-2 disabled:opacity-50"
-						disabled={flow !== null && isFlowGenerated(flow.origin)}
-						value={flow?.budgetId ?? ''}
-					>
-						<option value="">— aucun —</option>
-						{#each data.leaves as leaf (leaf.id)}
-							<option value={leaf.id}>{leaf.path}</option>
-						{/each}
-					</select>
-				</label>
-			</div>
-			{#if flow && isFlowGenerated(flow.origin)}
-				<p class="text-dark-light-blue/70 mt-2 text-xs">
-					Ce mouvement vient de la commande #{flow.orderId} : sa ventilation budgétaire se lit dans la
-					répartition de la commande, pas sur le mouvement.
-				</p>
-			{/if}
-			<div class="mt-3 flex items-center gap-2">
-				<Button size="sm" type="submit" variant="primary">Enregistrer</Button>
-				<Button onclick={() => (editing = null)} size="sm" variant="secondary">Annuler</Button>
-			</div>
+			<FlowFields
+				accounts={data.accounts}
+				fiscalYears={data.periods.fiscalYears}
+				{flow}
+				leaves={data.leaves}
+				onCancel={() => (editing = null)}
+				{today}
+			/>
 		</form>
 	{/snippet}
 
