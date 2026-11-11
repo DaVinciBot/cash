@@ -1,3 +1,4 @@
+import { attachmentsOf } from '#lib/server/attachments.js';
 import { entityHistory, rejection } from '#lib/server/audit.js';
 import { decimal, text, textAll } from '#lib/server/form.js';
 import {
@@ -35,18 +36,23 @@ export const load: PageServerLoad = async ({ locals, params, depends }) => {
 	}
 
 	const editable = order.state === 'pending_treso';
-	const [{ leaves }, address, accountRows, history, queue, { data: flowRows }] = await Promise.all([
-		budgetLeaves(locals.supabase, order.schoolYearId),
-		order.campus ? campusAddress(locals.supabase, order.campus) : Promise.resolve(null),
-		accounts(locals.supabase),
-		entityHistory(locals.supabase, 'order', id),
-		editable ? bundlingQueue(locals.supabase) : Promise.resolve([]),
-		locals.supabase
-			.schema('cash')
-			.from('flows')
-			.select('account_id, direction, amount_ttc')
-			.eq('order_id', id)
-	]);
+	const [{ leaves }, address, accountRows, history, queue, { data: flowRows }, attachments] =
+		await Promise.all([
+			budgetLeaves(locals.supabase, order.schoolYearId),
+			order.campus ? campusAddress(locals.supabase, order.campus) : Promise.resolve(null),
+			accounts(locals.supabase),
+			entityHistory(locals.supabase, 'order', id),
+			editable ? bundlingQueue(locals.supabase) : Promise.resolve([]),
+			locals.supabase
+				.schema('cash')
+				.from('flows')
+				.select('account_id, direction, amount_ttc')
+				.eq('order_id', id),
+			attachmentsOf(
+				locals.supabase,
+				order.items.map((item) => item.id)
+			)
+		]);
 
 	// #83 — seuls les items de la file qui peuvent rejoindre CETTE commande :
 	// même campus (CMD-F-45) et même année scolaire. La base le revérifie.
@@ -82,7 +88,9 @@ export const load: PageServerLoad = async ({ locals, params, depends }) => {
 		accounts: accountRows.filter((a) => !a.archivedAt),
 		history,
 		addable: sameCampus.filter((item) => inYear.has(item.id)),
-		refundAccountId
+		refundAccountId,
+		// #63 — les pièces jointes des items, à portée du trésorier qui commande.
+		attachments: Object.fromEntries(attachments)
 	};
 };
 

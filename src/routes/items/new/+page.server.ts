@@ -1,4 +1,10 @@
 import { itemFieldsError, knownTags } from '#lib/itemFields.js';
+import {
+	ATTACHMENT_ACCEPT,
+	attachFile,
+	attachmentProblem,
+	isChosenFile
+} from '#lib/server/attachments.js';
 import { rejection } from '#lib/server/audit.js';
 import {
 	budgetPressure,
@@ -18,6 +24,8 @@ import type { Actions, PageServerLoad } from './$types';
 // C'est pour cela qu'il n'y a ici ni table ni identifiant de panier.
 
 interface CartLine {
+	/** Rang de la ligne dans le formulaire : il apparie la ligne et sa pièce jointe. */
+	index: number;
 	name: string;
 	link: string;
 	unitPriceTtc: number;
@@ -75,6 +83,7 @@ function parseLines(form: FormData): { lines: CartLine[]; message?: string } {
 		}
 
 		lines.push({
+			index: i,
 			name,
 			link,
 			unitPriceTtc: Math.round(price * 100) / 100,
@@ -143,7 +152,8 @@ export const load: PageServerLoad = async ({ depends, locals }) => {
 		})),
 		memberCampus,
 		schoolYear,
-		partnerships: partnerships ?? []
+		partnerships: partnerships ?? [],
+		attachmentAccept: ATTACHMENT_ACCEPT
 	};
 };
 
@@ -167,6 +177,18 @@ export const actions: Actions = {
 		const { lines, message } = parseLines(form);
 		if (message) {
 			return fail(400, { message });
+		}
+
+		// #63 — une pièce jointe par ligne, dans l'ordre du formulaire : un champ
+		// laissé vide arrive quand même, en fichier de taille nulle, ce qui garde
+		// l'appariement. Les fichiers se vérifient AVANT d'enregistrer la demande.
+		const files = form.getAll('attachment');
+		for (const line of lines) {
+			const file = files[line.index];
+			const problem = isChosenFile(file) ? attachmentProblem(file) : null;
+			if (problem) {
+				return fail(400, { message: `Ligne ${String(line.index + 1)} : ${problem}` });
+			}
 		}
 
 		const [projects, schoolYear] = await Promise.all([
@@ -204,7 +226,7 @@ export const actions: Actions = {
 			});
 		}
 
-		const { error: insertError } = await locals.supabase
+		const { data: created, error: insertError } = await locals.supabase
 			.schema('cash')
 			.from('items')
 			.insert(
@@ -220,7 +242,8 @@ export const actions: Actions = {
 					requested_by: user.id,
 					school_year_id: schoolYear.id
 				}))
-			);
+			)
+			.select('id');
 
 		if (insertError) {
 			return fail(400, {
@@ -232,6 +255,26 @@ export const actions: Actions = {
 						entityType: 'item'
 					}
 				)
+			});
+		}
+
+		// Les lignes reviennent dans l'ordre d'insertion. Un dépôt qui échoue ne
+		// perd pas la demande : elle est enregistrée, et le fichier se rajoute
+		// depuis le détail de l'item.
+		const failures: string[] = [];
+		for (const [rank, line] of lines.entries()) {
+			const file = files[line.index];
+			const itemId = created[rank]?.id;
+			if (isChosenFile(file) && itemId !== undefined) {
+				const problem = await attachFile(locals.supabase, itemId, file);
+				if (problem) {
+					failures.push(problem);
+				}
+			}
+		}
+		if (failures.length > 0) {
+			return fail(400, {
+				message: `Vos composants sont enregistrés, mais ${failures.join(' ')} Ajoutez-le depuis le détail de l'item, dans « Mes items ».`
 			});
 		}
 
