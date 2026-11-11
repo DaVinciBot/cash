@@ -197,6 +197,14 @@ export const CASH_ERROR_MESSAGES: Record<string, string> = {
 		'Fonds insuffisants : le solde du compte sélectionné ne permet pas de régler cette commande.',
 	DVB09: 'Une commande ne peut pas être vide : annulez-la plutôt que de retirer son dernier item.',
 	DVB10: 'Cette ligne est historique : elle se révoque, elle ne se réécrit pas.',
+	DVB41:
+		"Impossible d'enregistrer ce flux : la date indiquée correspond à un exercice fiscal déjà clôturé.",
+	DVB42:
+		'Ce mouvement est pointé : dépointez-le avant de le modifier ou de toucher à ses justificatifs.',
+	DVB43:
+		"Impossible de pointer : la commande doit d'abord être finalisée (reçue ou annulée), son montant peut encore bouger.",
+	DVB44: 'Cet exercice est clos définitivement : il ne se rouvre plus et ne se modifie plus.',
+	DVB45: 'Cet exercice a encore des mouvements non pointés : pointez-les tous avant de le clore.',
 	'42501': "Vous n'avez pas les droits nécessaires pour cette action.",
 	'22023': 'Paramètre invalide.',
 	P0002: 'Élément introuvable.',
@@ -303,4 +311,12 @@ export function isOrderPassable(state: OrderState): boolean {
 /** L'annulation reste ouverte jusqu'à la livraison complète (§8). */
 export function isOrderCancelable(state: OrderState): boolean {
 	return state === 'pending_treso' || state === 'pending_delivery';
+}
+
+/**
+ * Une commande est finalisée quand plus rien ne bouge : reçue ou annulée. Son
+ * flux ne se pointe qu'à partir de là (DVB43).
+ */
+export function isOrderFinalized(state: OrderState): boolean {
+	return state === 'completed' || state === 'canceled';
 }
