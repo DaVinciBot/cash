@@ -9,7 +9,7 @@
 // archivage. Les adhésions relèvent d'une autre permission et d'un autre écran.
 
 import { num, str } from '#lib/server/coerce.js';
-import type { AccountKind, FlowDirection, FlowOrigin } from '#lib/types/domain.js';
+import type { AccountKind, FlowDirection, FlowOrigin, OrderState } from '#lib/types/domain.js';
 import { countsTowardTreasury } from '#lib/types/domain.js';
 import type { Database } from '@davincibot/database-types';
 import type { SupabaseClient } from '@supabase/supabase-js';
@@ -345,6 +345,10 @@ export interface Flow {
 	isReconciled: boolean;
 	reversesFlowId: number | null;
 	proofs: Proof[];
+	/** État de la commande d'origine : un flux de commande ne se pointe qu'une fois elle finalisée. */
+	orderState: OrderState | null;
+	/** Budgets sur lesquels la commande d'origine est imputée, avec leur quote-part. */
+	orderBudgets: { name: string; amountTtc: number }[];
 }
 
 /**
@@ -389,6 +393,34 @@ export async function flowList(supabase: Client, scope: FlowScope): Promise<Flow
 	const accountNames = new Map((accountRows ?? []).map((a) => [a.id, a.name]));
 	const yearNames = new Map((yearRows ?? []).map((y) => [y.id, y.label]));
 	const budgetNames = new Map((budgetRows ?? []).map((b) => [b.id, b.name]));
+
+	// Un flux de commande ne porte pas de budget (`flows_auto_has_no_budget`) :
+	// l'imputation se lit dans les quotes-parts de sa commande.
+	const orderIds = [
+		...new Set(flows.map((f) => f.order_id).filter((id): id is number => id !== null))
+	];
+	const [{ data: orderRows }, { data: shareRows }] =
+		orderIds.length > 0
+			? await Promise.all([
+					supabase.schema('cash').from('orders').select('id, state').in('id', orderIds),
+					supabase
+						.schema('cash')
+						.from('order_budget_shares')
+						.select('order_id, budget_id, total_share')
+						.in('order_id', orderIds)
+				])
+			: [{ data: [] }, { data: [] }];
+	const orderStates = new Map((orderRows ?? []).map((o) => [o.id, o.state]));
+	const sharesByOrder = new Map<number, { name: string; amountTtc: number }[]>();
+	for (const share of shareRows ?? []) {
+		sharesByOrder.set(share.order_id, [
+			...(sharesByOrder.get(share.order_id) ?? []),
+			{
+				name: budgetNames.get(share.budget_id) ?? `#${String(share.budget_id)}`,
+				amountTtc: num(share.total_share)
+			}
+		]);
+	}
 
 	const proofsByFlow = new Map<number, Proof[]>();
 	if (flows.length > 0) {
@@ -441,7 +473,9 @@ export async function flowList(supabase: Client, scope: FlowScope): Promise<Flow
 		origin: f.origin,
 		isReconciled: f.is_reconciled,
 		reversesFlowId: f.reverses_flow_id,
-		proofs: proofsByFlow.get(f.id) ?? []
+		proofs: proofsByFlow.get(f.id) ?? [],
+		orderState: f.order_id === null ? null : (orderStates.get(f.order_id) ?? null),
+		orderBudgets: f.order_id === null ? [] : (sharesByOrder.get(f.order_id) ?? [])
 	}));
 }
 

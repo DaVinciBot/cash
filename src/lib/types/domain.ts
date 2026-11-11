@@ -199,6 +199,8 @@ export const CASH_ERROR_MESSAGES: Record<string, string> = {
 	DVB10: 'Cette ligne est historique : elle se révoque, elle ne se réécrit pas.',
 	DVB41:
 		"Impossible d'enregistrer ce flux : la date indiquée correspond à un exercice fiscal déjà clôturé.",
+	DVB43:
+		"Impossible de pointer : la commande doit d'abord être finalisée (reçue ou annulée), son montant peut encore bouger.",
 	'42501': "Vous n'avez pas les droits nécessaires pour cette action.",
 	'22023': 'Paramètre invalide.',
 	P0002: 'Élément introuvable.',
@@ -305,4 +307,12 @@ export function isOrderPassable(state: OrderState): boolean {
 /** L'annulation reste ouverte jusqu'à la livraison complète (§8). */
 export function isOrderCancelable(state: OrderState): boolean {
 	return state === 'pending_treso' || state === 'pending_delivery';
+}
+
+/**
+ * Une commande est finalisée quand plus rien ne bouge : reçue ou annulée. Son
+ * flux ne se pointe qu'à partir de là (DVB43).
+ */
+export function isOrderFinalized(state: OrderState): boolean {
+	return state === 'completed' || state === 'canceled';
 }

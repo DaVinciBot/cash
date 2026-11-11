@@ -5,7 +5,7 @@
 	import FlowFields from '#lib/components/cash/FlowFields.svelte';
 	import StateBadge from '#lib/components/cash/StateBadge.svelte';
 	import { FLOW_DIRECTION_ICONS } from '#lib/components/cash/stateIcons.js';
-	import { FLOW_DIRECTION_BADGES } from '#lib/types/domain.js';
+	import { FLOW_DIRECTION_BADGES, isOrderFinalized } from '#lib/types/domain.js';
 	import type { ActionData, PageData } from './$types';
 
 	let { data, form }: { data: PageData; form: ActionData } = $props();
@@ -27,6 +27,10 @@
 	const periodsOfView = $derived(
 		data.view === 'school' ? data.periods.schoolYears : data.periods.fiscalYears
 	);
+
+	/** Un flux de commande ne se pointe qu'une fois la commande finalisée (#94). */
+	const awaitingOrder = (flow: Flow) =>
+		flow.orderState !== null && !isOrderFinalized(flow.orderState);
 
 	const totals = $derived(
 		data.flows.reduce(
@@ -177,6 +181,16 @@
 						{#if flow.budgetName}· {flow.budgetName}{/if}
 						{#if flow.isReconciled}· <span class="text-emerald-300">pointé</span>{/if}
 					</p>
+					<!-- #90 — le budget d'un flux de commande se lit dans ses quotes-parts. -->
+					{#if flow.orderBudgets.length > 0}
+						<p class="text-dark-light-blue/80 mt-1 text-xs">
+							Imputation de la commande :
+							{#each flow.orderBudgets as budget, index (budget.name)}
+								{index > 0 ? ' · ' : ''}<span class="text-light-blue">{budget.name}</span>
+								({euro.format(budget.amountTtc)})
+							{/each}
+						</p>
+					{/if}
 
 					{#if flow.proofs.length > 0}
 						<ul class="mt-2 flex flex-wrap gap-2">
@@ -238,23 +252,32 @@
 							size="sm"
 							variant="secondary">Justificatif</Button
 						>
-						<form action="?/toggleReconciled" method="POST" use:enhance>
-							<input name="id" type="hidden" value={flow.id} />
-							<input name="reconciled" type="hidden" value={flow.isReconciled ? '0' : '1'} />
-							<Button size="sm" type="submit" variant="secondary"
-								>{flow.isReconciled ? 'Dépointer' : 'Pointer'}</Button
-							>
-						</form>
-						<form action="?/delete" method="POST" use:enhance>
-							<input name="id" type="hidden" value={flow.id} />
-							<Button size="sm" type="submit" variant="danger">Supprimer</Button>
-						</form>
+						{#if awaitingOrder(flow) && !flow.isReconciled}
+							<span title="Impossible de pointer : la commande doit d'abord être finalisée">
+								<Button disabled size="sm" variant="secondary">Pointer</Button>
+							</span>
+						{:else}
+							<form action="?/toggleReconciled" method="POST" use:enhance>
+								<input name="id" type="hidden" value={flow.id} />
+								<input name="reconciled" type="hidden" value={flow.isReconciled ? '0' : '1'} />
+								<Button size="sm" type="submit" variant="secondary"
+									>{flow.isReconciled ? 'Dépointer' : 'Pointer'}</Button
+								>
+							</form>
+						{/if}
+						<!-- #70 — le règlement d'une commande ne se supprime pas : la commande s'annule. -->
+						{#if flow.orderId === null}
+							<form action="?/delete" method="POST" use:enhance>
+								<input name="id" type="hidden" value={flow.id} />
+								<Button size="sm" type="submit" variant="danger">Supprimer</Button>
+							</form>
+						{/if}
 					</div>
 
-					{#if flow.orderId !== null && !flow.isReconciled && flow.reversesFlowId === null}
+					{#if awaitingOrder(flow) && !flow.isReconciled}
 						<p class="text-dark-light-blue/70 mt-2 text-xs">
-							Non pointé : ce montant suivra automatiquement toute correction de la commande. Le
-							pointer le fige.
+							Commande non finalisée : ce montant suivra automatiquement toute correction de la
+							commande. Le pointage sera possible une fois la commande reçue ou annulée.
 						</p>
 					{/if}
 

@@ -4,19 +4,20 @@ import { currentSchoolYear } from '#lib/server/cash.js';
 import { decimal, text } from '#lib/server/form.js';
 import { budgetLeaves } from '#lib/server/orders.js';
 import { accounts, flowList, periods } from '#lib/server/treasury.js';
-import { FLOW_DIRECTIONS, type FlowDirection } from '#lib/types/domain.js';
+import { FLOW_DIRECTIONS, isOrderFinalized, type FlowDirection } from '#lib/types/domain.js';
 import { fail } from '@sveltejs/kit';
 import type { Actions, PageServerLoad } from './$types';
 
 // Dépenses et recettes (TRESO-F-20), avec leurs justificatifs (TRESO-F-30/31).
 //
-// Un flux `auto` naît du passage d'une commande : il reste modifiable et
-// supprimable (TRESO-F-23), mais tant qu'il n'est pas POINTÉ il se recale seul
-// sur le total de sa commande. Le pointer, c'est en prendre la responsabilité —
-// et c'est ce que l'écran dit.
+// Un flux `auto` naît du passage d'une commande. Tant qu'il n'est pas POINTÉ il
+// se recale seul sur le total de sa commande ; il ne se supprime pas d'ici, la
+// commande s'annule.
 //
-// L'exercice d'un flux se déduit de sa date, et une date d'exercice clos est
-// refusée (DVB41) ; celui d'un flux de commande est hérité de la commande.
+// Règles de rigueur comptable, portées par la base et rendues lisibles ici :
+//   - l'exercice d'un flux se déduit de sa date, et une date d'exercice clos est
+//     refusée (DVB41) ; celui d'un flux de commande est hérité de la commande ;
+//   - un flux de commande ne se pointe qu'une fois la commande finalisée (DVB43).
 
 const ISO_DAY = /^\d{4}-\d{2}-\d{2}$/;
 const PROOF_TYPES = ['image/png', 'image/jpeg', 'application/pdf'];
@@ -224,6 +225,18 @@ export const actions: Actions = {
 			return fail(400, { message: 'Mouvement invalide.' });
 		}
 
+		const flow = await flowState(locals.supabase, id);
+		if (!flow) {
+			return fail(404, { message: 'Mouvement introuvable.' });
+		}
+		// #70 — le règlement d'une commande ne se supprime pas d'ici : sa somme
+		// doit rester égale au dû (`flows_guard`). C'est la commande qui s'annule.
+		if (flow.order_id !== null) {
+			return fail(409, {
+				message: 'Ce mouvement règle une commande : annulez la commande plutôt que de le supprimer.'
+			});
+		}
+
 		// Les justificatifs partent avec le flux : un fichier orphelin dans le
 		// bucket n'est plus rattachable à rien et ne se retrouverait jamais.
 		const { data: proofs } = await locals.supabase
@@ -249,11 +262,11 @@ export const actions: Actions = {
 	},
 
 	/**
-	 * Pointage d'un flux.
+	 * Pointage d'un flux, et dépointage.
 	 *
 	 * Sur un flux issu d'une commande, c'est aussi ce qui le fige : `sync_order_flows`
-	 * ne recale plus un flux pointé. Le trésorier prend donc la responsabilité du
-	 * montant en confirmant qu'il l'a confronté au réel.
+	 * ne recale plus un flux pointé. Il faut donc que la commande soit finalisée
+	 * (#94).
 	 */
 	toggleReconciled: async ({ locals, request }) => {
 		const form = await request.formData();
@@ -261,18 +274,46 @@ export const actions: Actions = {
 		if (id === null) {
 			return fail(400, { message: 'Mouvement invalide.' });
 		}
+		const reconcile = text(form, 'reconciled') === '1';
+
+		if (reconcile) {
+			const flow = await flowState(locals.supabase, id);
+			if (!flow) {
+				return fail(404, { message: 'Mouvement introuvable.' });
+			}
+			if (flow.order_id !== null) {
+				const { data: order } = await locals.supabase
+					.schema('cash')
+					.from('orders')
+					.select('state')
+					.eq('id', flow.order_id)
+					.maybeSingle();
+				if (order && !isOrderFinalized(order.state)) {
+					return fail(409, {
+						message: "Impossible de pointer : la commande doit d'abord être finalisée."
+					});
+				}
+			}
+		}
 
 		const { error } = await locals.supabase
 			.schema('cash')
 			.from('flows')
-			.update({ is_reconciled: text(form, 'reconciled') === '1' })
+			.update({ is_reconciled: reconcile })
 			.eq('id', id);
 
 		if (error) {
 			return fail(400, {
-				message: await rejection(locals.supabase, error, "Ce mouvement n'a pas pu être pointé.", {
-					entityType: 'flow'
-				})
+				message: await rejection(
+					locals.supabase,
+					error,
+					reconcile
+						? "Ce mouvement n'a pas pu être pointé."
+						: "Ce mouvement n'a pas pu être dépointé.",
+					{
+						entityType: 'flow'
+					}
+				)
 			});
 		}
 		return { saved: 'flow' };
