@@ -720,35 +720,24 @@ DVBisous ! :robot:`;
 		</div>
 	{:else}
 		<AdminSlotSection
-			{findTrainingName}
-			{formatSlotDate}
 			onAddSlot={() => {
 				openSlotModal();
-			}}
-			onEditSlot={(slot: TrainingSlotListItem) => {
-				openSlotModal(slot);
 			}}
 			{onSlotRowClick}
 			{parseSlotItems}
 			{slotDbInfo}
 			{slotFilters}
 			{slotTableTopic}
-			{slots}
-			{trainings}
 		/>
 		<AdminTrainingSection
 			onAddTraining={() => {
 				openTrainingModal();
-			}}
-			onEditTraining={(training: TrainingListItem) => {
-				openTrainingModal(training);
 			}}
 			{onTrainingRowClick}
 			{parseTrainingItems}
 			{trainingDbInfo}
 			{trainingFilters}
 			{trainingTableTopic}
-			{trainings}
 		/>
 	{/if}
 </section>
