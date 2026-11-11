@@ -152,9 +152,11 @@
 
 	// `project_filter` et `role_filter` ne servent qu'aux filtres Projets et Rôles globaux :
 	// filtrer l'embed affiché masquerait les autres projets et rôles des membres retenus.
+	// `permission_filter` (#105) passe par la relation calculée `global_permission_grants` :
+	// une permission globale se détient par un rôle ou par un override, comme `has_permission`.
 	const dbInfo = {
 		table: 'profiles',
-		key: 'id, username, avatar_url, campus, status, member_of!membre_projet_profile_fkey(project!inner(id, name), revoked_at), project_filter:member_of!membre_projet_profile_fkey(project, revoked_at), profile_global_roles!profile_global_roles_profile_fkey(role, revoked_at), role_filter:profile_global_roles!profile_global_roles_profile_fkey(role, revoked_at)'
+		key: 'id, username, avatar_url, campus, status, member_of!membre_projet_profile_fkey(project!inner(id, name), revoked_at), project_filter:member_of!membre_projet_profile_fkey(project, revoked_at), profile_global_roles!profile_global_roles_profile_fkey(role, revoked_at), role_filter:profile_global_roles!profile_global_roles_profile_fkey(role, revoked_at), permission_filter:global_permission_grants(permission)'
 	};
 
 	let canEditProfile = $state<boolean>(false);
@@ -512,6 +514,16 @@
 			options: Object.values(GLOBAL_ROLE_CATEGORIES)
 				.flat()
 				.map((role) => ({ name: role.label, value: role.value }))
+		},
+		{
+			// #105 — « qui a telle permission », qu'elle vienne d'un rôle ou d'un override.
+			category: 'Permissions',
+			value: 'permission',
+			relation: 'permission_filter',
+			wide: true,
+			options: Object.values(OVERRIDE_PERMISSION_CATEGORIES)
+				.flat()
+				.map((permission) => ({ name: permission.label, value: permission.value }))
 		},
 		{
 			category: 'Statut',
