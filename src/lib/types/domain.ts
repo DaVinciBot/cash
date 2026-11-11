@@ -78,6 +78,15 @@ export const ACCOUNT_KINDS = ['current', 'savings', 'partner_credit'] as const;
 
 export type AccountKind = (typeof ACCOUNT_KINDS)[number];
 
+/**
+ * Types qu'on ouvre depuis la trésorerie. Une enveloppe partenaire n'en fait
+ * pas partie : elle naît et s'archive avec son partenariat, sur la page
+ * « Partenariats », pour toujours rester liée à un partenaire réel.
+ */
+export const TREASURY_ACCOUNT_KINDS = ACCOUNT_KINDS.filter(
+	(kind): kind is Exclude<AccountKind, 'partner_credit'> => kind !== 'partner_credit'
+);
+
 export const ACCOUNT_KIND_LABELS: Record<AccountKind, string> = {
 	current: 'Compte courant',
 	savings: 'Livret / épargne',
