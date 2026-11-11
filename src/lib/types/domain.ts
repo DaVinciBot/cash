@@ -199,6 +199,8 @@ export const CASH_ERROR_MESSAGES: Record<string, string> = {
 	DVB10: 'Cette ligne est historique : elle se révoque, elle ne se réécrit pas.',
 	DVB41:
 		"Impossible d'enregistrer ce flux : la date indiquée correspond à un exercice fiscal déjà clôturé.",
+	DVB42:
+		'Ce mouvement est pointé : dépointez-le avant de le modifier ou de toucher à ses justificatifs.',
 	DVB43:
 		"Impossible de pointer : la commande doit d'abord être finalisée (reçue ou annulée), son montant peut encore bouger.",
 	'42501': "Vous n'avez pas les droits nécessaires pour cette action.",

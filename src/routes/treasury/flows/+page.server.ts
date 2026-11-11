@@ -17,7 +17,10 @@ import type { Actions, PageServerLoad } from './$types';
 // Règles de rigueur comptable, portées par la base et rendues lisibles ici :
 //   - l'exercice d'un flux se déduit de sa date, et une date d'exercice clos est
 //     refusée (DVB41) ; celui d'un flux de commande est hérité de la commande ;
+//   - un flux pointé est figé, justificatifs compris, jusqu'à son dépointage (DVB42) ;
 //   - un flux de commande ne se pointe qu'une fois la commande finalisée (DVB43).
+// Seule l'exigence d'un justificatif pour pointer une dépense est une règle
+// d'écran : elle admet une dérogation explicite, cochée par le trésorier.
 
 const ISO_DAY = /^\d{4}-\d{2}-\d{2}$/;
 const PROOF_TYPES = ['image/png', 'image/jpeg', 'application/pdf'];
@@ -184,6 +187,11 @@ export const actions: Actions = {
 		if (!flow) {
 			return fail(404, { message: 'Mouvement introuvable.' });
 		}
+		if (flow.is_reconciled) {
+			return fail(409, {
+				message: 'Ce mouvement est pointé : dépointez-le avant de le modifier.'
+			});
+		}
 
 		// Un flux de commande garde l'exercice de sa commande (#91) : on ne
 		// l'envoie pas, et la base le fige de toute façon. Les autres suivent leur date.
@@ -236,6 +244,11 @@ export const actions: Actions = {
 				message: 'Ce mouvement règle une commande : annulez la commande plutôt que de le supprimer.'
 			});
 		}
+		if (flow.is_reconciled) {
+			return fail(409, {
+				message: 'Ce mouvement est pointé : dépointez-le avant de le supprimer.'
+			});
+		}
 
 		// Les justificatifs partent avec le flux : un fichier orphelin dans le
 		// bucket n'est plus rattachable à rien et ne se retrouverait jamais.
@@ -266,7 +279,8 @@ export const actions: Actions = {
 	 *
 	 * Sur un flux issu d'une commande, c'est aussi ce qui le fige : `sync_order_flows`
 	 * ne recale plus un flux pointé. Il faut donc que la commande soit finalisée
-	 * (#94).
+	 * (#94). Une dépense sans justificatif ne se pointe que sur dérogation
+	 * explicite (`force`, #72).
 	 */
 	toggleReconciled: async ({ locals, request }) => {
 		const form = await request.formData();
@@ -291,6 +305,20 @@ export const actions: Actions = {
 				if (order && !isOrderFinalized(order.state)) {
 					return fail(409, {
 						message: "Impossible de pointer : la commande doit d'abord être finalisée."
+					});
+				}
+			}
+			if (flow.direction === 'debit' && text(form, 'force') !== '1') {
+				const { count } = await locals.supabase
+					.schema('cash')
+					.from('flow_proofs')
+					.select('id', { count: 'exact', head: true })
+					.eq('flow_id', id);
+				if (!count) {
+					return fail(409, {
+						message:
+							"Cette dépense n'a aucun justificatif : déposez-en un, ou cochez « Forcer le pointage sans justificatif ».",
+						unproven: id
 					});
 				}
 			}
@@ -336,6 +364,15 @@ export const actions: Actions = {
 		}
 		if (file.size > PROOF_MAX_BYTES) {
 			return fail(400, { message: 'Le fichier dépasse 5 Mo.' });
+		}
+
+		// Vérifié avant le dépôt : un fichier envoyé pour rien resterait dans le
+		// bucket le temps qu'on le retire.
+		const flow = await flowState(locals.supabase, id);
+		if (flow?.is_reconciled) {
+			return fail(409, {
+				message: 'Ce mouvement est pointé : dépointez-le avant de toucher à ses justificatifs.'
+			});
 		}
 
 		// Nom aléatoire : deux justificatifs peuvent porter le même nom d'origine,

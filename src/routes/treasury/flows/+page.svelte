@@ -1,11 +1,12 @@
 <script lang="ts">
-	import { Button, FilterChip } from '@davincibot/components';
+	import { Button, Checkbox, FilterChip } from '@davincibot/components';
 	import { enhance } from '$app/forms';
 	import { resolve } from '$app/paths';
 	import FlowFields from '#lib/components/cash/FlowFields.svelte';
 	import StateBadge from '#lib/components/cash/StateBadge.svelte';
 	import { FLOW_DIRECTION_ICONS } from '#lib/components/cash/stateIcons.js';
 	import { FLOW_DIRECTION_BADGES, isOrderFinalized } from '#lib/types/domain.js';
+	import { CircleAlert } from '@lucide/svelte';
 	import type { ActionData, PageData } from './$types';
 
 	let { data, form }: { data: PageData; form: ActionData } = $props();
@@ -21,6 +22,9 @@
 	// sinon l'identifiant du flux en cours de modification.
 	let editing = $state<number | null>(null);
 	let uploading = $state<number | null>(null);
+	// Dépense sans justificatif dont le pointage attend une dérogation explicite.
+	let forcing = $state<number | null>(null);
+	let onlyUnproven = $state(false);
 
 	const today = new Date().toISOString().slice(0, 10);
 
@@ -28,9 +32,16 @@
 		data.view === 'school' ? data.periods.schoolYears : data.periods.fiscalYears
 	);
 
+	/** Une dépense sans pièce est à relancer (#71). Une recette n'en exige pas. */
+	const unproven = (flow: Flow) => flow.direction === 'debit' && flow.proofs.length === 0;
+	/** Pointé : plus rien ne se modifie (#72). */
+	const locked = (flow: Flow) => flow.isReconciled;
 	/** Un flux de commande ne se pointe qu'une fois la commande finalisée (#94). */
 	const awaitingOrder = (flow: Flow) =>
 		flow.orderState !== null && !isOrderFinalized(flow.orderState);
+
+	const unprovenCount = $derived(data.flows.filter(unproven).length);
+	const visible = $derived(onlyUnproven ? data.flows.filter(unproven) : data.flows);
 
 	const totals = $derived(
 		data.flows.reduce(
@@ -112,6 +123,21 @@
 		</p>
 	</form>
 
+	{#if unprovenCount > 0}
+		<!-- #71 — les dépenses à relancer se repèrent d'un coup d'œil. -->
+		<div
+			class="mb-4 flex flex-wrap items-center gap-3 rounded-xl bg-amber-500/10 px-4 py-3 text-sm text-amber-200 ring-1 ring-amber-500/30"
+		>
+			<CircleAlert class="size-4 shrink-0" />
+			<span>{unprovenCount} dépense(s) sans justificatif sur la période.</span>
+			<FilterChip
+				class="ml-auto"
+				onclick={() => (onlyUnproven = !onlyUnproven)}
+				pressed={onlyUnproven}>Afficher seulement celles-ci</FilterChip
+			>
+		</div>
+	{/if}
+
 	{#snippet flowForm(flow: Flow | null)}
 		<form
 			class="border-rule bg-blue-gray/15 mb-3 rounded-lg border p-4"
@@ -141,16 +167,20 @@
 		{@render flowForm(null)}
 	{/if}
 
-	{#if data.flows.length === 0}
+	{#if visible.length === 0}
 		<p
 			class="border-rule text-dark-light-blue/70 rounded-xl border border-dashed px-4 py-12 text-center"
 		>
-			Aucun mouvement sur cette période.
+			{onlyUnproven ? 'Aucune dépense sans justificatif.' : 'Aucun mouvement sur cette période.'}
 		</p>
 	{:else}
 		<ul class="space-y-2">
-			{#each data.flows as flow (flow.id)}
-				<li class="border-rule bg-blue-gray/15 rounded-2xl border p-4 sm:p-5">
+			{#each visible as flow (flow.id)}
+				<li
+					class="border-rule bg-blue-gray/15 rounded-2xl border p-4 sm:p-5 {unproven(flow)
+						? 'ring-1 ring-amber-500/30'
+						: ''}"
+				>
 					<div class="flex flex-wrap items-center gap-3">
 						<StateBadge
 							badge={FLOW_DIRECTION_BADGES[flow.direction]}
@@ -169,6 +199,14 @@
 							<span class="bg-dark-blue/60 text-dark-light-blue rounded-full px-2 py-0.5 text-xs"
 								>contrepassation</span
 							>
+						{/if}
+						{#if unproven(flow)}
+							<span
+								class="inline-flex items-center gap-1 rounded-full bg-amber-500/15 px-2 py-0.5 text-xs text-amber-300"
+							>
+								<CircleAlert class="size-3" />
+								Justificatif manquant
+							</span>
 						{/if}
 						<span
 							class="ml-auto font-semibold {flow.direction === 'credit'
@@ -207,16 +245,18 @@
 									{:else}
 										<span>Justificatif</span>
 									{/if}
-									<form action="?/removeProof" method="POST" use:enhance>
-										<input name="proof" type="hidden" value={proof.id} />
-										<Button size="sm" type="submit" variant="danger-ghost">retirer</Button>
-									</form>
+									{#if !locked(flow)}
+										<form action="?/removeProof" method="POST" use:enhance>
+											<input name="proof" type="hidden" value={proof.id} />
+											<Button size="sm" type="submit" variant="danger-ghost">retirer</Button>
+										</form>
+									{/if}
 								</li>
 							{/each}
 						</ul>
 					{/if}
 
-					{#if uploading === flow.id}
+					{#if uploading === flow.id && !locked(flow)}
 						<form
 							class="mt-2 flex flex-wrap items-center gap-2"
 							action="?/addProof"
@@ -242,31 +282,43 @@
 					{/if}
 
 					<div class="mt-3 flex flex-wrap items-center gap-2">
-						<Button
-							onclick={() => (editing = editing === flow.id ? null : flow.id)}
-							size="sm"
-							variant="secondary">Modifier</Button
-						>
-						<Button
-							onclick={() => (uploading = uploading === flow.id ? null : flow.id)}
-							size="sm"
-							variant="secondary">Justificatif</Button
-						>
-						{#if awaitingOrder(flow) && !flow.isReconciled}
+						{#if !flow.isReconciled}
+							<Button
+								onclick={() => (editing = editing === flow.id ? null : flow.id)}
+								size="sm"
+								variant="secondary">Modifier</Button
+							>
+							<Button
+								onclick={() => (uploading = uploading === flow.id ? null : flow.id)}
+								size="sm"
+								variant="secondary">Justificatif</Button
+							>
+						{/if}
+						{#if flow.isReconciled}
+							<form action="?/toggleReconciled" method="POST" use:enhance>
+								<input name="id" type="hidden" value={flow.id} />
+								<input name="reconciled" type="hidden" value="0" />
+								<Button size="sm" type="submit" variant="secondary">Dépointer</Button>
+							</form>
+						{:else if awaitingOrder(flow)}
 							<span title="Impossible de pointer : la commande doit d'abord être finalisée">
 								<Button disabled size="sm" variant="secondary">Pointer</Button>
 							</span>
+						{:else if unproven(flow)}
+							<Button
+								onclick={() => (forcing = forcing === flow.id ? null : flow.id)}
+								size="sm"
+								variant="secondary">Pointer</Button
+							>
 						{:else}
 							<form action="?/toggleReconciled" method="POST" use:enhance>
 								<input name="id" type="hidden" value={flow.id} />
-								<input name="reconciled" type="hidden" value={flow.isReconciled ? '0' : '1'} />
-								<Button size="sm" type="submit" variant="secondary"
-									>{flow.isReconciled ? 'Dépointer' : 'Pointer'}</Button
-								>
+								<input name="reconciled" type="hidden" value="1" />
+								<Button size="sm" type="submit" variant="secondary">Pointer</Button>
 							</form>
 						{/if}
 						<!-- #70 — le règlement d'une commande ne se supprime pas : la commande s'annule. -->
-						{#if flow.orderId === null}
+						{#if flow.orderId === null && !flow.isReconciled}
 							<form action="?/delete" method="POST" use:enhance>
 								<input name="id" type="hidden" value={flow.id} />
 								<Button size="sm" type="submit" variant="danger">Supprimer</Button>
@@ -279,9 +331,45 @@
 							Commande non finalisée : ce montant suivra automatiquement toute correction de la
 							commande. Le pointage sera possible une fois la commande reçue ou annulée.
 						</p>
+					{:else if flow.isReconciled}
+						<p class="text-dark-light-blue/70 mt-2 text-xs">
+							Pointé : ce mouvement est verrouillé. Dépointez-le pour le corriger.
+						</p>
 					{/if}
 
-					{#if editing === flow.id}
+					<!-- #72 — une dépense sans justificatif ne se pointe que sur dérogation explicite. -->
+					{#if forcing === flow.id && !flow.isReconciled}
+						<form
+							class="mt-3 rounded-lg border border-amber-500/40 bg-amber-500/5 p-3"
+							action="?/toggleReconciled"
+							method="POST"
+							use:enhance={() =>
+								({ update }) => {
+									forcing = null;
+									return update();
+								}}
+						>
+							<input name="id" type="hidden" value={flow.id} />
+							<input name="reconciled" type="hidden" value="1" />
+							<p class="text-sm text-amber-200">Cette dépense n'a aucun justificatif.</p>
+							<p class="text-dark-light-blue mt-1 text-xs">
+								Déposez-en un avant de la pointer. Si c'est réellement impossible, la dérogation
+								doit être explicite : une fois pointée, la dépense est verrouillée.
+							</p>
+							<label class="text-dark-light-blue mt-2 flex items-center gap-2 text-sm">
+								<Checkbox name="force" className="size-4" required value="1" />
+								Forcer le pointage sans justificatif
+							</label>
+							<div class="mt-3 flex items-center gap-2">
+								<Button size="sm" type="submit" variant="primary">Pointer quand même</Button>
+								<Button onclick={() => (forcing = null)} size="sm" variant="secondary"
+									>Annuler</Button
+								>
+							</div>
+						</form>
+					{/if}
+
+					{#if editing === flow.id && !locked(flow)}
 						{@render flowForm(flow)}
 					{/if}
 				</li>
