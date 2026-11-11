@@ -1,8 +1,15 @@
 <script lang="ts">
 	import { Button, Checkbox } from '@davincibot/components';
 	import { enhance } from '$app/forms';
+	import { resolve } from '$app/paths';
 	import CampusBadge from '#lib/components/cash/CampusBadge.svelte';
-	import { REFUSAL_REASON_MIN_LENGTH, refusalReasonError } from '#lib/types/domain.js';
+	import StateBadge from '#lib/components/cash/StateBadge.svelte';
+	import { ORDER_STATE_ICONS } from '#lib/components/cash/stateIcons.js';
+	import {
+		ORDER_STATE_BADGES,
+		REFUSAL_REASON_MIN_LENGTH,
+		refusalReasonError
+	} from '#lib/types/domain.js';
 	import { SvelteSet } from 'svelte/reactivity';
 	import type { ActionData, PageData } from './$types';
 
@@ -102,10 +109,70 @@
 	<header class="mb-6">
 		<h1 class="text-2xl font-bold text-white">Items à regrouper</h1>
 		<p class="text-dark-light-blue mt-1 text-sm">
-			Les items validés par leur chef de projet, du plus anciennement validé au plus récent. Cochez
-			ce qui part chez un même marchand, pour un même campus.
+			Les commandes en cours, puis les items validés par leur chef de projet, du plus anciennement
+			validé au plus récent. Cochez ce qui part chez un même marchand, pour un même campus.
 		</p>
 	</header>
+
+	<!-- #53 — les commandes à faire avancer et la file à regrouper, sur une seule page. -->
+	{#if data.activeOrders.length > 0}
+		<div class="mb-8">
+			<div class="mb-3 flex flex-wrap items-baseline justify-between gap-2">
+				<h2 class="text-dark-light-blue text-sm font-semibold tracking-wide uppercase">
+					Commandes en cours ({data.activeOrders.length})
+				</h2>
+				<a class="text-dark-light-blue text-xs hover:underline" href={resolve('/orders')}
+					>Toutes les commandes</a
+				>
+			</div>
+			<div class="border-rule overflow-x-auto rounded-lg border">
+				<table class="w-full text-sm">
+					<thead class="bg-blue-gray/15 text-dark-light-blue text-left text-xs uppercase">
+						<tr>
+							<th class="px-4 py-2">Commande</th>
+							<th class="px-4 py-2">État</th>
+							<th class="px-4 py-2">Campus</th>
+							<th class="px-4 py-2 text-right">Items</th>
+							<th class="px-4 py-2 text-right">Total TTC</th>
+						</tr>
+					</thead>
+					<tbody class="divide-rule divide-y">
+						{#each data.activeOrders as order (order.id)}
+							<tr class="hover:bg-blue-gray/15">
+								<td class="px-4 py-2">
+									<a
+										class="font-medium text-sky-400 hover:underline"
+										href={resolve('/orders/[id]', { id: String(order.id) })}>#{order.id}</a
+									>
+								</td>
+								<td class="px-4 py-2">
+									<StateBadge
+										badge={ORDER_STATE_BADGES[order.state]}
+										icon={ORDER_STATE_ICONS[order.state]}
+									/>
+								</td>
+								<td class="px-4 py-2">
+									{#if order.campus}<CampusBadge campus={order.campus} />{/if}
+								</td>
+								<td class="text-dark-light-blue px-4 py-2 text-right">
+									{order.state === 'pending_delivery'
+										? `${String(order.receivedCount)} / ${String(order.itemCount)} reçus`
+										: order.itemCount}
+								</td>
+								<td class="text-light-blue px-4 py-2 text-right font-medium">
+									{euro.format(order.amountTtc + order.shippingCostTtc)}
+								</td>
+							</tr>
+						{/each}
+					</tbody>
+				</table>
+			</div>
+		</div>
+	{/if}
+
+	<h2 class="text-dark-light-blue mb-3 text-sm font-semibold tracking-wide uppercase">
+		À regrouper ({items.length})
+	</h2>
 
 	{#if failure}
 		<p class="mb-4 rounded-xl bg-red-500/15 px-4 py-3 text-sm text-red-300 ring-1 ring-red-500/30">
