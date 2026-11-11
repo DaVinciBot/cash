@@ -219,8 +219,10 @@ export async function budgetLeaves(
  * Le projet pointe n'importe où dans l'arbre — souvent un nœud intermédiaire,
  * qui ne reçoit aucune imputation. On descend donc jusqu'à la feuille marquée
  * par défaut dans son sous-arbre ; si le nœud désigné est lui-même une feuille,
- * c'est lui. Sans feuille par défaut, aucune présélection : mieux vaut faire
- * choisir que deviner sur quel poste l'argent part.
+ * c'est lui. Un sous-arbre qui ne compte qu'une feuille n'a rien à trancher :
+ * c'est elle, marquée par défaut ou non (#86). Avec plusieurs feuilles et
+ * aucune par défaut, aucune présélection : mieux vaut faire choisir que deviner
+ * sur quel poste l'argent part.
  */
 export function defaultLeafFor(
 	nodes: { id: number; parentId: number | null; isDefault: boolean; archivedAt: string | null }[],
@@ -246,6 +248,7 @@ export function defaultLeafFor(
 
 	const stack = [projectBudgetId];
 	const seen = new Set<number>();
+	const subtreeLeaves: number[] = [];
 	while (stack.length > 0) {
 		const current = stack.pop();
 		if (current === undefined || seen.has(current)) {
@@ -253,13 +256,16 @@ export function defaultLeafFor(
 		}
 		seen.add(current);
 		for (const child of children.get(current) ?? []) {
-			if (leafIds.has(child.id) && child.isDefault) {
-				return child.id;
+			if (leafIds.has(child.id)) {
+				if (child.isDefault) {
+					return child.id;
+				}
+				subtreeLeaves.push(child.id);
 			}
 			stack.push(child.id);
 		}
 	}
-	return null;
+	return subtreeLeaves.length === 1 ? (subtreeLeaves[0] ?? null) : null;
 }
 
 export interface OrderSummary {
@@ -441,6 +447,8 @@ export interface OrderItem extends BundlableItem {
 export interface OrderShare {
 	budgetId: number;
 	budgetPath: string;
+	/** Montant actuel de l'enveloppe : ce qu'on relève quand elle est dépassée (#87). */
+	allocatedTtc: number;
 	itemsSubtotal: number;
 	shippingShare: number;
 	totalShare: number;
@@ -564,6 +572,7 @@ export async function orderDetail(supabase: Client, id: number): Promise<OrderDe
 		shares: (shares ?? []).map((s) => ({
 			budgetId: s.budget_id,
 			budgetPath: leafById.get(s.budget_id)?.path ?? `Budget #${String(s.budget_id)}`,
+			allocatedTtc: leafById.get(s.budget_id)?.allocatedTtc ?? 0,
 			itemsSubtotal: s.items_subtotal,
 			shippingShare: s.shipping_share,
 			totalShare: num(s.total_share),

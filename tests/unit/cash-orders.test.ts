@@ -54,6 +54,16 @@ describe("présélection de la feuille d'imputation (CMD-F-18, TRESO-F-02c)", ()
 		expect(defaultLeafFor(nodes, leafIds, null)).toBeNull();
 	});
 
+	// #86 — un projet dont le sous-arbre n'a qu'une feuille n'a rien à trancher :
+	// l'imputer ailleurs serait une erreur, ne rien présélectionner un oubli.
+	it("retient la seule feuille d'un sous-arbre, même non marquée par défaut", () => {
+		const uneFeuille = [
+			{ id: 30, parentId: null, isDefault: false, archivedAt: null },
+			{ id: 31, parentId: 30, isDefault: false, archivedAt: null }
+		];
+		expect(defaultLeafFor(uneFeuille, new Set([31]), 30)).toBe(31);
+	});
+
 	it('ignore les feuilles archivées', () => {
 		expect(defaultLeafFor(nodes, new Set([2, 4, 11, 12, 13, 20]), 5)).toBe(11);
 	});

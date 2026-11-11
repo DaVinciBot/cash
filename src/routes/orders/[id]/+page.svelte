@@ -44,6 +44,17 @@
 
 	const receivedCount = $derived(order.items.filter((i) => i.state === 'received').length);
 	const total = $derived(order.amountTtc + order.shippingCostTtc);
+	// #97 — ce qui n'a pas été reçu est ce que le fournisseur rembourse, a priori.
+	const notReceivedTtc = $derived(
+		Math.round(
+			order.items.filter((i) => i.state !== 'received').reduce((sum, i) => sum + i.totalTtc, 0) *
+				100
+		) / 100
+	);
+	let refundAccountId = $state(untrack(() => data.refundAccountId ?? data.accounts.at(0)?.id));
+	// #83 — items de la file à ajouter à cette commande.
+	let adding = $state(false);
+	const raisingShare = $derived(order.shares.find((s) => s.budgetId === raising) ?? null);
 
 	// Répartition du règlement (TRESO-F-14). Une somme nulle vaut « tout sur le
 	// compte courant » et laisse `on_order_ordered` faire comme avant ; dès
@@ -107,6 +118,29 @@
 		{#if order.deliveredAt}· livrée le {day.format(new Date(order.deliveredAt))}{/if}
 		{#if order.items.length > 0}· {receivedCount} / {order.items.length} reçus{/if}
 	</p>
+
+	<!-- #93 — les frais de port restent lisibles une fois enregistrés, à côté du total. -->
+	<dl
+		class="border-rule bg-blue-gray/15 mb-6 flex flex-wrap gap-x-8 gap-y-2 rounded-lg border px-4 py-3 text-sm"
+	>
+		<div>
+			<dt class="text-dark-light-blue/70 text-xs">Items</dt>
+			<dd class="text-light-blue">{euro.format(order.amountTtc)}</dd>
+		</div>
+		<div>
+			<dt class="text-dark-light-blue/70 text-xs">Frais de port</dt>
+			<dd class="text-light-blue">
+				{euro.format(order.shippingCostTtc)}
+				<span class="text-dark-light-blue/70 text-xs"
+					>({SHIPPING_ALLOCATION_LABELS[order.shippingAllocation].toLowerCase()})</span
+				>
+			</dd>
+		</div>
+		<div>
+			<dt class="text-dark-light-blue/70 text-xs">Total TTC</dt>
+			<dd class="font-semibold text-white">{euro.format(total)}</dd>
+		</div>
+	</dl>
 
 	{#if data.address}
 		<div
@@ -221,19 +255,54 @@
 				Les items non reçus repartent dans la file de regroupement.
 				{#if receivedCount > 0}
 					<span class="text-amber-300">
-						{receivedCount} item(s) déjà reçus resteront rattachés à cette commande, et la contrepassation
-						annulera la totalité du débit.
+						{receivedCount} item(s) déjà reçus resteront rattachés à cette commande : ils ont été payés
+						et acquis, seul le reste est remboursé.
 					</span>
 				{/if}
 			</p>
-			<label class="text-dark-light-blue mt-3 flex items-center gap-2 text-sm">
-				<Checkbox name="reverse" checked className="size-4" value="1" />
-				Contrepasser le mouvement de trésorerie
-			</label>
-			<p class="text-dark-light-blue/70 mt-1 text-xs">
-				À décocher si l'argent est réellement parti : annuler la commande ici ne rappelle pas un
-				virement.
-			</p>
+			{#if receivedCount > 0}
+				<!-- #97 — une annulation partielle ne rend que ce que le fournisseur rembourse. -->
+				<label class="text-dark-light-blue mt-3 flex items-center gap-2 text-sm">
+					<Checkbox name="reverse" checked className="size-4" value="1" />
+					Enregistrer le remboursement en trésorerie
+				</label>
+				<div class="mt-2 flex flex-wrap items-end gap-3">
+					<label class="text-dark-light-blue text-xs">
+						Montant remboursé TTC
+						<input
+							name="refund_ttc"
+							class="border-rule-strong bg-dark-blue/60 mt-1 block w-32 rounded-xl border p-2.5 text-sm"
+							inputmode="decimal"
+							value={notReceivedTtc.toFixed(2).replace('.', ',')}
+						/>
+					</label>
+					<label class="text-dark-light-blue text-xs">
+						Sur le compte
+						<select
+							name="refund_account_id"
+							class="border-rule-strong bg-dark-blue/60 text-light-blue mt-1 block rounded-xl border p-2.5 text-sm"
+							bind:value={refundAccountId}
+						>
+							{#each data.accounts as account (account.id)}
+								<option value={account.id}>{account.name}</option>
+							{/each}
+						</select>
+					</label>
+				</div>
+				<p class="text-dark-light-blue/70 mt-1 text-xs">
+					Proposé : le total des items non reçus ({euro.format(notReceivedTtc)}), hors frais de
+					port. Corrigez-le pour refléter le remboursement réellement accordé par le fournisseur.
+				</p>
+			{:else}
+				<label class="text-dark-light-blue mt-3 flex items-center gap-2 text-sm">
+					<Checkbox name="reverse" checked className="size-4" value="1" />
+					Contrepasser le mouvement de trésorerie
+				</label>
+				<p class="text-dark-light-blue/70 mt-1 text-xs">
+					À décocher si l'argent est réellement parti : annuler la commande ici ne rappelle pas un
+					virement.
+				</p>
+			{/if}
 			<div class="mt-3 flex items-center gap-2">
 				<Button size="sm" type="submit" variant="danger">Confirmer l'annulation</Button>
 				<Button onclick={() => (canceling = false)} size="md" variant="secondary">Revenir</Button>
@@ -280,7 +349,8 @@
 					<Button
 						onclick={() => {
 							raising = share.budgetId;
-							raiseAmount = '';
+							// Proposé : juste ce qu'il faut pour couvrir le dépassement.
+							raiseAmount = (share.allocatedTtc - share.remainingTtc).toFixed(2).replace('.', ',');
 						}}
 						size="sm"
 						variant="secondary">Augmenter {share.budgetPath}</Button
@@ -288,6 +358,15 @@
 				{/each}
 			</div>
 			{#if raising !== null}
+				{#if raisingShare}
+					<!-- #87 — on relève une enveloppe en connaissant son montant actuel. -->
+					<p class="text-dark-light-blue mt-3 text-sm">
+						Enveloppe actuelle de <span class="text-light-blue">{raisingShare.budgetPath}</span> :
+						<span class="font-medium text-white">{euro.format(raisingShare.allocatedTtc)}</span>
+						· dépassement de
+						<span class="font-medium text-red-300">{euro.format(-raisingShare.remainingTtc)}</span>
+					</p>
+				{/if}
 				<form
 					class="mt-3 flex flex-wrap items-end gap-2"
 					action="?/raiseBudget"
@@ -324,7 +403,11 @@
 			class="border-rule bg-blue-gray/15 mb-6 rounded-2xl border p-4 sm:p-5"
 			action="?/shipping"
 			method="POST"
-			use:enhance
+			use:enhance={() =>
+				({ update }) =>
+					// #93 — sans `reset: false`, la réussite vide le formulaire et le montant
+					// enregistré disparaît du champ.
+					update({ reset: false })}
 		>
 			<h2 class="text-light-blue mb-3 text-sm font-semibold">Frais de port</h2>
 			<div class="flex flex-wrap items-end gap-3">
@@ -355,9 +438,58 @@
 	{/if}
 
 	<!-- Items -->
-	<h2 class="text-dark-light-blue mb-3 text-sm font-semibold tracking-wide uppercase">
-		Items ({order.items.length})
-	</h2>
+	<div class="mb-3 flex flex-wrap items-center justify-between gap-2">
+		<h2 class="text-dark-light-blue text-sm font-semibold tracking-wide uppercase">
+			Items ({order.items.length})
+		</h2>
+		{#if isOrderPassable(order.state)}
+			<Button onclick={() => (adding = !adding)} size="sm" variant="secondary"
+				>{adding ? 'Fermer' : 'Ajouter des items'}</Button
+			>
+		{/if}
+	</div>
+
+	<!-- #83 — compléter la commande avec des items déjà validés de la file. -->
+	{#if isOrderPassable(order.state) && adding}
+		<form
+			class="border-rule bg-blue-gray/15 mb-4 rounded-2xl border p-4 sm:p-5"
+			action="?/addItems"
+			method="POST"
+			use:enhance={() =>
+				({ result, update }) => {
+					if (result.type === 'success') {
+						adding = false;
+					}
+					return update();
+				}}
+		>
+			{#if data.addable.length === 0}
+				<p class="text-dark-light-blue text-sm">
+					Aucun item validé n'attend dans la file pour ce campus et cette année scolaire.
+				</p>
+			{:else}
+				<p class="text-dark-light-blue mb-3 text-xs">
+					Items validés par leur CDP, en attente de regroupement, livrables au même campus que cette
+					commande. Leur imputation par défaut suit, comme à la création d'une commande.
+				</p>
+				<ul class="space-y-2">
+					{#each data.addable as candidate (candidate.id)}
+						<li>
+							<label class="flex items-center gap-3 text-sm">
+								<Checkbox name="item" className="size-4" value={candidate.id} />
+								<span class="min-w-0 flex-1 truncate text-white">{candidate.name}</span>
+								<span class="text-dark-light-blue">{candidate.projectName}</span>
+								<span class="text-light-blue font-medium">{euro.format(candidate.totalTtc)}</span>
+							</label>
+						</li>
+					{/each}
+				</ul>
+				<div class="mt-3">
+					<Button size="sm" type="submit" variant="primary">Ajouter à la commande</Button>
+				</div>
+			{/if}
+		</form>
+	{/if}
 	<ul class="mb-8 space-y-2">
 		{#each order.items as item (item.id)}
 			<li class="border-rule bg-blue-gray/15 rounded-2xl border p-4 sm:p-5">

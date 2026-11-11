@@ -37,7 +37,17 @@
 					budgetId: a.budgetId,
 					amount: a.amountTtc.toFixed(2).replace('.', ',')
 				}))
-			: [{ id: nextLineId++, budgetId: null, amount: '' }]
+			: [
+					{
+						id: nextLineId++,
+						// #86 — le budget du projet est présélectionné, pour tout le total.
+						budgetId: untrack(() => data.defaultBudgetId),
+						amount:
+							untrack(() => data.defaultBudgetId) === null
+								? ''
+								: seed.totalTtc.toFixed(2).replace('.', ',')
+					}
+				]
 	);
 
 	const parsedUnit = $derived(Number(unitPrice.replace(',', '.')));

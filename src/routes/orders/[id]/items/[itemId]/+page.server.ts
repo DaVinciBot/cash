@@ -1,6 +1,6 @@
 import { entityHistory, rejection } from '#lib/server/audit.js';
 import { decimal, text, textAll } from '#lib/server/form.js';
-import { budgetLeaves, orderDetail } from '#lib/server/orders.js';
+import { budgetLeaves, defaultLeafFor, orderDetail } from '#lib/server/orders.js';
 import { resolve } from '$app/paths';
 import { error, fail, redirect } from '@sveltejs/kit';
 import type { Actions, PageServerLoad } from './$types';
@@ -37,12 +37,21 @@ export const load: PageServerLoad = async ({ depends, locals, params }) => {
 		error(404, 'Item introuvable.');
 	}
 
-	const [{ leaves }, history] = await Promise.all([
+	const [{ leaves, nodes }, history, { data: project }] = await Promise.all([
 		budgetLeaves(locals.supabase, order.schoolYearId),
-		entityHistory(locals.supabase, 'item', itemId)
+		entityHistory(locals.supabase, 'item', itemId),
+		locals.supabase.from('projects').select('budget_id').eq('id', item.projectId).maybeSingle()
 	]);
 
-	return { order: { id: order.id, state: order.state }, item, leaves, history };
+	// #86 — sans imputation, le formulaire part du budget du projet de l'item :
+	// c'est lui qui paie par défaut, le trésorier n'a qu'à confirmer ou changer.
+	const defaultBudgetId = defaultLeafFor(
+		nodes,
+		new Set(leaves.map((leaf) => leaf.id)),
+		project?.budget_id ?? null
+	);
+
+	return { order: { id: order.id, state: order.state }, item, leaves, history, defaultBudgetId };
 };
 
 export const actions: Actions = {
