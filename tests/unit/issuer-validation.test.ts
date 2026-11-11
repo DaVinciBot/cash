@@ -8,6 +8,7 @@ import {
 	issuerFieldErrors,
 	normalizeIdentifier
 } from '#lib/issuerValidation.js';
+import { formatNumber, rankOf } from '#lib/server/documentNumbering.js';
 
 const empty = {
 	rna: '',
@@ -69,5 +70,17 @@ describe("mentions légales de l'émetteur (#80)", () => {
 
 	it('enregistre les identifiants sans espaces et en capitales', () => {
 		expect(normalizeIdentifier(' fr76 3000 6000 ')).toBe('FR7630006000');
+	});
+});
+
+describe('numérotation des documents (#81)', () => {
+	it("lit le rang final d'un numéro", () => {
+		expect(rankOf('FAC-2026-0151')).toBe(151);
+		expect(rankOf('sans rang')).toBe(0);
+	});
+
+	it('formate un numéro sur quatre chiffres', () => {
+		expect(formatNumber('invoice', 2026, 151)).toBe('FAC-2026-0151');
+		expect(formatNumber('tax_receipt', 2027, 1)).toBe('REC-2027-0001');
 	});
 });

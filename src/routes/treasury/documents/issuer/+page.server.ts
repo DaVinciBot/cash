@@ -1,28 +1,35 @@
 import { isOfficerGender } from '#lib/documents.js';
 import { issuerFieldErrors, normalizeIdentifier } from '#lib/issuerValidation.js';
 import { rejection } from '#lib/server/audit.js';
+import { saveManualRanks, seriesNumbering } from '#lib/server/documentNumbering.js';
 import { text } from '#lib/server/form.js';
 import { organization } from '#lib/server/reports.js';
+import { DOCUMENT_KINDS, type DocumentKind } from '#lib/types/domain.js';
 import { fail } from '@sveltejs/kit';
 import type { Actions, PageServerLoad } from './$types';
 
-// Identité de l'émetteur — écran à part.
+// Identité de l'émetteur et numérotation des documents — écran à part.
 //
 // C'est de la CONFIGURATION, pas un acte : on la renseigne une fois, elle sert
 // ensuite à toutes les pièces. La mêler au formulaire d'émission laissait croire
 // qu'il fallait la ressaisir à chaque document.
 //
 // La page s'ouvre avec `finance.read` (garde de route `/admin/treasury`), mais
-// ne s'écrit qu'avec `finance.write` (policy `organization_write`) : un lecteur
-// la consulte sans formulaire.
+// ne s'écrit qu'avec `finance.write` (policies `organization_write` et
+// `document_number_offsets_write`) : un lecteur la consulte sans formulaire.
+
+/** Année de la série affichée, celle de l'émission du prochain document. */
+const currentYear = () => new Date().getFullYear();
 
 export const load: PageServerLoad = async ({ locals, depends }) => {
 	depends('cash:issuer');
-	const [org, { data: canWrite }] = await Promise.all([
+	const year = currentYear();
+	const [org, numbering, { data: canWrite }] = await Promise.all([
 		organization(locals.supabase),
+		seriesNumbering(locals.supabase, year),
 		locals.supabase.rpc('has_permission', { p_permission: 'finance.write' })
 	]);
-	return { organization: org, canWrite: canWrite === true };
+	return { organization: org, numbering, year, canWrite: canWrite === true };
 };
 
 export const actions: Actions = {
@@ -92,5 +99,37 @@ export const actions: Actions = {
 			});
 		}
 		return { saved: 'issuer' };
+	},
+
+	/**
+	 * #81 — dernier rang émis hors du site, par série de l'année. Un champ vide
+	 * vaut zéro : rien n'a été émis à la main.
+	 */
+	numbering: async ({ locals, request }) => {
+		const form = await request.formData();
+		const ranks: Partial<Record<DocumentKind, number>> = {};
+		for (const kind of DOCUMENT_KINDS) {
+			const raw = text(form, `rank_${kind}`);
+			const rank = raw === '' ? 0 : Number(raw);
+			if (!Number.isSafeInteger(rank) || rank < 0 || rank > 9999) {
+				return fail(400, { message: 'Un rang est un entier entre 0 et 9999.' });
+			}
+			ranks[kind] = rank;
+		}
+
+		const error = await saveManualRanks(locals.supabase, currentYear(), ranks);
+		if (error) {
+			return fail(400, {
+				message: await rejection(
+					locals.supabase,
+					error,
+					"La numérotation n'a pas pu être enregistrée.",
+					{
+						entityType: 'document_number_offset'
+					}
+				)
+			});
+		}
+		return { saved: 'numbering' };
 	}
 };

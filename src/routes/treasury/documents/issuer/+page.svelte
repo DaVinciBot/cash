@@ -8,6 +8,7 @@
 	import { enhance } from '$app/forms';
 	import { resolve } from '$app/paths';
 	import { OFFICER_GENDERS, OFFICER_GENDER_LABELS, officerTitle } from '#lib/documents.js';
+	import { DOCUMENT_KIND_LABELS } from '#lib/types/domain.js';
 	import type { SubmitFunction } from '$app/forms';
 	import type { ActionData, PageData } from './$types';
 
@@ -53,15 +54,15 @@
 		<p
 			class="mb-4 rounded-xl bg-emerald-500/15 px-4 py-3 text-sm text-emerald-300 ring-1 ring-emerald-500/30"
 		>
-			Identité enregistrée.
+			{saved === 'numbering' ? 'Numérotation enregistrée.' : 'Identité enregistrée.'}
 		</p>
 	{/if}
 	{#if !data.canWrite}
 		<p
 			class="bg-blue-gray/15 text-dark-light-blue ring-rule mb-4 rounded-xl px-4 py-3 text-sm ring-1"
 		>
-			Consultation seule : modifier l'identité de l'émetteur demande le droit d'écriture sur la
-			trésorerie.
+			Consultation seule : modifier l'identité de l'émetteur ou la numérotation demande le droit
+			d'écriture sur la trésorerie.
 		</p>
 	{/if}
 
@@ -230,6 +231,63 @@
 
 			{#if data.canWrite}
 				<Button class="mt-4" size="sm" type="submit" variant="primary">Enregistrer</Button>
+			{/if}
+		</fieldset>
+	</form>
+
+	<!-- #81 — les pièces émises à la main avant le site comptent dans la série. -->
+	<form
+		class="border-rule bg-blue-gray/15 mt-6 rounded-2xl border p-4 sm:p-5"
+		action="?/numbering"
+		method="POST"
+		use:enhance={keepValues}
+	>
+		<h2 class="text-light-blue text-sm font-semibold">Numérotation {data.year}</h2>
+		<p class="text-dark-light-blue/70 mt-1 mb-3 text-xs">
+			Chaque série repart de 1 au 1er janvier. Si des documents ont été émis à la main cette année
+			avant le site, indiquez le dernier numéro utilisé : le site continue la série à partir de lui,
+			sans doublon ni trou.
+		</p>
+		<fieldset disabled={!data.canWrite}>
+			<div class="border-rule overflow-x-auto rounded-lg border">
+				<table class="w-full text-sm">
+					<thead class="bg-blue-gray/15 text-dark-light-blue text-left text-xs uppercase">
+						<tr>
+							<th class="px-4 py-2">Série</th>
+							<th class="px-4 py-2">Dernier rang émis hors du site</th>
+							<th class="px-4 py-2 text-right">Émis par le site</th>
+							<th class="px-4 py-2 text-right">Prochain numéro</th>
+						</tr>
+					</thead>
+					<tbody class="divide-rule divide-y">
+						{#each data.numbering as series (series.kind)}
+							<tr>
+								<td class="text-light-blue px-4 py-2">{DOCUMENT_KIND_LABELS[series.kind]}</td>
+								<td class="px-4 py-2">
+									<input
+										name="rank_{series.kind}"
+										class="{FIELD} mt-0 w-28"
+										aria-label="Dernier rang émis hors du site, {DOCUMENT_KIND_LABELS[series.kind]}"
+										inputmode="numeric"
+										max="9999"
+										min="0"
+										type="number"
+										value={series.manualRank || ''}
+									/>
+								</td>
+								<td class="text-dark-light-blue px-4 py-2 text-right">
+									{series.siteRank > 0 ? series.siteRank : '—'}
+								</td>
+								<td class="px-4 py-2 text-right font-mono text-white">{series.next}</td>
+							</tr>
+						{/each}
+					</tbody>
+				</table>
+			</div>
+			{#if data.canWrite}
+				<Button class="mt-4" size="sm" type="submit" variant="primary"
+					>Enregistrer la numérotation</Button
+				>
 			{/if}
 		</fieldset>
 	</form>
