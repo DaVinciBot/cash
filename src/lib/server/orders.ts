@@ -48,16 +48,24 @@ export interface BundlableItem {
  * confort — sans lui, une demande sans urgence apparente peut attendre
  * indéfiniment derrière des demandes plus récentes.
  */
-export async function bundlingQueue(supabase: Client): Promise<BundlableItem[]> {
+export async function bundlingQueue(
+	supabase: Client,
+	state: 'pending_bundled' | 'pending_cdp' = 'pending_bundled'
+): Promise<BundlableItem[]> {
+	// `pending_cdp` sert la vue d'anticipation du trésorier (#62) : mêmes
+	// colonnes, triées par date de demande faute de validation.
 	const { data, error } = await supabase
 		.schema('cash')
 		.from('items')
 		.select(
 			'id, name, link, domain, unit_price_ttc, quantity, total_ttc, tags, note, campus, project_id, requested_by, cdp_approved_at, created_at'
 		)
-		.eq('state', 'pending_bundled')
+		.eq('state', state)
 		.is('order_id', null)
-		.order('cdp_approved_at', { ascending: true, nullsFirst: true });
+		.order(state === 'pending_cdp' ? 'created_at' : 'cdp_approved_at', {
+			ascending: true,
+			nullsFirst: true
+		});
 
 	if (error || data.length === 0) {
 		return [];

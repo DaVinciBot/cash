@@ -1,5 +1,10 @@
 import { rejection } from '#lib/server/audit.js';
-import { projectsWithPermission, reviewQueue } from '#lib/server/cash.js';
+import {
+	currentSchoolYear,
+	projectsWithPermission,
+	reviewBudgets,
+	reviewQueue
+} from '#lib/server/cash.js';
 import { text, textAll } from '#lib/server/form.js';
 import { refusalReasonError } from '#lib/types/domain.js';
 import { error, fail } from '@sveltejs/kit';
@@ -25,7 +30,7 @@ export const load: PageServerLoad = async ({ locals, depends }) => {
 
 	const { user } = await locals.safeGetSession();
 	if (!user?.id) {
-		return { projects: [], items: [] };
+		return { projects: [], items: [], budgets: [] };
 	}
 
 	const projects = await projectsWithPermission(
@@ -34,7 +39,13 @@ export const load: PageServerLoad = async ({ locals, depends }) => {
 		'orders.items.review.project'
 	);
 
-	return { projects, items: await reviewQueue(locals.supabase, projects) };
+	const schoolYear = await currentSchoolYear(locals.supabase);
+	const [items, budgets] = await Promise.all([
+		reviewQueue(locals.supabase, projects),
+		schoolYear ? reviewBudgets(locals.supabase, projects, schoolYear.id) : Promise.resolve([])
+	]);
+
+	return { projects, items, budgets };
 };
 
 export const actions: Actions = {
