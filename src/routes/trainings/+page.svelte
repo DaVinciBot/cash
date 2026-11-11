@@ -11,6 +11,8 @@
 		buildSummaryFields,
 		buildTrainingFields,
 		type ProfileOption,
+		capacityModeOf,
+		type CapacityMode,
 		type SlotFieldsConfig
 	} from '#lib/helpers/trainingForms.js';
 	import { categoryOptions, statusOptions } from '#lib/helpers/trainingOptions.js';
@@ -192,9 +194,13 @@ DVBisous ! :robot:`;
 		showTrainingModal = true;
 	}
 
+	// formation#47 — mode de capacité du formulaire de session ouvert.
+	let capacityMode = $state<CapacityMode>('separate');
+
 	function openSlotModal(slot: TrainingSlotListItem | null = null) {
 		formError = null;
 		editingSlot = slot;
+		capacityMode = capacityModeOf(slot);
 		selectedTrainerId = slot?.trainer_id ?? null;
 		selectedTrainingId = slot?.training_id ?? null;
 		const rebuildSlotFields = (nextTrainingId: number | null) => {
@@ -206,6 +212,11 @@ DVBisous ! :robot:`;
 				searchTrainings,
 				searchProfiles,
 				selectedTrainingId: nextTrainingId,
+				capacityMode,
+				onCapacityModeChange: (mode: CapacityMode) => {
+					capacityMode = mode;
+					rebuildSlotFields(selectedTrainingId);
+				},
 				onTrainerChange: (nextId: string | null) => {
 					selectedTrainerId = nextId;
 				},
@@ -249,6 +260,11 @@ DVBisous ! :robot:`;
 			searchTrainings,
 			searchProfiles,
 			selectedTrainingId,
+			capacityMode,
+			onCapacityModeChange: (mode: CapacityMode) => {
+				capacityMode = mode;
+				rebuildSlotFields(selectedTrainingId);
+			},
 			onTrainerChange: (nextId: string | null) => {
 				selectedTrainerId = nextId;
 			},
@@ -367,8 +383,21 @@ DVBisous ! :robot:`;
 		const videoLink = getFormString(formData, 'video_conference_link').trim() || null;
 		const excusable = formData.has('excusable');
 		const startIso = startInput ? parseParisDatetimeLocal(startInput) : '';
-		const onSiteSeats = onSiteSeatsRaw === '' ? null : Number(onSiteSeatsRaw);
-		const remoteSeats = remoteSeatsRaw === '' ? null : Number(remoteSeatsRaw);
+		// formation#47 — en places communes, une seule capacité, et les deux modalités
+		// sont proposées : la base décompte chaque inscription du total commun.
+		const sharedMode = getFormString(formData, 'capacity_mode') === 'shared';
+		const sharedSeatsRaw = getFormString(formData, 'shared_seats');
+		const sharedSeats = sharedMode && sharedSeatsRaw !== '' ? Number(sharedSeatsRaw) : null;
+		const onSiteSeats = sharedMode
+			? sharedSeats
+			: onSiteSeatsRaw === ''
+				? null
+				: Number(onSiteSeatsRaw);
+		const remoteSeats = sharedMode
+			? sharedSeats
+			: remoteSeatsRaw === ''
+				? null
+				: Number(remoteSeatsRaw);
 		const trainerId = selectedTrainerId ?? '';
 		const customName = getFormString(formData, 'custom_name').trim() || null;
 		const customDescription = getFormString(formData, 'custom_description').trim() || null;
@@ -395,6 +424,9 @@ DVBisous ! :robot:`;
 		if (!statusOptions.some((option) => option.value === statusStr)) {
 			slotErrors.status = 'Le statut est obligatoire.';
 		}
+		if (sharedMode && (sharedSeats === null || !Number.isInteger(sharedSeats) || sharedSeats < 0)) {
+			slotErrors.shared_seats = 'Indiquez le nombre de places communes.';
+		}
 		if (applyFieldErrors(slotFields, slotErrors)) {
 			return;
 		}
@@ -405,7 +437,9 @@ DVBisous ! :robot:`;
 					custom_name?: string | null;
 					custom_description?: string | null;
 					custom_prerequisites?: string | null;
+					shared_seats?: number | null;
 				} = {
+					shared_seats: sharedSeats,
 					training_id: trainingId,
 					trainer_id: trainerId,
 					start: startIso,
@@ -431,7 +465,8 @@ DVBisous ! :robot:`;
 					...updates
 				});
 			} else {
-				await createTrainingSlot(supabaseClient, {
+				const payload = {
+					shared_seats: sharedSeats,
 					training_id: trainingId,
 					custom_name: customName && customName !== baseName ? customName : null,
 					custom_description:
@@ -449,7 +484,8 @@ DVBisous ! :robot:`;
 					video_conference_link: videoLink,
 					excusable,
 					status
-				});
+				};
+				await createTrainingSlot(supabaseClient, payload);
 			}
 			await loadData();
 			triggerTableRefresh(slotTableTopic);
