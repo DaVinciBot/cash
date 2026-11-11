@@ -25,6 +25,12 @@
 	let tags = $state<ItemTag[]>([...initial.tags]);
 	let note = $state(initial.note);
 	let submitting = $state(false);
+	// Les tags sont des puces, sans champ natif à rendre `required` : on vérifie
+	// à l'envoi et on ne signale l'oubli qu'après une première tentative.
+	let attempted = $state(false);
+	const clientMessage = $derived(
+		attempted && tags.length === 0 ? "Choisissez au moins un tag d'équipe." : null
+	);
 
 	const total = $derived((unitPrice ?? 0) * (quantity ?? 0));
 
@@ -50,16 +56,24 @@
 		</p>
 	</header>
 
-	{#if form?.message}
-		<p class="mb-4 rounded-xl bg-red-500/15 px-4 py-3 text-sm text-red-300 ring-1 ring-red-500/30">
-			{form.message}
+	{#if clientMessage ?? form?.message}
+		<p
+			class="mb-4 rounded-xl bg-red-500/15 px-4 py-3 text-sm text-red-300 ring-1 ring-red-500/30"
+			role="alert"
+		>
+			{clientMessage ?? form?.message}
 		</p>
 	{/if}
 
 	<form
 		class="border-rule bg-blue-gray/15 rounded-lg border p-6"
 		method="POST"
-		use:enhance={() => {
+		use:enhance={({ cancel }) => {
+			attempted = true;
+			if (tags.length === 0) {
+				cancel();
+				return;
+			}
 			submitting = true;
 			return async ({ update }) => {
 				await update();
@@ -82,6 +96,7 @@
 				<input
 					name="link"
 					class="border-rule-strong bg-dark-blue/60 text-light-blue placeholder:text-muted focus:border-light-blue/70 focus-visible:ring-light-blue/60 w-full rounded-xl border p-2.5 focus:outline-none focus-visible:ring-2 disabled:opacity-50"
+					required
 					type="url"
 					bind:value={link}
 				/>
@@ -111,8 +126,12 @@
 				/>
 			</label>
 			<div class="sm:col-span-6">
-				<span class="text-dark-light-blue mb-1 block text-sm">Tags</span>
-				<div class="flex flex-wrap gap-2 pt-1.5">
+				<span class="text-dark-light-blue mb-1 block text-sm">Tags de l'équipe</span>
+				<div
+					class="flex flex-wrap gap-2 rounded-lg pt-1.5 {attempted && tags.length === 0
+						? 'ring-1 ring-red-500/60 ring-offset-4 ring-offset-transparent'
+						: ''}"
+				>
 					{#each ITEM_TAGS as tag (tag)}
 						<FilterChip
 							onclick={() => {
