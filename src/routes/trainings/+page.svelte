@@ -4,6 +4,7 @@
 	import StateBadge from '#lib/components/cash/StateBadge.svelte';
 	import CrudForm from '#lib/components/modals/CrudForm.svelte';
 	import AdminHeader from '#lib/components/training/admin/AdminHeader.svelte';
+	import ScheduledAnnouncements from '#lib/components/training/admin/ScheduledAnnouncements.svelte';
 	import AdminSlotSection from '#lib/components/training/admin/AdminSlotSection.svelte';
 	import AdminTrainingSection from '#lib/components/training/admin/AdminTrainingSection.svelte';
 	import {
@@ -682,6 +683,9 @@ DVBisous ! :robot:`;
 		trainingsCount={trainings.length}
 		upcomingCount={upcomingSlots.length}
 	/>
+
+	<!-- formation#40 — l'annonce de la semaine, préparée à l'avance. -->
+	<ScheduledAnnouncements />
 
 	<!-- La synthèse part d'abord sur le webhook de test, et n'atteint le salon
 	     réel qu'après confirmation : un ping de masse ne se rattrape pas. -->
