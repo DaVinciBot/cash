@@ -9,6 +9,7 @@
 		PROFILE_FIELD_KEYS,
 		readProfileEdits
 	} from '#lib/helpers/profileForm.js';
+	import { absentMembers, demotionPrompt } from '#lib/memberSync.js';
 	import { GLOBAL_ROLE_CATEGORIES, OVERRIDE_PERMISSION_CATEGORIES } from '#lib/rbacCatalog.js';
 	import {
 		Table,
@@ -169,6 +170,8 @@
 	// saisit les arrivées. Attribuer un rôle en plus reste possible, et c'est ce
 	// surplus — pas l'import — qui demande `iam.roles.manage` (`canManageRoles`).
 	const canImportMembers = $derived(canInviteMembers && canManageProjects && canEditProfile);
+	// La synchronisation (cash#79) pose et retire les rôles membre et invité.
+	const canSyncMembers = $derived(canImportMembers && canManageRoles);
 	let pendingInvites = $state<AuthUser[]>([]);
 	let pendingInvitesLoading = $state<boolean>(false);
 	let pendingInvitesError = $state('');
@@ -676,7 +679,33 @@
 		return true;
 	}
 
+	/** Profils dont le rôle global `role` est actif. */
+	async function activeRoleHolders(
+		supabase: ReturnType<typeof getSupabaseBrowserClient>,
+		role: GlobalRole
+	): Promise<Set<string>> {
+		const { data, error } = await supabase
+			.from('profile_global_roles')
+			.select('profile')
+			.eq('role', role)
+			.is('revoked_at', null);
+		if (error) {
+			throw new Error(`Lecture des rôles impossible : ${error.message}`);
+		}
+		return new Set(data.map((row) => row.profile));
+	}
+
 	function addNew() {
+		openImport('add');
+	}
+
+	/**
+	 * `add` invite et rattache les membres du CSV. `sync` (cash#79) fait du CSV
+	 * la liste complète des membres : nom et campus réactualisés, rôle membre
+	 * garanti, et les membres absents du fichier redeviennent invités.
+	 */
+	function openImport(mode: 'add' | 'sync') {
+		const sync = mode === 'sync';
 		mountClosable(UserImportModal, {
 			target: document.body,
 			props: {
@@ -688,7 +717,7 @@
 							.flat()
 							.map((role) => ({ name: role.label, value: role.value }))
 					: [],
-				title: 'Importer des utilisateurs',
+				title: sync ? 'Synchroniser les membres (CSV complet)' : 'Importer des utilisateurs',
 				onSubmit: async ({
 					campus,
 					project,
@@ -703,6 +732,11 @@
 					if (!canImportMembers) {
 						throw new Error(
 							"Vous n'avez pas les permissions requises pour cette action (members.invite.send, members.projects.update.all et members.profile.update.all nécessaires)."
+						);
+					}
+					if (sync && !canSyncMembers) {
+						throw new Error(
+							'La synchronisation pose et retire les rôles membre et invité : iam.roles.manage est nécessaire.'
 						);
 					}
 
@@ -756,21 +790,58 @@
 						throw new Error('Impossible de récupérer la liste des utilisateurs existants.');
 					}
 
+					// Synchronisation : on calcule et on fait confirmer les rétrogradations
+					// avant la moindre écriture.
+					let demoted: { id: string; email: string }[] = [];
+					let guests = new Set<string>();
+					const refreshedUsers: string[] = [];
+					const demotedUsers: string[] = [];
+					if (sync) {
+						const members = await activeRoleHolders(supabase, 'member');
+						guests = await activeRoleHolders(supabase, 'guest');
+						const emailById = new SvelteMap<string, string>();
+						for (const [email, authUser] of existingAuthUsers) {
+							emailById.set(authUser.id, email);
+						}
+						const csvEmails = new Set(users.map((u) => u.email.trim().toLowerCase()));
+						const { data: self } = await supabase.auth.getUser();
+						demoted = absentMembers(members, emailById, csvEmails, self.user?.id ?? null);
+						if (demoted.length > 0 && !window.confirm(demotionPrompt(demoted))) {
+							throw new Error('Synchronisation annulée : aucun membre modifié.');
+						}
+					}
+
+					/** Garantit le rôle membre, en retirant le rôle invité s'il le portait. */
+					const ensureMember = async (profileId: string) => {
+						await assignImportedRole(supabase, profileId, 'member');
+						if (guests.has(profileId)) {
+							const { error } = await supabase.rpc('revoke_global_role', {
+								p_profile: profileId,
+								p_role: 'guest'
+							});
+							if (error) {
+								throw new Error(`Retrait du rôle invité impossible : ${error.message}`);
+							}
+						}
+					};
+
 					for (const user of users) {
 						const email = user.email.trim().toLowerCase();
 						const username = user.name.trim();
 						const projectRaw =
 							user.project && user.project !== 'NULL' ? user.project : defaultProject;
 						const resolvedProjectValue = projectRaw.trim();
-						if (!resolvedProjectValue) {
+						// En synchronisation, le projet est facultatif : le membre rejoint
+						// de toute façon Asso, rattachement automatique.
+						if (!resolvedProjectValue && !sync) {
 							failures.push({
 								email,
 								message: 'Aucun projet associé pour cet utilisateur.'
 							});
 							continue;
 						}
-						const projectId = parseInt(resolvedProjectValue, 10);
-						if (!Number.isInteger(projectId) || projectId < 0) {
+						const projectId = resolvedProjectValue ? parseInt(resolvedProjectValue, 10) : null;
+						if (projectId !== null && (!Number.isInteger(projectId) || projectId < 0)) {
 							failures.push({
 								email,
 								message: 'Projet invalide ou introuvable pour cet utilisateur.'
@@ -795,7 +866,9 @@
 								// déduit de l'email par celui du CSV, et poser le campus.
 								await applyImportedProfile(supabase, createdUserId, username, userCampus);
 								await assignImportedRole(supabase, createdUserId, importedRole);
-								await attachToProject(supabase, createdUserId, projectId);
+								if (projectId !== null) {
+									await attachToProject(supabase, createdUserId, projectId);
+								}
 								createdUsers.push(email);
 								existingAuthUsers.set(email, {
 									id: createdUserId,
@@ -805,12 +878,22 @@
 									last_sign_in_at: null
 								});
 							} else {
-								// Membre déjà connu : on ne réécrit ni son nom ni son campus, qu'il
-								// a pu corriger lui-même. Le rôle demandé vaut pour tout l'import,
-								// lui compris ; `assign_global_role` est idempotent.
+								// Membre déjà connu : à l'import, on ne réécrit ni son nom ni son
+								// campus, qu'il a pu corriger lui-même. En synchronisation, le CSV
+								// fait foi : les deux sont réactualisés et le rôle membre garanti.
+								// Le rôle demandé vaut pour tout l'import, lui compris ;
+								// `assign_global_role` est idempotent.
+								if (sync) {
+									await applyImportedProfile(supabase, existingAuth.id, username, userCampus);
+									await ensureMember(existingAuth.id);
+								}
 								await assignImportedRole(supabase, existingAuth.id, importedRole);
-								const attached = await attachToProject(supabase, existingAuth.id, projectId);
-								if (attached) {
+								const attached =
+									projectId !== null &&
+									(await attachToProject(supabase, existingAuth.id, projectId));
+								if (sync) {
+									refreshedUsers.push(email);
+								} else if (attached) {
 									updatedUsers.push(email);
 								} else {
 									alreadyLinked.push(email);
@@ -833,10 +916,32 @@
 						}
 					}
 
+					for (const member of demoted) {
+						try {
+							// Invité d'abord : un échec en route ne laisse jamais un profil sans rôle.
+							await assignImportedRole(supabase, member.id, 'guest');
+							const { error: revokeError } = await supabase.rpc('revoke_global_role', {
+								p_profile: member.id,
+								p_role: 'member'
+							});
+							if (revokeError) {
+								throw new Error(revokeError.message);
+							}
+							demotedUsers.push(member.email);
+						} catch (error) {
+							failures.push({
+								email: member.email,
+								message: `Passage en invité impossible : ${(error as Error | null)?.message ?? 'erreur inconnue'}`
+							});
+						}
+					}
+
 					if (
 						createdUsers.length === 0 &&
 						updatedUsers.length === 0 &&
-						alreadyLinked.length === 0
+						alreadyLinked.length === 0 &&
+						refreshedUsers.length === 0 &&
+						demotedUsers.length === 0
 					) {
 						const firstFailure = failures[0];
 						throw new Error(
@@ -863,6 +968,16 @@
 					}
 					if (alreadyLinked.length > 0) {
 						messageParts.push(`Déjà associés à ce projet : ${alreadyLinked.join(', ')}`);
+					}
+					if (refreshedUsers.length > 0) {
+						messageParts.push(
+							`${String(refreshedUsers.length)} membre(s) réactualisé(s) : nom, campus et rôle membre.`
+						);
+					}
+					if (demotedUsers.length > 0) {
+						messageParts.push(
+							`${String(demotedUsers.length)} membre(s) absent(s) du CSV repassé(s) en invité.`
+						);
 					}
 					if (
 						importedRole &&
@@ -1357,6 +1472,17 @@
 	</div>
 </div>
 <div class="w-full py-2 sm:px-8 lg:px-16">
+	{#if canSyncMembers}
+		<div class="mb-2 flex justify-end">
+			<Button
+				onclick={() => {
+					openImport('sync');
+				}}
+				size="sm"
+				variant="secondary">Synchroniser avec un CSV complet</Button
+			>
+		</div>
+	{/if}
 	<div class="bg-blue-gray/15 rounded-lg">
 		<Table
 			addNew={canImportMembers ? addNew : null}
