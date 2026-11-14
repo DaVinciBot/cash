@@ -11,6 +11,13 @@ import type { Actions, PageServerLoad } from './$types';
 // l'enveloppe est modélisée, sous forme de compte dont le solde décroît. La
 // remise n'a pas de solde et se résout par la liste de domaines, qui sert aussi
 // à reconnaître le partenaire dans le lien d'un item (CMD-F-05, TRESO-F-12).
+//
+// Seuls les partenariats ACTIFS réservent un nom (index partiel
+// `partnerships_active_name_unique`) : un homonyme archivé ne bloque rien. Et
+// l'enveloppe suit son partenariat — elle s'archive et se rouvre avec lui
+// (trigger `partnerships_sync_envelope_archive`), jamais depuis la trésorerie.
+
+const DUPLICATE_NAME = 'Un partenariat actif porte déjà ce nom pour cette année scolaire.';
 
 export const load: PageServerLoad = async ({ locals, depends }) => {
 	depends('cash:partners');
@@ -47,6 +54,19 @@ export const actions: Actions = {
 			return fail(400, { message: 'Année scolaire invalide.' });
 		}
 
+		// Vérifié AVANT de créer l'enveloppe : sinon un doublon laisserait derrière
+		// lui un compte orphelin. La base reste juge en dernier ressort (23505).
+		const { count: homonyms } = await locals.supabase
+			.schema('cash')
+			.from('partnerships')
+			.select('id', { count: 'exact', head: true })
+			.eq('school_year_id', schoolYearId)
+			.eq('name', name)
+			.is('archived_at', null);
+		if (homonyms) {
+			return fail(409, { message: DUPLICATE_NAME });
+		}
+
 		// L'enveloppe est un compte, pas un champ du partenariat : c'est ce qui
 		// lui donne un solde et la fait apparaître dans les règlements.
 		let accountId: number | null = null;
@@ -70,7 +90,9 @@ export const actions: Actions = {
 					message: await rejection(
 						locals.supabase,
 						accountError,
-						"L'enveloppe n'a pas pu être créée.",
+						accountError.code === '23505'
+							? `Un compte ouvert s'appelle déjà « Enveloppe ${name} » : archivez-le ou renommez-le d'abord.`
+							: "L'enveloppe n'a pas pu être créée.",
 						{
 							entityType: 'partnership'
 						}
@@ -92,10 +114,19 @@ export const actions: Actions = {
 			});
 
 		if (error) {
+			// Le partenariat n'existe pas : son enveloppe non plus.
+			if (accountId !== null) {
+				await locals.supabase.schema('cash').from('bank_accounts').delete().eq('id', accountId);
+			}
 			return fail(400, {
-				message: await rejection(locals.supabase, error, "Ce partenariat n'a pas pu être créé.", {
-					entityType: 'partnership'
-				})
+				message: await rejection(
+					locals.supabase,
+					error,
+					error.code === '23505' ? DUPLICATE_NAME : "Ce partenariat n'a pas pu être créé.",
+					{
+						entityType: 'partnership'
+					}
+				)
 			});
 		}
 		return { saved: 'partner' };
@@ -126,7 +157,7 @@ export const actions: Actions = {
 				message: await rejection(
 					locals.supabase,
 					error,
-					"Ce partenariat n'a pas pu être modifié.",
+					error.code === '23505' ? DUPLICATE_NAME : "Ce partenariat n'a pas pu être modifié.",
 					{
 						entityType: 'partnership'
 					}
@@ -138,7 +169,8 @@ export const actions: Actions = {
 
 	/**
 	 * Archivage plutôt que suppression : un partenariat éteint a pu porter des
-	 * commandes, et son enveloppe explique des soldes passés.
+	 * commandes, et son enveloppe explique des soldes passés. L'enveloppe est
+	 * archivée avec lui par la base, sauf si un autre partenariat actif la vise.
 	 */
 	archive: async ({ locals, request }) => {
 		const form = await request.formData();
@@ -168,7 +200,10 @@ export const actions: Actions = {
 		return { saved: 'partner' };
 	},
 
-	/** Désarchivage : le partenariat redevient reconnu dans les liens. */
+	/**
+	 * Désarchivage : le partenariat redevient reconnu dans les liens, et son
+	 * enveloppe se rouvre. Refusé si un homonyme actif a pris sa place.
+	 */
 	unarchive: async ({ locals, request }) => {
 		const form = await request.formData();
 		const id = Number(form.get('id'));
@@ -187,7 +222,9 @@ export const actions: Actions = {
 				message: await rejection(
 					locals.supabase,
 					error,
-					"Ce partenariat n'a pas pu être désarchivé.",
+					error.code === '23505'
+						? "Un partenariat actif porte déjà ce nom (ou le nom de son enveloppe) : archivez-le d'abord."
+						: "Ce partenariat n'a pas pu être désarchivé.",
 					{
 						entityType: 'partnership'
 					}
