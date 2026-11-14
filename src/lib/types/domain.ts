@@ -78,6 +78,15 @@ export const ACCOUNT_KINDS = ['current', 'savings', 'partner_credit'] as const;
 
 export type AccountKind = (typeof ACCOUNT_KINDS)[number];
 
+/**
+ * Types qu'on ouvre depuis la trésorerie. Une enveloppe partenaire n'en fait
+ * pas partie : elle naît et s'archive avec son partenariat, sur la page
+ * « Partenariats », pour toujours rester liée à un partenaire réel.
+ */
+export const TREASURY_ACCOUNT_KINDS = ACCOUNT_KINDS.filter(
+	(kind): kind is Exclude<AccountKind, 'partner_credit'> => kind !== 'partner_credit'
+);
+
 export const ACCOUNT_KIND_LABELS: Record<AccountKind, string> = {
 	current: 'Compte courant',
 	savings: 'Livret / épargne',
@@ -197,6 +206,8 @@ export const CASH_ERROR_MESSAGES: Record<string, string> = {
 		'Fonds insuffisants : le solde du compte sélectionné ne permet pas de régler cette commande.',
 	DVB09: 'Une commande ne peut pas être vide : annulez-la plutôt que de retirer son dernier item.',
 	DVB10: 'Cette ligne est historique : elle se révoque, elle ne se réécrit pas.',
+	DVB40:
+		"C'est le dernier compte courant ouvert : les commandes se règlent dessus, il ne peut pas être archivé.",
 	'42501': "Vous n'avez pas les droits nécessaires pour cette action.",
 	'22023': 'Paramètre invalide.',
 	P0002: 'Élément introuvable.',
