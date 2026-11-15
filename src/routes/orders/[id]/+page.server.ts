@@ -1,3 +1,4 @@
+import { attachmentsOf } from '#lib/server/attachments.js';
 import { entityHistory, rejection } from '#lib/server/audit.js';
 import { decimal, text, textAll } from '#lib/server/form.js';
 import {
@@ -36,7 +37,7 @@ export const load: PageServerLoad = async ({ locals, params, depends }) => {
 	}
 
 	const editable = order.state === 'pending_treso';
-	const [{ leaves }, address, accountRows, history, queue, { data: flowRows }, codes] =
+	const [{ leaves }, address, accountRows, history, queue, { data: flowRows }, codes, attachments] =
 		await Promise.all([
 			budgetLeaves(locals.supabase, order.schoolYearId),
 			order.campus ? campusAddress(locals.supabase, order.campus) : Promise.resolve(null),
@@ -48,7 +49,11 @@ export const load: PageServerLoad = async ({ locals, params, depends }) => {
 				.from('flows')
 				.select('account_id, direction, amount_ttc')
 				.eq('order_id', id),
-			promoCodes(locals.supabase)
+			promoCodes(locals.supabase),
+			attachmentsOf(
+				locals.supabase,
+				order.items.map((item) => item.id)
+			)
 		]);
 	// #98 — codes actifs pour les sites des items de la commande.
 	const today = new Date().toISOString().slice(0, 10);
@@ -95,7 +100,9 @@ export const load: PageServerLoad = async ({ locals, params, depends }) => {
 		history,
 		addable: sameCampus.filter((item) => inYear.has(item.id)),
 		refundAccountId,
-		applicableCodes
+		applicableCodes,
+		// #63 — les pièces jointes des items, à portée du trésorier qui commande.
+		attachments: Object.fromEntries(attachments)
 	};
 };
 
