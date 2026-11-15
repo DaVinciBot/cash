@@ -1,3 +1,4 @@
+import { itemFieldsError, knownTags } from '#lib/itemFields.js';
 import { rejection } from '#lib/server/audit.js';
 import {
 	budgetPressure,
@@ -58,6 +59,12 @@ function parseLines(form: FormData): { lines: CartLine[]; message?: string } {
 		if (!name) {
 			return { lines: [], message: `Ligne ${rank} : le nom est obligatoire.` };
 		}
+		const link = (links[i] ?? '').trim();
+		const lineTags = knownTags(jsonArray<unknown>(tags[i] ?? ''));
+		const fieldsError = itemFieldsError(link, lineTags, `Ligne ${rank} : `);
+		if (fieldsError) {
+			return { lines: [], message: fieldsError };
+		}
 		const price = Number(rawPrice.replace(',', '.'));
 		if (!Number.isFinite(price) || price < 0) {
 			return { lines: [], message: `Ligne ${rank} : prix unitaire invalide.` };
@@ -69,10 +76,10 @@ function parseLines(form: FormData): { lines: CartLine[]; message?: string } {
 
 		lines.push({
 			name,
-			link: (links[i] ?? '').trim(),
+			link,
 			unitPriceTtc: Math.round(price * 100) / 100,
 			quantity,
-			tags: jsonArray<ItemTag>(tags[i] ?? ''),
+			tags: lineTags,
 			note
 		});
 	}

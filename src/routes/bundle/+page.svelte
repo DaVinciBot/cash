@@ -327,4 +327,39 @@
 			</div>
 		{/each}
 	{/if}
+
+	<!-- #62 — anticiper : les demandes que les CDP n'ont pas encore tranchées. Elles
+	     ne se regroupent pas, d'où une section à part, en retrait et sans case. -->
+	{#if data.upcoming.length > 0}
+		{@const upcomingTotal = data.upcoming.reduce((sum, item) => sum + item.totalTtc, 0)}
+		<div class="mt-10">
+			<div class="mb-3 flex flex-wrap items-baseline justify-between gap-2">
+				<h2 class="text-dark-light-blue text-sm font-semibold tracking-wide uppercase">
+					À venir : en attente de validation CDP ({data.upcoming.length})
+				</h2>
+				<span class="text-dark-light-blue text-sm"
+					>{euro.format(upcomingTotal)} de décaissements possibles</span
+				>
+			</div>
+			<ul class="space-y-2 opacity-80">
+				{#each data.upcoming as item (item.id)}
+					<li
+						class="border-rule flex flex-wrap items-center gap-3 rounded-2xl border border-dashed px-4 py-3 text-sm"
+					>
+						<span
+							class="rounded-full bg-slate-500/20 px-2 py-0.5 text-xs text-slate-300 ring-1 ring-slate-500/30"
+							>En attente du CDP</span
+						>
+						<span class="min-w-0 flex-1 truncate text-white">{item.name}</span>
+						<CampusBadge campus={item.campus} />
+						<span class="text-dark-light-blue">{item.projectName} · {item.requesterName}</span>
+						<span class="text-light-blue font-medium">{euro.format(item.totalTtc)}</span>
+						<span class="text-dark-light-blue/70 text-xs"
+							>demandé le {day.format(new Date(item.createdAt))}</span
+						>
+					</li>
+				{/each}
+			</ul>
+		</div>
+	{/if}
 </section>

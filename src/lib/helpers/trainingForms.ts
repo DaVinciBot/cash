@@ -237,3 +237,40 @@ export function buildSlotFields({
 		}
 	];
 }
+
+/**
+ * Forme de comparaison d'un nom : minuscules, sans accents ni espaces superflus.
+ * « Élodie » et « elodie » se retrouvent, comme « François » et « francois » (#35).
+ */
+export function searchKey(value: string): string {
+	return value.normalize('NFD').replace(/[̀-ͯ]/g, '').toLowerCase().replace(/\s+/g, ' ').trim();
+}
+
+/** Les `limit` profils dont le nom contient la recherche, accents ignorés. */
+export function matchProfiles<T extends { username: string | null }>(
+	profiles: readonly T[],
+	search: string,
+	limit = 5
+): T[] {
+	const needle = searchKey(search);
+	if (!needle) {
+		return [];
+	}
+	return profiles.filter((p) => searchKey(p.username ?? '').includes(needle)).slice(0, limit);
+}
+
+const ISO_DAY = (date: Date) =>
+	`${String(date.getFullYear())}-${String(date.getMonth() + 1).padStart(2, '0')}-${String(date.getDate()).padStart(2, '0')}`;
+
+/**
+ * Semaine annoncée par défaut sur Discord : du lundi au vendredi (#39). Un lundi,
+ * c'est la semaine qui commence ; les autres jours, la semaine suivante, puisque
+ * l'annonce part avant les formations qu'elle présente.
+ */
+export function defaultAnnouncementWeek(today: Date): { from: string; to: string } {
+	const day = today.getDay(); // 0 = dimanche, 1 = lundi
+	const offset = day === 1 ? 0 : (8 - day) % 7 || 7;
+	const monday = new Date(today.getFullYear(), today.getMonth(), today.getDate() + offset);
+	const friday = new Date(monday.getFullYear(), monday.getMonth(), monday.getDate() + 4);
+	return { from: ISO_DAY(monday), to: ISO_DAY(friday) };
+}

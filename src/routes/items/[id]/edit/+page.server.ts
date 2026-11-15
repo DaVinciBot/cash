@@ -1,7 +1,7 @@
+import { itemFieldsError, knownTags } from '#lib/itemFields.js';
 import { rejection } from '#lib/server/audit.js';
 import { memberProjects } from '#lib/server/cash.js';
 import { decimal, jsonArray, text } from '#lib/server/form.js';
-import { type ItemTag } from '#lib/types/domain.js';
 import { resolve } from '$app/paths';
 import { error, fail, redirect } from '@sveltejs/kit';
 import type { Actions, PageServerLoad } from './$types';
@@ -71,10 +71,14 @@ export const actions: Actions = {
 		const price = decimal(form, 'unit_price_ttc');
 		const quantity = Number(text(form, 'quantity'));
 		const note = text(form, 'note');
-		const tags = jsonArray<ItemTag>(text(form, 'tags'));
+		const tags = knownTags(jsonArray<unknown>(text(form, 'tags')));
 
 		if (!name) {
 			return fail(400, { message: 'Le nom est obligatoire.' });
+		}
+		const fieldsError = itemFieldsError(link, tags);
+		if (fieldsError) {
+			return fail(400, { message: fieldsError });
 		}
 		if (!Number.isFinite(price) || price < 0) {
 			return fail(400, { message: 'Prix unitaire invalide.' });
