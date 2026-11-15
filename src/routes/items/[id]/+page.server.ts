@@ -6,6 +6,7 @@ import {
 	isChosenFile
 } from '#lib/server/attachments.js';
 import { entityHistory } from '#lib/server/audit.js';
+import { fastTracks } from '#lib/server/fastTrack.js';
 import { error, fail } from '@sveltejs/kit';
 import type { Actions, PageServerLoad } from './$types';
 
@@ -41,13 +42,14 @@ export const load: PageServerLoad = async ({ depends, locals, params }) => {
 		error(404, 'Item introuvable.');
 	}
 
-	const [{ data: project }, { data: requester }, history, attachments, { data: bundler }] =
+	const [{ data: project }, { data: requester }, history, attachments, { data: bundler }, traces] =
 		await Promise.all([
 			locals.supabase.from('projects').select('name').eq('id', item.project_id).maybeSingle(),
 			locals.supabase.from('profiles').select('username').eq('id', item.requested_by).maybeSingle(),
 			entityHistory(locals.supabase, 'item', id),
 			attachmentsOf(locals.supabase, [id]),
-			locals.supabase.rpc('has_permission', { p_permission: 'orders.bundle.manage' })
+			locals.supabase.rpc('has_permission', { p_permission: 'orders.bundle.manage' }),
+			fastTracks(locals.supabase, [id])
 		]);
 
 	const { user } = await locals.safeGetSession();
@@ -75,7 +77,8 @@ export const load: PageServerLoad = async ({ depends, locals, params }) => {
 			cdpApprovedAt: item.cdp_approved_at,
 			receivedAt: item.received_at,
 			createdAt: item.created_at,
-			isMine: item.requested_by === user?.id
+			isMine: item.requested_by === user?.id,
+			fastTrack: traces.get(id) ?? null
 		},
 		history,
 		attachments: attachments.get(id) ?? [],
