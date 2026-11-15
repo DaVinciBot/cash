@@ -9,20 +9,17 @@
 		type TableColumn,
 		type TableRow
 	} from '@davincibot/components';
-	import type { TrainingListItem } from '@davincibot/lib';
 	import { Plus } from '@lucide/svelte';
 
 	const noop = () => undefined;
 
 	interface Props {
-		trainings?: TrainingListItem[];
 		trainingDbInfo: DBInfo;
 		onTrainingRowClick?: (row: TableRow) => void;
 		trainingFilters?: Filter[];
 		trainingTableTopic?: string;
 		parseTrainingItems: ParseItems;
 		onAddTraining?: () => void;
-		onEditTraining?: (training: TrainingListItem) => void;
 	}
 
 	let {
