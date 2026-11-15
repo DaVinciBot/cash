@@ -1,4 +1,5 @@
 import { entityHistory } from '#lib/server/audit.js';
+import { fastTracks } from '#lib/server/fastTrack.js';
 import { error } from '@sveltejs/kit';
 import type { PageServerLoad } from './$types';
 
@@ -34,10 +35,11 @@ export const load: PageServerLoad = async ({ depends, locals, params }) => {
 		error(404, 'Item introuvable.');
 	}
 
-	const [{ data: project }, { data: requester }, history] = await Promise.all([
+	const [{ data: project }, { data: requester }, history, traces] = await Promise.all([
 		locals.supabase.from('projects').select('name').eq('id', item.project_id).maybeSingle(),
 		locals.supabase.from('profiles').select('username').eq('id', item.requested_by).maybeSingle(),
-		entityHistory(locals.supabase, 'item', id)
+		entityHistory(locals.supabase, 'item', id),
+		fastTracks(locals.supabase, [id])
 	]);
 
 	const { user } = await locals.safeGetSession();
@@ -62,7 +64,8 @@ export const load: PageServerLoad = async ({ depends, locals, params }) => {
 			cdpApprovedAt: item.cdp_approved_at,
 			receivedAt: item.received_at,
 			createdAt: item.created_at,
-			isMine: item.requested_by === user?.id
+			isMine: item.requested_by === user?.id,
+			fastTrack: traces.get(id) ?? null
 		},
 		history
 	};

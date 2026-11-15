@@ -1,5 +1,5 @@
 <script lang="ts">
-	import { Button, FilterChip } from '@davincibot/components';
+	import { Button, Checkbox, FilterChip } from '@davincibot/components';
 	import { enhance } from '$app/forms';
 	import { resolve } from '$app/paths';
 	import { CAMPUS_BADGES, type Campus } from '@davincibot/lib';
@@ -335,6 +335,23 @@
 					</fieldset>
 				{/each}
 			</div>
+
+			{#if data.treasurer}
+				<!-- #100 — le trésorier peut valider sa propre demande sans attendre le CDP. -->
+				<label
+					class="mt-4 flex items-start gap-2 rounded-lg bg-orange-500/5 px-4 py-3 text-sm ring-1 ring-orange-500/30"
+				>
+					<Checkbox name="fast_track" className="mt-0.5 size-4" value="1" />
+					<span>
+						<span class="text-orange-200">Valider en urgence</span>
+						<span class="text-dark-light-blue block text-xs">
+							La demande part directement dans la file de regroupement, avec un badge « Validation
+							d'urgence ». La validation est tracée à votre nom et le CDP du projet est prévenu par
+							mail.
+						</span>
+					</span>
+				</label>
+			{/if}
 
 			<div class="mt-4 flex flex-wrap items-center justify-between gap-3">
 				<Button onclick={addLine} size="md" variant="secondary">+ Ajouter un composant</Button>

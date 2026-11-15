@@ -2,9 +2,10 @@ import { rejection } from '#lib/server/audit.js';
 import {
 	budgetPressure,
 	currentSchoolYear,
-	memberProjects,
+	orderableProjects,
 	resolveCampus
 } from '#lib/server/cash.js';
+import { fastTrackItems } from '#lib/server/fastTrack.js';
 import { jsonArray, text, textAll } from '#lib/server/form.js';
 import { cashErrorMessage, type ItemTag } from '#lib/types/domain.js';
 import { resolve } from '$app/paths';
@@ -91,8 +92,8 @@ export const load: PageServerLoad = async ({ depends, locals }) => {
 		error(401, 'Session expirée.');
 	}
 
-	const [projects, schoolYear] = await Promise.all([
-		memberProjects(locals.supabase, user.id),
+	const [{ projects, treasurer }, schoolYear] = await Promise.all([
+		orderableProjects(locals.supabase, user.id),
 		currentSchoolYear(locals.supabase)
 	]);
 
@@ -136,7 +137,9 @@ export const load: PageServerLoad = async ({ depends, locals }) => {
 		})),
 		memberCampus,
 		schoolYear,
-		partnerships: partnerships ?? []
+		partnerships: partnerships ?? [],
+		// #100 — le trésorier peut valider sa demande en urgence dès l'envoi.
+		treasurer
 	};
 };
 
@@ -162,8 +165,8 @@ export const actions: Actions = {
 			return fail(400, { message });
 		}
 
-		const [projects, schoolYear] = await Promise.all([
-			memberProjects(locals.supabase, user.id),
+		const [{ projects, treasurer }, schoolYear] = await Promise.all([
+			orderableProjects(locals.supabase, user.id),
 			currentSchoolYear(locals.supabase)
 		]);
 
@@ -197,7 +200,7 @@ export const actions: Actions = {
 			});
 		}
 
-		const { error: insertError } = await locals.supabase
+		const { data: created, error: insertError } = await locals.supabase
 			.schema('cash')
 			.from('items')
 			.insert(
@@ -213,7 +216,8 @@ export const actions: Actions = {
 					requested_by: user.id,
 					school_year_id: schoolYear.id
 				}))
-			);
+			)
+			.select('id');
 
 		if (insertError) {
 			return fail(400, {
@@ -226,6 +230,26 @@ export const actions: Actions = {
 					}
 				)
 			});
+		}
+
+		// #100 — validation d'urgence à l'envoi. Un échec ici ne perd pas la
+		// demande : elle reste en attente du CDP et se valide depuis « Items à regrouper ».
+		if (treasurer && text(form, 'fast_track') === '1') {
+			const { error: fastTrackError } = await fastTrackItems(
+				locals.supabase,
+				created.map((row) => row.id)
+			);
+			if (fastTrackError) {
+				return fail(400, {
+					message: await rejection(
+						locals.supabase,
+						fastTrackError,
+						"La demande est enregistrée, mais la validation d'urgence a échoué : relancez-la depuis « Items à regrouper ».",
+						{ entityType: 'item' }
+					)
+				});
+			}
+			redirect(303, resolve('/bundle'));
 		}
 
 		redirect(303, resolve('/'));
