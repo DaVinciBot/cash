@@ -26,7 +26,27 @@ export interface CatalogEntry<T extends string> {
 
 export type CatalogCategories<T extends string> = Record<string, CatalogEntry<T>[]>;
 
+// formation#51 — permission et rôle ajoutés par la prochaine version de
+// `@davincibot/lib`. Étalés plutôt qu'écrits dans la liste, ils compilent avant
+// comme après la mise à jour de la dépendance ; à replacer dans la liste au bump.
+const UPCOMING_PERMISSION_LABELS = {
+	'training.registration.create.bulk': 'Inscrire des participants externes'
+};
+const UPCOMING_ROLE_LABELS: Record<string, string> = {
+	external_training_manager: 'Responsable formations externe'
+};
+
+/** Libellé d'un rôle global, y compris ceux que la version installée de lib ignore encore. */
+export function roleLabel(role: string): string {
+	return (
+		(GLOBAL_ROLE_LABELS as Partial<Record<string, string>>)[role] ??
+		UPCOMING_ROLE_LABELS[role] ??
+		role
+	);
+}
+
 export const GLOBAL_PERMISSION_LABELS: Record<GlobalPermission, string> = {
+	...UPCOMING_PERMISSION_LABELS,
 	// members.*
 	'members.profile.read.all': 'Voir les membres',
 	'members.profile.update.all': 'Éditer les membres',
@@ -112,7 +132,8 @@ const PERMISSION_GROUPS: { title: string; permissions: GlobalPermission[] }[] = 
 			'training.request.manage.self',
 			'training.request.manage.all',
 			'training.feedback.read',
-			'training.presence.update'
+			'training.presence.update',
+			'training.registration.create.bulk' as GlobalPermission
 		]
 	},
 	{
@@ -208,12 +229,17 @@ const ROLE_GROUPS: { title: string; roles: GlobalRole[] }[] = [
 	{
 		title: 'Membres',
 		roles: ['content_writer', 'digital_department', 'member', 'guest']
+	},
+	{
+		// formation#51 — responsable formations d'une autre association.
+		title: 'Externes',
+		roles: ['external_training_manager' as GlobalRole]
 	}
 ];
 
 export const GLOBAL_ROLE_CATEGORIES: CatalogCategories<GlobalRole> = Object.fromEntries(
 	ROLE_GROUPS.map((group) => [
 		group.title,
-		group.roles.map((role) => ({ value: role, label: GLOBAL_ROLE_LABELS[role] }))
+		group.roles.map((role) => ({ value: role, label: roleLabel(role) }))
 	])
 );

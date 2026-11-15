@@ -9,7 +9,11 @@
 		PROFILE_FIELD_KEYS,
 		readProfileEdits
 	} from '#lib/helpers/profileForm.js';
-	import { GLOBAL_ROLE_CATEGORIES, OVERRIDE_PERMISSION_CATEGORIES } from '#lib/rbacCatalog.js';
+	import {
+		GLOBAL_ROLE_CATEGORIES,
+		OVERRIDE_PERMISSION_CATEGORIES,
+		roleLabel
+	} from '#lib/rbacCatalog.js';
 	import {
 		Table,
 		UserImportModal,
@@ -125,7 +129,7 @@
 			label: 'Rôles globaux',
 			csv: (row) =>
 				globalRolesOf(row[3]?.value)
-					.map((role) => GLOBAL_ROLE_LABELS[role])
+					.map((role) => roleLabel(role))
 					.join(', ')
 		},
 		{ key: 'status', label: 'Statut', sortable: true }
@@ -1026,11 +1030,16 @@
 		const { data, error } = (await supabase
 			.from('profiles')
 			.select(
-				'id, username, campus, permissions, status, profile_global_roles!profile_global_roles_profile_fkey(role, revoked_at), member_of!membre_projet_profile_fkey(role, revoked_at, project(id,name)), avatar_url'
+				'id, username, campus, permissions, status, profile_global_roles!profile_global_roles_profile_fkey(role, revoked_at), member_of!membre_projet_profile_fkey(role, revoked_at, project(id,name)), avatar_url, association:associations(name)'
 			)
 			.eq('id', id)
 			.single()) as {
-			data: (ProfileRow & { permissions: string[] | null }) | null;
+			data:
+				| (ProfileRow & {
+						permissions: string[] | null;
+						association?: { name: string } | null;
+				  })
+				| null;
 			error: unknown;
 		};
 		if (error || !data) {
@@ -1053,7 +1062,7 @@
 			.filter((m) => m.project_id !== undefined);
 
 		const roleBadges = activeGlobalRoles.map((role) => ({
-			text: GLOBAL_ROLE_LABELS[role],
+			text: roleLabel(role),
 			color: 'bg-dark-blue border border-light-blue/70 text-light-blue'
 		}));
 
@@ -1092,6 +1101,11 @@
 				},
 				{ label: 'Campus', id: PROFILE_FIELD_KEYS.campus, value: data.campus ?? 'NULL' },
 				{
+					label: 'Association (externe)',
+					id: 'association',
+					value: data.association?.name ?? ''
+				},
+				{
 					label: 'Rôles globaux',
 					value: { type: 'badges', list: roleBadges },
 					id: 'roles',
@@ -1120,6 +1134,16 @@
 			...(canEditProfile ? buildProfileFields() : []),
 			...(canManageRoles
 				? [
+						// formation#51 — un responsable formations externe inscrit des
+						// participants au nom de cette association. Vide pour un membre
+						// DaVinciBot ; un nom inconnu crée l'association.
+						{
+							name: 'Association (externe)',
+							id: 'association',
+							type: 'text',
+							placeholder: 'Vide pour un membre DaVinciBot',
+							wide: true
+						},
 						{
 							name: 'Rôles globaux',
 							id: 'roles',
@@ -1196,6 +1220,32 @@
 								'Erreur lors de la mise à jour du profil : ' +
 									(profileError as { message: string }).message
 							);
+							return;
+						}
+					}
+
+					// Association (formation#51) : écrite seulement si le champ était
+					// présenté et que sa valeur a changé.
+					const associationRaw = formData.get('association');
+					const nextAssociation = typeof associationRaw === 'string' ? associationRaw.trim() : null;
+					if (
+						newFields.some((f) => f.id === 'association') &&
+						nextAssociation !== null &&
+						nextAssociation !== (data.association?.name ?? '')
+					) {
+						const { error: associationError } = await (
+							supabase as unknown as {
+								rpc: (
+									name: 'set_profile_association',
+									args: { p_profile: string; p_association_name: string }
+								) => PromiseLike<{ error: { message: string } | null }>;
+							}
+						).rpc('set_profile_association', {
+							p_profile: id,
+							p_association_name: nextAssociation
+						});
+						if (associationError) {
+							alert("Erreur lors du rattachement à l'association : " + associationError.message);
 							return;
 						}
 					}
@@ -1317,7 +1367,7 @@
 				<span
 					class="bg-dark-blue border-light-blue/70 text-light-blue inline-flex items-center rounded-full border px-2 py-0.5 text-xs whitespace-nowrap"
 				>
-					{GLOBAL_ROLE_LABELS[role]}
+					{roleLabel(role)}
 				</span>
 			{/each}
 		</div>
