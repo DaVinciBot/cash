@@ -142,6 +142,25 @@
 		</div>
 	</dl>
 
+	{#if data.applicableCodes.length > 0 && isOrderPassable(order.state)}
+		<!-- #98 — avant de passer la commande, les codes valables chez ce marchand. -->
+		<div
+			class="mb-6 rounded-xl bg-amber-500/10 px-4 py-3 text-sm text-amber-200 ring-1 ring-amber-500/30"
+			role="note"
+		>
+			<p class="font-semibold">Code promo disponible pour cette commande</p>
+			<ul class="mt-1 space-y-1">
+				{#each data.applicableCodes as promo (promo.id)}
+					<li>
+						{promo.supplier} :
+						<span class="font-mono font-semibold text-white">{promo.code}</span>
+						({promo.discount}{promo.conditions ? ` — ${promo.conditions}` : ''})
+					</li>
+				{/each}
+			</ul>
+		</div>
+	{/if}
+
 	{#if data.address}
 		<div
 			class="border-rule bg-blue-gray/15 mb-6 flex items-start gap-3 rounded-lg border px-4 py-3"
