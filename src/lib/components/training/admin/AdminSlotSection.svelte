@@ -9,23 +9,17 @@
 		type TableColumn,
 		type TableRow
 	} from '@davincibot/components';
-	import type { TrainingListItem, TrainingSlotListItem } from '@davincibot/lib';
 	import { Plus } from '@lucide/svelte';
 
 	const noop = () => undefined;
 
 	interface Props {
-		slots?: TrainingSlotListItem[];
 		slotDbInfo: DBInfo;
 		onSlotRowClick?: (row: TableRow) => void;
 		slotFilters?: Filter[];
 		slotTableTopic?: string;
 		parseSlotItems: ParseItems;
 		onAddSlot?: () => void;
-		onEditSlot?: (slot: TrainingSlotListItem) => void;
-		formatSlotDate: (value: string) => string;
-		findTrainingName: (trainingId: number, trainings: TrainingListItem[]) => string;
-		trainings?: TrainingListItem[];
 	}
 
 	let {
