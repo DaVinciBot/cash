@@ -1,22 +1,34 @@
+import { fiscalYearProblem, periodFor } from '#lib/periods.js';
 import { rejection } from '#lib/server/audit.js';
 import { currentSchoolYear } from '#lib/server/cash.js';
 import { decimal, text } from '#lib/server/form.js';
 import { budgetLeaves } from '#lib/server/orders.js';
 import { accounts, flowList, periods } from '#lib/server/treasury.js';
-import { FLOW_DIRECTIONS, type FlowDirection } from '#lib/types/domain.js';
+import { FLOW_DIRECTIONS, isOrderFinalized, type FlowDirection } from '#lib/types/domain.js';
 import { fail } from '@sveltejs/kit';
 import type { Actions, PageServerLoad } from './$types';
 
 // Dépenses et recettes (TRESO-F-20), avec leurs justificatifs (TRESO-F-30/31).
 //
-// Un flux `auto` naît du passage d'une commande : il reste modifiable et
-// supprimable (TRESO-F-23), mais tant qu'il n'est pas POINTÉ il se recale seul
-// sur le total de sa commande. Le pointer, c'est en prendre la responsabilité —
-// et c'est ce que l'écran dit.
+// Un flux `auto` naît du passage d'une commande. Tant qu'il n'est pas POINTÉ il
+// se recale seul sur le total de sa commande ; il ne se supprime pas d'ici, la
+// commande s'annule.
+//
+// Règles de rigueur comptable, portées par la base et rendues lisibles ici :
+//   - l'exercice d'un flux se déduit de sa date, et une date d'exercice clos est
+//     refusée (DVB41) ; celui d'un flux de commande est hérité de la commande ;
+//   - un flux pointé est figé, justificatifs compris, jusqu'à son dépointage (DVB42) ;
+//   - un flux de commande ne se pointe qu'une fois la commande finalisée (DVB43) ;
+//   - un exercice clos est en lecture seule, définitivement (DVB44).
+// Seule l'exigence d'un justificatif pour pointer une dépense est une règle
+// d'écran : elle admet une dérogation explicite, cochée par le trésorier.
 
 const ISO_DAY = /^\d{4}-\d{2}-\d{2}$/;
 const PROOF_TYPES = ['image/png', 'image/jpeg', 'application/pdf'];
 const PROOF_MAX_BYTES = 5 * 1024 * 1024;
+
+/** Découpage de la liste : exercice fiscal, ou année scolaire de septembre à août (#69). */
+type FlowView = 'fiscal' | 'school';
 
 function flowId(form: FormData): number | null {
 	const id = Number(form.get('id'));
@@ -27,28 +39,48 @@ export const load: PageServerLoad = async ({ locals, url, depends }) => {
 	depends('cash:flows');
 
 	const periodRows = await periods(locals.supabase);
+	const view: FlowView = url.searchParams.get('view') === 'school' ? 'school' : 'fiscal';
 	const requested = Number(url.searchParams.get('year'));
-	// Par défaut, l'exercice qui COUVRE aujourd'hui — et non le premier exercice
-	// ouvert. Les exercices sont listés du plus récent au plus ancien, et 2027
-	// est ouvert bien avant d'avoir le moindre mouvement : s'y poser d'office
-	// donnerait une page vide pour toute réponse.
+	// Par défaut, la période qui COUVRE aujourd'hui — et non la première période
+	// ouverte. Les périodes sont listées de la plus récente à la plus ancienne,
+	// et la suivante est ouverte bien avant d'avoir le moindre mouvement : s'y
+	// poser d'office donnerait une page vide pour toute réponse.
 	const today = new Date().toISOString().slice(0, 10);
+	const candidates = view === 'school' ? periodRows.schoolYears : periodRows.fiscalYears;
 	const current =
-		periodRows.fiscalYears.find((y) => y.startsOn <= today && today <= y.endsOn) ??
-		periodRows.fiscalYears.find((y) => !y.closedAt);
-	const fiscalYearId =
-		Number.isSafeInteger(requested) && requested > 0 ? requested : (current?.id ?? null);
+		periodFor(today, candidates) ?? candidates.find((period) => !period.closedAt) ?? null;
+	const selected =
+		(Number.isSafeInteger(requested) && requested > 0
+			? candidates.find((period) => period.id === requested)
+			: null) ?? current;
+
+	// Une année scolaire chevauche deux exercices : elle se filtre par dates.
+	const scope =
+		selected === null
+			? null
+			: view === 'school'
+				? { from: selected.startsOn, to: selected.endsOn }
+				: selected.id;
 
 	const year = await currentSchoolYear(locals.supabase);
 	const [flows, accountRows, leaves] = await Promise.all([
-		flowList(locals.supabase, fiscalYearId),
+		flowList(locals.supabase, scope),
 		accounts(locals.supabase),
 		year
 			? budgetLeaves(locals.supabase, year.id).then((r) => r.leaves)
 			: Promise.resolve([] as Awaited<ReturnType<typeof budgetLeaves>>['leaves'])
 	]);
 
-	return { flows, accounts: accountRows, leaves, periods: periodRows, fiscalYearId };
+	return {
+		flows,
+		accounts: accountRows,
+		leaves,
+		periods: periodRows,
+		view,
+		periodId: selected?.id ?? null,
+		// Conservé pour les écrans qui lisent encore l'exercice sélectionné.
+		fiscalYearId: view === 'fiscal' ? (selected?.id ?? null) : null
+	};
 };
 
 /** Champs communs à la création et à la modification d'un flux. */
@@ -58,7 +90,6 @@ function readFlow(form: FormData) {
 	const occurredOn = text(form, 'occurred_on');
 	const label = text(form, 'label');
 	const accountId = Number(form.get('account_id'));
-	const fiscalYearId = Number(form.get('fiscal_year_id'));
 	const rawBudget = text(form, 'budget_id');
 	const budgetId = rawBudget === '' ? null : Number(rawBudget);
 
@@ -74,8 +105,8 @@ function readFlow(form: FormData) {
 	if (label.length === 0) {
 		return { error: 'Le libellé est obligatoire.' as const };
 	}
-	if (!Number.isSafeInteger(accountId) || !Number.isSafeInteger(fiscalYearId)) {
-		return { error: 'Compte ou exercice invalide.' as const };
+	if (!Number.isSafeInteger(accountId)) {
+		return { error: 'Compte invalide.' as const };
 	}
 	if (budgetId !== null && !Number.isSafeInteger(budgetId)) {
 		return { error: 'Budget invalide.' as const };
@@ -88,10 +119,20 @@ function readFlow(form: FormData) {
 			occurred_on: occurredOn,
 			label,
 			account_id: accountId,
-			fiscal_year_id: fiscalYearId,
 			budget_id: budgetId
 		}
 	};
+}
+
+/** Ce qu'il faut savoir d'un flux avant d'y toucher. */
+async function flowState(supabase: App.Locals['supabase'], id: number) {
+	const { data } = await supabase
+		.schema('cash')
+		.from('flows')
+		.select('id, direction, order_id, is_reconciled, fiscal_year_id')
+		.eq('id', id)
+		.maybeSingle();
+	return data;
 }
 
 export const actions: Actions = {
@@ -102,10 +143,20 @@ export const actions: Actions = {
 			return fail(400, { message: parsed.error });
 		}
 
+		// L'exercice se déduit de la date (#77) : la base le recalcule de toute
+		// façon, on le calcule ici pour refuser une date d'exercice clos avec un
+		// message clair plutôt qu'un code.
+		const { fiscalYears } = await periods(locals.supabase);
+		const problem = fiscalYearProblem(parsed.values.occurred_on, fiscalYears);
+		const fiscalYear = periodFor(parsed.values.occurred_on, fiscalYears);
+		if (problem || !fiscalYear) {
+			return fail(400, { message: problem ?? 'Exercice introuvable.' });
+		}
+
 		const { error } = await locals.supabase
 			.schema('cash')
 			.from('flows')
-			.insert({ ...parsed.values, origin: 'manual' });
+			.insert({ ...parsed.values, fiscal_year_id: fiscalYear.id, origin: 'manual' });
 
 		if (error) {
 			return fail(400, {
@@ -133,10 +184,37 @@ export const actions: Actions = {
 			return fail(400, { message: parsed.error });
 		}
 
+		const flow = await flowState(locals.supabase, id);
+		if (!flow) {
+			return fail(404, { message: 'Mouvement introuvable.' });
+		}
+		if (flow.is_reconciled) {
+			return fail(409, {
+				message: 'Ce mouvement est pointé : dépointez-le avant de le modifier.'
+			});
+		}
+
+		// Un flux de commande garde l'exercice de sa commande (#91) : on ne
+		// l'envoie pas, et la base le fige de toute façon. Les autres suivent leur date.
+		let fiscalYearId: number | undefined;
+		if (flow.order_id === null) {
+			const { fiscalYears } = await periods(locals.supabase);
+			const problem = fiscalYearProblem(parsed.values.occurred_on, fiscalYears);
+			const fiscalYear = periodFor(parsed.values.occurred_on, fiscalYears);
+			if (problem || !fiscalYear) {
+				return fail(400, { message: problem ?? 'Exercice introuvable.' });
+			}
+			fiscalYearId = fiscalYear.id;
+		}
+
 		const { error } = await locals.supabase
 			.schema('cash')
 			.from('flows')
-			.update(parsed.values)
+			.update(
+				fiscalYearId === undefined
+					? parsed.values
+					: { ...parsed.values, fiscal_year_id: fiscalYearId }
+			)
 			.eq('id', id);
 
 		if (error) {
@@ -154,6 +232,23 @@ export const actions: Actions = {
 		const id = flowId(form);
 		if (id === null) {
 			return fail(400, { message: 'Mouvement invalide.' });
+		}
+
+		const flow = await flowState(locals.supabase, id);
+		if (!flow) {
+			return fail(404, { message: 'Mouvement introuvable.' });
+		}
+		// #70 — le règlement d'une commande ne se supprime pas d'ici : sa somme
+		// doit rester égale au dû (`flows_guard`). C'est la commande qui s'annule.
+		if (flow.order_id !== null) {
+			return fail(409, {
+				message: 'Ce mouvement règle une commande : annulez la commande plutôt que de le supprimer.'
+			});
+		}
+		if (flow.is_reconciled) {
+			return fail(409, {
+				message: 'Ce mouvement est pointé : dépointez-le avant de le supprimer.'
+			});
 		}
 
 		// Les justificatifs partent avec le flux : un fichier orphelin dans le
@@ -181,11 +276,12 @@ export const actions: Actions = {
 	},
 
 	/**
-	 * Pointage d'un flux.
+	 * Pointage d'un flux, et dépointage.
 	 *
 	 * Sur un flux issu d'une commande, c'est aussi ce qui le fige : `sync_order_flows`
-	 * ne recale plus un flux pointé. Le trésorier prend donc la responsabilité du
-	 * montant en confirmant qu'il l'a confronté au réel.
+	 * ne recale plus un flux pointé. Il faut donc que la commande soit finalisée
+	 * (#94). Une dépense sans justificatif ne se pointe que sur dérogation
+	 * explicite (`force`, #72).
 	 */
 	toggleReconciled: async ({ locals, request }) => {
 		const form = await request.formData();
@@ -193,18 +289,60 @@ export const actions: Actions = {
 		if (id === null) {
 			return fail(400, { message: 'Mouvement invalide.' });
 		}
+		const reconcile = text(form, 'reconciled') === '1';
+
+		if (reconcile) {
+			const flow = await flowState(locals.supabase, id);
+			if (!flow) {
+				return fail(404, { message: 'Mouvement introuvable.' });
+			}
+			if (flow.order_id !== null) {
+				const { data: order } = await locals.supabase
+					.schema('cash')
+					.from('orders')
+					.select('state')
+					.eq('id', flow.order_id)
+					.maybeSingle();
+				if (order && !isOrderFinalized(order.state)) {
+					return fail(409, {
+						message: "Impossible de pointer : la commande doit d'abord être finalisée."
+					});
+				}
+			}
+			if (flow.direction === 'debit' && text(form, 'force') !== '1') {
+				const { count } = await locals.supabase
+					.schema('cash')
+					.from('flow_proofs')
+					.select('id', { count: 'exact', head: true })
+					.eq('flow_id', id);
+				if (!count) {
+					return fail(409, {
+						message:
+							"Cette dépense n'a aucun justificatif : déposez-en un, ou cochez « Forcer le pointage sans justificatif ».",
+						unproven: id
+					});
+				}
+			}
+		}
 
 		const { error } = await locals.supabase
 			.schema('cash')
 			.from('flows')
-			.update({ is_reconciled: text(form, 'reconciled') === '1' })
+			.update({ is_reconciled: reconcile })
 			.eq('id', id);
 
 		if (error) {
 			return fail(400, {
-				message: await rejection(locals.supabase, error, "Ce mouvement n'a pas pu être pointé.", {
-					entityType: 'flow'
-				})
+				message: await rejection(
+					locals.supabase,
+					error,
+					reconcile
+						? "Ce mouvement n'a pas pu être pointé."
+						: "Ce mouvement n'a pas pu être dépointé.",
+					{
+						entityType: 'flow'
+					}
+				)
 			});
 		}
 		return { saved: 'flow' };
@@ -227,6 +365,15 @@ export const actions: Actions = {
 		}
 		if (file.size > PROOF_MAX_BYTES) {
 			return fail(400, { message: 'Le fichier dépasse 5 Mo.' });
+		}
+
+		// Vérifié avant le dépôt : un fichier envoyé pour rien resterait dans le
+		// bucket le temps qu'on le retire.
+		const flow = await flowState(locals.supabase, id);
+		if (flow?.is_reconciled) {
+			return fail(409, {
+				message: 'Ce mouvement est pointé : dépointez-le avant de toucher à ses justificatifs.'
+			});
 		}
 
 		// Nom aléatoire : deux justificatifs peuvent porter le même nom d'origine,

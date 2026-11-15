@@ -50,6 +50,16 @@
 	let chosenCampus = $state<Campus | ''>('');
 	let lines = $state<Line[]>([emptyLine()]);
 	let submitting = $state(false);
+	// Le navigateur valide seul les champs `required`, mais pas les tags : ce sont
+	// des puces, sans champ natif à rendre obligatoire. On le fait à l'envoi, et
+	// on ne souligne les lignes fautives qu'après une première tentative.
+	let attempted = $state(false);
+	const untagged = $derived(lines.filter((line) => line.tags.length === 0).map((line) => line.id));
+	const clientMessage = $derived(
+		attempted && untagged.length > 0
+			? "Choisissez au moins un tag d'équipe pour chaque composant."
+			: null
+	);
 
 	const project = $derived(data.projects.find((p) => p.id === projectId) ?? null);
 
@@ -135,17 +145,24 @@
 			</p>
 		{/if}
 
-		{#if form?.message}
+		{#if clientMessage ?? form?.message}
 			<p
 				class="mb-4 rounded-xl bg-red-500/15 px-4 py-3 text-sm text-red-300 ring-1 ring-red-500/30"
+				role="alert"
 			>
-				{form.message}
+				{clientMessage ?? form?.message}
 			</p>
 		{/if}
 
 		<form
+			enctype="multipart/form-data"
 			method="POST"
-			use:enhance={() => {
+			use:enhance={({ cancel }) => {
+				attempted = true;
+				if (untagged.length > 0) {
+					cancel();
+					return;
+				}
 				submitting = true;
 				return async ({ update }) => {
 					await update();
@@ -253,6 +270,7 @@
 									name="link"
 									class="border-rule-strong bg-dark-blue/60 w-full rounded-lg border p-2 text-white"
 									placeholder="https://eu.mouser.com/…"
+									required
 									type="url"
 									bind:value={line.link}
 								/>
@@ -287,8 +305,12 @@
 
 						<div class="mt-3 grid gap-3 sm:grid-cols-12">
 							<div class="sm:col-span-4">
-								<span class="text-dark-light-blue mb-1 block text-xs">Tags</span>
-								<div class="flex flex-wrap gap-2">
+								<span class="text-dark-light-blue mb-1 block text-xs">Tags de l'équipe</span>
+								<div
+									class="flex flex-wrap gap-2 rounded-lg {attempted && untagged.includes(line.id)
+										? 'ring-1 ring-red-500/60 ring-offset-4 ring-offset-transparent'
+										: ''}"
+								>
 									{#each ITEM_TAGS as tag (tag)}
 										<FilterChip
 											onclick={() => {
@@ -319,6 +341,20 @@
 								/>
 							</label>
 						</div>
+
+						<!-- #63 — BOM, projet KiCad, devis : un fichier par composant. Le champ
+						     reste présent même vide, pour que chaque fichier retrouve sa ligne. -->
+						<label class="mt-3 block">
+							<span class="text-dark-light-blue mb-1 block text-xs">
+								Pièce jointe (facultative : BOM, fichier KiCad, PDF, 20 Mo maximum)
+							</span>
+							<input
+								name="attachment"
+								class="text-dark-light-blue file:border-rule-strong file:bg-dark-blue/60 file:text-light-blue text-xs file:mr-3 file:rounded-lg file:border file:px-3 file:py-1.5"
+								accept={data.attachmentAccept}
+								type="file"
+							/>
+						</label>
 
 						<div class="mt-3 flex items-center justify-between">
 							<span class="text-dark-light-blue text-sm">

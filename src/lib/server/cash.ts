@@ -428,3 +428,80 @@ export async function reviewQueue(
 		createdAt: i.created_at
 	}));
 }
+
+/** Budget d'un projet vu par son CDP depuis la file de revue (#64). */
+export interface ReviewBudget {
+	projectId: number;
+	budgetName: string;
+	allocatedTtc: number;
+	/**
+	 * Déjà validé : ce qui est imputé sur le budget (items en commande, port
+	 * compris) plus les items validés qui attendent leur regroupement.
+	 */
+	validatedTtc: number;
+}
+
+/**
+ * Ce que chaque projet a déjà validé face à son budget. Purement informatif : le
+ * CDP reste décisionnaire et un dépassement ne bloque jamais sa validation, le
+ * point de contrôle est chez le trésorier (CMD-F-53).
+ */
+export async function reviewBudgets(
+	supabase: Client,
+	projects: ScopedProject[],
+	schoolYearId: number
+): Promise<ReviewBudget[]> {
+	const funded = projects.filter(
+		(p): p is ScopedProject & { budgetId: number } => p.budgetId !== null
+	);
+	if (funded.length === 0) {
+		return [];
+	}
+
+	const [{ data: budgets }, { data: waiting }] = await Promise.all([
+		supabase
+			.schema('cash')
+			.from('budget_consumption')
+			.select('budget_id, name, allocated_ttc, consumed_ttc')
+			.in(
+				'budget_id',
+				funded.map((p) => p.budgetId)
+			),
+		supabase
+			.schema('cash')
+			.from('items')
+			.select('project_id, total_ttc')
+			.eq('school_year_id', schoolYearId)
+			.eq('state', 'pending_bundled')
+			.in(
+				'project_id',
+				funded.map((p) => p.id)
+			)
+	]);
+
+	const byBudget = new Map((budgets ?? []).map((b) => [num(b.budget_id), b]));
+	const waitingByProject = new Map<number, number>();
+	for (const row of waiting ?? []) {
+		waitingByProject.set(
+			row.project_id,
+			(waitingByProject.get(row.project_id) ?? 0) + num(row.total_ttc)
+		);
+	}
+
+	return funded.flatMap((project) => {
+		const budget = byBudget.get(project.budgetId);
+		if (!budget) {
+			return [];
+		}
+		return [
+			{
+				projectId: project.id,
+				budgetName: str(budget.name),
+				allocatedTtc: num(budget.allocated_ttc),
+				validatedTtc:
+					Math.round((num(budget.consumed_ttc) + (waitingByProject.get(project.id) ?? 0)) * 100) /
+					100
+			}
+		];
+	});
+}
