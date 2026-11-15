@@ -1,3 +1,4 @@
+import { attachmentsOf } from '#lib/server/attachments.js';
 import { rejection } from '#lib/server/audit.js';
 import {
 	currentSchoolYear,
@@ -44,8 +45,17 @@ export const load: PageServerLoad = async ({ locals, depends }) => {
 		reviewQueue(locals.supabase, projects),
 		schoolYear ? reviewBudgets(locals.supabase, projects, schoolYear.id) : Promise.resolve([])
 	]);
+	// #63 — le CDP statue en ayant la BOM ou le fichier KiCad sous la main.
+	const attachments = await attachmentsOf(
+		locals.supabase,
+		items.map((item) => item.id)
+	);
 
-	return { projects, items, budgets };
+	return {
+		projects,
+		items: items.map((item) => ({ ...item, attachments: attachments.get(item.id) ?? [] })),
+		budgets
+	};
 };
 
 export const actions: Actions = {

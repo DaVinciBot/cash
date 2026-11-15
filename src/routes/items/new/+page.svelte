@@ -155,6 +155,7 @@
 		{/if}
 
 		<form
+			enctype="multipart/form-data"
 			method="POST"
 			use:enhance={({ cancel }) => {
 				attempted = true;
@@ -340,6 +341,20 @@
 								/>
 							</label>
 						</div>
+
+						<!-- #63 — BOM, projet KiCad, devis : un fichier par composant. Le champ
+						     reste présent même vide, pour que chaque fichier retrouve sa ligne. -->
+						<label class="mt-3 block">
+							<span class="text-dark-light-blue mb-1 block text-xs">
+								Pièce jointe (facultative : BOM, fichier KiCad, PDF, 20 Mo maximum)
+							</span>
+							<input
+								name="attachment"
+								class="text-dark-light-blue file:border-rule-strong file:bg-dark-blue/60 file:text-light-blue text-xs file:mr-3 file:rounded-lg file:border file:px-3 file:py-1.5"
+								accept={data.attachmentAccept}
+								type="file"
+							/>
+						</label>
 
 						<div class="mt-3 flex items-center justify-between">
 							<span class="text-dark-light-blue text-sm">

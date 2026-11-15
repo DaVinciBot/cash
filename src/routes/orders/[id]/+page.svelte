@@ -17,7 +17,7 @@
 		SHIPPING_ALLOCATION_LABELS,
 		SHIPPING_ALLOCATIONS
 	} from '#lib/types/domain.js';
-	import { Check, Copy } from '@lucide/svelte';
+	import { Check, Copy, Paperclip } from '@lucide/svelte';
 	import { untrack } from 'svelte';
 	import type { ActionData, PageData } from './$types';
 
@@ -519,6 +519,25 @@
 						</p>
 						<!-- CMD-F-0B — la note reste visible sans déplier : c'est par elle
 						     que passe une demande de livraison exceptionnelle. -->
+						{#if (data.attachments[item.id] ?? []).length > 0}
+							<p class="mt-2 flex flex-wrap items-center gap-2 text-xs">
+								<Paperclip class="text-dark-light-blue size-3.5" />
+								{#each data.attachments[item.id] ?? [] as attachment (attachment.id)}
+									{#if attachment.url}
+										<!-- eslint-disable svelte/no-navigation-without-resolve -- URL signée du bucket de stockage -->
+										<a
+											class="text-sky-400 hover:underline"
+											href={attachment.url}
+											rel="noopener noreferrer"
+											target="_blank">{attachment.filename}</a
+										>
+										<!-- eslint-enable svelte/no-navigation-without-resolve -->
+									{:else}
+										<span class="text-light-blue">{attachment.filename}</span>
+									{/if}
+								{/each}
+							</p>
+						{/if}
 						{#if item.note}
 							<p class="bg-dark-blue/40 text-dark-light-blue mt-2 rounded px-2 py-1 text-sm">
 								{item.note}
