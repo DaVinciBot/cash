@@ -4,6 +4,7 @@ import {
 	ADMIN_MENU,
 	canAccessAdminPath,
 	filterMenuByPermissions,
+	flattenMenu,
 	hasAnyPermission,
 	normalizePath
 } from '@davincibot/lib';
@@ -76,13 +77,13 @@ describe('permissions helpers', () => {
 	});
 
 	it('ADMIN_MENU expose la liste des commandes aux seuls lecteurs de commandes', () => {
-		const pourMembre = filterMenuByPermissions(ADMIN_MENU, ['orders.items.manage.self']).map(
-			(item) => item.uri
-		);
-		const pourTresorier = filterMenuByPermissions(ADMIN_MENU, [
-			'orders.read.all',
-			'orders.bundle.manage'
-		]).map((item) => item.uri);
+		// Le menu est groupé : on déplie les groupes pour lire chaque entrée.
+		const pourMembre = flattenMenu(
+			filterMenuByPermissions(ADMIN_MENU, ['orders.items.manage.self'])
+		).map((item) => item.uri);
+		const pourTresorier = flattenMenu(
+			filterMenuByPermissions(ADMIN_MENU, ['orders.read.all', 'orders.bundle.manage'])
+		).map((item) => item.uri);
 
 		expect(pourMembre).not.toContain('/admin/orders');
 		expect(pourMembre).not.toContain('/admin/bundle');

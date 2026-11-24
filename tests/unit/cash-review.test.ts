@@ -10,6 +10,7 @@ import {
 	ADMIN_MENU,
 	canAccessAdminPath,
 	filterMenuByPermissions,
+	flattenMenu,
 	type EffectivePermission
 } from '@davincibot/lib';
 
@@ -51,8 +52,11 @@ describe('ouverture de la file aux permissions scopées-projet', () => {
 	// La revue est une permission projet : gérée comme une permission globale,
 	// son entrée de menu serait inatteignable pour tout le monde.
 	it("affiche l'entrée de menu à un CDP et la cache aux autres", () => {
-		const pourCdp = filterMenuByPermissions(ADMIN_MENU, cdp).map((entry) => entry.uri);
-		const pourMembre = filterMenuByPermissions(ADMIN_MENU, membre).map((entry) => entry.uri);
+		// Le menu est groupé : on déplie les groupes pour lire chaque entrée.
+		const pourCdp = flattenMenu(filterMenuByPermissions(ADMIN_MENU, cdp)).map((entry) => entry.uri);
+		const pourMembre = flattenMenu(filterMenuByPermissions(ADMIN_MENU, membre)).map(
+			(entry) => entry.uri
+		);
 		expect(pourCdp).toContain('/admin/review');
 		expect(pourMembre).not.toContain('/admin/review');
 	});

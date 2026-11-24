@@ -16,12 +16,7 @@
 		matchProfiles
 	} from '#lib/helpers/trainingForms.js';
 	import { categoryOptions, statusOptions } from '#lib/helpers/trainingOptions.js';
-	import {
-		createSlotTableItems,
-		createTrainingTableItems,
-		findTrainingName,
-		formatSlotDate
-	} from '#lib/helpers/trainingTables.js';
+	import { createSlotTableItems, createTrainingTableItems } from '#lib/helpers/trainingTables.js';
 	import type { TableCell, TableRow } from '@davincibot/components';
 	import type { StateBadge as StateBadgeData } from '@davincibot/lib';
 	import type { CrudField } from '#lib/types/crud.js';
