@@ -272,17 +272,17 @@
 						>{row.archivedAt ? 'Réactiver' : 'Archiver'}</Button
 					>
 				</form>
-                {#if row.itemCount === 0}
-                    <Button
-                            class="w-full justify-start"
-                            onclick={() => {
-						removing = row;
-						close();
-					}}
-                            size="sm"
-                            variant="danger">Supprimer</Button
-                    >
-                {/if}
+				{#if row.itemCount === 0}
+					<Button
+						class="w-full justify-start"
+						onclick={() => {
+							removing = row;
+							close();
+						}}
+						size="sm"
+						variant="danger">Supprimer</Button
+					>
+				{/if}
 			{/if}
 		{/snippet}
 	</RowMenu>
