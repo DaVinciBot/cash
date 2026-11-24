@@ -153,6 +153,8 @@ export const load: LayoutServerLoad = async ({ locals, cookies, depends, url }) 
 					.from('projects')
 					.select('id, name, campus')
 					.is('archived_at', null)
+					// Asso (cash#55) : rattachement automatique, absent des choix manuels.
+					.filter('auto_membership', 'eq', false)
 					.order('name');
 				if (!projectsError) {
 					userProfile.allProjects = allProjects.map((p) => ({
