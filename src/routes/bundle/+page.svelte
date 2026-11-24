@@ -85,8 +85,14 @@
 	const reasonError = $derived(reason.length > 0 ? refusalReasonError(reason) : null);
 	const failure = $derived(form && 'message' in form ? form.message : null);
 	const outcome = $derived(
-		form && 'refused' in form ? `${String(form.refused)} item(s) refusé(s).` : null
+		form && 'refused' in form
+			? `${String(form.refused)} item(s) refusé(s).`
+			: form && 'fastTracked' in form
+				? `${String(form.fastTracked)} item(s) validé(s) en urgence : leur CDP est prévenu par mail.`
+				: null
 	);
+	// #100 — item en attente du CDP dont la validation d'urgence attend confirmation.
+	let fastTracking = $state<number | null>(null);
 
 	function waitingDays(iso: string | null): number | null {
 		if (!iso) {
@@ -296,6 +302,14 @@
 											<span class="truncate font-medium text-white">{item.name}</span>
 										{/if}
 										<CampusBadge campus={item.campus} />
+										{#if item.fastTrack}
+											<span
+												class="rounded-full bg-orange-500/15 px-2 py-0.5 text-xs text-orange-300 ring-1 ring-orange-500/30"
+												title="Validé par {item.fastTrack.byName} le {day.format(
+													new Date(item.fastTrack.at)
+												)}, sans revue du CDP">Validation d'urgence</span
+											>
+										{/if}
 									</div>
 									<p class="text-dark-light-blue mt-1 text-sm">
 										{item.projectName} · {item.requesterName} · {item.quantity} × {euro.format(
@@ -326,5 +340,75 @@
 				</ul>
 			</div>
 		{/each}
+	{/if}
+
+	<!-- #62 — anticiper : les demandes que les CDP n'ont pas encore tranchées. Elles
+	     ne se regroupent pas, d'où une section à part, en retrait et sans case. -->
+	{#if data.upcoming.length > 0}
+		{@const upcomingTotal = data.upcoming.reduce((sum, item) => sum + item.totalTtc, 0)}
+		<div class="mt-10">
+			<div class="mb-3 flex flex-wrap items-baseline justify-between gap-2">
+				<h2 class="text-dark-light-blue text-sm font-semibold tracking-wide uppercase">
+					À venir : en attente de validation CDP ({data.upcoming.length})
+				</h2>
+				<span class="text-dark-light-blue text-sm"
+					>{euro.format(upcomingTotal)} de décaissements possibles</span
+				>
+			</div>
+			<ul class="space-y-2">
+				{#each data.upcoming as item (item.id)}
+					<li
+						class="border-rule flex flex-wrap items-center gap-3 rounded-2xl border border-dashed px-4 py-3 text-sm"
+					>
+						<span
+							class="rounded-full bg-slate-500/20 px-2 py-0.5 text-xs text-slate-300 ring-1 ring-slate-500/30"
+							>En attente du CDP</span
+						>
+						<span class="min-w-0 flex-1 truncate text-white">{item.name}</span>
+						<CampusBadge campus={item.campus} />
+						<span class="text-dark-light-blue">{item.projectName} · {item.requesterName}</span>
+						<span class="text-light-blue font-medium">{euro.format(item.totalTtc)}</span>
+						<span class="text-dark-light-blue/70 text-xs"
+							>demandé le {day.format(new Date(item.createdAt))}</span
+						>
+						<Button
+							onclick={() => (fastTracking = fastTracking === item.id ? null : item.id)}
+							size="sm"
+							variant="secondary">Valider en urgence</Button
+						>
+						{#if fastTracking === item.id}
+							<!-- #100 — la validation d'urgence se confirme : elle se fait à la place du CDP. -->
+							<form
+								class="w-full rounded-lg border border-orange-500/40 bg-orange-500/5 p-3"
+								action="?/fastTrack"
+								method="POST"
+								use:enhance={() =>
+									({ update }) => {
+										fastTracking = null;
+										return update();
+									}}
+							>
+								<input name="id" type="hidden" value={item.id} />
+								<p class="text-sm text-orange-200">
+									Valider en urgence « {item.name} » ({euro.format(item.totalTtc)}) sur
+									{item.projectName}, sans attendre son CDP ?
+								</p>
+								<p class="text-dark-light-blue mt-1 text-xs">
+									L'item rejoint la file de regroupement avec un badge « Validation d'urgence ». La
+									validation est tracée à votre nom, et le CDP du projet est prévenu par mail que la
+									dépense a été imputée sur son budget.
+								</p>
+								<div class="mt-3 flex items-center gap-2">
+									<Button size="sm" type="submit" variant="primary">Confirmer la validation</Button>
+									<Button onclick={() => (fastTracking = null)} size="sm" variant="secondary"
+										>Annuler</Button
+									>
+								</div>
+							</form>
+						{/if}
+					</li>
+				{/each}
+			</ul>
+		</div>
 	{/if}
 </section>

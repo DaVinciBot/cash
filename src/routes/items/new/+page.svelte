@@ -1,9 +1,10 @@
 <script lang="ts">
-	import { Button, FilterChip } from '@davincibot/components';
+	import { Button, Checkbox, FilterChip } from '@davincibot/components';
 	import { enhance } from '$app/forms';
 	import { resolve } from '$app/paths';
 	import { CAMPUS_BADGES, type Campus } from '@davincibot/lib';
 	import { ITEM_TAGS, type ItemTag } from '#lib/types/domain.js';
+	import { promoCodesFor } from '#lib/promoCodes.js';
 	import { untrack } from 'svelte';
 	import type { ActionData, PageData } from './$types';
 
@@ -50,6 +51,16 @@
 	let chosenCampus = $state<Campus | ''>('');
 	let lines = $state<Line[]>([emptyLine()]);
 	let submitting = $state(false);
+	// Le navigateur valide seul les champs `required`, mais pas les tags : ce sont
+	// des puces, sans champ natif à rendre obligatoire. On le fait à l'envoi, et
+	// on ne souligne les lignes fautives qu'après une première tentative.
+	let attempted = $state(false);
+	const untagged = $derived(lines.filter((line) => line.tags.length === 0).map((line) => line.id));
+	const clientMessage = $derived(
+		attempted && untagged.length > 0
+			? "Choisissez au moins un tag d'équipe pour chaque composant."
+			: null
+	);
 
 	const project = $derived(data.projects.find((p) => p.id === projectId) ?? null);
 
@@ -104,6 +115,7 @@
 	}
 
 	const euro = new Intl.NumberFormat('fr-FR', { style: 'currency', currency: 'EUR' });
+	const today = new Date().toISOString().slice(0, 10);
 </script>
 
 <svelte:head><title>Faire une commande — DaVinciBot</title></svelte:head>
@@ -135,17 +147,24 @@
 			</p>
 		{/if}
 
-		{#if form?.message}
+		{#if clientMessage ?? form?.message}
 			<p
 				class="mb-4 rounded-xl bg-red-500/15 px-4 py-3 text-sm text-red-300 ring-1 ring-red-500/30"
+				role="alert"
 			>
-				{form.message}
+				{clientMessage ?? form?.message}
 			</p>
 		{/if}
 
 		<form
+			enctype="multipart/form-data"
 			method="POST"
-			use:enhance={() => {
+			use:enhance={({ cancel }) => {
+				attempted = true;
+				if (untagged.length > 0) {
+					cancel();
+					return;
+				}
 				submitting = true;
 				return async ({ update }) => {
 					await update();
@@ -253,6 +272,7 @@
 									name="link"
 									class="border-rule-strong bg-dark-blue/60 w-full rounded-lg border p-2 text-white"
 									placeholder="https://eu.mouser.com/…"
+									required
 									type="url"
 									bind:value={line.link}
 								/>
@@ -285,10 +305,27 @@
 							</label>
 						</div>
 
+						{#each promoCodesFor(line.link, data.promoCodes, today) as promo (promo.id)}
+							<!-- #98 — un code existe pour ce site : le dire avant la commande, pas après. -->
+							<p
+								class="mt-3 rounded-lg bg-amber-500/10 px-3 py-2 text-sm text-amber-200 ring-1 ring-amber-500/30"
+								role="note"
+							>
+								L'association dispose d'un code promo pour {promo.supplier} :
+								<span class="font-mono font-semibold text-white">{promo.code}</span>
+								({promo.discount}{promo.conditions ? ` — ${promo.conditions}` : ''}). Indiquez-le en
+								note pour la trésorerie.
+							</p>
+						{/each}
+
 						<div class="mt-3 grid gap-3 sm:grid-cols-12">
 							<div class="sm:col-span-4">
-								<span class="text-dark-light-blue mb-1 block text-xs">Tags</span>
-								<div class="flex flex-wrap gap-2">
+								<span class="text-dark-light-blue mb-1 block text-xs">Tags de l'équipe</span>
+								<div
+									class="flex flex-wrap gap-2 rounded-lg {attempted && untagged.includes(line.id)
+										? 'ring-1 ring-red-500/60 ring-offset-4 ring-offset-transparent'
+										: ''}"
+								>
 									{#each ITEM_TAGS as tag (tag)}
 										<FilterChip
 											onclick={() => {
@@ -320,6 +357,20 @@
 							</label>
 						</div>
 
+						<!-- #63 — BOM, projet KiCad, devis : un fichier par composant. Le champ
+						     reste présent même vide, pour que chaque fichier retrouve sa ligne. -->
+						<label class="mt-3 block">
+							<span class="text-dark-light-blue mb-1 block text-xs">
+								Pièce jointe (facultative : BOM, fichier KiCad, PDF, 20 Mo maximum)
+							</span>
+							<input
+								name="attachment"
+								class="text-dark-light-blue file:border-rule-strong file:bg-dark-blue/60 file:text-light-blue text-xs file:mr-3 file:rounded-lg file:border file:px-3 file:py-1.5"
+								accept={data.attachmentAccept}
+								type="file"
+							/>
+						</label>
+
 						<div class="mt-3 flex items-center justify-between">
 							<span class="text-dark-light-blue text-sm">
 								Total ligne : {euro.format(lineTotal(line))}
@@ -335,6 +386,23 @@
 					</fieldset>
 				{/each}
 			</div>
+
+			{#if data.treasurer}
+				<!-- #100 — le trésorier peut valider sa propre demande sans attendre le CDP. -->
+				<label
+					class="mt-4 flex items-start gap-2 rounded-lg bg-orange-500/5 px-4 py-3 text-sm ring-1 ring-orange-500/30"
+				>
+					<Checkbox name="fast_track" className="mt-0.5 size-4" value="1" />
+					<span>
+						<span class="text-orange-200">Valider en urgence</span>
+						<span class="text-dark-light-blue block text-xs">
+							La demande part directement dans la file de regroupement, avec un badge « Validation
+							d'urgence ». La validation est tracée à votre nom et le CDP du projet est prévenu par
+							mail.
+						</span>
+					</span>
+				</label>
+			{/if}
 
 			<div class="mt-4 flex flex-wrap items-center justify-between gap-3">
 				<Button onclick={addLine} size="md" variant="secondary">+ Ajouter un composant</Button>

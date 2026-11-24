@@ -49,9 +49,9 @@
 		"vitest": "^5.0.3"
 	},
 	"dependencies": {
-		"@davincibot/components": "^8.2.1",
+		"@davincibot/components": "^8.3.0",
 		"@davincibot/database-types": "^4.11.0",
-		"@davincibot/lib": "^7.0.0",
+		"@davincibot/lib": "^7.1.0",
 		"@lucide/svelte": "^1.52.0",
 		"@simplewebauthn/browser": "^14.0.0",
 		"@supabase/phoenix": "^0.4.5",

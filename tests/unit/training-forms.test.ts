@@ -7,7 +7,10 @@ vi.mock('@davincibot/lib', () => ({
 import {
 	buildSlotFields,
 	buildSummaryFields,
-	buildTrainingFields
+	buildTrainingFields,
+	defaultAnnouncementWeek,
+	matchProfiles,
+	searchKey
 } from '../../src/lib/helpers/trainingForms';
 
 describe('training form helpers', () => {
@@ -115,5 +118,47 @@ describe('training form helpers', () => {
 		trainerField?.onSelect?.('trainer-2');
 		expect(onTrainerChange).toHaveBeenLastCalledWith('trainer-2');
 		expect(startField?.value).toBe('local:2025-01-10T10:00:00.000Z');
+	});
+});
+
+describe('recherche de formateur·ice (#35)', () => {
+	const profiles = [
+		{ username: 'Élodie Martin' },
+		{ username: 'François Dupont' },
+		{ username: 'Zoé' },
+		{ username: null }
+	];
+
+	it('ignore les accents et la casse', () => {
+		expect(matchProfiles(profiles, 'elodie').map((p) => p.username)).toEqual(['Élodie Martin']);
+		expect(matchProfiles(profiles, 'FRANCOIS').map((p) => p.username)).toEqual(['François Dupont']);
+		expect(matchProfiles(profiles, 'zoe').map((p) => p.username)).toEqual(['Zoé']);
+	});
+
+	it('ne renvoie rien pour une recherche vide et borne le nombre de résultats', () => {
+		expect(matchProfiles(profiles, '  ')).toEqual([]);
+		expect(matchProfiles(profiles, 'o', 2)).toHaveLength(2);
+	});
+
+	it('normalise une chaîne', () => {
+		expect(searchKey('  Ça   va  ')).toBe('ca va');
+	});
+});
+
+describe('semaine annoncée par défaut (#39)', () => {
+	it('propose la semaine qui commence un lundi', () => {
+		expect(defaultAnnouncementWeek(new Date(2026, 10, 9))).toEqual({
+			from: '2026-11-09',
+			to: '2026-11-13'
+		});
+	});
+
+	it('propose la semaine suivante les autres jours', () => {
+		// mercredi 11 et dimanche 15 novembre 2026
+		expect(defaultAnnouncementWeek(new Date(2026, 10, 11)).from).toBe('2026-11-16');
+		expect(defaultAnnouncementWeek(new Date(2026, 10, 15))).toEqual({
+			from: '2026-11-16',
+			to: '2026-11-20'
+		});
 	});
 });
